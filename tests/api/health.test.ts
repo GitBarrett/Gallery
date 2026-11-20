@@ -8,7 +8,7 @@ await setup({ server: true, browser: false })
 
 describe('platform API', () => {
   it('GET /api/health answers ok', async () => {
-    expect(HealthResponse.parse(await $fetch('/api/health'))).toEqual({ status: 'ok' })
+    expect(HealthResponse.parse(await $fetch('/api/health'))).toEqual({ status: 'ok', checks: {} })
   })
 
   it('an unknown API route answers 404 in the common error format, with the cf-ray correlation id', async () => {

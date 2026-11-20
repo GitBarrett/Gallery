@@ -5,7 +5,11 @@ const valid = { NUXT_PUBLIC_SITE_URL: 'https://legendaryshots.example', NUXT_FAK
 
 describe('loadConfig', () => {
   it('returns a typed config from valid variables', () => {
-    expect(loadConfig(valid)).toEqual({ siteUrl: 'https://legendaryshots.example', fakeProviders: false })
+    expect(loadConfig(valid)).toEqual({
+      siteUrl: 'https://legendaryshots.example',
+      fakeProviders: false,
+      deployEnv: 'local',
+    })
   })
 
   it('fails at startup when a required variable is missing, naming it', () => {
@@ -18,5 +22,12 @@ describe('loadConfig', () => {
 
   it('rejects anything but true or false for the fake providers flag', () => {
     expect(() => loadConfig({ ...valid, NUXT_FAKE_PROVIDERS: 'yes' })).toThrow(/NUXT_FAKE_PROVIDERS/)
+  })
+
+  it('refuses to start in production with the fake providers', () => {
+    expect(() => loadConfig({ ...valid, NUXT_DEPLOY_ENV: 'production', NUXT_FAKE_PROVIDERS: 'true' })).toThrow(
+      /NUXT_FAKE_PROVIDERS/,
+    )
+    expect(loadConfig({ ...valid, NUXT_DEPLOY_ENV: 'preview', NUXT_FAKE_PROVIDERS: 'true' }).fakeProviders).toBe(true)
   })
 })
