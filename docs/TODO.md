@@ -1,6 +1,6 @@
 # TODO — Legendary Shots
 
-Mémoire partagée entre Adrien et Claude Code. Date de dernière mise à jour : 2026-11-18. Specs à jour (63 stories, 274 critères, 68 tâches). Reste : maquettes et placeholders du canevas, non encore faits.
+Mémoire partagée entre Adrien et Claude Code. Date de dernière mise à jour : 2026-11-18. Specs à jour (63 stories, 274 critères, 104 tâches dont 96 à faire après la phase T-00, plan redécoupé le 20/11/2026). Reste : maquettes et placeholders du canevas, non encore faits.
 
 ## À faire dans le pack (avant de lancer le code)
 
