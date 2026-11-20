@@ -149,6 +149,6 @@ Une ligne par groupe de routes de `03-architecture.md` § Inventaire ; le test d
 | `POST /api/bug-reports` | ✓ (« I can't sign in » seule) | ✓ (« I can't sign in » seule) | ✓ | — | ✓ | ✓ | ✓ |
 | `/api/admin/moderation/*`, `/appeals/*` (v1.x, T-71), `/reports/*`, `/users` (recherche), `/sanctions/*` (avertissement, suspension) | 401 | 403 | 403 | 403 | 403 | ✓ (MFA ; recours : jamais l'auteur de la décision) | ✓ (MFA) |
 | `/api/admin/sanctions/*` (bannissement, levée) | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA + réauth) |
-| `/api/admin/users/{id}/role`, `/settings`, `/legal` | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA + réauth) |
+| `/api/admin/users/{id}/role`, `/settings`, `/legal` (v1.x, T-70) | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA + réauth) |
 | `/api/admin/game-versions/*`, `/zones/*`, `/invites/*`, `/waitlist`, `/audit`, `/bug-reports/*` | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA) |
 | `/__test/*` | 404 en production pour tous ; preview uniquement (derrière Access) | | | | | | |

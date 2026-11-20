@@ -25,7 +25,7 @@ Légende des tests : **U** unitaire, **I** intégration (API/base), **E** E2E Pl
 
 ## Phase T-00 — Prototypes (avant toute infrastructure)
 
-Scripts jetables dans `prototypes/` (hors application, jamais fusionnés dans `main`). Chaque prototype a un critère de réussite et un repli ; le résultat est consigné dans `docs/adr/` et dans la matrice d'architecture (`03-architecture.md`). Pas de code applicatif dans cette phase.
+Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamais importés par l'application). Chaque prototype a un critère de réussite et un repli ; le résultat est consigné dans `docs/adr/` et dans la matrice d'architecture (`03-architecture.md`). Pas de code applicatif dans cette phase.
 
 - [x] **T-00a Mémoire Worker et 8K** : décoder une capture 8K (7680×4320) dans un Worker n'est pas permis (ADR-011) ; mesurer la mémoire du chemin binding Images avec une image 33,2 Mpx. Réussite : aucune erreur mémoire sur 20 Mo. Repli : limite sous 20 Mpx côté serveur et conversion navigateur obligatoire au-delà.
 - [x] **T-00b Binding Images 33,2 Mpx** : confirmer les limites exactes du binding Images (dimension, taille d'entrée, nombre de transformations facturées). Réussite : les 4 variantes et la vignette 64 px sont produites pour un JPEG 8K. Repli : réduire les largeurs de variantes ou passer à deux étapes.
@@ -41,7 +41,7 @@ Scripts jetables dans `prototypes/` (hors application, jamais fusionnés dans `m
 ## Phase 0 — Fondations (squelette déployé de bout en bout)
 
 - [ ] **T-01a Squelette Nuxt et qualité de code**
-  Nuxt 3+ TypeScript strict, pnpm, arborescence de `10-clean-architecture.md` (`shared/`, `server/modules`, `server/platform`, `app/features`, `app/components/ui`…) avec un fichier d'exemple par dossier, ESLint (`vue/no-v-html`, `no-explicit-any`), Prettier, commitlint (Conventional Commits), gitleaks en pre-commit, `.env.example`.
+  Nuxt 3+ TypeScript strict, pnpm, arborescence de `10-clean-architecture.md` (`shared/`, `server/modules`, `server/platform`, `app/features`, `app/components/ui`…) avec un fichier d'exemple par dossier, ESLint (`vue/no-v-html`, `no-explicit-any`), Prettier, commitlint (Conventional Commits), gitleaks en pre-commit, `.env.example` ; `prototypes/` exclu d'ESLint, du `tsconfig`, de Vitest et de dependency-cruiser.
   Tests : `pnpm lint` et `pnpm typecheck` verts sur le squelette.
 
 - [ ] **T-01b Outillage de test** (dép. T-01a)
@@ -60,7 +60,7 @@ Scripts jetables dans `prototypes/` (hors application, jamais fusionnés dans `m
   nuxt-security : en-têtes, CSP à nonce, vérification d'origine des mutations ; Sentry serveur et client (`sendDefaultPii: false`).
   Tests : I (en-têtes présents, CSP avec nonce, mutation cross-origin refusée).
 
-- [ ] **T-03a Déploiement de production** (dép. T-02b) — **action humaine** : Sentry ; domaine (Q3).
+- [ ] **T-03a Déploiement de production** (dép. T-02b) — **action humaine** : Sentry. Le domaine (Q3) n'est pas requis ici : `*.workers.dev` suffit à la DoD (domaine en T-58).
   `wrangler.toml` (bindings R2 privé, Queues + DLQ, Hyperdrive sans cache (ADR-016), Images, Rate Limiting, Cron Triggers), hooks Nitro `cloudflare:queue` et `cloudflare:scheduled` branchés (consommateur et cron de test, acquittement message par message, T-00f), déploiement de production depuis `main`, secrets publiés avec la version (`--secrets-file`, T-00g), politique CORS du bucket de production, adaptateurs factices des fournisseurs et routes `/__test/*` uniquement dans les builds preview (démarrage refusé en production sinon), beacon Web Analytics ajouté par Nuxt.
   DoD : `/api/health` de production OK (base et R2) ; un message et un cron de test traités ; l'artefact de production ne contient aucune route `/__test`.
 
@@ -369,7 +369,7 @@ Scripts jetables dans `prototypes/` (hors application, jamais fusionnés dans `m
   Stories : US-68, US-75. Tests : I, E, ZAP, Lighthouse.
 
 - [ ] **T-58 Recette MVP et bêta fermée** (dép. T-57) — **action humaine** : validation de Q6, Q7, Q8, Q11, Q13 ; registre des traitements et accords de sous-traitance signés (Q11).
-  Exécution de tous les parcours de `11-strategie-de-tests.md` § 5 sur la preview de release, puis **bêta en production** avec `features.inviteOnly` (20 à 30 photographes, ≥ 200 captures ; jamais sur une preview, protégée par Access), correction des retours. **Action humaine avant l'ouverture** : Resend Pro et Neon Launch actifs (`05-finops.md`), décision sur le plan Cloudflare Pro.
+  Exécution de tous les parcours de `11-strategie-de-tests.md` § 5 sur la preview de release, puis **bêta en production** avec `features.inviteOnly` (20 à 30 photographes, ≥ 200 captures ; jamais sur une preview, protégée par Access), correction des retours. **Action humaine avant l'ouverture** : domaine (Q3) branché sur le Worker de production (API Cache de `/img` active), domaine d'envoi Resend (SPF, DKIM, DMARC), Resend Pro et Neon Launch actifs (`05-finops.md`), décision sur le plan Cloudflare Pro.
 
 **Jalon : ouverture publique (désactivation du mode invitation).**
 
