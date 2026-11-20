@@ -109,3 +109,11 @@
 - **Décision** : CSS natif. `app/assets/css/tokens.css` (seul fichier contenant des valeurs : couleurs, typographies, tailles, espacements, rayons, ombres, z-index, points de rupture documentés), `app/assets/css/base.css` (reset léger, typographie, focus visibles, `prefers-reduced-motion`), styles des composants dans `<style scoped>` n'utilisant que des `var(--…)`. Mobile d'abord (`min-width` uniquement). Pas de préprocesseur (imbrication CSS native). Stylelint (`stylelint-config-standard`, `stylelint-declaration-strict-value`) refuse toute couleur, taille de police, espacement ou z-index en dur hors de `tokens.css` ; lancé dans `pnpm lint`.
 - **Alternatives** : Tailwind CSS (plus rapide et homogène avec un agent IA, mais classes dans les templates et dépendance) ; UnoCSS (moins connu des modèles).
 - **Conséquences** : aucune classe utilitaire ; un style inline (`style="…"`) est interdit dans les composants, sauf valeur dynamique calculée (ex. `--tier-color`) ; la dérive est contrôlée par Stylelint et par la revue ; le passage à Tailwind resterait possible en réutilisant `tokens.css`.
+
+# ADR-015 — Hachage des mots de passe : Argon2id en JavaScript pur
+
+- **Statut** : accepté (T-00d, 20/11/2026) ; tranche Q5.
+- **Contexte** : la spec demande Argon2id, avec scrypt en repli. Mesures sur un Worker distant (`prototypes/t00d-hash`), paramètres OWASP, temps réseau déduit : Argon2id `hash-wasm` refusé (Workers interdit la compilation WebAssembly à l'exécution) ; Argon2id `@noble/hashes` ≈ 170 à 350 ms ; scrypt `node:crypto` ≈ 200 ms ; scrypt `@noble/hashes` ≈ 430 à 520 ms.
+- **Décision** : Argon2id via `@noble/hashes` (`argon2id`, m = 19 MiB, t = 2, p = 1, sel de 16 octets, clé de 32 octets), sous le seuil de 500 ms de T-00d.
+- **Alternatives** : scrypt natif (plus rapide, mais algorithme second choix de la spec et de l'OWASP) ; Argon2id WASM importé comme module `.wasm` statique (plus rapide, dépendance et chargement à valider).
+- **Conséquences** : chaque connexion ou inscription coûte quelques centaines de ms de CPU ; les limites de débit sur `/api/auth/*` (08 § 8) protègent aussi le budget CPU. Paramètres stockés avec le hachage (format PHC) pour pouvoir les durcir plus tard avec un rehachage à la connexion.
