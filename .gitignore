@@ -8,3 +8,6 @@ dist/
 .output/
 .nuxt/
 .data/
+coverage/
+test-results/
+playwright-report/

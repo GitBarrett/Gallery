@@ -44,7 +44,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Nuxt 3+ TypeScript strict, pnpm, arborescence de `10-clean-architecture.md` (`shared/`, `server/modules`, `server/platform`, `app/features`, `app/components/ui`…) avec un fichier d'exemple par dossier, ESLint (`vue/no-v-html`, `no-explicit-any`), Prettier, commitlint (Conventional Commits), gitleaks en pre-commit, `.env.example` ; `prototypes/` exclu d'ESLint, du `tsconfig`, de Vitest et de dependency-cruiser.
   Tests : `pnpm lint` et `pnpm typecheck` verts sur le squelette.
 
-- [ ] **T-01b Outillage de test** (dép. T-01a)
+- [x] **T-01b Outillage de test** (dép. T-01a)
   Vitest (projets unit / component / integration, seuils de couverture de `11-strategie-de-tests.md` § 2), Playwright (projets desktop, iPhone 14, Pixel 7), script `pnpm test:trace` (chaque AC [MVP] référencé dans un test), script `pnpm check`.
   Tests : un test d'exemple par projet ; `test:trace` échoue sur un AC [MVP] sans test, puis passe une fois l'exemple retiré du périmètre.
 

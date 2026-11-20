@@ -491,7 +491,7 @@ Règles de référence : `02-specs-fonctionnelles.md` §5.
 ### US-70 [MVP] Aucun bloc vide
 - US-70.1 Given un auteur avec une seule autre capture, When j'ouvre sa PDP, Then le bloc « More from » est complété par « Similar captures » (même zone puis même version), sans emplacement vide.
 - US-70.2 Given un auteur sans autre capture et aucune capture de la même zone, When j'ouvre la PDP, Then le bloc devient « Latest in {version} », ou disparaît s'il n'y a rien.
-- US-70.3 Given moins de 10 captures publiées cette semaine, When j'ouvre le classement (si activé), Then la période passe au mois puis à « All time », ou une jauge de progression s'affiche avec un CTA Upload.
+- US-70.3 [v1.x, T-63] Given moins de 10 captures publiées cette semaine, When j'ouvre le classement (si activé), Then la période passe au mois puis à « All time », ou une jauge de progression s'affiche avec un CTA Upload.
 - US-70.4 Given aucune capture avec 10 likes sur 7 jours, When j'ouvre la home, Then « Capture of the week » montre la plus likée sur 30 jours, puis de tous les temps, puis l'« Editor's pick ».
 - US-70.5 Given une version sans capture, When j'ouvre sa PLP, Then « Be the first to capture {version} » s'affiche avec un CTA Upload.
 - US-70.6 Given une capture avec 4 likes et 2 téléchargements, When je la vois, Then aucun compteur sous 10 n'est affiché ; badge « New » si elle a moins de 7 jours.

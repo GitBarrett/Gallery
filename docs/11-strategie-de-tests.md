@@ -22,7 +22,7 @@ Principe : **chaque critère d'acceptation (`US-xx.n`) est couvert par au moins 
 | `app/components/ui` | 90 % | 80 % |
 | Global | 80 % | 70 % |
 
-La couverture ne remplace pas la traçabilité : un script `pnpm test:trace` vérifie que **chaque identifiant `US-xx.n` des stories [MVP] apparaît dans au moins un test** (`test('US-30.2 …')` ou annotation Playwright `{ tag: '@US-30.2' }`) et échoue sinon. Un critère marqué `[v1.x, T-xx]` dans une story [MVP] est exclu jusqu'à sa tâche.
+La couverture ne remplace pas la traçabilité : un script `pnpm test:trace` vérifie que **chaque identifiant `US-xx.n` des stories [MVP] apparaît dans au moins un test** (`test('US-30.2 …')` ou annotation Playwright `{ tag: '@US-30.2' }`) et échoue sinon. Pendant le développement, seuls les critères des tâches cochées dans `06-plan-de-taches.md` sont exigés (T-01b, 20/11/2026) : ceux qu'une tâche cochée cite explicitement ; une story en entier, quand toutes les tâches qui la citent sont cochées (un critère qu'aucune tâche ne cite est alors signalé) ; un critère marqué `[v1.x, T-xx]`, quand T-xx est cochée. À la fin du MVP, toutes les tâches étant cochées, la règle s'applique à tous les critères [MVP].
 
 ## 3. Conventions d'écriture
 - Nom du test = identifiant + comportement : `it('US-10.3 rejects a PNG whose bytes are an HTML file')`.
