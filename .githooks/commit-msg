@@ -1,0 +1,3 @@
+#!/bin/sh
+# Messages au format Conventional Commits (CLAUDE.md, Conventions).
+exec pnpm exec commitlint --edit "$1"

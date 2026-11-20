@@ -40,7 +40,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
 
 ## Phase 0 — Fondations (squelette déployé de bout en bout)
 
-- [ ] **T-01a Squelette Nuxt et qualité de code**
+- [x] **T-01a Squelette Nuxt et qualité de code**
   Nuxt 3+ TypeScript strict, pnpm, arborescence de `10-clean-architecture.md` (`shared/`, `server/modules`, `server/platform`, `app/features`, `app/components/ui`…) avec un fichier d'exemple par dossier, ESLint (`vue/no-v-html`, `no-explicit-any`), Prettier, commitlint (Conventional Commits), gitleaks en pre-commit, `.env.example` ; `prototypes/` exclu d'ESLint, du `tsconfig`, de Vitest et de dependency-cruiser.
   Tests : `pnpm lint` et `pnpm typecheck` verts sur le squelette.
 
