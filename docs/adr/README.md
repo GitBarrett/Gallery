@@ -131,3 +131,17 @@
   2. chaque preview a **sa propre configuration Hyperdrive** (cache désactivé), créée et supprimée par la CI avec la branche Neon ; même chemin qu'en production.
 - **Alternatives** : deux bindings (avec cache pour les grilles publiques, sans cache pour le reste) — plus rapide mais chaque requête doit choisir le bon, risque d'erreur silencieuse ; pilote Neon serverless (HTTP) en preview — chemin différent de la production.
 - **Conséquences** : chaque lecture va jusqu'à Neon (≈ 17 ms) ; la charge des grilles est absorbée par le cache CDN des API publiques (`Cache-Control: public, max-age=60`) ; si le calcul Neon devient un poste important, ajouter un binding avec cache réservé aux lectures publiques, par ADR. Maximum 25 configurations Hyperdrive par compte : 1 production + 1 par PR ouverte. Le plan Workers Paid est requis (le plan gratuit coupe les requêtes longues).
+
+# ADR-017 — Hébergement : Cloudflare conservé (clôture de T-00h)
+
+- **Statut** : accepté (Adrien, 20/11/2026) ; clôt T-00h et confirme ADR-002.
+- **Contexte** : T-00h devait comparer l'option A (tout Cloudflare) et l'option B (Vercel pour l'application, images ailleurs). L'option B visait surtout les risques de l'option A ; T-00a à T-00g les ont tous levés sur des Workers distants :
+  - 8K de 17 Mo traitée sans erreur mémoire, 6 variantes en 4 à 6 s, traitement parallèle sans ralentissement (T-00a/b/c, ADR-011) ;
+  - Argon2id en JavaScript sous 500 ms (T-00d, ADR-015) ;
+  - Neon via Hyperdrive sans cache : 16–17 ms depuis Paris (T-00e, ADR-016) ;
+  - Queues et crons branchés par les hooks Nitro, nouveaux essais fonctionnels (T-00f) ;
+  - preview complète par PR créée en 31–41 s, isolée, supprimée sans reste en 12 s (T-00g).
+- **Décision** : option A, la stack de `CLAUDE.md` reste inchangée. Pas de chiffrage détaillé de l'option B : aucun risque restant ne le justifiait (option la plus simple, règle 10).
+- **Lecture des critères pondérés (18/11/2026)** : coût 25 % — R2 sans frais de sortie, adapté à une galerie, Workers Paid 5 $ ; simplicité 20 % — un seul fournisseur pour calcul, stockage, files, crons et previews ; performance 15 % — mesures ci-dessus ; sécurité et exploitation 15 % — bucket privé, Access sur les previews, WAF ; portabilité 15 % — Nuxt et Drizzle portables (changement de preset Nitro), dépendances fortes limitées au binding Images et aux Queues ; previews 10 % — validées par T-00g.
+- **Alternatives** : option B (Vercel + stockage externe) : previews natives et plus de mémoire, mais bande passante des images plus chère, deux fournisseurs et Queues à remplacer ; AWS écarté le 18/11/2026 (droits jugés trop complexes).
+- **Conséquences** : T-02 et T-03 sont débloquées. Rouvrir la question par un nouvel ADR si le prix du binding Images ou des Queues change fortement, ou si l'entretien des previews (T-03) s'avère trop lourd.
