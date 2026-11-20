@@ -1,0 +1,6 @@
+docs/
+prototypes/
+*.md
+pnpm-lock.yaml
+.nuxt/
+.output/
