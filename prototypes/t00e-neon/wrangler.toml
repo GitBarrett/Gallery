@@ -1,0 +1,15 @@
+name = "ls-proto-neon"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Identifiants donnés par `wrangler hyperdrive create` (non secrets)
+[[hyperdrive]]
+binding = "HD_CACHED"
+id = "020e87cea56941c195d3bf6e5533af1d"
+
+[[hyperdrive]]
+binding = "HD_NOCACHE"
+id = "a960298913cf4107857d6c4f626a2392"
+
+# Secrets à définir : npx wrangler secret put PROTO_TOKEN ; npx wrangler secret put DATABASE_URL (pooler Neon)
