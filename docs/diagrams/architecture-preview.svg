@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 760" width="1560" height="760" font-family="Inter, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<defs><marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#455A64"/></marker><marker id="arS" markerWidth="9" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M9,0 L0,4.5 L9,9 z" fill="#455A64"/></marker></defs>
+<text x="40" y="28" font-size="16" font-weight="bold" fill="#111">Legendary Shots — architecture MVP (v1.0) — 18/11/2026</text>
+<rect x="290" y="60" width="920" height="480" fill="none" stroke="#F6821F" stroke-width="1.5" stroke-dasharray="7,5" rx="4"/>
+<text x="302" y="80" font-size="13" font-weight="bold" fill="#F6821F">Cloudflare (plan Free pendant la bêta, Q16)</text>
+<rect x="40" y="300" width="210" height="100" rx="8" fill="#E1F5FE" stroke="#0277BD" stroke-width="1.6"/>
+<text x="145.0" y="338.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Navigateur / PWA</text>
+<text x="145.0" y="354.0" font-size="11" text-anchor="middle" fill="#1B2631">Nuxt SSR + Vue 3</text>
+<text x="145.0" y="370.0" font-size="11" text-anchor="middle" fill="#1B2631">Web Worker WASM (conversion)</text>
+<rect x="330" y="110" width="240" height="90" rx="8" fill="#FFF3E0" stroke="#F6821F" stroke-width="1.6"/>
+<text x="450.0" y="143.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Cron Triggers</text>
+<text x="450.0" y="159.0" font-size="11" text-anchor="middle" fill="#1B2631">leaderboard 5 min</text>
+<text x="450.0" y="175.0" font-size="11" text-anchor="middle" fill="#1B2631">purge 03:15 quotidien</text>
+<rect x="630" y="110" width="240" height="90" rx="8" fill="#FFF3E0" stroke="#F6821F" stroke-width="1.6"/>
+<text x="750.0" y="143.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Worker Nuxt</text>
+<text x="750.0" y="159.0" font-size="11" text-anchor="middle" fill="#1B2631">SSR · API · /img/{id}/{w}</text>
+<text x="750.0" y="175.0" font-size="11" text-anchor="middle" fill="#1B2631">CSP à nonce · en-têtes</text>
+<rect x="930" y="110" width="240" height="90" rx="8" fill="#FFF3E0" stroke="#F6821F" stroke-width="1.6"/>
+<text x="1050.0" y="143.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Queues + DLQ</text>
+<text x="1050.0" y="159.0" font-size="11" text-anchor="middle" fill="#1B2631">outbox · e-mails · modération</text>
+<text x="1050.0" y="175.0" font-size="11" text-anchor="middle" fill="#1B2631">un consommateur par queue</text>
+<rect x="330" y="260" width="240" height="90" rx="8" fill="#FFF3E0" stroke="#F6821F" stroke-width="1.6"/>
+<text x="450.0" y="293.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Binding Images</text>
+<text x="450.0" y="309.0" font-size="11" text-anchor="middle" fill="#1B2631">6 transformations par capture</text>
+<text x="450.0" y="325.0" font-size="11" text-anchor="middle" fill="#1B2631">(ADR-012)</text>
+<rect x="630" y="260" width="240" height="90" rx="8" fill="#FFF3E0" stroke="#F6821F" stroke-width="1.6"/>
+<text x="750.0" y="301.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Hyperdrive</text>
+<text x="750.0" y="317.0" font-size="11" text-anchor="middle" fill="#1B2631">pool vers Neon (production)</text>
+<rect x="930" y="260" width="240" height="90" rx="8" fill="#FFF3E0" stroke="#F6821F" stroke-width="1.6"/>
+<text x="1050.0" y="293.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Rate limiting</text>
+<text x="1050.0" y="309.0" font-size="11" text-anchor="middle" fill="#1B2631">binding (court terme)</text>
+<text x="1050.0" y="325.0" font-size="11" text-anchor="middle" fill="#1B2631">rate_limit_counters (base)</text>
+<rect x="330" y="430" width="240" height="90" rx="8" fill="#E8F5E9" stroke="#2E7D32" stroke-width="1.6"/>
+<text x="450.0" y="463.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">R2 privé (ADR-011)</text>
+<text x="450.0" y="479.0" font-size="11" text-anchor="middle" fill="#1B2631">incoming · originals</text>
+<text x="450.0" y="495.0" font-size="11" text-anchor="middle" fill="#1B2631">variants · trash</text>
+<rect x="630" y="600" width="240" height="90" rx="8" fill="#E8F5E9" stroke="#2E7D32" stroke-width="1.6"/>
+<text x="750.0" y="633.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Neon Postgres</text>
+<text x="750.0" y="649.0" font-size="11" text-anchor="middle" fill="#1B2631">UUID v7 · Drizzle · outbox</text>
+<text x="750.0" y="665.0" font-size="11" text-anchor="middle" fill="#1B2631">audit_log · sessions</text>
+<rect x="1290" y="110" width="240" height="50" rx="8" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.6"/>
+<text x="1410.0" y="139.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">OAuth Google / Battle.net</text>
+<rect x="1290" y="180" width="240" height="50" rx="8" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.6"/>
+<text x="1410.0" y="209.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Resend (e-mails)</text>
+<rect x="1290" y="250" width="240" height="50" rx="8" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.6"/>
+<text x="1410.0" y="279.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Sightengine (modération)</text>
+<rect x="1290" y="320" width="240" height="50" rx="8" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.6"/>
+<text x="1410.0" y="349.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">PostHog EU (beacon navigateur)</text>
+<rect x="1290" y="390" width="240" height="50" rx="8" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.6"/>
+<text x="1410.0" y="419.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Sentry (erreurs)</text>
+<rect x="1290" y="460" width="240" height="50" rx="8" fill="#FFFFFF" stroke="#7B1FA2" stroke-width="1.6" stroke-dasharray="6,4"/>
+<text x="1410.0" y="489.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B2631">Prestataire de dons (v1.1)</text>
+<rect x="40" y="560" width="230" height="150" fill="#FFFDE7" stroke="#FBC02D" rx="3"/>
+<text x="52" y="582" font-size="12" font-weight="bold" fill="#1B2631">Previews par PR (ADR-013)</text>
+<text x="52" y="599" font-size="11" font-weight="normal" fill="#1B2631">Worker ls-pr-{n}</text>
+<text x="52" y="616" font-size="11" font-weight="normal" fill="#1B2631">Queue et DLQ suffixées</text>
+<text x="52" y="633" font-size="11" font-weight="normal" fill="#1B2631">Branche Neon en connexion directe</text>
+<text x="52" y="650" font-size="11" font-weight="normal" fill="#1B2631">Préfixe ls-preview/pr-{n}/</text>
+<text x="52" y="667" font-size="11" font-weight="normal" fill="#1B2631">Access sur tous les Workers</text>
+<text x="52" y="684" font-size="11" font-weight="normal" fill="#1B2631">Suppression à la fermeture de la PR</text>
+<path d="M145,300 L145,40 L750,40 L750,110" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="300" y="30" font-size="10.5" fill="#37474F">HTTPS, cookie scellé</text>
+<path d="M145,400 L145,475 L330,475" fill="none" stroke="#455A64" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#ar)"/>
+<text x="160" y="466" font-size="10.5" fill="#37474F">PUT présigné (CORS)</text>
+<path d="M570,155 L630,155" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M870,155 L930,155" fill="none" stroke="#455A64" stroke-width="1.5" marker-start="url(#arS)" marker-end="url(#ar)"/>
+<text x="886" y="146" font-size="10.5" fill="#37474F">outbox</text>
+<path d="M630,195 L600,195 L600,305 L570,305" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M450,350 L450,430" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="458" y="392" font-size="10.5" fill="#37474F">variants/</text>
+<path d="M750,200 L750,260" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="758" y="236" font-size="10.5" fill="#37474F">requêtes</text>
+<path d="M870,195 L900,195 L900,305 L930,305" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M750,350 L750,600" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="758" y="480" font-size="10.5" fill="#37474F">SQL</text>
+<path d="M1210,135 L1290,135" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M1210,205 L1290,205" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M1210,275 L1290,275" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M1210,415 L1290,415" fill="none" stroke="#455A64" stroke-width="1.5" marker-end="url(#ar)"/>
+<path d="M1210,485 L1290,485" fill="none" stroke="#455A64" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#ar)"/>
+<text x="40" y="743" font-size="11" fill="#555">Légende : orange = Cloudflare · bleu = client · vert = données · violet = services tiers · pointillés = v1.1 ou appel asynchrone · les flèches vers les services partent de la zone Cloudflare</text>
+</svg>

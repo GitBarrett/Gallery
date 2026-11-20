@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Weekly leaderboard</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E14}
+a{color:#E8B54A}a:hover{color:#F5D38A}
+</style>
+</helmet>
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs><linearGradient id="mk-y" gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="0" y2="27"><stop offset="0" stop-color="#FFF27A"></stop><stop offset="0.35" stop-color="#FFD100"></stop><stop offset="0.8" stop-color="#FF9A00"></stop><stop offset="1" stop-color="#FF7A00"></stop></linearGradient><linearGradient id="mk-w" gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="0" y2="27"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="0.5" stop-color="#E6EAF0"></stop><stop offset="1" stop-color="#AEB6C2"></stop></linearGradient><filter id="mk-glow" x="-80%" y="-40%" width="260%" height="180%"><feGaussianBlur stdDeviation="1.8"></feGaussianBlur></filter></defs></svg>
+<div style="min-height: 100vh; background: #0B0E14; color: #E6E9F0; font-family: Inter, system-ui, sans-serif; font-size: 15px">
+<dc-import name="Header" active="leaderboard" hint-size="100%,69px"></dc-import>
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs><linearGradient id="ig-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF0A8"></stop><stop offset="0.5" stop-color="#E8B54A"></stop><stop offset="1" stop-color="#7A4E0E"></stop></linearGradient><linearGradient id="ig-steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F6FA"></stop><stop offset="0.5" stop-color="#AEB6C4"></stop><stop offset="1" stop-color="#3E4656"></stop></linearGradient><linearGradient id="ig-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A8A"></stop><stop offset="0.5" stop-color="#D0302A"></stop><stop offset="1" stop-color="#5E0E0A"></stop></linearGradient><linearGradient id="ig-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE6FF"></stop><stop offset="0.5" stop-color="#3D9BFF"></stop><stop offset="1" stop-color="#0E2E6E"></stop></linearGradient><linearGradient id="ig-purple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0C8FF"></stop><stop offset="0.5" stop-color="#A335EE"></stop><stop offset="1" stop-color="#3E0E66"></stop></linearGradient><linearGradient id="ig-parch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF8E0"></stop><stop offset="0.5" stop-color="#E6CF96"></stop><stop offset="1" stop-color="#9A7A40"></stop></linearGradient><linearGradient id="ig-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D49A5E"></stop><stop offset="0.5" stop-color="#7A4A22"></stop><stop offset="1" stop-color="#341C08"></stop></linearGradient></defs></svg>
+<main style="max-width: 1360px; margin: 0 auto; padding: 28px 24px 48px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px">
+<div style="display: flex; align-items: center; gap: 16px">
+<span aria-hidden="true" style="flex: 0 0 auto; display: block; width: 56px; height: 56px; box-sizing: border-box; padding: 3px; border-radius: 6px; background: linear-gradient(145deg, #9a9a9a 0%, #4a4a4a 35%, #1c1c1c 70%, #5a5a5a 100%); box-shadow: 0 1px 3px rgba(0,0,0,0.7)"><span style="position: relative; display: block; width: 100%; height: 100%; border-radius: 3px; overflow: hidden; background: radial-gradient(circle at 40% 35%, #2a3240 0%, #07090e 75%); box-shadow: inset 0 0 0 1px #000000"><svg viewBox="0 0 32 32" style="position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 0 1.2px rgba(255,220,150,0.6)) drop-shadow(0 0 4px rgba(255,170,60,0.3))"><path d="M4 3.5l4.5 1 15 15-3.5 3.5-15-15Z" fill="url(#ig-steel)" stroke="#2A1A0A" stroke-width="0.7" stroke-linejoin="round"></path><path d="M28 3.5l-1 4.5-15 15-3.5-3.5 15-15Z" fill="url(#ig-steel)" stroke="#2A1A0A" stroke-width="0.7" stroke-linejoin="round"></path><path d="M18.5 22.5l4-4 2.2 2.2-4 4Z M9.5 18.5l4 4-2.2 2.2-4-4Z" fill="url(#ig-gold)" stroke="#2A1A0A" stroke-width="0.7" stroke-linejoin="round"></path><circle cx="25.5" cy="25.5" r="2.2" fill="url(#ig-gold)" stroke="#2A1A0A" stroke-width="0.7" stroke-linejoin="round"></circle><circle cx="6.5" cy="25.5" r="2.2" fill="url(#ig-gold)" stroke="#2A1A0A" stroke-width="0.7" stroke-linejoin="round"></circle></svg><span style="position: absolute; inset: 0; box-shadow: inset 0 0 8px 1px rgba(0,0,0,0.85); background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 45%)"></span></span></span>
+<div><h1 style="margin: 0; font-family: Cinzel, serif; font-size: 34px; color: #FFFFFF">Leaderboard</h1><p style="margin: 2px 0 0; color: #A9B1C2">Most liked captures published {{periodText}} · WoW Forever</p></div>
+</div>
+<div role="tablist" aria-label="Period" style="display: flex; gap: 6px">
+<sc-for list="{{periods}}" as="p" hint-placeholder-count="3">
+<button type="button" role="tab" aria-selected="{{p.sel}}" onClick="{{p.pick}}" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid {{p.border}}; background: {{p.bg}}; color: {{p.fg}}; font: inherit; font-weight: 600; cursor: pointer">{{p.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<section aria-label="Top 3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: end; margin-bottom: 28px">
+<sc-for list="{{podium}}" as="t" hint-placeholder-count="3">
+<a href="Photo.dc.html" style="display: block; border-radius: 6px; border: 2px solid {{t.c}}; background: #10141D; text-decoration: none; color: inherit; box-shadow: {{t.glow}}">
+<span style="display: block; position: relative; height: {{t.h}}; border-radius: 4px 4px 0 0; overflow: hidden; background: {{t.bg}}">
+<svg viewBox="0 0 300 200" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%" aria-hidden="true"><path d="M0 140 L60 100 L110 125 L170 80 L230 120 L300 95 L300 200 L0 200 Z" fill="rgba(0,0,0,0.35)"></path></svg>
+<span style="position: absolute; top: 10px; left: 10px; width: 40px; height: 40px; border-radius: 999px; background: {{t.medal}}; color: #14100A; font-family: Cinzel, serif; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #1A1206">{{t.rank}}</span>
+</span>
+<span style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: Cinzel, serif; font-size: 18px; font-weight: 700; color: {{t.c}}">{{t.title}}</span><span style="font-size: 13px; color: #A9B1C2">{{t.zone}} · {{t.author}}</span></span>
+<span style="font-size: 15px; font-weight: 600; color: {{t.c}}">♥ {{t.likes}}</span>
+</span>
+</a>
+</sc-for>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<section aria-labelledby="rk" style="flex: 999 1 640px; min-width: 0">
+<h2 id="rk" style="margin: 0 0 12px; font-family: Cinzel, serif; font-size: 20px; color: #FFFFFF">Ranks 4 – 10</h2>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="7">
+<li>
+<a href="Photo.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; border: 1px solid #232A38; border-left: 3px solid {{r.c}}; border-radius: 6px; background: #10141D; color: inherit; text-decoration: none">
+<span style="width: 28px; font-family: Cinzel, serif; font-size: 18px; font-weight: 700; color: #A9B1C2; text-align: center">{{r.rank}}</span>
+<span aria-hidden="true" style="width: 96px; height: 56px; border-radius: 4px; background: {{r.bg}}"></span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-family: Cinzel, serif; font-weight: 700; color: {{r.c}}">{{r.title}}</span><span style="font-size: 13px; color: #A9B1C2">{{r.zone}} · {{r.author}}</span></span>
+<span style="font-size: 13px; color: {{r.moveC}}">{{r.move}}</span>
+<span style="width: 80px; text-align: right; font-weight: 600">♥ {{r.likes}}</span>
+</a>
+</li>
+</sc-for>
+</ol>
+<div style="display: flex; align-items: center; gap: 14px; margin-top: 12px; padding: 10px 14px; border: 1px solid #E8B54A; border-radius: 6px; background: rgba(232,181,74,0.08)"><span style="width: 44px; font-family: Cinzel, serif; font-size: 16px; font-weight: 700; color: #E8B54A; text-align: center">#237</span><span aria-hidden="true" style="width: 96px; height: 56px; border-radius: 4px; background: linear-gradient(180deg,#b8c4cc,#22303a)"></span><span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 600; color: #FFFFFF">Your best this week · Harbor Mist</span><span style="font-size: 13px; color: #A9B1C2">of 1,840 captures · 12 likes to reach #200</span></span><a href="Photo.dc.html" style="font-size: 14px; font-weight: 600">View</a></div>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 16px"><button type="button" style="height: 44px; padding: 0 22px; border-radius: 6px; border: 1px solid #5C4A2A; background: #161C29; color: #E8B54A; font: inherit; font-weight: 600; cursor: pointer">Show ranks 11 – 50</button><a href="Category.dc.html" style="display: flex; align-items: center; height: 44px; padding: 0 18px; border-radius: 6px; border: 1px solid #2A3244; color: #E6E9F0; text-decoration: none">Browse all 1,840 by likes →</a></div>
+</section>
+
+<aside aria-labelledby="tp" style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="tp" style="margin: 0; font-family: Cinzel, serif; font-size: 20px; color: #FFFFFF">Top photographers</h2>
+<sc-for list="{{people}}" as="u" hint-placeholder-count="5">
+<a href="Profile.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid #232A38; border-radius: 6px; background: #10141D; color: inherit; text-decoration: none">
+<span aria-hidden="true" style="width: 40px; height: 40px; box-sizing: border-box; border-radius: 6px; border: 2px solid {{u.c}}; background: {{u.bg}}"></span>
+<span style="flex: 1"><span style="display: block; font-weight: 600">{{u.name}}</span><span style="font-size: 12px; color: #A9B1C2">{{u.stat}}</span></span>
+<span style="font-family: Cinzel, serif; font-weight: 700; color: #A9B1C2">#{{u.rank}}</span>
+</a>
+</sc-for>
+<div style="display: flex; align-items: center; gap: 12px; padding: 12px; margin-top: 4px; border: 1px solid #5C4A2A; border-radius: 6px; background: linear-gradient(90deg, rgba(255,209,0,0.08) 0%, rgba(255,209,0,0) 70%)">
+<svg width="16" height="22" viewBox="-2 -1 24 30" style="overflow: visible" aria-hidden="true"><g filter="url(#mk-glow)" opacity="0.75"><path d="M6.3 3.4C6.1 1.6 7.6 1 10 1s3.9 0.6 3.7 2.4L12.1 17c-0.2 1.3-0.9 1.7-2.1 1.7s-1.9-0.4-2.1-1.7Z" fill="url(#mk-y)"></path><circle cx="10" cy="23.4" r="3.1" fill="url(#mk-y)"></circle></g><path d="M6.3 3.4C6.1 1.6 7.6 1 10 1s3.9 0.6 3.7 2.4L12.1 17c-0.2 1.3-0.9 1.7-2.1 1.7s-1.9-0.4-2.1-1.7Z" fill="url(#mk-y)"></path><circle cx="10" cy="23.4" r="3.1" fill="url(#mk-y)"></circle></svg>
+<p style="margin: 0; font-size: 13px; color: #C3CAD8">Leaderboard resets every Monday at 00:00 UTC.</p>
+</div>
+</aside>
+</div>
+</main>
+<dc-import name="Footer" hint-size="100%,110px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { period: 0 };
+  }
+  renderVals() {
+    var self = this;
+    var Q = { Poor: '#9D9D9D', Uncommon: '#1EFF00', Rare: '#3D9BFF', Epic: '#C77DFF', Legendary: '#FF8000' };
+    var tier = function (n) { return n >= 1000 ? 'Legendary' : n >= 500 ? 'Epic' : n >= 100 ? 'Rare' : n >= 10 ? 'Uncommon' : 'Poor'; };
+    var mult = [1, 3.4, 11][this.state.period];
+    var data = [
+      { title: 'Ice Crown', zone: 'Icecrown', author: '@Valdren', n: 1430, bg: 'linear-gradient(180deg,#0d1b2a 0%,#3a5a78 45%,#a8d0e6 75%,#1b2a3a 100%)' },
+      { title: 'Nights of Suramar', zone: 'Suramar', author: '@Lunelame', n: 1284, bg: 'linear-gradient(180deg,#140c2e 0%,#4b2a7a 45%,#c06fd8 72%,#2a1846 100%)' },
+      { title: 'Frozen Silence', zone: 'Northrend', author: '@Ysolde', n: 1102, bg: 'linear-gradient(180deg,#bcd7ef 0%,#e8f1f8 40%,#8fb0cc 70%,#3d566e 100%)' },
+      { title: 'Dawn on the Plains', zone: 'Nagrand', author: '@Kaelys', n: 842, bg: 'linear-gradient(180deg,#7fb3d5 0%,#cfe3c8 45%,#5f8a4a 70%,#2f4a2a 100%)', move: '▲ 3' },
+      { title: 'Emerald Dream', zone: 'Val’sharah', author: '@Myrielle', n: 733, bg: 'linear-gradient(180deg,#2c4a3a 0%,#5a8a6a 40%,#d6a8c8 70%,#24352b 100%)', move: '▼ 1' },
+      { title: 'Stormwind Falls Asleep', zone: 'Stormwind', author: '@Brannoc', n: 615, bg: 'linear-gradient(180deg,#0e1a3a 0%,#2b3f78 50%,#c9a24a 85%,#3a2a18 100%)', move: 'New' },
+      { title: 'Golden Hour, Elwynn', zone: 'Elwynn Forest', author: '@Aerith', n: 521, bg: 'linear-gradient(180deg,#9cc4e4 0%,#e6d79a 45%,#6f9a4c 72%,#2c4420 100%)', move: '▲ 2' },
+      { title: 'Red Earth', zone: 'Durotar', author: '@Grakk', n: 258, bg: 'linear-gradient(180deg,#e8a06a 0%,#c25a2e 50%,#7a2e18 80%,#2e140c 100%)', move: '▼ 2' },
+      { title: 'Canal Lights', zone: 'Suramar', author: '@Nyx', n: 188, bg: 'linear-gradient(180deg,#0c1030 0%,#2a2a7a 50%,#8a6fd8 80%,#1a1446 100%)', move: '—' },
+      { title: 'Sandstorm', zone: 'Tanaris', author: '@Zuljin', n: 64, bg: 'linear-gradient(180deg,#f2c58b 0%,#e39b55 50%,#b5662e 75%,#6e3b1c 100%)', move: 'New' }
+    ];
+    var fmt = function (n) { return Math.round(n * mult).toLocaleString('en-US'); };
+    var medals = ['#E8C26A', '#C9CED8', '#C98A4E'];
+    var order = [1, 0, 2];
+    var heights = ['220px', '280px', '190px'];
+    return {
+      periodText: ['this week', 'this month', 'all time'][this.state.period],
+      periods: ['This week', 'This month', 'All time'].map(function (l, i) {
+        var on = i === self.state.period;
+        return { label: l, sel: on ? 'true' : 'false', border: on ? '#E8B54A' : '#2A3244', bg: on ? 'rgba(232,181,74,0.12)' : 'transparent', fg: on ? '#E8B54A' : '#C3CAD8', pick: function () { self.setState({ period: i }); } };
+      }),
+      podium: order.map(function (idx, pos) {
+        var t = data[idx]; var k = tier(Math.round(t.n * mult));
+        return { rank: String(idx + 1), title: t.title, zone: t.zone, author: t.author, bg: t.bg, likes: fmt(t.n), c: Q[k], medal: medals[idx], h: heights[pos], glow: idx === 0 ? '0 0 28px rgba(255,128,0,0.3)' : 'none' };
+      }),
+      rows: data.slice(3).map(function (t, i) {
+        var k = tier(Math.round(t.n * mult));
+        var mc = t.move.indexOf('▲') === 0 ? '#1EFF00' : t.move.indexOf('▼') === 0 ? '#FF6B5A' : t.move === 'New' ? '#FFD100' : '#8C95A8';
+        return { rank: String(i + 4), title: t.title, zone: t.zone, author: t.author, bg: t.bg, likes: fmt(t.n), c: Q[k], move: t.move, moveC: mc };
+      }),
+      people: [
+        { name: 'Lunelame', stat: '3,102 likes this week', rank: 1, c: '#FF8000', bg: 'linear-gradient(180deg,#140c2e,#4b2a7a)' },
+        { name: 'Valdren', stat: '2,870 likes this week', rank: 2, c: '#FF8000', bg: 'linear-gradient(180deg,#0d1b2a,#a8d0e6)' },
+        { name: 'Ysolde', stat: '2,214 likes this week', rank: 3, c: '#C77DFF', bg: 'linear-gradient(180deg,#bcd7ef,#3d566e)' },
+        { name: 'Kaelys', stat: '1,640 likes this week', rank: 4, c: '#C77DFF', bg: 'linear-gradient(180deg,#7fb3d5,#2f4a2a)' },
+        { name: 'Brannoc', stat: '1,198 likes this week', rank: 5, c: '#3D9BFF', bg: 'linear-gradient(180deg,#0e1a3a,#c9a24a)' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

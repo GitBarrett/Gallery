@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lunelame — profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E14}
+a{color:#E8B54A}a:hover{color:#F5D38A}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #0B0E14; color: #E6E9F0; font-family: Inter, system-ui, sans-serif; font-size: 15px">
+<dc-import name="Header" active="collections" hint-size="100%,69px"></dc-import>
+
+<div style="height: 220px; position: relative; border-bottom: 1px solid #3A3220; background: linear-gradient(180deg,#140c2e 0%,#4b2a7a 45%,#c06fd8 72%,#2a1846 100%)">
+<svg viewBox="0 0 1440 220" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%" aria-hidden="true"><path d="M0 160 L200 110 L360 140 L560 80 L760 140 L940 100 L1140 150 L1320 100 L1440 130 L1440 220 L0 220 Z" fill="rgba(11,14,20,0.6)"></path></svg>
+</div>
+
+<main style="max-width: 1360px; margin: 0 auto; padding: 0 24px 48px">
+<section aria-labelledby="pn" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px; margin-top: -56px; margin-bottom: 28px; position: relative">
+<div aria-hidden="true" style="width: 128px; height: 128px; box-sizing: border-box; border-radius: 8px; border: 3px solid #FF8000; box-shadow: inset 0 0 0 2px #1A1206, 0 0 24px rgba(255,128,0,0.3); background: radial-gradient(circle at 35% 30%, #4b2a7a 0%, #140c2e 75%); display: flex; align-items: center; justify-content: center"><svg width="64" height="64" viewBox="0 0 32 32" fill="none" stroke="#E8C26A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 28V15a9 10 0 0 1 18 0v13 M7 20h18 M16 5v23 M11 24h2 M19 24h2"></path></svg></div>
+<div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 6px; padding-bottom: 6px">
+<h1 id="pn" style="margin: 0; font-family: Cinzel, serif; font-size: 36px; color: #FFFFFF">Lunelame</h1>
+<p style="margin: 0; color: #C3CAD8">Night Elf priest and night-light hunter. Suramar, Val’sharah and every moonwell in between.</p>
+<p style="margin: 0; font-size: 13px; color: #8C95A8">Member since Nov 2026 · Plays WoW Forever and Classic</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; padding-bottom: 6px">
+<button type="button" onClick="{{toggleFollow}}" aria-pressed="{{followAttr}}" style="height: 44px; padding: 0 18px; border-radius: 6px; border: 1px solid #E8B54A; background: {{followBg}}; color: {{followFg}}; font: inherit; font-weight: 600; cursor: pointer">{{followLabel}}</button>
+<button type="button" aria-label="Share profile" style="width: 44px; height: 44px; border-radius: 6px; border: 1px solid #2A3244; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="#C3CAD8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 16a8 12 0 1 0 16 0a8 12 0 1 0-16 0Z M12 16a4 7 0 1 0 8 0a4 7 0 1 0-8 0Z"></path></svg></button>
+</div>
+</section>
+
+<dl style="margin: 0 0 28px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+<div style="padding: 14px 16px; border: 1px solid #232A38; border-radius: 6px; background: #10141D"><dt style="font-size: 12px; color: #A9B1C2">Captures</dt><dd style="margin: 4px 0 0; font-family: Cinzel, serif; font-size: 24px; color: #FFFFFF">148</dd></div>
+<div style="padding: 14px 16px; border: 1px solid #232A38; border-radius: 6px; background: #10141D"><dt style="font-size: 12px; color: #A9B1C2">Likes received</dt><dd style="margin: 4px 0 0; font-family: Cinzel, serif; font-size: 24px; color: #FFFFFF">31,402</dd></div>
+<div style="padding: 14px 16px; border: 1px solid #232A38; border-radius: 6px; background: #10141D"><dt style="font-size: 12px; color: #A9B1C2">Followers</dt><dd style="margin: 4px 0 0; font-family: Cinzel, serif; font-size: 24px; color: #FFFFFF">{{followers}}</dd></div>
+<div style="padding: 14px 16px; border: 1px solid #FF8000; border-radius: 6px; background: #10141D"><dt style="font-size: 12px; color: #A9B1C2">Legendary captures</dt><dd style="margin: 4px 0 0; font-family: Cinzel, serif; font-size: 24px; color: #FF8000">6</dd></div>
+<div style="padding: 14px 16px; border: 1px solid #232A38; border-radius: 6px; background: #10141D"><dt style="font-size: 12px; color: #A9B1C2">Contest wins</dt><dd style="margin: 4px 0 0; font-family: Cinzel, serif; font-size: 24px; color: #FFD100">2</dd></div>
+</dl>
+
+<div role="tablist" aria-label="Profile sections" style="display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid #232A38; margin-bottom: 20px">
+<sc-for list="{{tabs}}" as="tb" hint-placeholder-count="3">
+<button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="height: 44px; padding: 0 16px; border: 0; border-bottom: 2px solid {{tb.line}}; background: transparent; color: {{tb.fg}}; font: inherit; font-weight: 600; cursor: pointer">{{tb.label}}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{showGrid}}" hint-placeholder-val="{{true}}">
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px">
+<sc-for list="{{items}}" as="t" hint-placeholder-count="8">
+<a href="Photo.dc.html" style="display: block; border-radius: 6px; border: 1px solid {{t.c}}; background: #10141D; text-decoration: none">
+<span style="display: block; position: relative; height: 170px; border-radius: 5px 5px 0 0; overflow: hidden; background: {{t.bg}}"><span style="position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 3px; background: rgba(11,14,20,0.85); border: 1px solid {{t.c}}; color: {{t.c}}; font-size: 11px; font-weight: 600">{{t.tier}}</span></span>
+<span style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px"><span style="font-family: Cinzel, serif; font-size: 14px; font-weight: 700; color: {{t.c}}">{{t.title}}</span><span style="font-size: 12px; color: #A9B1C2">♥ {{t.likes}}</span></span>
+</a>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{showCollections}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px">
+<sc-for list="{{collections}}" as="col" hint-placeholder-count="3">
+<a href="#" style="display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 6px; border: 1px solid #5C4A2A; background: #10141D; color: #E6E9F0; text-decoration: none">
+<span style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; height: 110px"><span style="background: {{col.a}}; border-radius: 3px"></span><span style="background: {{col.b}}; border-radius: 3px"></span><span style="background: {{col.c}}; border-radius: 3px"></span></span>
+<span style="display: flex; align-items: center; gap: 8px; font-family: Cinzel, serif; font-weight: 700"><svg width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="#E8C26A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h17a3 3 0 0 1 3 3v21H9a3 3 0 0 1-3-3Z M6 25a3 3 0 0 1 3-3h17 M12 9h9 M12 13h7"></path></svg>{{col.name}}</span>
+<span style="font-size: 13px; color: #A9B1C2">{{col.count}} captures · {{col.vis}}</span>
+</a>
+</sc-for>
+</div>
+</sc-if>
+</main>
+<dc-import name="Footer" hint-size="100%,110px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 0, following: false };
+  }
+  renderVals() {
+    var self = this;
+    var s = this.state;
+    var Q = { Poor: '#9D9D9D', Uncommon: '#1EFF00', Rare: '#3D9BFF', Epic: '#C77DFF', Legendary: '#FF8000' };
+    var tier = function (n) { return n >= 1000 ? 'Legendary' : n >= 500 ? 'Epic' : n >= 100 ? 'Rare' : n >= 10 ? 'Uncommon' : 'Poor'; };
+    var caps = [
+      { title: 'Nights of Suramar', n: 1284, bg: 'linear-gradient(180deg,#140c2e 0%,#4b2a7a 45%,#c06fd8 72%,#2a1846 100%)' },
+      { title: 'Arcane Dusk', n: 967, bg: 'linear-gradient(180deg,#140c2e 0%,#4b2a7a 45%,#c06fd8 75%,#2a1846 100%)' },
+      { title: 'Canal Lights', n: 188, bg: 'linear-gradient(180deg,#0c1030 0%,#2a2a7a 50%,#8a6fd8 80%,#1a1446 100%)' },
+      { title: 'Moonwell', n: 612, bg: 'linear-gradient(180deg,#0d1b2a 0%,#3a5a78 45%,#a8d0e6 75%,#1b2a3a 100%)' },
+      { title: 'Shal’Aran', n: 74, bg: 'linear-gradient(180deg,#2c4a3a 0%,#5a8a6a 40%,#d6a8c8 70%,#24352b 100%)' },
+      { title: 'Emerald Dream', n: 733, bg: 'linear-gradient(180deg,#2c4a3a 0%,#5a8a6a 40%,#d6a8c8 70%,#24352b 100%)' },
+      { title: 'Teldrassil, Before', n: 1530, bg: 'linear-gradient(180deg,#1a2a3a 0%,#2a5a5a 45%,#a8c8a0 75%,#1a2a20 100%)' },
+      { title: 'Lantern Path', n: 9, bg: 'linear-gradient(180deg,#1a1410 0%,#3d2a1a 40%,#c9a24a 75%,#1f1a12 100%)' }
+    ];
+    var liked = [
+      { title: 'Frozen Silence', n: 1102, bg: 'linear-gradient(180deg,#bcd7ef 0%,#e8f1f8 40%,#8fb0cc 70%,#3d566e 100%)' },
+      { title: 'Dawn on the Plains', n: 842, bg: 'linear-gradient(180deg,#7fb3d5 0%,#cfe3c8 45%,#5f8a4a 70%,#2f4a2a 100%)' },
+      { title: 'Red Earth', n: 258, bg: 'linear-gradient(180deg,#e8a06a 0%,#c25a2e 50%,#7a2e18 80%,#2e140c 100%)' }
+    ];
+    var src = s.tab === 2 ? liked : caps;
+    var labels = ['Captures · 148', 'Collections · 3', 'Liked'];
+    return {
+      followers: (2310 + (s.following ? 1 : 0)).toLocaleString('en-US'),
+      followAttr: s.following ? 'true' : 'false',
+      followLabel: s.following ? 'Following' : 'Follow',
+      followBg: s.following ? 'transparent' : '#E8B54A',
+      followFg: s.following ? '#E8B54A' : '#14100A',
+      toggleFollow: function () { self.setState({ following: !s.following }); },
+      tabs: labels.map(function (l, i) {
+        var on = i === s.tab;
+        return { label: l, sel: on ? 'true' : 'false', line: on ? '#E8B54A' : 'transparent', fg: on ? '#FFFFFF' : '#A9B1C2', pick: function () { self.setState({ tab: i }); } };
+      }),
+      showGrid: s.tab !== 1,
+      showCollections: s.tab === 1,
+      items: src.map(function (t) { var k = tier(t.n); return { title: t.title, bg: t.bg, tier: k, c: Q[k], likes: t.n.toLocaleString('en-US') }; }),
+      collections: [
+        { name: 'Moonlit Kaldorei', count: 24, vis: 'Public', a: 'linear-gradient(180deg,#140c2e,#c06fd8)', b: 'linear-gradient(180deg,#0d1b2a,#a8d0e6)', c: 'linear-gradient(180deg,#2c4a3a,#d6a8c8)' },
+        { name: 'Wallpapers 21:9', count: 41, vis: 'Public', a: 'linear-gradient(180deg,#bcd7ef,#3d566e)', b: 'linear-gradient(180deg,#7fb3d5,#2f4a2a)', c: 'linear-gradient(180deg,#e8a06a,#2e140c)' },
+        { name: 'Next contest ideas', count: 7, vis: 'Private', a: 'linear-gradient(180deg,#0e1a3a,#c9a24a)', b: 'linear-gradient(180deg,#1a1410,#6b8a2f)', c: 'linear-gradient(180deg,#f2c58b,#6e3b1c)' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

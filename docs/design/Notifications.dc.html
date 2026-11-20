@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Notifications</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E14}
+a{color:#E8B54A}a:hover{color:#F5D38A}
+</style>
+</helmet>
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs><linearGradient id="mk-y" gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="0" y2="27"><stop offset="0" stop-color="#FFF27A"></stop><stop offset="0.35" stop-color="#FFD100"></stop><stop offset="0.8" stop-color="#FF9A00"></stop><stop offset="1" stop-color="#FF7A00"></stop></linearGradient><linearGradient id="mk-w" gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="0" y2="27"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="0.5" stop-color="#E6EAF0"></stop><stop offset="1" stop-color="#AEB6C2"></stop></linearGradient><filter id="mk-glow" x="-80%" y="-40%" width="260%" height="180%"><feGaussianBlur stdDeviation="1.8"></feGaussianBlur></filter></defs></svg>
+<div style="min-height: 100vh; background: #0B0E14; color: #E6E9F0; font-family: Inter, system-ui, sans-serif; font-size: 15px">
+<dc-import name="Header" active="none" hint-size="100%,69px"></dc-import>
+
+<main style="max-width: 1360px; margin: 0 auto; padding: 28px 24px 48px; display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+<section aria-labelledby="nt" style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<h1 id="nt" style="margin: 0; font-family: Cinzel, serif; font-size: 34px; color: #FFFFFF">Quest log</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<div role="tablist" aria-label="Filter" style="display: flex; gap: 6px">
+<sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2">
+<button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid {{tb.border}}; background: {{tb.bg}}; color: {{tb.fg}}; font: inherit; font-weight: 600; cursor: pointer">{{tb.label}}</button>
+</sc-for>
+</div>
+<button type="button" onClick="{{markAll}}" style="height: 40px; padding: 0 14px; border-radius: 6px; border: 1px solid #2A3244; background: transparent; color: #E6E9F0; font: inherit; cursor: pointer">Mark all as read</button>
+</div>
+</div>
+
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 8px 0 0; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #8C95A8">{{g.label}}</h2>
+<sc-for list="{{g.items}}" as="n" hint-placeholder-count="3">
+<article style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid {{n.border}}; border-left: 3px solid {{n.accent}}; border-radius: 6px; background: {{n.bg}}">
+<sc-if value="{{n.isEx}}" hint-placeholder-val="{{true}}"><svg width="18" height="26" viewBox="-2 -1 24 30" style="overflow: visible" role="img" aria-label="{{n.markerLabel}}"><g filter="url(#mk-glow)" opacity="0.75"><path d="M6.3 3.4C6.1 1.6 7.6 1 10 1s3.9 0.6 3.7 2.4L12.1 17c-0.2 1.3-0.9 1.7-2.1 1.7s-1.9-0.4-2.1-1.7Z" fill="{{n.grad}}"></path><circle cx="10" cy="23.4" r="3.1" fill="{{n.grad}}"></circle></g><path d="M6.3 3.4C6.1 1.6 7.6 1 10 1s3.9 0.6 3.7 2.4L12.1 17c-0.2 1.3-0.9 1.7-2.1 1.7s-1.9-0.4-2.1-1.7Z" fill="{{n.grad}}"></path><circle cx="10" cy="23.4" r="3.1" fill="{{n.grad}}"></circle></svg></sc-if><sc-if value="{{n.isQu}}" hint-placeholder-val="{{false}}"><svg width="18" height="26" viewBox="-2 -1 24 30" style="overflow: visible" role="img" aria-label="{{n.markerLabel}}"><g filter="url(#mk-glow)" opacity="0.75"><path d="M5.4 8.3C5.4 4.6 7.5 3 10 3s4.6 1.6 4.6 4.4c0 2.4-1.5 3.4-2.9 4.4-1.3 0.9-1.7 1.8-1.7 4" stroke="{{n.grad}}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path><circle cx="10" cy="22.9" r="2.7" fill="{{n.grad}}"></circle></g><path d="M5.4 8.3C5.4 4.6 7.5 3 10 3s4.6 1.6 4.6 4.4c0 2.4-1.5 3.4-2.9 4.4-1.3 0.9-1.7 1.8-1.7 4" stroke="{{n.grad}}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path><circle cx="10" cy="22.9" r="2.7" fill="{{n.grad}}"></circle></svg></sc-if>
+<span aria-hidden="true" style="flex: 0 0 auto; width: 48px; height: 36px; border-radius: 4px; border: 1px solid {{n.thumbBorder}}; background: {{n.thumb}}"></span>
+<div style="flex: 1; min-width: 0">
+<p style="margin: 0; color: {{n.fg}}">{{n.text}}</p>
+<p style="margin: 2px 0 0; font-size: 12px; color: #8C95A8">{{n.when}}</p>
+</div>
+<a href="{{n.href}}" style="font-size: 14px; font-weight: 600; white-space: nowrap">{{n.cta}}</a>
+</article>
+</sc-for>
+</div>
+</sc-for>
+<sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 32px; border: 1px dashed #2A3244; border-radius: 6px; text-align: center; color: #A9B1C2">No new quests. Go capture something beautiful.</p>
+</sc-if>
+</section>
+
+<aside aria-labelledby="ns" style="flex: 1 1 320px; padding: 18px; border: 1px solid #232A38; border-radius: 6px; background: #10141D; display: flex; flex-direction: column; gap: 14px">
+<h2 id="ns" style="margin: 0; font-family: Cinzel, serif; font-size: 20px; color: #FFFFFF">Notification settings</h2>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 10px">
+<legend style="font-size: 13px; color: #A9B1C2; margin-bottom: 8px">In-app</legend>
+<label style="display: flex; align-items: center; gap: 10px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #E8B54A">Likes on my captures</label>
+<label style="display: flex; align-items: center; gap: 10px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #E8B54A">Comments</label>
+<label style="display: flex; align-items: center; gap: 10px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #E8B54A">New followers</label>
+<label style="display: flex; align-items: center; gap: 10px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #E8B54A">Contests and results</label>
+<label style="display: flex; align-items: center; gap: 10px; color: #A9B1C2"><input type="checkbox" checked disabled style="width: 18px; height: 18px; accent-color: #E8B54A">Moderation decisions (always on)</label>
+</fieldset>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 10px">
+<legend style="font-size: 13px; color: #A9B1C2; margin-bottom: 8px">Email</legend>
+<label style="display: flex; align-items: center; gap: 10px"><input type="checkbox" style="width: 18px; height: 18px; accent-color: #E8B54A">Weekly digest of unread notifications</label>
+</fieldset>
+<p style="margin: 0; font-size: 13px; color: #8C95A8">Likes are grouped: “Ysolde and 23 others liked…” to avoid flooding your log.</p>
+</aside>
+</main>
+<dc-import name="Footer" hint-size="100%,110px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { unreadOnly: false, allRead: false };
+  }
+  renderVals() {
+    var self = this, s = this.state;
+    var EX = 'M5.6 1.5h8.8l-2.4 17.6H8Z M13.4 23.7a3.4 3.4 0 1 1 -6.8 0a3.4 3.4 0 1 1 6.8 0Z';
+    var QU = 'M3.6 8.2a6.4 6.4 0 1 1 9.7 5.4c-1.9 1.1-2 2-2 4.9H7.9c0-4 1-5.4 3.1-6.8A2.9 2.9 0 1 0 6.9 8.2Z M12.9 23.7a3.3 3.3 0 1 1 -6.6 0a3.3 3.3 0 1 1 6.6 0Z';
+    var data = [
+      { g: 'Today', unread: true, m: EX, text: 'Your capture “Dawn on the Plains” reached Epic quality (500 likes).', when: '12 min ago', cta: 'View', href: 'Photo.dc.html', accent: '#C77DFF', thumb: 'linear-gradient(180deg,#7fb3d5,#2f4a2a)' },
+      { g: 'Today', unread: true, m: EX, text: 'Ysolde and 23 others liked “Dawn on the Plains”.', when: '1 h ago', cta: 'View', href: 'Photo.dc.html', accent: '#E8B54A', thumb: 'linear-gradient(180deg,#7fb3d5,#2f4a2a)' },
+      { g: 'Today', unread: true, m: EX, text: 'Brannoc commented: “Set as my wallpaper, the 5120 width fits perfectly.”', when: '3 h ago', cta: 'Reply', href: 'Photo.dc.html', accent: '#3D9BFF', thumb: 'linear-gradient(180deg,#140c2e,#c06fd8)' },
+      { g: 'Today', unread: false, m: QU, text: 'Task: add zone and in-game time to 3 of your captures.', when: '5 h ago', cta: 'Do it', href: 'Upload.dc.html', accent: '#FFD100', thumb: 'linear-gradient(180deg,#1a1410,#6b8a2f)' },
+      { g: 'Earlier', unread: false, m: EX, text: 'Your capture “Harbor Mist” was published after moderation.', when: 'Yesterday', cta: 'View', href: 'Photo.dc.html', accent: '#1EFF00', thumb: 'linear-gradient(180deg,#b8c4cc,#22303a)' },
+      { g: 'Earlier', unread: false, m: EX, text: 'Valdren started following you.', when: '2 days ago', cta: 'Profile', href: 'Profile.dc.html', accent: '#E8B54A', thumb: 'linear-gradient(180deg,#0d1b2a,#a8d0e6)' },
+      { g: 'Earlier', unread: false, m: EX, text: 'Contest “Frozen North” ended: you placed 7th of 214.', when: '5 days ago', cta: 'Results', href: 'Contest.dc.html', accent: '#FF8000', thumb: 'linear-gradient(180deg,#bcd7ef,#3d566e)' }
+    ];
+    var items = data.filter(function (d) { return !s.unreadOnly || (d.unread && !s.allRead); });
+    var groups = ['Today', 'Earlier'].map(function (g) {
+      return { label: g, items: items.filter(function (d) { return d.g === g; }).map(function (d) {
+        var un = d.unread && !s.allRead;
+        return { text: d.text, when: d.when, cta: d.cta, href: d.href, accent: d.accent, thumb: d.thumb, thumbBorder: '#2A3244', marker: d.m,
+          grad: un ? 'url(#mk-y)' : 'url(#mk-w)', isEx: d.m === EX, isQu: d.m !== EX, markerLabel: un ? 'Unread' : 'Read', fg: un ? '#FFFFFF' : '#C3CAD8',
+          bg: un ? '#141A28' : '#10141D', border: un ? '#3A3220' : '#232A38' };
+      }) };
+    }).filter(function (g) { return g.items.length; });
+    var unread = s.allRead ? 0 : data.filter(function (d) { return d.unread; }).length;
+    return {
+      groups: groups,
+      empty: groups.length === 0,
+      markAll: function () { self.setState({ allRead: true }); },
+      tabs: [{ k: false, l: 'All' }, { k: true, l: 'Unread · ' + unread }].map(function (t) {
+        var on = t.k === s.unreadOnly;
+        return { label: t.l, sel: on ? 'true' : 'false', border: on ? '#E8B54A' : '#2A3244', bg: on ? 'rgba(232,181,74,0.12)' : 'transparent', fg: on ? '#E8B54A' : '#C3CAD8', pick: function () { self.setState({ unreadOnly: t.k }); } };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

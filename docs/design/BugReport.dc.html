@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Report a bug</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E14}
+a{color:#E8B54A}a:hover{color:#F5D38A}
+</style>
+</helmet>
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs><linearGradient id="mk-y" gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="0" y2="27"><stop offset="0" stop-color="#FFF27A"></stop><stop offset="0.35" stop-color="#FFD100"></stop><stop offset="0.8" stop-color="#FF9A00"></stop><stop offset="1" stop-color="#FF7A00"></stop></linearGradient><linearGradient id="mk-w" gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="0" y2="27"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="0.5" stop-color="#E6EAF0"></stop><stop offset="1" stop-color="#AEB6C2"></stop></linearGradient><filter id="mk-glow" x="-80%" y="-40%" width="260%" height="180%"><feGaussianBlur stdDeviation="1.8"></feGaussianBlur></filter></defs></svg>
+<div style="position: relative; min-height: 100vh; background: #0B0E14; color: #E6E9F0; font-family: Inter, system-ui, sans-serif; font-size: 15px">
+<dc-import name="Header" active="none" hint-size="100%,69px"></dc-import>
+<div aria-hidden="true" style="max-width: 1360px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; opacity: 0.5">
+<span style="height: 260px; border-radius: 6px; background: linear-gradient(180deg,#7fb3d5,#2f4a2a)"></span><span style="height: 260px; border-radius: 6px; background: linear-gradient(180deg,#140c2e,#c06fd8)"></span><span style="height: 260px; border-radius: 6px; background: linear-gradient(180deg,#bcd7ef,#3d566e)"></span><span style="height: 260px; border-radius: 6px; background: linear-gradient(180deg,#e8a06a,#2e140c)"></span>
+</div>
+
+<div style="position: absolute; inset: 0; background: rgba(4,6,10,0.78); display: flex; justify-content: center; align-items: flex-start; padding: 80px 16px">
+<div role="dialog" aria-modal="true" aria-labelledby="br" style="width: 100%; max-width: 560px; box-sizing: border-box; padding: 24px; border-radius: 8px; border: 1px solid #9AA3B5; box-shadow: 0 0 0 1px #000000, 0 16px 48px rgba(0,0,0,0.7); background: rgba(6,10,32,0.98); display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="br" style="margin: 0; display: flex; align-items: center; gap: 12px; font-family: Cinzel, serif; font-size: 24px; color: #FFFFFF"><svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#E8C26A" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M16 11a5 5 0 1 0 0 10a5 5 0 1 0 0-10Z M16 3v4 M16 25v4 M3 16h4 M25 16h4 M6.8 6.8l2.8 2.8 M22.4 22.4l2.8 2.8 M6.8 25.2l2.8-2.8 M22.4 9.6l2.8-2.8"></path></svg>Report a bug</h2>
+<a href="Main.dc.html" aria-label="Close" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #C3CAD8; text-decoration: none; font-size: 22px">×</a>
+</div>
+
+<sc-if value="{{isForm}}" hint-placeholder-val="{{true}}">
+<form onSubmit="{{send}}" style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="bc" style="font-size: 13px; font-weight: 600">What went wrong? <span style="color: #E8B54A">*</span></label><select id="bc" required style="height: 44px; padding: 0 10px; border-radius: 6px; border: 1px solid #2A3244; background: #151A25; color: #E6E9F0; font: inherit"><option>Upload failed</option><option>Page displays incorrectly</option><option>Search or filters</option><option>Likes, comments, follows</option><option>Account and sign-in</option><option>Something else</option></select></div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="bd" style="font-size: 13px; font-weight: 600">Describe the problem <span style="color: #E8B54A">*</span></label>
+<textarea id="bd" rows="5" minlength="20" maxlength="5000" required onInput="{{typing}}" placeholder="What did you do, what did you expect, what happened instead?" style="padding: 10px 12px; border-radius: 6px; border: 1px solid {{descBorder}}; background: #151A25; color: #E6E9F0; font: inherit; resize: vertical"></textarea>
+<div style="display: flex; justify-content: space-between; font-size: 12px"><span style="color: {{descHintC}}">{{descHint}}</span><span style="color: #8C95A8">{{count}} / 5000</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600">Screenshot <span style="font-weight: 400; color: #A9B1C2">· optional, image only, max 5 MB</span></span><button type="button" style="height: 44px; border-radius: 6px; border: 1px dashed #5C4A2A; background: #10141D; color: #C3CAD8; font: inherit; cursor: pointer">Attach a screenshot</button></div>
+<div aria-hidden="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden"><label for="hp">Leave this field empty</label><input id="hp" type="text" tabindex="-1" autocomplete="off"></div>
+<details style="font-size: 13px; color: #A9B1C2"><summary style="cursor: pointer">Sent automatically with your report</summary><p style="margin: 6px 0 0">Page URL, browser and OS, screen size, your user ID. Never your email or password.</p></details>
+<div style="height: 64px; border-radius: 6px; border: 1px dashed #2A3244; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #8C95A8">[Turnstile check]</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-size: 12px; color: #8C95A8">{{quota}}</span>
+<button type="submit" disabled="{{cantSend}}" style="height: 46px; padding: 0 22px; border-radius: 6px; border: 0; background: {{sendBg}}; color: #14100A; font: inherit; font-weight: 600; cursor: pointer">Send report</button>
+</div>
+</form>
+</sc-if>
+
+<sc-if value="{{isSent}}" hint-placeholder-val="{{false}}">
+<div role="status" style="display: flex; flex-direction: column; gap: 12px">
+<p style="margin: 0; display: flex; align-items: center; gap: 12px; font-weight: 600; color: #FFD100"><svg width="18" height="26" viewBox="-2 -1 24 30" style="overflow: visible" aria-hidden="true"><g filter="url(#mk-glow)" opacity="0.75"><path d="M5.4 8.3C5.4 4.6 7.5 3 10 3s4.6 1.6 4.6 4.4c0 2.4-1.5 3.4-2.9 4.4-1.3 0.9-1.7 1.8-1.7 4" stroke="url(#mk-y)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path><circle cx="10" cy="22.9" r="2.7" fill="url(#mk-y)"></circle></g><path d="M5.4 8.3C5.4 4.6 7.5 3 10 3s4.6 1.6 4.6 4.4c0 2.4-1.5 3.4-2.9 4.4-1.3 0.9-1.7 1.8-1.7 4" stroke="url(#mk-y)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path><circle cx="10" cy="22.9" r="2.7" fill="url(#mk-y)"></circle></svg>Report received, thank you!</p>
+<p style="margin: 0; color: #C3CAD8">Reference <strong style="color: #FFFFFF">BR-2611-0042</strong>. We read every report; you'll get a notification if we need more details.</p>
+<a href="Main.dc.html" style="align-self: flex-start; height: 44px; display: flex; align-items: center; padding: 0 18px; border-radius: 6px; border: 1px solid #2A3244; color: #E6E9F0; text-decoration: none">Back to the gallery</a>
+</div>
+</sc-if>
+
+<sc-if value="{{isLimited}}" hint-placeholder-val="{{false}}">
+<div role="alert" style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 6px; border: 1px solid #9B2C1F; background: rgba(155,44,31,0.12)">
+<p style="margin: 0; font-weight: 600; color: #FF9A8A">You've reached the limit of 3 reports per hour.</p>
+<p style="margin: 0; color: #C3CAD8">You can send a new one in 38 minutes. Already reported something similar? It's being looked at.</p>
+</div>
+</sc-if>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"scenario":{"editor":"enum","options":["form","rate-limited"],"default":"form"},"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { len: 0, sent: false };
+  }
+  renderVals() {
+    var self = this, s = this.state;
+    var limited = (this.props.scenario ?? 'form') === 'rate-limited';
+    var ok = s.len >= 20;
+    return {
+      isForm: !limited && !s.sent,
+      isSent: !limited && s.sent,
+      isLimited: limited,
+      count: String(s.len),
+      typing: function (e) { self.setState({ len: e.target.value.length }); },
+      descHint: s.len === 0 ? 'At least 20 characters.' : ok ? 'Looks good.' : (20 - s.len) + ' more characters needed.',
+      descHintC: s.len === 0 ? '#8C95A8' : ok ? '#1EFF00' : '#FFB86B',
+      descBorder: s.len > 0 && !ok ? '#FFB86B' : '#2A3244',
+      cantSend: !ok,
+      sendBg: ok ? '#E8B54A' : '#5C4A2A',
+      quota: '2 of 3 reports left this hour',
+      send: function (e) { e.preventDefault(); if (ok) self.setState({ sent: true }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

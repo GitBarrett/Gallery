@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E14}
+a{color:#E8B54A}a:hover{color:#F5D38A}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #0B0E14; color: #E6E9F0; font-family: Inter, system-ui, sans-serif; font-size: 15px; display: flex; flex-direction: column">
+<dc-import name="Header" active="none" signed-in="{{false}}" hint-size="100%,69px"></dc-import>
+
+<main style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; padding: 56px 16px; background: linear-gradient(180deg,#0e1a3a 0%,#2b3f78 50%,#c9a24a 85%,#3a2a18 100%)">
+<svg viewBox="0 0 1440 700" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%" aria-hidden="true"><path d="M0 470 L200 360 L340 420 L520 300 L700 410 L880 330 L1060 420 L1260 320 L1440 380 L1440 700 L0 700 Z" fill="rgba(11,14,20,0.55)"></path><path d="M0 560 L260 500 L520 550 L780 480 L1040 540 L1300 490 L1440 520 L1440 700 L0 700 Z" fill="rgba(11,14,20,0.85)"></path></svg>
+
+<div style="position: relative; width: 100%; max-width: 440px; box-sizing: border-box; padding: 28px; border-radius: 8px; border: 1px solid #9AA3B5; box-shadow: 0 0 0 1px #000000, 0 16px 48px rgba(0,0,0,0.6); background: rgba(6,10,32,0.96); display: flex; flex-direction: column; gap: 18px">
+
+<div role="tablist" aria-label="Account" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid #232A38">
+<sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2">
+<button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="height: 44px; border: 0; border-bottom: 2px solid {{tb.line}}; background: transparent; color: {{tb.fg}}; font-family: Cinzel, serif; font-size: 16px; font-weight: 700; cursor: pointer">{{tb.label}}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{showMain}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<button type="button" style="display: flex; align-items: center; justify-content: center; gap: 12px; height: 48px; border-radius: 6px; border: 1px solid #148EFF; background: #0E2A4E; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer"><span aria-hidden="true" style="width: 24px; height: 24px; box-sizing: border-box; border-radius: 4px; border: 1px dashed rgba(255,255,255,0.6); font-size: 8px; line-height: 22px; text-align: center; color: rgba(255,255,255,0.8)">LOGO</span>Continue with Battle.net</button>
+<button type="button" style="display: flex; align-items: center; justify-content: center; gap: 12px; height: 48px; border-radius: 6px; border: 1px solid #2A3244; background: #FFFFFF; color: #1F1F1F; font: inherit; font-weight: 600; cursor: pointer"><span aria-hidden="true" style="width: 24px; height: 24px; box-sizing: border-box; border-radius: 4px; border: 1px dashed #9AA3B5; font-size: 8px; line-height: 22px; text-align: center; color: #5E6575">LOGO</span>Continue with Google</button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; color: #8C95A8; font-size: 13px" aria-hidden="true"><span style="flex: 1; border-top: 1px solid #232A38"></span>or with email<span style="flex: 1; border-top: 1px solid #232A38"></span></div>
+<form style="display: flex; flex-direction: column; gap: 14px" onSubmit="{{noop}}">
+<sc-if value="{{isSignUp}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="sn" style="font-size: 13px; font-weight: 600">Username</label><input id="sn" type="text" autocomplete="username" placeholder="3–24 characters" style="height: 44px; padding: 0 12px; border-radius: 6px; border: 1px solid #2A3244; background: #151A25; color: #E6E9F0; font: inherit"><span style="font-size: 12px; color: #1EFF00">✓ “Kaelys” is available</span></div>
+</sc-if>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="se" style="font-size: 13px; font-weight: 600">Email</label><input id="se" type="email" autocomplete="email" style="height: 44px; padding: 0 12px; border-radius: 6px; border: 1px solid #2A3244; background: #151A25; color: #E6E9F0; font: inherit"></div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><label for="sp" style="font-size: 13px; font-weight: 600">Password</label><sc-if value="{{isSignIn}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{forgot}}" style="border: 0; background: transparent; color: #E8B54A; font: inherit; font-size: 13px; cursor: pointer; padding: 0">Forgot password?</button></sc-if></div>
+<input id="sp" type="password" autocomplete="current-password" style="height: 44px; padding: 0 12px; border-radius: 6px; border: 1px solid #2A3244; background: #151A25; color: #E6E9F0; font: inherit">
+<sc-if value="{{isSignUp}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; color: #A9B1C2">At least 10 characters.</span></sc-if>
+</div>
+<sc-if value="{{isSignUp}}" hint-placeholder-val="{{false}}">
+<label for="st" style="display: flex; gap: 10px; align-items: flex-start; min-height: 44px; font-size: 13px; color: #C3CAD8; line-height: 1.45; cursor: pointer"><input id="st" type="checkbox" required style="width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: #E8B54A"><span>I am at least 15 and accept the <a href="#">Terms</a> and <a href="#">Privacy policy</a>.</span></label>
+</sc-if>
+<div style="height: 64px; border-radius: 6px; border: 1px dashed #2A3244; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #8C95A8">[Turnstile check]</div>
+<button type="submit" style="height: 48px; border-radius: 6px; border: 0; background: #E8B54A; color: #14100A; font: inherit; font-weight: 600; cursor: pointer">{{cta}}</button>
+<sc-if value="{{isSignUp}}" hint-placeholder-val="{{false}}"><p style="margin: 0; font-size: 12px; color: #8C95A8">We'll send a link to verify your email. You can publish once it's verified.</p></sc-if>
+</form>
+</sc-if>
+
+<sc-if value="{{showForgot}}" hint-placeholder-val="{{false}}">
+<form style="display: flex; flex-direction: column; gap: 14px" onSubmit="{{sendReset}}">
+<p style="margin: 0; color: #C3CAD8">Enter your email. If an account exists, we'll send a reset link valid for 1 hour.</p>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="fe2" style="font-size: 13px; font-weight: 600">Email</label><input id="fe2" type="email" style="height: 44px; padding: 0 12px; border-radius: 6px; border: 1px solid #2A3244; background: #151A25; color: #E6E9F0; font: inherit"></div>
+<sc-if value="{{sent}}" hint-placeholder-val="{{false}}"><p role="status" style="margin: 0; color: #1EFF00">Check your inbox: if this email is registered, the link is on its way.</p></sc-if>
+<button type="submit" style="height: 48px; border-radius: 6px; border: 0; background: #E8B54A; color: #14100A; font: inherit; font-weight: 600; cursor: pointer">Send reset link</button>
+<button type="button" onClick="{{back}}" style="height: 44px; border: 0; background: transparent; color: #E8B54A; font: inherit; cursor: pointer">Back to sign in</button>
+</form>
+</sc-if>
+</div>
+</main>
+<dc-import name="Footer" hint-size="100%,110px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { mode: 'signin', sent: false };
+  }
+  renderVals() {
+    var self = this;
+    var m = this.state.mode;
+    var labels = [{ k: 'signin', l: 'Sign in' }, { k: 'signup', l: 'Create account' }];
+    return {
+      tabs: labels.map(function (t) {
+        var on = t.k === m || (m === 'forgot' && t.k === 'signin');
+        return { label: t.l, sel: on ? 'true' : 'false', line: on ? '#E8B54A' : 'transparent', fg: on ? '#FFFFFF' : '#A9B1C2', pick: function () { self.setState({ mode: t.k, sent: false }); } };
+      }),
+      showMain: m !== 'forgot',
+      showForgot: m === 'forgot',
+      isSignIn: m === 'signin',
+      isSignUp: m === 'signup',
+      cta: m === 'signup' ? 'Create my account' : 'Sign in',
+      sent: this.state.sent,
+      forgot: function () { self.setState({ mode: 'forgot', sent: false }); },
+      back: function () { self.setState({ mode: 'signin' }); },
+      sendReset: function (e) { e.preventDefault(); self.setState({ sent: true }); },
+      noop: function (e) { e.preventDefault(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

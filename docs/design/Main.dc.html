@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E14}
+a{color:#E8B54A}a:hover{color:#F5D38A}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</helmet>
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs><linearGradient id="mk-y" gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="0" y2="27"><stop offset="0" stop-color="#FFF27A"></stop><stop offset="0.35" stop-color="#FFD100"></stop><stop offset="0.8" stop-color="#FF9A00"></stop><stop offset="1" stop-color="#FF7A00"></stop></linearGradient><linearGradient id="mk-w" gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="0" y2="27"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="0.5" stop-color="#E6EAF0"></stop><stop offset="1" stop-color="#AEB6C2"></stop></linearGradient><filter id="mk-glow" x="-80%" y="-40%" width="260%" height="180%"><feGaussianBlur stdDeviation="1.8"></feGaussianBlur></filter></defs></svg>
+<div style="min-height: 100vh; background: #0B0E14; color: #E6E9F0; font-family: Inter, system-ui, sans-serif; font-size: 15px">
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs><linearGradient id="ig-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF0A8"></stop><stop offset="0.5" stop-color="#E8B54A"></stop><stop offset="1" stop-color="#7A4E0E"></stop></linearGradient><linearGradient id="ig-steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F6FA"></stop><stop offset="0.5" stop-color="#AEB6C4"></stop><stop offset="1" stop-color="#3E4656"></stop></linearGradient><linearGradient id="ig-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A8A"></stop><stop offset="0.5" stop-color="#D0302A"></stop><stop offset="1" stop-color="#5E0E0A"></stop></linearGradient><linearGradient id="ig-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE6FF"></stop><stop offset="0.5" stop-color="#3D9BFF"></stop><stop offset="1" stop-color="#0E2E6E"></stop></linearGradient><linearGradient id="ig-purple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0C8FF"></stop><stop offset="0.5" stop-color="#A335EE"></stop><stop offset="1" stop-color="#3E0E66"></stop></linearGradient><linearGradient id="ig-parch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF8E0"></stop><stop offset="0.5" stop-color="#E6CF96"></stop><stop offset="1" stop-color="#9A7A40"></stop></linearGradient><linearGradient id="ig-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D49A5E"></stop><stop offset="0.5" stop-color="#7A4A22"></stop><stop offset="1" stop-color="#341C08"></stop></linearGradient></defs></svg>
+<section aria-labelledby="hero" style="position: relative; min-height: 680px; display: flex; flex-direction: column; background: #0B0E14; overflow: hidden">
+<img src="/_blob/291eafd771c6b1bb3eb7d65071f723ca" alt="A night-elf forest path lit by moonbeams through violet trees" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%">
+<span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(11,14,20,0.88) 0%, rgba(11,14,20,0.55) 40%, rgba(11,14,20,0) 70%)"></span>
+<span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,14,20,0.8) 0%, rgba(11,14,20,0) 18%, rgba(11,14,20,0) 60%, #0B0E14 100%)"></span>
+<dc-import name="Header" active="explore" signed-in="{{false}}" transparent="{{true}}" hint-size="100%,69px"></dc-import>
+<div style="position: relative; flex: 1; max-width: 1360px; width: 100%; margin: 0 auto; padding: 0 24px 64px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-end; gap: 18px">
+<p style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: {{accent}}">WoW Forever · A brand-new engine</p>
+<h1 id="hero" style="margin: 0; max-width: 760px; font-family: Cinzel, serif; font-weight: 700; font-size: 60px; line-height: 1.05; color: #FFFFFF">Azeroth, seen by its players.</h1>
+<p style="margin: 0; max-width: 540px; font-size: 18px; color: #E6E9F0">Share your best captures, discover the community's, download them in full resolution.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="Upload.dc.html" style="display: flex; align-items: center; height: 52px; padding: 0 26px; border-radius: 6px; background: {{accent}}; color: #14100A; font-size: 16px; font-weight: 600; text-decoration: none">Upload a capture</a>
+<a href="Category.dc.html" style="display: flex; align-items: center; height: 52px; padding: 0 26px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.6); background: rgba(11,14,20,0.55); color: #FFFFFF; font-size: 16px; text-decoration: none">Explore the gallery</a>
+</div>
+<p style="margin: 4px 0 0; display: inline-flex; align-self: flex-start; gap: 6px; padding: 6px 10px; border-radius: 4px; background: rgba(11,14,20,0.8); font-size: 13px; color: #C3CAD8">Background: “Moonlit Path” by <a href="Photo.dc.html">@[author]</a></p>
+</div>
+</section>
+
+<main style="max-width: 1360px; margin: 0 auto; padding: 24px 24px 48px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 12px 16px; margin-bottom: 24px; border: 1px solid #5C4A2A; border-radius: 6px; background: linear-gradient(90deg, rgba(255,209,0,0.08) 0%, rgba(255,209,0,0) 60%)">
+<svg width="20" height="28" viewBox="-2 -1 24 30" style="overflow: visible" role="img" aria-label="New quest"><g filter="url(#mk-glow)" opacity="0.75"><path d="M6.3 3.4C6.1 1.6 7.6 1 10 1s3.9 0.6 3.7 2.4L12.1 17c-0.2 1.3-0.9 1.7-2.1 1.7s-1.9-0.4-2.1-1.7Z" fill="url(#mk-y)"></path><circle cx="10" cy="23.4" r="3.1" fill="url(#mk-y)"></circle></g><path d="M6.3 3.4C6.1 1.6 7.6 1 10 1s3.9 0.6 3.7 2.4L12.1 17c-0.2 1.3-0.9 1.7-2.1 1.7s-1.9-0.4-2.1-1.7Z" fill="url(#mk-y)"></path><circle cx="10" cy="23.4" r="3.1" fill="url(#mk-y)"></circle></svg>
+<p style="margin: 0; flex: 1 1 300px"><strong style="color: #FFD100; font-weight: 600">New contest: Night Capitals.</strong> <span style="color: #C3CAD8">Submit one capture of a city after dark. Ends [DATE].</span></p>
+<a href="Contest.dc.html" style="font-weight: 600">Accept quest</a>
+</div>
+
+<div role="tablist" aria-label="Game version" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 24px">
+<svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true" style="filter: drop-shadow(0 0 1.2px rgba(255,220,150,0.6))"><circle cx="16" cy="16" r="13" fill="url(#ig-gold)" stroke="#2A1A0A" stroke-width="0.7" stroke-linejoin="round"></circle><circle cx="16" cy="16" r="10.3" fill="url(#ig-blue)" stroke="#2A1A0A" stroke-width="0.7" stroke-linejoin="round"></circle><path d="M26.60 16.00 L28.40 16.00 M25.18 21.30 L26.74 22.20 M21.30 25.18 L22.20 26.74 M16.00 26.60 L16.00 28.40 M10.70 25.18 L9.80 26.74 M6.82 21.30 L5.26 22.20 M5.40 16.00 L3.60 16.00 M6.82 10.70 L5.26 9.80 M10.70 6.82 L9.80 5.26 M16.00 5.40 L16.00 3.60 M21.30 6.82 L22.20 5.26 M25.18 10.70 L26.74 9.80" stroke="#2A1A0A" stroke-width="0.9"></path><ellipse cx="16" cy="16" rx="10.3" ry="4" fill="none" stroke="#E8C26A" stroke-width="0.9" transform="rotate(-25 16 16)"></ellipse><path d="M16 16 L16 7.5" stroke="#F2C76A" stroke-width="2" stroke-linecap="round"></path><path d="M16 16 L22 19.5" stroke="#D8DDE6" stroke-width="1.6" stroke-linecap="round"></path><circle cx="16" cy="16" r="2.2" fill="url(#ig-gold)" stroke="#2A1A0A" stroke-width="0.7" stroke-linejoin="round"></circle><circle cx="11" cy="11.5" r="0.9" fill="#FFFFFF"></circle><circle cx="21.5" cy="12" r="0.7" fill="#FFFFFF"></circle></svg>
+<button type="button" role="tab" aria-selected="true" style="height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid {{accent}}; background: rgba(232,181,74,0.12); color: {{accent}}; font: inherit; font-weight: 600">WoW Forever</button>
+<button type="button" role="tab" aria-selected="false" style="height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid #2A3244; background: transparent; color: #A9B1C2; font: inherit">Retail</button>
+<button type="button" role="tab" aria-selected="false" style="height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid #2A3244; background: transparent; color: #A9B1C2; font: inherit">Classic</button>
+<button type="button" role="tab" aria-selected="false" style="height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid #2A3244; background: transparent; color: #A9B1C2; font: inherit">Cataclysm Classic</button>
+<button type="button" role="tab" aria-selected="false" style="height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid #2A3244; background: transparent; color: #A9B1C2; font: inherit">All</button>
+</div>
+
+<section aria-labelledby="sem" style="display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 40px">
+<div style="flex: 999 1 560px; min-height: 440px; position: relative; border: 2px solid #FF8000; border-radius: 6px; overflow: hidden; box-shadow: 0 0 24px rgba(255,128,0,0.25); background: linear-gradient(180deg,#140c2e 0%,#4b2a7a 45%,#c06fd8 72%,#2a1846 100%)">
+<svg viewBox="0 0 800 420" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%" aria-hidden="true"><path d="M0 300 L120 220 L220 270 L340 170 L470 260 L560 200 L680 250 L800 190 L800 420 L0 420 Z" fill="rgba(10,6,20,0.55)"></path><path d="M0 350 L160 300 L300 340 L460 290 L620 330 L800 300 L800 420 L0 420 Z" fill="rgba(10,6,20,0.8)"></path></svg>
+<span style="position: absolute; top: 14px; left: 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(11,14,20,0.85); color: {{accent}}; padding: 6px 10px; border-radius: 4px">Capture of the week</span>
+<span style="position: absolute; top: 14px; right: 14px; font-size: 12px; font-weight: 600; background: rgba(11,14,20,0.85); border: 1px solid #FF8000; color: #FF8000; padding: 5px 10px; border-radius: 4px">Legendary</span>
+</div>
+
+<div style="flex: 1 1 340px; box-sizing: border-box; padding: 16px 18px; border-radius: 6px; border: 1px solid #9AA3B5; box-shadow: 0 0 0 1px #000000, 0 8px 24px rgba(0,0,0,0.5); background: rgba(6,10,32,0.96); display: flex; flex-direction: column; gap: 4px; line-height: 1.5">
+<h2 id="sem" style="margin: 0 0 2px; font-family: Cinzel, serif; font-size: 26px; font-weight: 700; color: #FF8000">Nights of Suramar</h2>
+<p style="margin: 0; color: #FFFFFF">Legendary capture · WoW Forever</p>
+<div style="display: flex; justify-content: space-between; color: #FFFFFF"><span>Suramar</span><span>23:40 in-game</span></div>
+<p style="margin: 0; color: #FFFFFF">Ultra · Ray tracing on</p>
+<p style="margin: 0; color: #FFFFFF">5120 × 2160 · 1,284 likes · 312 downloads</p>
+<p style="margin: 8px 0 0; color: #1EFF00">Use: download the original as a wallpaper.</p>
+<p style="margin: 8px 0 0; color: #FFD100; font-style: italic">“The canals glow brighter than the stars tonight.”</p>
+<p style="margin: 8px 0 0; color: #A9B1C2">Captured by <a href="#">@Lunelame</a></p>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 16px">
+<button type="button" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 6px; border: 0; background: {{accent}}; color: #14100A; font: inherit; font-weight: 600; cursor: pointer"><svg width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="#14100A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ic.chest}}"></path></svg>Download HD</button>
+<button type="button" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 6px; border: 1px solid #2A3244; background: transparent; color: #E6E9F0; font: inherit; cursor: pointer"><svg width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="#C3CAD8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ic.portal}}"></path></svg>Share</button>
+<button type="button" aria-label="Add to a collection" style="width: 44px; height: 44px; border-radius: 6px; border: 1px solid #2A3244; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="#C3CAD8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ic.book}}"></path></svg></button>
+</div>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px">
+<h2 style="margin: 0; font-family: Cinzel, serif; font-size: 22px; color: #FFFFFF">Latest captures</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font-size: 13px">
+<sc-for list="{{tiers}}" as="q" hint-placeholder-count="5"><span style="display: flex; align-items: center; gap: 6px; color: {{q.c}}"><span style="width: 10px; height: 10px; border-radius: 2px; background: {{q.c}}"></span>{{q.name}}</span></sc-for>
+</div>
+</div>
+
+<div style="column-width: 260px; column-gap: 16px">
+<sc-for list="{{tiles}}" as="t" hint-placeholder-count="8">
+<article style="position: relative; break-inside: avoid; margin-bottom: 16px; border-radius: 6px; border: 1px solid {{t.c}}; background: #10141D">
+<div style="position: relative; height: {{t.h}}; border-radius: 5px 5px 0 0; overflow: hidden; background: {{t.bg}}">
+<svg viewBox="0 0 300 200" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%" aria-hidden="true"><path d="M0 140 L60 100 L110 125 L170 80 L230 120 L300 95 L300 200 L0 200 Z" fill="rgba(0,0,0,0.35)"></path></svg>
+<span style="position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 3px; background: rgba(11,14,20,0.85); border: 1px solid {{t.c}}; color: {{t.c}}; font-size: 11px; font-weight: 600">{{t.tier}}</span>
+</div>
+<div style="padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<div style="min-width: 0">
+<h3 style="margin: 0; font-family: Cinzel, serif; font-size: 15px; font-weight: 700; color: {{t.c}}">{{t.title}}</h3>
+<p style="margin: 2px 0 0; font-size: 12px; color: #8C95A8">{{t.zone}} · {{t.author}}</p>
+</div>
+<button type="button" aria-label="Like" style="display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 8px; border: 0; background: transparent; color: #C3CAD8; font: inherit; font-size: 13px; cursor: pointer"><svg width="16" height="16" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="{{ic.heart}}"></path></svg>{{t.likes}}</button>
+</div>
+<sc-if value="{{t.tip}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; z-index: 2; top: 40px; left: 60%; width: 270px; box-sizing: border-box; padding: 10px 12px; border-radius: 5px; border: 1px solid #9AA3B5; box-shadow: 0 0 0 1px #000000, 0 8px 24px rgba(0,0,0,0.7); background: rgba(6,10,32,0.97); font-size: 13px; line-height: 1.5">
+<p style="margin: 0; font-size: 15px; font-weight: 600; color: {{t.c}}">{{t.title}}</p>
+<p style="margin: 0; color: #FFFFFF">{{t.tier}} capture · WoW Forever</p>
+<div style="display: flex; justify-content: space-between; color: #FFFFFF"><span>{{t.zone}}</span><span>06:12 in-game</span></div>
+<p style="margin: 0; color: #FFFFFF">3840 × 2160</p>
+<p style="margin: 6px 0 0; color: #1EFF00">Use: open in full screen.</p>
+<p style="margin: 6px 0 0; color: #FFD100; font-style: italic">“First light on the floating isles.”</p>
+</div>
+</sc-if>
+</article>
+</sc-for>
+<div aria-label="Advertisement" style="break-inside: avoid; margin-bottom: 16px; height: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1px dashed #3A4358; border-radius: 6px; color: #8C95A8; font-size: 12px; text-align: center; padding: 8px">Advertisement<span>Grid slot after every 24 captures · same width as a tile · height reserved (CLS) · ships with features.ads</span></div>
+</div>
+</main>
+
+<footer style="border-top: 1px solid #3A3220; background: #0E121B">
+<div style="max-width: 1360px; margin: 0 auto; padding: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; font-size: 13px; color: #8C95A8">
+<a href="#" style="display: flex; align-items: center; gap: 6px; color: #C3CAD8"><svg width="16" height="16" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="{{ic.gear}}"></path></svg>Report a bug</a>
+<a href="#" style="color: #C3CAD8">Legal notice</a><a href="#" style="color: #C3CAD8">Privacy</a><a href="#" style="color: #C3CAD8">Cookies</a><a href="#" style="color: #C3CAD8">Français</a>
+<p style="margin: 0; flex-basis: 100%">World of Warcraft and Blizzard Entertainment are trademarks of Blizzard Entertainment, Inc. This site is not affiliated with or endorsed by Blizzard Entertainment.</p>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#E8B54A","options":["#E8B54A","#4FA3FF","#C06FD8"]},"showTooltip":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":2500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var Q = {
+      Poor: '#9D9D9D', Uncommon: '#1EFF00', Rare: '#3D9BFF', Epic: '#C77DFF', Legendary: '#FF8000'
+    };
+    var tierOf = function (n) {
+      if (n >= 1000) return 'Legendary';
+      if (n >= 500) return 'Epic';
+      if (n >= 100) return 'Rare';
+      if (n >= 10) return 'Uncommon';
+      return 'Poor';
+    };
+    var showTip = this.props.showTooltip ?? true;
+    var raw = [
+      { title: 'Dawn on the Plains', zone: 'Nagrand', author: '@Kaelys', n: 842, h: '320px', bg: 'linear-gradient(180deg,#7fb3d5 0%,#cfe3c8 45%,#5f8a4a 70%,#2f4a2a 100%)', tip: true },
+      { title: 'Stormwind Falls Asleep', zone: 'Stormwind', author: '@Brannoc', n: 615, h: '220px', bg: 'linear-gradient(180deg,#0e1a3a 0%,#2b3f78 50%,#c9a24a 85%,#3a2a18 100%)' },
+      { title: 'Sandstorm', zone: 'Tanaris', author: '@Zuljin', n: 64, h: '260px', bg: 'linear-gradient(180deg,#f2c58b 0%,#e39b55 50%,#b5662e 75%,#6e3b1c 100%)' },
+      { title: 'Frozen Silence', zone: 'Northrend', author: '@Ysolde', n: 1102, h: '400px', bg: 'linear-gradient(180deg,#bcd7ef 0%,#e8f1f8 40%,#8fb0cc 70%,#3d566e 100%)' },
+      { title: 'Tainted Edge', zone: 'Felwood', author: '@Thornar', n: 7, h: '240px', bg: 'linear-gradient(180deg,#1a1410 0%,#3d2a1a 40%,#6b8a2f 75%,#1f2a12 100%)' },
+      { title: 'Emerald Dream', zone: 'Val’sharah', author: '@Myrielle', n: 733, h: '340px', bg: 'linear-gradient(180deg,#2c4a3a 0%,#5a8a6a 40%,#d6a8c8 70%,#24352b 100%)' },
+      { title: 'Red Earth', zone: 'Durotar', author: '@Grakk', n: 258, h: '280px', bg: 'linear-gradient(180deg,#e8a06a 0%,#c25a2e 50%,#7a2e18 80%,#2e140c 100%)' },
+      { title: 'Arcane Dusk', zone: 'Suramar', author: '@Lunelame', n: 967, h: '230px', bg: 'linear-gradient(180deg,#140c2e 0%,#4b2a7a 45%,#c06fd8 75%,#2a1846 100%)' }
+    ];
+    return {
+      accent: this.props.accent ?? '#E8B54A',
+      tiers: ['Poor', 'Uncommon', 'Rare', 'Epic', 'Legendary'].map(function (k) { return { name: k, c: Q[k] }; }),
+      tiles: raw.map(function (t) {
+        var tier = tierOf(t.n);
+        return {
+          title: t.title, zone: t.zone, author: t.author, h: t.h, bg: t.bg,
+          likes: t.n.toLocaleString('en-US'), tier: tier, c: Q[tier], tip: showTip && !!t.tip
+        };
+      }),
+      ic: {
+        explore: 'M16 3a13 13 0 1 0 0 26a13 13 0 1 0 0-26Z M16 7l3.5 9L16 25l-3.5-9Z',
+        quill: 'M26 4C17 6 11 13 8 24 M26 4c-1 7-5 12-12 15 M8 24l-2 4 M12 16h6',
+        heart: 'M16 27s-10-6-12.5-12A6.5 6.5 0 0 1 16 9a6.5 6.5 0 0 1 12.5 6C26 21 16 27 16 27Z',
+        portal: 'M8 16a8 12 0 1 0 16 0a8 12 0 1 0-16 0Z M12 16a4 7 0 1 0 8 0a4 7 0 1 0-8 0Z',
+        chest: 'M4 14h24v13H4Z M4 14c0-6 4-9 12-9s12 3 12 9 M4 18h24 M14 16h4v5h-4Z',
+        book: 'M6 4h17a3 3 0 0 1 3 3v21H9a3 3 0 0 1-3-3Z M6 25a3 3 0 0 1 3-3h17 M12 9h9 M12 13h7',
+        chalice: 'M9 4h14v6a7 7 0 0 1-14 0Z M9 7H5a4 4 0 0 0 4 6 M23 7h4a4 4 0 0 1-4 6 M16 17v6 M12 23h8v5h-8Z',
+        swords: 'M5 5l17 17 M27 5L10 22 M19 25l6-6 M7 19l6 6 M22 22l4 4 M10 22l-4 4',
+        helm: 'M7 28V15a9 10 0 0 1 18 0v13 M7 20h18 M16 5v23 M11 24h2 M19 24h2',
+        gear: 'M16 11a5 5 0 1 0 0 10a5 5 0 1 0 0-10Z M16 3v4 M16 25v4 M3 16h4 M25 16h4 M6.8 6.8l2.8 2.8 M22.4 22.4l2.8 2.8 M6.8 25.2l2.8-2.8 M22.4 9.6l2.8-2.8',
+        orb: 'M16 4a10 10 0 1 0 0 20a10 10 0 1 0 0-20Z M10 28h12 M12 24l-2 4 M20 24l2 4 M12 11a5 5 0 0 1 4-3',
+        hourglass: 'M8 4h16 M8 28h16 M10 4c0 7 12 7 12 12s-12 5-12 12 M22 4c0 7-12 7-12 12s12 5 12 12 M13 25h6'
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
