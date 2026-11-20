@@ -52,7 +52,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   dependency-cruiser avec les règles de `10-clean-architecture.md` § 7, `pnpm arch`.
   Tests : U (le contrôle échoue sur un import interdit d'exemple, puis l'exemple est retiré).
 
-- [ ] **T-02a Socle serveur** (dép. T-01b, T-01c)
+- [x] **T-02a Socle serveur** (dép. T-01b, T-01c)
   `server/platform` : config validée par Zod au démarrage, logger JSON sans données personnelles, type `Result`, erreurs métier → HTTP au format commun, identifiant de corrélation (`cf-ray`), container de composition, ports `Clock` et `IdGenerator` (UUID v7), `GET /api/health`.
   Tests : U (mapping des erreurs, config manquante = échec), I (format d'erreur, health).
 
