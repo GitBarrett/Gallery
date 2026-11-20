@@ -83,6 +83,7 @@
 - **Décision** : (1) TGA converti en PNG dans le navigateur ; fichier de plus de 20 Mo converti dans le navigateur en WebP sans perte, puis en JPEG 95 4:4:4 si nécessaire (encodeurs WebAssembly, jamais de WebP avec perte pour un original) ; (2) le serveur n'accepte que JPEG, PNG, WebP ; (3) validation par octets magiques + `IMAGES.info()` ; (4) métadonnées supprimées au niveau octet sans réencodage (original sans perte) ; (5) toutes les variantes (affichage, luminance, modération) produites par le binding Images.
 - **Alternatives** : décodage WASM (@jsquash, photon) — risque de dépassement mémoire ; Cloudflare Containers — coût et complexité ; service externe (imgproxy) — infrastructure supplémentaire.
 - **Conséquences** : Q4 (conversion PNG → WebP) abandonnée, les originaux PNG sont conservés tels quels (stockage un peu plus élevé) ; à valider dès T-22 : si `IMAGES.info()` ou les sorties ne couvrent pas un cas, ouvrir un nouvel ADR.
+- **Validation T-00a/b/c (20/11/2026, `prototypes/t00ab-images`, Worker distant)** : aucune erreur mémoire ; 8K JPEG 2,2 Mo → `info()` 336 ms, 6 variantes en 4,1 s ; 8K PNG 17,3 Mo → 536 ms, 5,6 s ; trois PNG 5120×2160 en parallèle → 5,6 s au total. Le décodage se fait dans le service Images, hors de la mémoire du Worker. Limites : images de synthèse (variantes bien plus légères qu'une vraie capture), limite exacte de 20 Mo non testée ; à recontrôler en T-22 sur le corpus `tests/fixtures/images`.
 
 # ADR-012 — Variantes d'affichage générées une fois et stockées dans R2
 

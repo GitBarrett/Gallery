@@ -40,7 +40,8 @@ async function processOne(env: Env, key: string) {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    if (request.headers.get('authorization') !== `Bearer ${env.PROTO_TOKEN}`) {
+    // Sans secret défini, tout est refusé (sinon « Bearer undefined » passerait)
+    if (!env.PROTO_TOKEN || request.headers.get('authorization') !== `Bearer ${env.PROTO_TOKEN}`) {
       return new Response('Unauthorized', { status: 401 })
     }
     const url = new URL(request.url)
