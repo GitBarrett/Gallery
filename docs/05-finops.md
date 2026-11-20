@@ -42,7 +42,7 @@ Coût ≈ 0,01 à 0,02 $ par MAU. Revenu pub indicatif à 100k MAU : 6 M pages v
 2. Sightengine : ne lancer que les modèles utiles.
 3. Transformations : largeurs fixes, variantes écrites une seule fois ; toute nouvelle largeur = retraitement par lot chiffré avant décision.
 4. Stockage : originaux conservés sans réencodage (ADR-011) ; si le stockage devient un poste important, réévaluer une conversion PNG → WebP sans perte hors Worker.
-5. Neon : taille de calcul plafonnée (autoscaling 0,25 → 2 CU), requêtes de grille mises en cache 60 s par Hyperdrive.
+5. Neon : taille de calcul plafonnée (autoscaling 0,25 → 2 CU), cache Hyperdrive désactivé (ADR-016), les API publiques GET restent en cache CDN 60 s (`Cache-Control`).
 6. Alertes de budget sur chaque service ; tableau de bord mensuel.
 
 ## Exigences techniques induites

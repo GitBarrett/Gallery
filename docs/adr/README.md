@@ -95,7 +95,7 @@
 
 # ADR-013 — Une preview complète par pull request
 
-- **Statut** : accepté (revue du 17/11/2026).
+- **Statut** : accepté (revue du 17/11/2026) ; **connexion directe au pooler remplacée par ADR-016** (une configuration Hyperdrive par preview).
 - **Contexte** : Adrien veut des previews par branche comme sur Vercel. Les « preview URLs » de versions Workers partagent les bindings de production (base, R2) et seule la version déployée consomme les Queues et exécute les crons. Une Queue n'accepte qu'un Worker consommateur. Hyperdrive est limité à 25 configurations par compte. L'API Cache est inactive sur `workers.dev`.
 - **Décision** : la CI crée par PR un Worker `ls-pr-{n}` (configuration générée depuis `wrangler.toml`, environnement `preview`), ses Queues et DLQ suffixées, une branche Neon (connexion directe au pooler), un préfixe dans le bucket R2 `ls-preview`, protégé par Cloudflare Access ; tout est supprimé à la fermeture de la PR (workflow `preview-cleanup`, plus un balayage hebdomadaire des ressources orphelines).
 - **Alternatives** : preview URLs de versions (bindings de production, pas de Queue ni de cron) ; un seul environnement de staging partagé (pas de parallélisme entre PR).
@@ -117,3 +117,16 @@
 - **Décision** : Argon2id via `@noble/hashes` (`argon2id`, m = 19 MiB, t = 2, p = 1, sel de 16 octets, clé de 32 octets), sous le seuil de 500 ms de T-00d.
 - **Alternatives** : scrypt natif (plus rapide, mais algorithme second choix de la spec et de l'OWASP) ; Argon2id WASM importé comme module `.wasm` statique (plus rapide, dépendance et chargement à valider).
 - **Conséquences** : chaque connexion ou inscription coûte quelques centaines de ms de CPU ; les limites de débit sur `/api/auth/*` (08 § 8) protègent aussi le budget CPU. Paramètres stockés avec le hachage (format PHC) pour pouvoir les durcir plus tard avec un rehachage à la connexion.
+
+# ADR-016 — Hyperdrive sans cache, et une configuration Hyperdrive par preview
+
+- **Statut** : accepté (T-00e, 20/11/2026) ; remplace la connexion directe des previews d'ADR-013. À valider par Adrien (option la plus simple et réversible, règle 6).
+- **Contexte** : mesures T-00e (`prototypes/t00e-neon`, Worker en plan Paid, colo CDG → Neon Frankfurt, Postgres 18) :
+  - Hyperdrive sans cache : `select 1` en 16–17 ms (médiane), ≈ 80 ms pour la première requête ;
+  - Hyperdrive avec cache (réglage par défaut) : 3 ms, mais **une session révoquée reste lue comme valide pendant 76 s** (lecture sans cache : révocation vue immédiatement), contraire à ADR-010 ;
+  - connexion directe au pooler Neon avec `postgres` (postgres.js) : 2 s de CPU puis arrêt en plan gratuit ; 6,2 s de CPU, 42 s et connexion fermée en plan Paid. Inutilisable.
+- **Décision** :
+  1. une seule configuration Hyperdrive en production, **cache désactivé** : toute lecture voit la dernière écriture (sessions, sanctions, statut des captures, likes) ;
+  2. chaque preview a **sa propre configuration Hyperdrive** (cache désactivé), créée et supprimée par la CI avec la branche Neon ; même chemin qu'en production.
+- **Alternatives** : deux bindings (avec cache pour les grilles publiques, sans cache pour le reste) — plus rapide mais chaque requête doit choisir le bon, risque d'erreur silencieuse ; pilote Neon serverless (HTTP) en preview — chemin différent de la production.
+- **Conséquences** : chaque lecture va jusqu'à Neon (≈ 17 ms) ; la charge des grilles est absorbée par le cache CDN des API publiques (`Cache-Control: public, max-age=60`) ; si le calcul Neon devient un poste important, ajouter un binding avec cache réservé aux lectures publiques, par ADR. Maximum 25 configurations Hyperdrive par compte : 1 production + 1 par PR ouverte. Le plan Workers Paid est requis (le plan gratuit coupe les requêtes longues).

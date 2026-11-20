@@ -20,7 +20,7 @@ Site communautaire de galeries de captures d'écran World of Warcraft (focus WoW
 
 - Nuxt 3+ (Vue 3, TypeScript strict), full-stack, monolithe modulaire en Clean Architecture. Pas de front découplé, pas de microservices.
 - Déploiement : Cloudflare Workers (preset Nitro `cloudflare_module`), Cron Triggers, Queues (+ DLQ), Workers Rate Limiting.
-- Base : PostgreSQL serverless Neon via Cloudflare Hyperdrive en production (connexion directe au pooler Neon en preview, ADR-013). ORM : Drizzle. Clés UUID v7.
+- Base : PostgreSQL serverless Neon via Cloudflare Hyperdrive en production (cache Hyperdrive désactivé ; une configuration Hyperdrive par preview, ADR-016). ORM : Drizzle. Clés UUID v7.
 - Images : Cloudflare R2 **privé** (originaux + variantes) ; variantes WebP et JPEG générées **une seule fois** au traitement par le binding Cloudflare Images (ADR-012), servies par la route `/img/{id}/{w}` sans transformation à l'affichage. Originaux jamais publics.
 - Previews : une preview complète par PR (Worker, Queues, branche Neon, préfixe R2), derrière Cloudflare Access (ADR-013).
 - Auth : nuxt-auth-utils (cookie scellé + table `sessions`), OAuth Google (state + PKCE) et Battle.net (state), email + mot de passe (Argon2id), TOTP pour le staff.
