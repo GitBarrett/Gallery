@@ -1,0 +1,24 @@
+name = "ls-proto-nitro"
+main = ".output/server/index.mjs"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "ls-proto"
+
+[[queues.producers]]
+binding = "QUEUE"
+queue = "ls-proto-t00f"
+
+[[queues.consumers]]
+queue = "ls-proto-t00f"
+max_batch_size = 10
+max_batch_timeout = 1
+max_retries = 2
+retry_delay = 0
+
+[triggers]
+crons = ["* * * * *"]
+
+# Secret à définir : npx wrangler secret put PROTO_TOKEN
