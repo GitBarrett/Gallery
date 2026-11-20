@@ -13,7 +13,13 @@
     "prepare": "git config core.hooksPath .githooks",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run --project unit --project component",
+    "test:coverage": "vitest run --project unit --project component --coverage",
+    "test:int": "vitest run --project integration --passWithNoTests",
+    "test:e2e": "playwright test",
+    "test:trace": "node scripts/test-trace.mjs",
+    "check": "pnpm lint && pnpm typecheck && pnpm test:coverage && pnpm test:int && pnpm test:trace"
   },
   "dependencies": {
     "nuxt": "^4.6.4",
@@ -24,9 +30,15 @@
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@nuxt/eslint": "^1.17.0",
+    "@nuxt/test-utils": "^4.4.0",
+    "@playwright/test": "^1.65.1",
+    "@vitest/coverage-v8": "^5.1.1",
+    "@vue/test-utils": "^2.6.0",
     "eslint": "^10.15.0",
+    "happy-dom": "^21.0.4",
     "prettier": "^3.10.1",
     "typescript": "~6.0.3",
+    "vitest": "^5.1.1",
     "vue-tsc": "^3.3.14"
   }
 }
