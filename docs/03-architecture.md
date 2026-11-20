@@ -256,7 +256,7 @@ Fournisseurs externes en local et en preview : adaptateurs factices activés par
 - **Routes de test** (`/__test/*`) : présentes uniquement dans les builds `preview` (exclues à la compilation via une variable de build) ; le démarrage en production échoue si `NUXT_FAKE_PROVIDERS=true` ou si une route `/__test` est enregistrée.
 
 ### Intégration Nitro / Workers
-Le preset `cloudflare_module` expose `fetch` ; les consommateurs de Queues et les Cron Triggers sont branchés via les hooks Nitro `cloudflare:queue` et `cloudflare:scheduled` (à valider dès T-03 ; à défaut, Worker d'entrée personnalisé qui délègue à Nitro, ADR à créer).
+Le preset `cloudflare_module` expose `fetch` ; les consommateurs de Queues et les Cron Triggers sont branchés via les hooks Nitro `cloudflare:queue` et `cloudflare:scheduled`. **Validé par T-00f (20/11/2026, nitropack 2.13, Worker distant)** : message traité ; une exception dans le hook déclenche les nouveaux essais (1 + `max_retries`), `msg.retry()` aussi ; cron exécuté chaque minute, le premier environ 6 min après le déploiement (à prévoir dans les DoD des previews). Dans un lot, acquitter chaque message (`msg.ack()`) dès qu'il est traité : une exception renvoie tous les messages non acquittés du lot.
 
 ## Navigateurs supportés
 Deux dernières versions de Chrome, Edge, Firefox et Safari ; Safari iOS ≥ 16.4 ; Chrome Android récent. Pas d'Internet Explorer ni de Safari < 16. Les fonctionnalités absentes (share target, `beforeinstallprompt`) se dégradent proprement.
