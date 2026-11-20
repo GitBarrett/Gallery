@@ -31,3 +31,54 @@ id = "232936a763ef4fcf8d7b25b9bad0e3cb"
 
 [images]
 binding = "IMAGES"
+
+# Files de 03-architecture.md § Files d'attente ; chaque file a sa DLQ. Les previews suffixent les noms par -pr-{n}.
+[[queues.producers]]
+binding = "PHOTO_PROCESS_QUEUE"
+queue = "photo-process"
+
+[[queues.producers]]
+binding = "NOTIFICATIONS_QUEUE"
+queue = "notifications"
+
+[[queues.producers]]
+binding = "EMAILS_QUEUE"
+queue = "emails"
+
+[[queues.producers]]
+binding = "FEEDBACK_QUEUE"
+queue = "feedback"
+
+[[queues.producers]]
+binding = "ACCOUNT_PURGE_QUEUE"
+queue = "account-purge"
+
+[[queues.consumers]]
+queue = "photo-process"
+max_retries = 3
+retry_delay = 30
+dead_letter_queue = "photo-process-dlq"
+
+[[queues.consumers]]
+queue = "notifications"
+max_retries = 5
+dead_letter_queue = "notifications-dlq"
+
+[[queues.consumers]]
+queue = "emails"
+max_retries = 5
+dead_letter_queue = "emails-dlq"
+
+[[queues.consumers]]
+queue = "feedback"
+max_retries = 5
+dead_letter_queue = "feedback-dlq"
+
+[[queues.consumers]]
+queue = "account-purge"
+max_retries = 5
+dead_letter_queue = "account-purge-dlq"
+
+# Crons du MVP ; */5 (concours) et hebdomadaire (récap) arrivent avec leurs tâches v1.x
+[triggers]
+crons = ["0 * * * *", "15 3 * * *"]
