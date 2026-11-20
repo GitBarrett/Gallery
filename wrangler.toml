@@ -1,0 +1,33 @@
+# Production (T-03a). Les previews génèrent leur configuration à partir de ce fichier (T-03b, ADR-013).
+name = "legendary-shots"
+main = ".output/server/index.mjs"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+preview_urls = false
+
+[assets]
+directory = ".output/public"
+binding = "ASSETS"
+
+[observability]
+enabled = true
+
+# Valeurs publiques ; les secrets passent par `wrangler deploy --secrets-file` (T-00g)
+[vars]
+NUXT_PUBLIC_SITE_URL = "https://legendary-shots.aleygues.workers.dev"
+NUXT_DEPLOY_ENV = "production"
+NUXT_FAKE_PROVIDERS = "false"
+
+# Bucket privé : originaux et variantes, jamais publics (ADR-004, ADR-012)
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "ls-prod"
+
+# Neon, branche principale ; cache désactivé (ADR-016)
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "232936a763ef4fcf8d7b25b9bad0e3cb"
+
+[images]
+binding = "IMAGES"
