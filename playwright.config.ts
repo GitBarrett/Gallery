@@ -13,5 +13,11 @@ export default defineConfig({
   ],
   webServer: process.env.BASE_URL
     ? undefined
-    : { command: 'pnpm dev', url: 'http://localhost:3000', reuseExistingServer: true, timeout: 120_000 },
+    : {
+        command: 'pnpm dev',
+        url: 'http://localhost:3000',
+        env: { NUXT_PUBLIC_SITE_URL: 'http://localhost:3000' },
+        reuseExistingServer: true,
+        timeout: 120_000,
+      },
 })

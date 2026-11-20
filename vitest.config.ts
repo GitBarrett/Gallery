@@ -25,7 +25,6 @@ export default defineConfig({
           name: 'integration',
           environment: 'node',
           include: ['server/**/*.int.test.ts', 'tests/api/**/*.test.ts'],
-          // shortcut: `test:int` passe sans test (--passWithNoTests) jusqu'à la base (T-05a) ; retirer alors l'option du script
         },
       },
     ],
@@ -41,7 +40,8 @@ export default defineConfig({
         'app/composables/**',
         'app/services/**',
       ],
-      exclude: ['**/*.test.ts', '**/README.md'],
+      // Colle Nitro (routes, plugins, gestionnaire d'erreurs) : exécutée dans le serveur des tests d'intégration
+      exclude: ['**/*.test.ts', '**/README.md', 'server/api/**', 'server/plugins/**', 'server/error-handler.ts'],
       thresholds: {
         lines: 80,
         branches: 70,
