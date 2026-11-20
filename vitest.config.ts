@@ -9,7 +9,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['shared/**/*.test.ts', 'server/**/*.test.ts', 'scripts/**/*.test.ts'],
+          include: ['shared/**/*.test.ts', 'server/**/*.test.ts', 'scripts/**/*.test.ts', 'tests/*.test.ts'],
           exclude: ['**/*.int.test.ts'],
         },
       },

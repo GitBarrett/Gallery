@@ -48,7 +48,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Vitest (projets unit / component / integration, seuils de couverture de `11-strategie-de-tests.md` § 2), Playwright (projets desktop, iPhone 14, Pixel 7), script `pnpm test:trace` (chaque AC [MVP] référencé dans un test), script `pnpm check`.
   Tests : un test d'exemple par projet ; `test:trace` échoue sur un AC [MVP] sans test, puis passe une fois l'exemple retiré du périmètre.
 
-- [ ] **T-01c Contrôle d'architecture** (dép. T-01a)
+- [x] **T-01c Contrôle d'architecture** (dép. T-01a)
   dependency-cruiser avec les règles de `10-clean-architecture.md` § 7, `pnpm arch`.
   Tests : U (le contrôle échoue sur un import interdit d'exemple, puis l'exemple est retiré).
 
