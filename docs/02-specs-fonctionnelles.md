@@ -18,7 +18,7 @@ Les critères d'acceptation font foi dans `04-user-stories.md` ; la sécurité d
 - [MVP] Un compte banni ne peut pas se réinscrire pendant 1 an (empreinte HMAC de l'email et des identifiants OAuth).
 - [MVP] Double authentification TOTP obligatoire pour les modérateurs et admins, quel que soit le mode de connexion, avec 10 codes de secours.
 - [MVP] Mode bêta sur invitation (`features.inviteOnly`) : inscription sur invitation nominative, sinon liste d'attente ; désactivé à l'ouverture publique.
-- [MVP] Changement des Terms : publication avec date d'effet à J+15 minimum, notification in-app et email, réacceptation demandée après la date d'effet.
+- [MVP] Changement des Terms : au MVP, nouvelle version publiée sur `/terms` et annoncée à la main par email au moins 15 jours avant son entrée en vigueur (décision du 20/11/2026). [v1.x, T-70] Publication depuis l'admin avec date d'effet à J+15 minimum, notification in-app et email, réacceptation demandée après la date d'effet.
 
 ## 2. Publication [MVP]
 - Formats : JPEG, PNG, WebP ; TGA accepté dans le formulaire et converti en PNG sans perte dans le navigateur avant envoi (ADR-011).
@@ -75,7 +75,7 @@ Une fois `open`, seuls la description, les récompenses et la date de fin (allon
 - Égalité : la participation inscrite en premier gagne.
 
 ### 5.5 Anti-triche
-- Alerte modérateur si > 30 % des likes d'une participation viennent de comptes créés après le début du concours, ou si > 20 % viennent d'un même `ip_hash`.
+- Alerte modérateur (à partir de 10 likes comptés) si > 30 % des likes d'une participation viennent de comptes créés après le début du concours, ou si > 20 % viennent d'une même adresse. L'adresse est relevée seulement pour les likes sur une participation d'un concours ouvert, dans `contest_like_signals`, sous forme de HMAC propre au concours (préfixe `/64` en IPv6), puis purgée 30 jours après la clôture.
 - Disqualification par un modérateur, avec motif notifié et voie de recours (cf. Terms §5) ; une participation disqualifiée sort du classement et n'est pas remplaçable.
 - 2 disqualifications pour triche = exclusion des concours pendant 90 jours.
 
@@ -98,7 +98,7 @@ Ouverture d'un concours (utilisateurs ayant activé « Contests »), J-1 avant l
   - < 0,5 → `published`
   - Seuils en configuration, pas en dur.
 - Signalements : motif + commentaire ; 3 signalements distincts (réglable) de comptes vérifiés depuis plus de 7 jours et non sanctionnés → `hidden` ; les autres alimentent la file sans masquer.
-- Admin : file de modération, historique des décisions, sanctions [MVP] (avertissement, suspension datée, bannissement — ce dernier réservé aux admins), recours traité par un autre modérateur, gestion des versions et des zones, réglages du site, journal d'audit.
+- Admin : file de modération, historique des décisions, sanctions [MVP] (avertissement, suspension datée, bannissement — ce dernier réservé aux admins), recours reçus par email et traités à la main par un autre modérateur [MVP] (recours dans l'application : v1.x, T-71), gestion des versions et des zones, réglages du site, journal d'audit.
 - Rôles : `user`, `moderator`, `admin` ; promotion par un admin uniquement.
 
 ## 7. Transverse

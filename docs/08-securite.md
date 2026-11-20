@@ -132,7 +132,7 @@ Une ligne par groupe de routes de `03-architecture.md` § Inventaire ; le test d
 | Auth sans session : `signup`, `signin`, `password/*`, `verify-email`, `email/confirm`, `deletion/cancel`, `GET /auth/*`, `oauth/complete`, `POST /api/waitlist` | ✓ (Turnstile, § 8) | ✓ | ✓ | — | ✓ (banni : refusé) | ✓ | ✓ |
 | `signout`, `resend-verification`, `reauth` | 401 | ✓ | ✓ | — | ✓ | ✓ | ✓ |
 | `POST /api/auth/mfa/*` | 401 | 403 | 403 | — | 403 | ✓ | ✓ |
-| Compte : `GET/PATCH /api/me`, `/api/me/sessions*`, `email`, `password`, `oauth/*`, `terms/accept`, `decisions`, `GET /api/me/photos`, `POST /api/me/deletion` | 401 | ✓ | ✓ | — | ✓ (PATCH bio : 403) | ✓ | ✓ (dernier admin : suppression 409) |
+| Compte : `GET/PATCH /api/me`, `/api/me/sessions*`, `email`, `password`, `oauth/*`, `terms/accept` (v1.x, T-70), `decisions`, `GET /api/me/photos`, `POST /api/me/deletion` | 401 | ✓ | ✓ | — | ✓ (PATCH bio : 403) | ✓ | ✓ (dernier admin : suppression 409) |
 | `POST /api/me/avatar-upload-url`, `avatar/complete` | 401 | 403 | ✓ | — | 403 | ✓ | ✓ |
 | Capture non publiée : `GET /api/photos/{id}`, `/img/{id}/{w}?preview=1` | 404 | 404 | 404 | ✓ | ✓ | ✓ (MFA) | ✓ (MFA) |
 | `POST /api/photos/upload-url`, `/complete` | 401 | 403 | ✓ | — | 403 | ✓ | ✓ |
@@ -145,9 +145,9 @@ Une ligne par groupe de routes de `03-architecture.md` § Inventaire ; le test d
 | `DELETE /api/comments/{id}` | 401 | 403 | 403 | ✓ (auteur du commentaire ou de la capture) | ✓ (idem) | 403 (passer par la modération) | 403 (idem) |
 | `/api/notifications*` (liste, compteur, lecture) | 401 | ✓ | ✓ | — | ✓ | ✓ | ✓ |
 | `POST /api/reports` | 401 | 403 | ✓ | 403 (son propre contenu) | 403 | ✓ | ✓ |
-| `POST /api/appeals` | 401 | ✓ | ✓ | ✓ (décision le concernant, sinon 404) | ✓ | ✓ | ✓ |
+| `POST /api/appeals` (v1.x, T-71) | 401 | ✓ | ✓ | ✓ (décision le concernant, sinon 404) | ✓ | ✓ | ✓ |
 | `POST /api/bug-reports` | ✓ (« I can't sign in » seule) | ✓ (« I can't sign in » seule) | ✓ | — | ✓ | ✓ | ✓ |
-| `/api/admin/moderation/*`, `/appeals/*`, `/reports/*`, `/users` (recherche), `/sanctions/*` (avertissement, suspension) | 401 | 403 | 403 | 403 | 403 | ✓ (MFA ; recours : jamais l'auteur de la décision) | ✓ (MFA) |
+| `/api/admin/moderation/*`, `/appeals/*` (v1.x, T-71), `/reports/*`, `/users` (recherche), `/sanctions/*` (avertissement, suspension) | 401 | 403 | 403 | 403 | 403 | ✓ (MFA ; recours : jamais l'auteur de la décision) | ✓ (MFA) |
 | `/api/admin/sanctions/*` (bannissement, levée) | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA + réauth) |
 | `/api/admin/users/{id}/role`, `/settings`, `/legal` | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA + réauth) |
 | `/api/admin/game-versions/*`, `/zones/*`, `/invites/*`, `/waitlist`, `/audit`, `/bug-reports/*` | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA) |

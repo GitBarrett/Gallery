@@ -22,7 +22,7 @@ Principe : **chaque critère d'acceptation (`US-xx.n`) est couvert par au moins 
 | `app/components/ui` | 90 % | 80 % |
 | Global | 80 % | 70 % |
 
-La couverture ne remplace pas la traçabilité : un script `pnpm test:trace` vérifie que **chaque identifiant `US-xx.n` des stories [MVP] apparaît dans au moins un test** (`test('US-30.2 …')` ou annotation Playwright `{ tag: '@US-30.2' }`) et échoue sinon.
+La couverture ne remplace pas la traçabilité : un script `pnpm test:trace` vérifie que **chaque identifiant `US-xx.n` des stories [MVP] apparaît dans au moins un test** (`test('US-30.2 …')` ou annotation Playwright `{ tag: '@US-30.2' }`) et échoue sinon. Un critère marqué `[v1.x, T-xx]` dans une story [MVP] est exclu jusqu'à sa tâche.
 
 ## 3. Conventions d'écriture
 - Nom du test = identifiant + comportement : `it('US-10.3 rejects a PNG whose bytes are an HTML file')`.
@@ -61,7 +61,7 @@ La couverture ne remplace pas la traçabilité : un script `pnpm test:trace` vé
 | Signalement ×3 par comptes éligibles → masquage (×3 par comptes de moins de 7 jours → pas de masquage) → décision du modérateur (avec TOTP) → notification | US-51, US-52, US-55 | desktop |
 | Staff : connexion OAuth puis TOTP exigé ; connexion avec un code de secours ; code réutilisé refusé | US-55.2, US-55.5 | desktop |
 | Mode invitation : inscription sans invitation → liste d'attente ; lien d'invitation → inscription réussie | US-56.4–5 | desktop |
-| Nouvelle version des Terms : notification, puis écran de réacceptation après la date d'effet (horloge simulée) | US-74.2–3 | desktop |
+| Nouvelle version des Terms : notification, puis écran de réacceptation après la date d'effet (horloge simulée) — v1.x, T-70 | US-74.2–3 | desktop |
 | Suspension puis tentative de publication | US-53 | desktop |
 | Réglages : avatar, changement d'email, suppression du compte puis annulation | US-07, US-09 | desktop |
 | Consentement : refus → aucun appel PostHog ; acceptation → événements | US-61, US-72 | desktop |
@@ -72,7 +72,7 @@ La couverture ne remplace pas la traçabilité : un script `pnpm test:trace` vé
 | Bug report : envoi, honeypot, limite, échappement | US-60 | desktop |
 | XSS stockée sur titre, commentaire, bio, pseudo | `08-securite.md` § 11 | desktop |
 | Accessibilité clavier : parcours inscription → upload → like sans souris, modales et visionneuse | US-75 | desktop |
-| Recours : décision automatique contestée puis annulée | US-52.5–6 | desktop |
+| Décision automatique annulée par un modérateur (recours reçu par email au MVP ; formulaire de recours : v1.x, T-71) | US-52.6 | desktop |
 | Réinscription d'un compte banni refusée | US-53.5 | desktop |
 
 Chaque parcours vérifie aussi l'accessibilité de chaque page visitée avec `@axe-core/playwright` (aucune violation « serious » ou « critical »).

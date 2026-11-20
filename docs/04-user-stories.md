@@ -278,7 +278,7 @@ Règles de référence : `02-specs-fonctionnelles.md` §5.
 - Tests : U (score, égalités), I, E.
 
 ### US-43 Anti-triche et disqualification
-- US-43.1 Given plus de 30 % des likes d'une participation venant de comptes créés après le début, ou plus de 20 % d'un même `ip_hash`, When le classement est calculé, Then une alerte apparaît dans la file de modération.
+- US-43.1 Given au moins 10 likes comptés et plus de 30 % venant de comptes créés après le début, ou plus de 20 % d'une même adresse (HMAC propre au concours, `/64` en IPv6, table `contest_like_signals`), When le classement est calculé, Then une alerte apparaît dans la file de modération.
 - US-43.2 Given un modérateur, When il disqualifie une participation avec un motif, Then elle sort du classement et l'auteur est notifié du motif et de la voie de recours.
 - US-43.3 Given 2 disqualifications pour triche, When le membre ouvre un concours pendant 90 jours, Then il ne peut pas participer.
 - Tests : U, I.
@@ -332,8 +332,8 @@ Règles de référence : `02-specs-fonctionnelles.md` §5.
 - US-52.1 Given un modérateur, When il ouvre `/admin/moderation`, Then il voit les contenus `pending_review`, `hidden` et les alertes, triés du plus ancien au plus récent, avec scores et signalements.
 - US-52.2 Given un modérateur, When il publie, masque ou supprime un contenu avec un motif, Then la décision est appliquée, historisée et l'auteur notifié (motif, règle, automatisation, recours).
 - US-52.3 Given un membre, When il appelle une API `/api/admin/*`, Then 403.
-- US-52.4 Given un recours d'un auteur, When un modérateur le traite, Then ce ne peut pas être celui qui a pris la décision initiale.
-- US-52.5 Given la notification d'une décision me concernant, When je clique « Appeal » dans les 6 mois et écris un message (20 à 2000 caractères), Then le recours est enregistré, confirmé et un seul recours est possible par décision.
+- US-52.4 [v1.x, T-71] Given un recours d'un auteur, When un modérateur le traite, Then ce ne peut pas être celui qui a pris la décision initiale.
+- US-52.5 [v1.x, T-71] Given la notification d'une décision me concernant, When je clique « Appeal » dans les 6 mois et écris un message (20 à 2000 caractères), Then le recours est enregistré, confirmé et un seul recours est possible par décision.
 - US-52.6 Given une décision automatique contestée, When un modérateur traite le recours, Then il voit les scores bruts et peut annuler la décision (capture republiée, auteur notifié).
 - Tests : U, I, E.
 
@@ -480,8 +480,8 @@ Règles de référence : `02-specs-fonctionnelles.md` §5.
 
 ### US-74 [MVP] Pages légales
 - US-74.1 Given le pied de page, When je clique Legal notice, Terms, Privacy ou Cookie settings, Then la page correspondante s'affiche dans ma langue (repli anglais) avec sa date de mise à jour.
-- US-74.2 Given une modification significative des Terms, When un admin publie la nouvelle version avec une date d'effet à J+15 minimum, Then les membres sont notifiés (in-app et par email) et la page affiche la version à venir.
-- US-74.3 Given la date d'effet passée et un membre qui a accepté une version antérieure, When il se connecte ou publie, Then un écran lui demande d'accepter la nouvelle version (`terms_version` mis à jour) ; il peut aussi supprimer son compte depuis cet écran.
+- US-74.2 [v1.x, T-70] Given une modification significative des Terms, When un admin publie la nouvelle version avec une date d'effet à J+15 minimum, Then les membres sont notifiés (in-app et par email) et la page affiche la version à venir.
+- US-74.3 [v1.x, T-70] Given la date d'effet passée et un membre qui a accepté une version antérieure, When il se connecte ou publie, Then un écran lui demande d'accepter la nouvelle version (`terms_version` mis à jour) ; il peut aussi supprimer son compte depuis cet écran.
 - Tests : E.
 
 ---

@@ -92,13 +92,14 @@ Pas de bibliothèque de décodage d'image dans le Worker (limite mémoire), à l
 | reports | id, reporter_id, target_type (`photo`/`comment`/`profile`), target_id, reason (`nudity`/`violence`/`hate`/`spam`/`copyright`/`personal_info`/`other`), comment, created_at, unique(reporter_id, target_type, target_id) |
 | moderation_decisions | id, target_type, target_id, decision, source (`auto`/`manual`), moderator_id, reason, scores jsonb, created_at |
 | bug_reports | id, user_id (nullable), ip_hash, category, body, page_url, user_agent, screenshot_key, fingerprint, duplicate_of, status (`queued`/`sent`/`duplicate`/`spam`/`held`), github_issue_number, created_at |
-| site_settings | key, value jsonb, updated_by, updated_at (seuils de qualité, de modération et d'affichage, `moderation.reportsToHide`, hero, editor's pick, flags `features.*`, `legal` : version des Terms en vigueur et version à venir avec date d'effet) |
+| site_settings | key, value jsonb, updated_by, updated_at (seuils de qualité, de modération et d'affichage, `moderation.reportsToHide`, hero, editor's pick, flags `features.*`, `legal` : version des Terms en vigueur (version à venir avec date d'effet : v1.x, T-70)) |
 | rate_limit_counters | key_hmac (action + compte ou IP, HMAC), window_start, count, PK(key_hmac, window_start) — fenêtres longues (heure, jour) ; purge horaire des fenêtres échues |
 | beta_invites | id, email_hmac, token_hash, invited_by, created_at, expires_at (14 jours), used_at — mode bêta sur invitation (US-56.4) |
 | waitlist_entries | id, email, locale, created_at — supprimées 3 mois après l'ouverture publique |
 | leaderboard_snapshots | period (`week`/`month`/`all`), game_version_id (nullable = toutes), photo_id, rank, score, computed_at ; index (period, game_version_id, rank) — recalculé toutes les 5 min par Cron Trigger, top 50 + rang de chaque photo de la période |
 | sanctions | id, user_id, type (`warning`/`suspension`/`ban`), ends_at, reason, moderator_id, created_at, lifted_at, lifted_by |
-| appeals | id, decision_id (unique), user_id, message, status (`open`/`accepted`/`rejected`), resolution, handled_by (≠ auteur de la décision), handled_at, created_at |
+| appeals | (v1.x, T-71) id, decision_id (unique), user_id, message, status (`open`/`accepted`/`rejected`), resolution, handled_by (≠ auteur de la décision), handled_at, created_at |
+| contest_like_signals | (v1.x, T-64c) contest_id, photo_id, user_id, ip_hash (HMAC avec une clé dérivée de `CONTEST_IP_KEY` et de l'id du concours ; préfixe `/64` en IPv6), created_at — rempli seulement pour les likes sur une participation d'un concours ouvert ; purgé 30 jours après `closed` |
 | downloads | user_id, photo_id, day, PK(user_id, photo_id, day) — déduplication du compteur |
 | audit_log | id, actor_id, action, target_type, target_id, before jsonb, after jsonb, ip_hash, created_at — insertion seule (rôle base sans UPDATE/DELETE) |
 | processed_messages | message_id, consumer, processed_at — idempotence des consommateurs de Queue |
@@ -185,7 +186,7 @@ Source de la matrice d'autorisation (08, annexe B) : toute route ajoutée ici y 
 | Domaine | Routes |
 |---|---|
 | Auth | `POST /api/auth/signup`, `POST /api/auth/signin`, `POST /api/auth/signout`, `POST /api/auth/verify-email`, `POST /api/auth/resend-verification`, `POST /api/auth/password/forgot`, `POST /api/auth/password/reset`, `POST /api/auth/email/confirm` (changement d'email), `POST /api/auth/deletion/cancel` (jeton reçu par email), `GET /auth/{google,battlenet}` + callbacks, `POST /api/auth/oauth/complete` (pseudo + Terms au premier login), `POST /api/auth/mfa/setup`, `POST /api/auth/mfa/verify`, `POST /api/auth/mfa/challenge` (TOTP ou code de secours après connexion staff), `POST /api/auth/reauth`, `POST /api/waitlist` (mode invitation) |
-| Compte | `GET/PATCH /api/me`, `GET /api/me/photos` (« My captures », tous statuts), `GET /api/me/sessions`, `DELETE /api/me/sessions/{id}`, `POST /api/me/sessions/revoke-others`, `POST /api/me/avatar-upload-url`, `POST /api/me/avatar/complete`, `POST /api/me/email`, `POST /api/me/password`, `DELETE /api/me/oauth/{provider}`, `POST /api/me/deletion`, `POST /api/me/terms/accept`, `GET /api/usernames/{name}/availability` |
+| Compte | `GET/PATCH /api/me`, `GET /api/me/photos` (« My captures », tous statuts), `GET /api/me/sessions`, `DELETE /api/me/sessions/{id}`, `POST /api/me/sessions/revoke-others`, `POST /api/me/avatar-upload-url`, `POST /api/me/avatar/complete`, `POST /api/me/email`, `POST /api/me/password`, `DELETE /api/me/oauth/{provider}`, `POST /api/me/deletion`, `GET /api/usernames/{name}/availability` |
 | Profils | `GET /api/users/{username}`, `GET /api/users/{username}/photos` |
 | Captures | `POST /api/photos/upload-url`, `POST /api/photos/{id}/complete`, `GET /api/photos` (filtres, curseur), `GET /api/photos/{id}`, `GET /api/photos/{id}/related` (US-70), `PATCH /api/photos/{id}`, `DELETE /api/photos/{id}`, `POST /api/photos/{id}/download` |
 | Médias | `GET /img/{photoId}/{400,800,1200,2400}`, `GET /img/{photoId}/og.jpg`, `GET /img/{photoId}/{w}?preview=1` (auteur, modérateurs), `GET /avatar/{userId}/{version}/{64,128,256}` |
@@ -193,11 +194,11 @@ Source de la matrice d'autorisation (08, annexe B) : toute route ajoutée ici y 
 | Accueil et réglages publics | `GET /api/home` (hero, capture de la semaine, dernières captures, bandeau de quête), `GET /api/settings/public` (seuils de qualité, flags visibles) |
 | Social | `PUT/DELETE /api/photos/{id}/like`, `GET/POST /api/photos/{id}/comments`, `PATCH/DELETE /api/comments/{id}` |
 | Notifications | `GET /api/notifications`, `GET /api/notifications/unread-count`, `POST /api/notifications/{id}/read`, `POST /api/notifications/read-all` |
-| Signalements et recours | `POST /api/reports`, `GET /api/me/decisions` (décisions me concernant), `POST /api/appeals` |
-| Admin (MFA) | `/api/admin/moderation/*` (file, décisions), `/api/admin/appeals/*`, `/api/admin/reports/*`, `/api/admin/sanctions/*`, `/api/admin/users` (recherche) et `/api/admin/users/{id}/role`, `/api/admin/game-versions/*`, `/api/admin/zones/*`, `/api/admin/settings`, `/api/admin/legal` (publication d'une version des Terms), `/api/admin/invites/*` et `/api/admin/waitlist`, `/api/admin/audit`, `/api/admin/bug-reports/*` |
+| Signalements et recours | `POST /api/reports`, `GET /api/me/decisions` (décisions me concernant) ; recours par email au MVP (`POST /api/appeals` : v1.x, T-71) |
+| Admin (MFA) | `/api/admin/moderation/*` (file, décisions), `/api/admin/reports/*`, `/api/admin/sanctions/*`, `/api/admin/users` (recherche) et `/api/admin/users/{id}/role`, `/api/admin/game-versions/*`, `/api/admin/zones/*`, `/api/admin/settings`, `/api/admin/invites/*` et `/api/admin/waitlist`, `/api/admin/audit`, `/api/admin/bug-reports/*` |
 | Divers | `POST /api/bug-reports` (multipart, capture ≤ 5 Mo facultative), `GET /sitemap.xml` (+ lots `sitemap-{n}.xml`), `GET /robots.txt`, `GET /api/health` |
 | Preview uniquement | `/__test/*` (reset de base, boîte mail factice, horloge) — absent des builds de production |
-| v1.x | follows (`PUT/DELETE /api/users/{username}/follow`, `GET /api/feed`), collections (`/api/collections/*`), classement (`GET /api/leaderboard`), concours (`/api/contests/*`, `/api/admin/contests/*`), export (`POST /api/me/export`), `POST /share-target`, désinscription du récap (`GET /api/email/unsubscribe?token=`) |
+| v1.x | follows (`PUT/DELETE /api/users/{username}/follow`, `GET /api/feed`), collections (`/api/collections/*`), classement (`GET /api/leaderboard`), concours (`/api/contests/*`, `/api/admin/contests/*`), export (`POST /api/me/export`), versions des Terms (`/api/admin/legal`, `POST /api/me/terms/accept`, T-70), recours (`POST /api/appeals`, `/api/admin/appeals/*`, T-71), `POST /share-target`, désinscription du récap (`GET /api/email/unsubscribe?token=`) |
 
 ## Files d'attente et tâches planifiées
 | Queue | Producteur | Consommateur | Retries | DLQ |
@@ -214,7 +215,7 @@ Tous les consommateurs sont **idempotents** (`processed_messages` + opérations 
 |---|---|---|
 | `*/5 * * * *` | 5 min | transitions de concours, recalcul classements (v1.x), alertes anti-triche |
 | `0 * * * *` | horaire | nettoyage des uploads orphelins (> 24 h), tokens expirés, fenêtres échues de `rate_limit_counters` |
-| `15 3 * * *` | quotidien | purge des comptes à J+30, notifications > 6 mois, bug reports > 12 mois, décisions de modération, signalements traités, recours traités et sanctions échues > 1 an, `downloads` > 30 jours (le compteur est déjà incrémenté), `username_redirects` expirées, invitations utilisées ou expirées > 30 jours, `processed_messages` > 30 jours, `outbox` publiée > 7 jours, `audit_log` > 2 ans, `banned_identities` expirées, sessions et jetons expirés, `waitlist_entries` 3 mois après l'ouverture, `trash/` (lifecycle R2 30 j en complément), sitemap, entrée en vigueur d'une nouvelle version des Terms |
+| `15 3 * * *` | quotidien | purge des comptes à J+30, notifications > 6 mois, bug reports > 12 mois, décisions de modération, signalements traités, recours traités et sanctions échues > 1 an, `downloads` > 30 jours (le compteur est déjà incrémenté), `username_redirects` expirées, invitations utilisées ou expirées > 30 jours, `processed_messages` > 30 jours, `outbox` publiée > 7 jours, `audit_log` > 2 ans, `banned_identities` expirées, sessions et jetons expirés, `waitlist_entries` 3 mois après l'ouverture, `trash/` (lifecycle R2 30 j en complément), sitemap, entrée en vigueur d'une nouvelle version des Terms (v1.x, T-70) |
 | `0 8 * * 1` | hebdomadaire | récap email (v1.x) |
 
 ## Configuration et secrets
@@ -233,6 +234,7 @@ Tous les consommateurs sont **idempotents** (`processed_messages` + opérations 
 | `RESEND_API_KEY` | secret | emails |
 | `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_FEEDBACK_REPO` | secrets | bug reports |
 | `IP_HASH_KEY_CURRENT/PREVIOUS` | secrets (rotation 30 j) | HMAC des IP |
+| `CONTEST_IP_KEY` | secret (v1.x, T-64c ; changée seulement entre deux concours) | clé dérivée par concours pour `contest_like_signals` |
 | `MFA_ENCRYPTION_KEY` | secret | chiffrement des secrets TOTP |
 | `SENTRY_DSN` / `NUXT_PUBLIC_SENTRY_DSN` | secret / public | suivi d'erreurs serveur / client |
 | `NUXT_PUBLIC_POSTHOG_KEY`, `NUXT_PUBLIC_SITE_URL` | public | analytics, URLs absolues |
