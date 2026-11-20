@@ -56,13 +56,13 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   `server/platform` : config validée par Zod au démarrage, logger JSON sans données personnelles, type `Result`, erreurs métier → HTTP au format commun, identifiant de corrélation (`cf-ray`), container de composition, ports `Clock` et `IdGenerator` (UUID v7), `GET /api/health`.
   Tests : U (mapping des erreurs, config manquante = échec), I (format d'erreur, health).
 
-- [ ] **T-02b Sécurité HTTP et Sentry** (dép. T-02a)
-  nuxt-security : en-têtes, CSP à nonce, vérification d'origine des mutations ; Sentry serveur et client (`sendDefaultPii: false`).
+- [x] **T-02b Sécurité HTTP** (dép. T-02a)
+  nuxt-security : en-têtes, CSP à nonce, vérification d'origine des mutations. Sentry déplacé en T-03a (20/11/2026) : son intégration Workers ne se vérifie qu'avec le compte et un déploiement réel.
   Tests : I (en-têtes présents, CSP avec nonce, mutation cross-origin refusée).
 
 - [ ] **T-03a Déploiement de production** (dép. T-02b) — **action humaine** : Sentry. Le domaine (Q3) n'est pas requis ici : `*.workers.dev` suffit à la DoD (domaine en T-58).
-  `wrangler.toml` (bindings R2 privé, Queues + DLQ, Hyperdrive sans cache (ADR-016), Images, Rate Limiting, Cron Triggers), hooks Nitro `cloudflare:queue` et `cloudflare:scheduled` branchés (consommateur et cron de test, acquittement message par message, T-00f), déploiement de production depuis `main`, secrets publiés avec la version (`--secrets-file`, T-00g), politique CORS du bucket de production, adaptateurs factices des fournisseurs et routes `/__test/*` uniquement dans les builds preview (démarrage refusé en production sinon), beacon Web Analytics ajouté par Nuxt.
-  DoD : `/api/health` de production OK (base et R2) ; un message et un cron de test traités ; l'artefact de production ne contient aucune route `/__test`.
+  `wrangler.toml` (bindings R2 privé, Queues + DLQ, Hyperdrive sans cache (ADR-016), Images, Rate Limiting, Cron Triggers), hooks Nitro `cloudflare:queue` et `cloudflare:scheduled` branchés (consommateur et cron de test, acquittement message par message, T-00f), Sentry serveur (intégration Workers) et client (`sendDefaultPii: false`, rapport des violations CSP), déploiement de production depuis `main`, secrets publiés avec la version (`--secrets-file`, T-00g), politique CORS du bucket de production, adaptateurs factices des fournisseurs et routes `/__test/*` uniquement dans les builds preview (démarrage refusé en production sinon), beacon Web Analytics ajouté par Nuxt.
+  DoD : `/api/health` de production OK (base et R2) ; un message et un cron de test traités ; une erreur de test reçue dans Sentry, sans donnée personnelle ; l'artefact de production ne contient aucune route `/__test`.
 
 - [ ] **T-03b Création des previews** (dép. T-03a)
   Workflow `preview-deploy` repris de `prototypes/t00g-preview` (ADR-013, ADR-016) : Worker `ls-pr-{n}`, Queues et DLQ suffixées, branche Neon `pr-{n}`, configuration Hyperdrive dédiée sans cache, préfixe `pr-{n}/` du bucket `ls-preview` (CORS des previews), secrets publiés avec la version, `noindex`, commentaire de la PR avec l'URL.
