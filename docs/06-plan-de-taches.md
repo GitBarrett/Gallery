@@ -84,7 +84,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Cloudflare Access « tous les Workers » avec bypass du seul Worker de production, jeton de service pour la CI. WAF, règle de limitation et Bot Fight Mode (`08-securite.md` § 2) exigent une zone : reportés au branchement du domaine en T-58 (Q24).
   DoD : une preview sans jeton Access est refusée ; la CI y accède avec le jeton de service ; la production reste publique.
 
-- [ ] **T-04a CI : contrôles de PR** (dép. T-03b)
+- [x] **T-04a CI : contrôles de PR** (dép. T-03b)
   Workflow `ci` (`11-strategie-de-tests.md` § 7) : lint, typecheck, `arch`, unitaires et couverture, `test:trace`, artefact de production sans route de test, intégration (Postgres de CI, Q15), gitleaks, Semgrep CE (à la place de CodeQL, Q26), `pnpm audit` ; actions épinglées par SHA ; Dependabot. Pas de protection de `main` (Q26). L'étape de CI des migrations arrive avec leur runner (T-05a).
   Tests : une PR de démonstration échoue sur chaque garde.
 
