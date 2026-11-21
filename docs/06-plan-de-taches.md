@@ -85,7 +85,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   DoD : une preview sans jeton Access est refusée ; la CI y accède avec le jeton de service ; la production reste publique.
 
 - [ ] **T-04a CI : contrôles de PR** (dép. T-03b)
-  Pipeline de `11-strategie-de-tests.md` § 7 : lint, typecheck, `arch`, unitaires, intégration (Postgres de CI, Q15), migrations, `test:trace`, gitleaks, CodeQL, audit des dépendances ; Dependabot ; protection de `main`.
+  Workflow `ci` (`11-strategie-de-tests.md` § 7) : lint, typecheck, `arch`, unitaires et couverture, `test:trace`, artefact de production sans route de test, intégration (Postgres de CI, Q15), gitleaks, Semgrep CE (à la place de CodeQL, Q26), `pnpm audit` ; actions épinglées par SHA ; Dependabot. Pas de protection de `main` (Q26). L'étape de CI des migrations arrive avec leur runner (T-05a).
   Tests : une PR de démonstration échoue sur chaque garde.
 
 - [ ] **T-04b CI : preview, E2E et production** (dép. T-04a, T-03d)
@@ -94,7 +94,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
 
 - [ ] **T-05a Base de données : socle** (dép. T-03a)
   Drizzle, conventions (UUID v7, `timestamptz`, `created_at`/`updated_at`, index), runner de migrations, tables transverses `outbox`, `processed_messages`, `site_settings`, `audit_log` (rôle base sans UPDATE/DELETE), `rate_limit_counters`, `donations` (flag désactivé), seed de base, transaction de test annulée.
-  Tests : I (migration sur base vierge, rôle d'audit sans UPDATE/DELETE).
+  Tests : I (migration sur base vierge, rôle d'audit sans UPDATE/DELETE). Étape `ci` des migrations (`11-strategie-de-tests.md` § 7 : base vierge et copie du schéma de production).
 
 - [ ] **T-05b Unité de travail et outbox** (dép. T-05a)
   `UnitOfWork`, relais outbox → Queues, garde d'idempotence `processed_messages` pour les consommateurs.

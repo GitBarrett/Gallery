@@ -1,0 +1,91 @@
+# Contrôles de PR (T-04a, 11-strategie-de-tests.md § 7). Chaque garde est une étape distincte qui s'exécute même
+# si une autre échoue, pour tout voir en un passage. Pas de protection de main (Q26) : une PR ne se fusionne
+# qu'avec cette CI verte.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - id: install
+        run: pnpm install --frozen-lockfile
+      - name: Lint (ESLint, Prettier)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm lint
+      - name: Typecheck
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm typecheck
+      - name: Architecture (dependency-cruiser)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm arch
+      - name: Unit and component tests with coverage thresholds
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm test:coverage
+      - name: Every acceptance criterion has a test
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm test:trace
+      - name: Production artifact has no test route
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm build && ! grep -rl "/__test" .output/server
+        env:
+          NITRO_PRESET: cloudflare_module
+
+  integration:
+    runs-on: ubuntu-latest
+    # Postgres de CI (Q15) ; les migrations s'y ajoutent avec Drizzle (T-05a)
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:int
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0 # gitleaks analyse tout l'historique
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+      - name: Secrets (gitleaks)
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact --no-banner
+      - name: Vulnerable dependencies (high and critical)
+        if: ${{ !cancelled() }}
+        run: pnpm audit --prod --audit-level high
+      # Semgrep CE remplace CodeQL, indisponible sur un dépôt privé d'un compte Free (Q26)
+      - name: Static analysis (Semgrep CE)
+        if: ${{ !cancelled() }}
+        run: pipx run semgrep==1.183.0 scan --config p/javascript --config p/typescript --error --metrics=off

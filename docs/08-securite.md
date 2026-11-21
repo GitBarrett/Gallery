@@ -89,7 +89,7 @@ Implémentation : port `RateLimiter` avec deux adaptateurs — binding Workers R
 
 ## 9. Chaîne de livraison
 - Dépendances épinglées (`pnpm-lock.yaml`), Dependabot hebdomadaire, `pnpm audit --prod` bloquant sur les vulnérabilités hautes et critiques.
-- CodeQL (JavaScript/TypeScript) sur chaque PR ; gitleaks ; actions GitHub épinglées par SHA ; permissions `GITHUB_TOKEN` minimales (`contents: read` par défaut).
+- Analyse statique sur chaque PR : Semgrep CE (règles JavaScript et TypeScript), CodeQL étant indisponible sur un dépôt privé d'un compte GitHub Free (Q26) ; gitleaks ; actions GitHub épinglées par SHA ; permissions `GITHUB_TOKEN` minimales (`contents: read` par défaut).
 - Branche `main` protégée : PR obligatoire, CI verte, revue (humaine ou Claude Code `/review`), pas de force-push.
 - Migrations de base revues en PR, rétrocompatibles (expand → migrate → contract), jamais appliquées à la main en production.
 
