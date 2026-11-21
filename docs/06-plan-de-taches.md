@@ -60,7 +60,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   nuxt-security : en-têtes, CSP à nonce, vérification d'origine des mutations. Sentry déplacé en T-03a (20/11/2026) : son intégration Workers ne se vérifie qu'avec le compte et un déploiement réel.
   Tests : I (en-têtes présents, CSP avec nonce, mutation cross-origin refusée).
 
-- [ ] **T-03a Déploiement de production** (dép. T-02b) — **action humaine** : jeton Cloudflare de la CI dans les secrets GitHub. Découpée le 20/11/2026 en T-03a, T-03e et T-03f. Le domaine (Q3) n'est pas requis : `*.workers.dev` suffit (domaine en T-58).
+- [x] **T-03a Déploiement de production** (dép. T-02b) — **action humaine** : jeton Cloudflare de la CI dans les secrets GitHub. Découpée le 20/11/2026 en T-03a, T-03e et T-03f. Le domaine (Q3) n'est pas requis : `*.workers.dev` suffit (domaine en T-58).
   `wrangler.toml` de production (Worker `legendary-shots`, bindings R2 privé, Hyperdrive sans cache (ADR-016), Images, variables), build Nitro `cloudflare_module`, `/api/health` qui vérifie la base et R2 (503 si un contrôle échoue), bucket de production et sa politique CORS, démarrage refusé en production avec `NUXT_FAKE_PROVIDERS=true`, workflow `deploy-production` depuis `main` (secrets publiés avec la version, `--secrets-file`, T-00g) qui échoue si l'artefact contient une route `/__test`.
   DoD : `/api/health` de production OK (base et R2) ; l'artefact de production ne contient aucune route `/__test`.
 
@@ -68,11 +68,11 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Queues et DLQ de `03-architecture.md` § Files, Cron Triggers du MVP (horaire et quotidien ; `*/5` et hebdomadaire avec leurs tâches v1.x), aiguillage des hooks Nitro `cloudflare:queue` et `cloudflare:scheduled` vers les consommateurs par nom de file (acquittement message par message, T-00f), consommateur et cron de test.
   DoD : un message et un cron de test traités en production.
 
-- [ ] **T-03f Sentry et Web Analytics** (dép. T-03a) — **action humaine** : compte et projet Sentry (DSN), jeton du beacon Web Analytics.
-  Sentry serveur (intégration Workers) et client (`sendDefaultPii: false`, rapport des violations CSP), beacon Web Analytics ajouté par Nuxt avec nonce (injection automatique désactivée dans le tableau de bord).
+- [x] **T-03f Sentry et Web Analytics** (dép. T-03a) — **action humaine** : compte et projet Sentry (DSN), jeton du beacon Web Analytics.
+  Sentry serveur (intégration Workers) et client (`dataCollection` restrictif, ex-`sendDefaultPii: false` ; rapport des violations CSP), beacon Web Analytics ajouté par Nuxt avec nonce (injection automatique désactivée dans le tableau de bord).
   DoD : une erreur de test reçue dans Sentry, sans donnée personnelle ; le beacon se charge sans violation CSP.
 
-- [ ] **T-03b Création des previews** (dép. T-03e) — **action humaine** : secret `NEON_API_KEY` et droits Queues, Hyperdrive et R2 du jeton de la CI.
+- [x] **T-03b Création des previews** (dép. T-03e) — **action humaine** : secret `NEON_API_KEY` et droits Queues, Hyperdrive et R2 du jeton de la CI.
   Workflow `preview-deploy` repris de `prototypes/t00g-preview` (ADR-013, ADR-016) : Worker `ls-pr-{n}`, Queues et DLQ suffixées, branche Neon `pr-{n}`, configuration Hyperdrive dédiée sans cache, préfixe `pr-{n}/` du bucket `ls-preview` (CORS des previews), secrets publiés avec la version, `noindex`, commentaire de la PR avec l'URL.
   DoD : la preview d'une PR répond sur `/api/health` ; un message de Queue est traité sur la preview ; deux PR en parallèle ne partagent ni Queue ni base ; un PUT navigateur vers une URL présignée du bucket de preview passe le CORS.
 
@@ -80,7 +80,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Workflow `preview-cleanup` à la fermeture de la PR (consommateurs retirés avant le Worker, T-00g), balayage hebdomadaire des ressources orphelines.
   DoD : la fermeture d'une PR supprime toutes ses ressources, vérifié par l'API.
 
-- [ ] **T-03d Protection des previews et périmètre** (dép. T-03b) — **action humaine** : activer Zero Trust.
+- [x] **T-03d Protection des previews et périmètre** (dép. T-03b) — **action humaine** : activer Zero Trust.
   Cloudflare Access « tous les Workers » avec bypass du seul Worker de production, jeton de service pour la CI. WAF, règle de limitation et Bot Fight Mode (`08-securite.md` § 2) exigent une zone : reportés au branchement du domaine en T-58 (Q24).
   DoD : une preview sans jeton Access est refusée ; la CI y accède avec le jeton de service ; la production reste publique.
 

@@ -3,9 +3,13 @@ const r2Host = process.env.R2_ACCOUNT_ID ? [`https://${process.env.R2_ACCOUNT_ID
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-11-01',
-  modules: ['@nuxt/eslint', 'nuxt-security'],
+  modules: ['@nuxt/eslint', 'nuxt-security', '@sentry/nuxt/module'],
   typescript: { strict: true },
   devtools: { enabled: false },
+  // Valeurs publiques lues au démarrage (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN), vides en local (T-03f)
+  runtimeConfig: { public: { sentryDsn: '', cfBeaconToken: '' } },
+  // Pas d'envoi des source maps (jeton d'organisation non requis au MVP) ni de télémétrie du plugin de build
+  sentry: { sourcemaps: { disable: true }, telemetry: false },
   // Routes /__test (réinitialisation, boîte mail factice, file…) : uniquement dans les builds de preview (ADR-013)
   nitro: { ignore: process.env.NUXT_DEPLOY_ENV === 'preview' ? [] : ['routes/__test/**'] },
   // En-têtes de sécurité de 08-securite.md § 5

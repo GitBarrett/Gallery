@@ -61,7 +61,7 @@ Analyse STRIDE par flux à mettre à jour à chaque nouvelle fonctionnalité exp
 - **Contenu illicite** : modération automatique avant publication (US-50) ; tout contenu signalé comme pédopornographique est retiré immédiatement, conservé hors ligne pour les autorités et signalé via PHAROS (France) ; procédure dans le runbook modération.
 
 ## 7. Données personnelles et secrets
-- **Minimisation** : IP stockées uniquement sous forme de HMAC (`IP_HASH_KEY`, rotation 30 jours) ; aucune donnée personnelle dans les logs, Sentry (`sendDefaultPii: false`, filtrage des corps de requête), PostHog (identifiant pseudonyme), GitHub.
+- **Minimisation** : IP stockées uniquement sous forme de HMAC (`IP_HASH_KEY`, rotation 30 jours) ; aucune donnée personnelle dans les logs, Sentry (`dataCollection` restrictif, ex-`sendDefaultPii: false` ; adresses IP non stockées dans les réglages du projet ; filtrage des corps de requête), PostHog (identifiant pseudonyme), GitHub.
 - **Chiffrement** : TLS partout ; chiffrement au repos assuré par Neon et R2 ; secrets TOTP chiffrés applicativement.
 - **Rétention** : appliquée par les tâches planifiées (`03-architecture.md` § Files et tâches) et décrite dans `docs/legal/privacy.md`.
 - **Suppression** : cascade complète testée (US-09.2) : base, R2, PostHog, sessions.

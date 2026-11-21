@@ -236,7 +236,8 @@ Tous les consommateurs sont **idempotents** (`processed_messages` + opérations 
 | `IP_HASH_KEY_CURRENT/PREVIOUS` | secrets (rotation 30 j) | HMAC des IP |
 | `CONTEST_IP_KEY` | secret (v1.x, T-64c ; changée seulement entre deux concours) | clé dérivée par concours pour `contest_like_signals` |
 | `MFA_ENCRYPTION_KEY` | secret | chiffrement des secrets TOTP |
-| `SENTRY_DSN` / `NUXT_PUBLIC_SENTRY_DSN` | secret / public | suivi d'erreurs serveur / client |
+| `NUXT_PUBLIC_SENTRY_DSN` | public (le DSN est servi au navigateur ; un seul DSN pour le Worker et le client, Q25) | suivi d'erreurs serveur et client |
+| `NUXT_PUBLIC_CF_BEACON_TOKEN` | public | beacon Cloudflare Web Analytics (ajouté par Nuxt avec nonce) |
 | `NUXT_PUBLIC_POSTHOG_KEY`, `NUXT_PUBLIC_SITE_URL` | public | analytics, URLs absolues |
 | `NUXT_FAKE_PROVIDERS` | variable de build | `true` uniquement en local et en preview ; refusée au démarrage en production |
 
@@ -265,7 +266,7 @@ Deux dernières versions de Chrome, Edge, Firefox et Safari ; Safari iOS ≥ 16.
 
 ## Observabilité
 - **Logs** : JSON structurés (`level`, `msg`, `correlationId`, `userId` pseudonymisé, `module`, `durationMs`), jamais d'email, de mot de passe, de jeton ni de contenu de fichier ; Workers Logs, rétention 7 jours ; Logpush vers R2 (30 jours) pour l'audit d'incident.
-- **Erreurs** : Sentry (`@sentry/cloudflare`) côté Worker et client, `sendDefaultPii: false`, échantillonnage des traces 10 %.
+- **Erreurs** : Sentry (`@sentry/cloudflare`) côté Worker et client, `dataCollection` restrictif (ni utilisateur, ni cookies, ni corps, ni query, ni variables locales ; `sendDefaultPii` n'existe plus en v11), erreurs 4xx attendues non envoyées, échantillonnage des traces 10 %, pas d'envoi des source maps au MVP.
 - **Santé** : `GET /api/health` (base, R2, Queue) ; sonde externe toutes les 5 min (UptimeRobot ou Cloudflare Health Checks).
 - **Alertes** (email admin) : taux d'erreur 5xx > 2 % sur 5 min, file `photo-process` > 500 messages ou DLQ non vide, disjoncteur bug reports déclenché, budget mensuel d'un fournisseur à 80 %.
 

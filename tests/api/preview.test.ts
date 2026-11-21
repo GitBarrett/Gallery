@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
 process.env.NUXT_DEPLOY_ENV = 'preview'
 process.env.NUXT_FAKE_PROVIDERS = 'true'
+process.env.NUXT_PUBLIC_CF_BEACON_TOKEN = 'f'.repeat(32)
 await setup({ server: true, browser: false })
 
 describe('preview build', () => {
@@ -18,5 +19,15 @@ describe('preview build', () => {
     expect(
       (await fetch('/__test/queue-ping', { method: 'POST', headers: { origin: 'http://localhost:3000' } })).status,
     ).toBe(503)
+  })
+
+  it('loads the Web Analytics beacon with the CSP nonce (08-securite.md § 5)', async () => {
+    const response = await fetch('/', { headers: { accept: 'text/html' } })
+    const nonce = /'nonce-([^']+)'/.exec(response.headers.get('content-security-policy') ?? '')?.[1]
+    const html = await response.text()
+    const beacon = /<script[^>]*beacon\.min\.js[^>]*>/.exec(html)?.[0]
+    expect(nonce).toBeTruthy()
+    expect(beacon).toContain(`nonce="${nonce}"`)
+    expect(beacon).toContain('f'.repeat(32))
   })
 })
