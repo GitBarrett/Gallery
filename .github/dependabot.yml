@@ -5,6 +5,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7 # versions publiées depuis au moins une semaine, comme pnpm
     groups:
       minor-and-patch:
         update-types: [minor, patch]
@@ -12,3 +14,5 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7 # versions publiées depuis au moins une semaine, comme pnpm
