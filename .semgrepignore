@@ -1,0 +1,3 @@
+:include .gitignore
+# Prototypes jetables de T-00, jamais importés
+prototypes/

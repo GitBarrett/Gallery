@@ -93,7 +93,7 @@ Chaque parcours vérifie aussi l'accessibilité de chaque page visitée avec `@a
 | Playwright E2E (desktop, iPhone 14, Pixel 7) sur la preview, authentifié auprès de Cloudflare Access par jeton de service | chaque PR | oui |
 | Vérification de l'artefact de production : aucune route `/__test`, aucun fournisseur factice | chaque PR | oui |
 | Lighthouse CI (home, PLP, PDP) | chaque PR | oui (seuils US-68) |
-| CodeQL, `pnpm audit` | chaque PR | oui (haute/critique) |
+| Semgrep CE (à la place de CodeQL, Q26), `pnpm audit --prod` | chaque PR | oui (Semgrep : toute alerte ; audit : haute/critique) |
 | OWASP ZAP baseline | hebdomadaire + avant mise en production | oui (« High ») |
 | Smoke test production (`/api/health` via Hyperdrive, home, PDP de référence, `/img` de référence servie puis `HIT` au second appel) | après déploiement | rollback automatique si échec |
 
