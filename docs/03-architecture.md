@@ -211,13 +211,13 @@ Source de la matrice d'autorisation (08, annexe B) : toute route ajoutée ici y 
 | `feedback` | bug report | réencodage de la capture jointe (binding Images), création issue GitHub | 5 | `feedback-dlq` |
 | `account-purge` | cron | suppression en cascade d'un compte | 5 | `account-purge-dlq`, alerte |
 
-Tous les consommateurs sont **idempotents** (`processed_messages` + opérations conditionnelles) : Cloudflare Queues livre au moins une fois.
+Tous les consommateurs sont **idempotents** (`processed_messages` + opérations conditionnelles) : Cloudflare Queues livre au moins une fois. Un message porte `{ eventId, payload }` : `eventId` est l'identifiant de la ligne d'outbox, stable même si le relais renvoie l'événement ; la garde `onceOnly` (`server/db/idempotency.ts`) enregistre `(consommateur, eventId)` dans la transaction du traitement.
 
 | Cron Trigger | Fréquence | Rôle |
 |---|---|---|
 | `*/5 * * * *` | 5 min | transitions de concours, recalcul classements (v1.x), alertes anti-triche |
-| `0 * * * *` | horaire | nettoyage des uploads orphelins (> 24 h), tokens expirés, fenêtres échues de `rate_limit_counters` |
-| `15 3 * * *` | quotidien | purge des comptes à J+30, notifications > 6 mois, bug reports > 12 mois, décisions de modération, signalements traités, recours traités et sanctions échues > 1 an, `downloads` > 30 jours (le compteur est déjà incrémenté), `username_redirects` expirées, invitations utilisées ou expirées > 30 jours, `processed_messages` > 30 jours, `outbox` publiée > 7 jours, `audit_log` > 2 ans, `banned_identities` expirées, sessions et jetons expirés, `waitlist_entries` 3 mois après l'ouverture, `trash/` (lifecycle R2 30 j en complément), sitemap, entrée en vigueur d'une nouvelle version des Terms (v1.x, T-70) |
+| `0 * * * *` | horaire | relais de l'outbox (événements refusés par une file après le commit, T-05b), battement de la chaîne cron → file, nettoyage des uploads orphelins (> 24 h), tokens expirés, fenêtres échues de `rate_limit_counters` |
+| `15 3 * * *` | quotidien | purge de l'outbox publiée (> 7 jours) et de `processed_messages` (> 30 jours), purge des comptes à J+30, notifications > 6 mois, bug reports > 12 mois, décisions de modération, signalements traités, recours traités et sanctions échues > 1 an, `downloads` > 30 jours (le compteur est déjà incrémenté), `username_redirects` expirées, invitations utilisées ou expirées > 30 jours, `processed_messages` > 30 jours, `outbox` publiée > 7 jours, `audit_log` > 2 ans, `banned_identities` expirées, sessions et jetons expirés, `waitlist_entries` 3 mois après l'ouverture, `trash/` (lifecycle R2 30 j en complément), sitemap, entrée en vigueur d'une nouvelle version des Terms (v1.x, T-70) |
 | `0 8 * * 1` | hebdomadaire | récap email (v1.x) |
 
 ## Configuration et secrets

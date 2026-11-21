@@ -9,5 +9,9 @@ export interface QueueProducer {
 export interface Bindings {
   HYPERDRIVE?: { connectionString: string }
   R2?: { head(key: string): Promise<unknown> }
+  PHOTO_PROCESS_QUEUE?: QueueProducer
   NOTIFICATIONS_QUEUE?: QueueProducer
+  EMAILS_QUEUE?: QueueProducer
+  FEEDBACK_QUEUE?: QueueProducer
+  ACCOUNT_PURGE_QUEUE?: QueueProducer
 }
