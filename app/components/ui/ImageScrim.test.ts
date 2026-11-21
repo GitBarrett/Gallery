@@ -8,8 +8,9 @@ import ImageScrim from './ImageScrim.vue'
 // happy-dom renders no image pixels: the contrast is computed on the tokens, the veil laid over the worst photos,
 // a pure white and a pure black area (07-design.md § Texte sur image). Playwright checks real pages later.
 const css = readFileSync('app/assets/css/tokens.css', 'utf8') // from the repository root: import.meta.url is not file: here
+const tokens = new Map([...css.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g)].map((m) => [m[1]!, m[2]!.trim()]))
 const rgb = (name: string): number[] => {
-  const value = css.match(new RegExp(`--${name}:\\s*([^;]+);`))?.[1]?.trim()
+  const value = tokens.get(name)
   if (!value) throw new Error(`token --${name} missing`)
   const veil = value.match(/^rgb\((\d+) (\d+) (\d+) \/ (\d+)%\)$/)
   if (veil) return veil.slice(1, 5).map(Number)
