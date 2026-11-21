@@ -18,7 +18,9 @@ of each story (axe) reports issues during development; component tests and Playw
 
 - Everything clickable is reachable by keyboard, in reading order; nothing is available on hover only.
 - Focus is always visible (`--focus-ring`); never remove it without replacing it.
-- A modal traps focus, closes with Escape and gives focus back to the element that opened it (T-06b).
+- A modal or a bottom sheet traps focus, closes with Escape and gives focus back to the element that opened it
+  (US-75.2): use Modal and BottomSheet, never a hand-made overlay.
+- An icon-only control is an ActionIcon, named by its `label`.
 
 ## Targets and layout
 
