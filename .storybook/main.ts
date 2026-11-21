@@ -12,6 +12,7 @@ const config: StorybookConfig = {
   framework: { name: '@storybook-vue/nuxt', options: {} },
   core: { disableTelemetry: true },
   // Polices auto-hébergées, référencées en _nuxt/fonts/ : lancer `pnpm build` avant ; sans lui, polices de secours
-  staticDirs: existsSync(FONTS) ? [{ from: FONTS, to: '/_nuxt/fonts' }] : [],
+  // public/ du site (emblème du logo…) et polices
+  staticDirs: ['../public', ...(existsSync(FONTS) ? [{ from: FONTS, to: '/_nuxt/fonts' }] : [])],
 }
 export default config
