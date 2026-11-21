@@ -7,10 +7,18 @@ test.beforeEach(({ browserName }) => {
   test.skip(browserName !== 'chromium', 'service workers are tested in Chromium')
 })
 
+// Fetched by the page itself: its requests carry the Access service token (fixtures.ts), unlike `request`
+const fetchInPage = (page: Page, url: string) =>
+  page.evaluate(async (url) => {
+    const response = await fetch(url)
+    return { status: response.status, type: response.headers.get('content-type') ?? '', body: await response.text() }
+  }, url)
+
 async function controlledHome(page: Page) {
-  // Skipped only when the build has no service worker (pnpm dev); otherwise it must register
-  test.skip((await page.request.get('/sw.js')).status() !== 200, 'no service worker outside production builds')
   await page.goto('/')
+  // Skipped only when the build has no service worker (pnpm dev); otherwise it must register
+  const sw = await fetchInPage(page, '/sw.js')
+  test.skip(sw.status !== 200 || !sw.type.includes('javascript'), 'no service worker outside production builds')
   await page.evaluate(() => navigator.serviceWorker.ready) // registration happens after load, then activation
   await page.reload() // the active service worker now controls the page and has cached it
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true)
@@ -18,11 +26,10 @@ async function controlledHome(page: Page) {
 
 test('US-63.1 the app is installable: manifest with name, colours, maskable icons, shortcuts and a service worker', async ({
   page,
-  request,
 }) => {
   await controlledHome(page)
   const href = await page.locator('link[rel="manifest"]').getAttribute('href')
-  const manifest = await (await request.get(href!)).json()
+  const manifest = JSON.parse((await fetchInPage(page, href!)).body)
   expect(manifest).toMatchObject({
     id: '/',
     start_url: '/?source=pwa',
@@ -37,7 +44,7 @@ test('US-63.1 the app is installable: manifest with name, colours, maskable icon
   expect(icons).toEqual(
     expect.arrayContaining(['192x192 any', '512x512 any', '512x512 maskable', '512x512 monochrome']),
   )
-  for (const icon of manifest.icons) expect((await request.get(icon.src)).headers()['content-type']).toBe('image/png')
+  for (const icon of manifest.icons) expect((await fetchInPage(page, icon.src)).type).toBe('image/png')
   expect(manifest.shortcuts.map((s: { url: string }) => s.url)).toEqual(['/upload', '/search', '/notifications'])
 })
 
