@@ -46,25 +46,27 @@ async function r2Keys(prefix) {
 
 async function neonBranch() {
   let branch = await findBranch(BRANCH)
-  if (!branch)
-    // schema-only : jamais de données de production dans une preview (seed de démo, 03-architecture.md § Environnements)
+  if (!branch) {
+    // Enfant de la branche modèle, sans données : jamais de données de production dans une preview (ADR-018)
+    const template = await findBranch('preview-template')
+    if (!template) throw new Error('branche preview-template absente : node scripts/database.mjs template (ADR-018)')
     branch = (
       await neon('POST', 'branches', {
-        branch: { name: BRANCH, init_source: 'schema-only' },
+        branch: { name: BRANCH, parent_id: template.id },
         endpoints: [{ type: 'read_write' }],
       })
     ).branch
+  }
   log(`branche Neon ${BRANCH} prête`)
   return branch
 }
 
 // Import dynamique : database.mjs dépend de drizzle et de postgres, absents du job de suppression (sans installation)
 async function migrateBranch(branch) {
-  const { copyJournal, migrate, setAppRole } = await import('./database.mjs')
+  const { migrate, setAppRole } = await import('./database.mjs')
   const owner = await ownerUrl(branch.id)
-  const copied = await copyJournal(await ownerUrl((await findBranch('production')).id), owner)
-  await migrate(owner)
-  log(`migrations appliquées${copied ? ` (journal de production recopié : ${copied})` : ''}`)
+  await migrate(owner) // seulement les migrations de la PR : le modèle a déjà celles de production
+  log('migrations appliquées')
   return setAppRole(owner) // nouveau mot de passe à chaque passage, aussitôt posé dans Hyperdrive
 }
 

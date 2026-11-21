@@ -109,7 +109,7 @@ Conventions : UUID v7 pour toutes les clés ; `created_at`/`updated_at` en `time
 
 Compteurs dénormalisés (`likes_count`…) mis à jour en transaction.
 
-**Rôles de base (T-05a)** : le propriétaire `neondb_owner` sert uniquement aux migrations (`scripts/database.mjs`, URL obtenue par l'API Neon, jamais stockée) ; le Worker se connecte par Hyperdrive avec `ls_app`, rôle de connexion créé en SQL (`NOSUPERUSER NOCREATEDB NOCREATEROLE` : un rôle créé par l'API Neon serait membre de `neon_superuser` et hériterait des droits du propriétaire), membre du rôle `app_rw` qui a lecture et écriture sur les tables, sauf `UPDATE`, `DELETE` et `TRUNCATE` sur `audit_log`. Les droits sont posés par migration et s'appliquent aux tables futures (`ALTER DEFAULT PRIVILEGES`). En production, les migrations s'exécutent dans `deploy-production` avant le déploiement du code ; sur une preview (branche schema-only), le journal des migrations de production est recopié pour que seules les nouvelles migrations s'appliquent.
+**Rôles de base (T-05a)** : le propriétaire `neondb_owner` sert uniquement aux migrations (`scripts/database.mjs`, URL obtenue par l'API Neon, jamais stockée) ; le Worker se connecte par Hyperdrive avec `ls_app`, rôle de connexion créé en SQL (`NOSUPERUSER NOCREATEDB NOCREATEROLE` : un rôle créé par l'API Neon serait membre de `neon_superuser` et hériterait des droits du propriétaire), membre du rôle `app_rw` qui a lecture et écriture sur les tables, sauf `UPDATE`, `DELETE` et `TRUNCATE` sur `audit_log`. Les droits sont posés par migration et s'appliquent aux tables futures (`ALTER DEFAULT PRIVILEGES`). En production, les migrations s'exécutent dans `deploy-production` avant le déploiement du code ; la branche modèle des previews (`preview-template`, sans données, ADR-018) reçoit les mêmes migrations, et chaque preview n'applique que celles de sa PR.
 
 ## Sécurité
 Voir `08-securite.md` (modèle de menaces, contrôles par couche, en-têtes, upload, sessions, secrets, tests de sécurité). Ce document fait foi.
@@ -211,13 +211,13 @@ Source de la matrice d'autorisation (08, annexe B) : toute route ajoutée ici y 
 | `feedback` | bug report | réencodage de la capture jointe (binding Images), création issue GitHub | 5 | `feedback-dlq` |
 | `account-purge` | cron | suppression en cascade d'un compte | 5 | `account-purge-dlq`, alerte |
 
-Tous les consommateurs sont **idempotents** (`processed_messages` + opérations conditionnelles) : Cloudflare Queues livre au moins une fois.
+Tous les consommateurs sont **idempotents** (`processed_messages` + opérations conditionnelles) : Cloudflare Queues livre au moins une fois. Un message porte `{ eventId, payload }` : `eventId` est l'identifiant de la ligne d'outbox, stable même si le relais renvoie l'événement ; la garde `onceOnly` (`server/db/idempotency.ts`) enregistre `(consommateur, eventId)` dans la transaction du traitement.
 
 | Cron Trigger | Fréquence | Rôle |
 |---|---|---|
 | `*/5 * * * *` | 5 min | transitions de concours, recalcul classements (v1.x), alertes anti-triche |
-| `0 * * * *` | horaire | nettoyage des uploads orphelins (> 24 h), tokens expirés, fenêtres échues de `rate_limit_counters` |
-| `15 3 * * *` | quotidien | purge des comptes à J+30, notifications > 6 mois, bug reports > 12 mois, décisions de modération, signalements traités, recours traités et sanctions échues > 1 an, `downloads` > 30 jours (le compteur est déjà incrémenté), `username_redirects` expirées, invitations utilisées ou expirées > 30 jours, `processed_messages` > 30 jours, `outbox` publiée > 7 jours, `audit_log` > 2 ans, `banned_identities` expirées, sessions et jetons expirés, `waitlist_entries` 3 mois après l'ouverture, `trash/` (lifecycle R2 30 j en complément), sitemap, entrée en vigueur d'une nouvelle version des Terms (v1.x, T-70) |
+| `0 * * * *` | horaire | relais de l'outbox (événements refusés par une file après le commit, T-05b), battement de la chaîne cron → file, nettoyage des uploads orphelins (> 24 h), tokens expirés, fenêtres échues de `rate_limit_counters` |
+| `15 3 * * *` | quotidien | purge de l'outbox publiée (> 7 jours) et de `processed_messages` (> 30 jours), purge des comptes à J+30, notifications > 6 mois, bug reports > 12 mois, décisions de modération, signalements traités, recours traités et sanctions échues > 1 an, `downloads` > 30 jours (le compteur est déjà incrémenté), `username_redirects` expirées, invitations utilisées ou expirées > 30 jours, `processed_messages` > 30 jours, `outbox` publiée > 7 jours, `audit_log` > 2 ans, `banned_identities` expirées, sessions et jetons expirés, `waitlist_entries` 3 mois après l'ouverture, `trash/` (lifecycle R2 30 j en complément), sitemap, entrée en vigueur d'une nouvelle version des Terms (v1.x, T-70) |
 | `0 8 * * 1` | hebdomadaire | récap email (v1.x) |
 
 ## Configuration et secrets
@@ -251,7 +251,7 @@ Validation au démarrage par un schéma Zod (`server/config.ts`) : variable manq
 | Env | Hébergement | Base | Données |
 |---|---|---|---|
 | local | `wrangler dev` (Miniflare : R2, Queues, API Cache locaux) | branche Neon `dev-{prénom}` ou Postgres Docker | seed de démo (`pnpm db:seed`) |
-| preview | Worker `ls-pr-{n}` par pull request (ADR-013) | branche Neon `pr-{n}` créée par la CI depuis `main`, via sa propre configuration Hyperdrive (ADR-016) | seed de démo + fixtures E2E |
+| preview | Worker `ls-pr-{n}` par pull request (ADR-013) | branche Neon `pr-{n}` créée par la CI depuis la branche modèle `preview-template`, sans données (ADR-018), via sa propre configuration Hyperdrive (ADR-016) | seed de démo + fixtures E2E |
 | production | Worker `main` | branche Neon principale | réelles |
 
 Fournisseurs externes en local et en preview : adaptateurs factices activés par `NUXT_FAKE_PROVIDERS=true` (Sightengine, Resend → boîte mail de test consultable, GitHub, OAuth) ; jamais en production.
