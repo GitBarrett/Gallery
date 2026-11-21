@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { previewConfig } from './preview-config.mjs'
+import { previewConfig, previewNumbers } from './preview-config.mjs'
 
 const production = readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8')
 const preview = previewConfig(production, { pr: 42, hyperdriveId: 'aaaabbbbccccddddeeeeffff00001111' })
@@ -40,5 +40,23 @@ describe('previewConfig (ADR-013)', () => {
         hyperdriveId: 'x',
       }),
     ).toThrow(/ls-prod/)
+  })
+})
+
+describe('previewNumbers (T-03c)', () => {
+  it('finds the pull request of every preview resource, never a production one', () => {
+    const names = [
+      'ls-pr-12',
+      'photo-process-dlq-pr-12',
+      'pr-7',
+      'pr-30/',
+      'legendary-shots',
+      'photo-process',
+      'ls-prod',
+      'main',
+      'gallery',
+      'sprint-pr-notes',
+    ]
+    expect([...previewNumbers(names)].sort()).toEqual(['12', '30', '7'])
   })
 })

@@ -30,3 +30,8 @@ export function previewConfig(productionToml, { pr, hyperdriveId }) {
   const queues = [...new Set([...toml.matchAll(/^(?:queue|dead_letter_queue) = "([^"]+)"$/gm)].map((m) => m[1]))]
   return { toml, queues }
 }
+
+// Numéros des PR dont il reste une ressource : ls-pr-{n}, <file>-pr-{n}, branche pr-{n}, préfixe R2 pr-{n}/
+export function previewNumbers(names) {
+  return new Set(names.map((name) => /(?:^|-)pr-(\d+)\/?$/.exec(name)?.[1]).filter(Boolean))
+}
