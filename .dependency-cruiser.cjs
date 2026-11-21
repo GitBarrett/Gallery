@@ -55,7 +55,7 @@ module.exports = {
   ],
   options: {
     doNotFollow: { path: 'node_modules' },
-    exclude: { path: '(^|/)(prototypes|tests/fixtures|\\.nuxt|\\.output)/' },
+    exclude: { path: '(^|/)(tests/fixtures|\\.nuxt|\\.output)/' },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: '.nuxt/tsconfig.json' },
     enhancedResolveOptions: { extensions: ['.ts', '.mjs', '.js', '.vue', '.json'] },

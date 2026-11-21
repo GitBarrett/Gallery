@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitest/config'
 import { defineVitestProject } from '@nuxt/test-utils/config'
 
-// Trois projets (11-strategie-de-tests.md § 1) ; prototypes/ hors périmètre (T-00, jamais importés).
+// Trois projets (11-strategie-de-tests.md § 1).
 export default defineConfig({
   test: {
     projects: [
