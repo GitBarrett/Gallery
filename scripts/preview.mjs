@@ -1,5 +1,5 @@
 // node scripts/preview.mjs up <n> — crée ou met à jour la preview de la PR n (ADR-013, ADR-016, prototype T-00g).
-// Idempotent : relancé à chaque commit de la PR, il réutilise la branche Neon, la configuration Hyperdrive et les files.
+// Idempotent : relancé à chaque commit de la PR, il réutilise la branche Neon et les files, et réécrit la configuration Hyperdrive.
 // Attend un build fait avec NITRO_PRESET=cloudflare_module et NUXT_DEPLOY_ENV=preview.
 // Variables : CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, NEON_API_KEY, NEON_PROJECT_ID.
 import { execFileSync } from 'node:child_process'
@@ -48,7 +48,13 @@ const wrangler = (...args) =>
 async function neonBranch() {
   let branch = (await neon('GET', 'branches')).branches.find((b) => b.name === BRANCH)
   if (!branch)
-    branch = (await neon('POST', 'branches', { branch: { name: BRANCH }, endpoints: [{ type: 'read_write' }] })).branch
+    // schema-only : jamais de données de production dans une preview (seed de démo, 03-architecture.md § Environnements)
+    branch = (
+      await neon('POST', 'branches', {
+        branch: { name: BRANCH, init_source: 'schema-only' },
+        endpoints: [{ type: 'read_write' }],
+      })
+    ).branch
   const { uri } = await neon(
     'GET',
     `connection_uri?branch_id=${branch.id}&database_name=neondb&role_name=neondb_owner&pooled=false`,
@@ -59,7 +65,8 @@ async function neonBranch() {
 
 async function hyperdrive(uri) {
   const existing = (await cf('GET', 'hyperdrive/configs')).result.find((c) => c.name === NAME)
-  if (existing) return existing.id
+  // Toujours réécrite : une branche recréée change d'hôte et de mot de passe
+  const [method, path] = existing ? ['PUT', `hyperdrive/configs/${existing.id}`] : ['POST', 'hyperdrive/configs']
   const origin = {
     scheme: 'postgres',
     host: uri.hostname,
@@ -70,7 +77,7 @@ async function hyperdrive(uri) {
   }
   for (let attempt = 1; ; attempt++) {
     try {
-      return (await cf('POST', 'hyperdrive/configs', { name: NAME, origin, caching: { disabled: true } })).result.id
+      return (await cf(method, path, { name: NAME, origin, caching: { disabled: true } })).result.id
     } catch (error) {
       if (attempt >= 10) throw error
       await sleep(5000) // le point d'accès de la nouvelle branche démarre encore
@@ -79,7 +86,12 @@ async function hyperdrive(uri) {
 }
 
 async function ensureQueues(names) {
-  const existing = new Set((await cf('GET', 'queues?per_page=100')).result.map((q) => q.queue_name))
+  const existing = new Set()
+  for (let page = 1; ; page++) {
+    const { result } = await cf('GET', `queues?per_page=100&page=${page}`)
+    for (const q of result) existing.add(q.queue_name)
+    if (result.length < 100) break
+  }
   for (const name of names.filter((n) => !existing.has(n))) await cf('POST', 'queues', { queue_name: name })
   log(`${names.length} files prêtes`)
 }
