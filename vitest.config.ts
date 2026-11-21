@@ -1,5 +1,9 @@
+import { existsSync } from 'node:fs'
 import { defineConfig } from 'vitest/config'
 import { defineVitestProject } from '@nuxt/test-utils/config'
+
+// Base de test locale (branche Neon dev-…) : DATABASE_URL dans .env.test, ignoré par git ; en CI, service Postgres
+if (existsSync('.env.test')) process.loadEnvFile('.env.test')
 
 // Trois projets (11-strategie-de-tests.md § 1).
 export default defineConfig({
@@ -24,6 +28,8 @@ export default defineConfig({
         test: {
           name: 'integration',
           environment: 'node',
+          globalSetup: ['tests/db-setup.ts'],
+          testTimeout: 30_000, // vraie base (Neon en local) : création de bases et migrations
           include: ['server/**/*.int.test.ts', 'tests/api/**/*.test.ts'],
         },
       },
@@ -41,7 +47,7 @@ export default defineConfig({
         'app/services/**',
       ],
       // Colle Nitro (routes, middlewares, plugins, gestionnaire d'erreurs) : exécutée dans le serveur des tests
-      // d'intégration. scripts/preview.mjs et lighthouse.mjs : appels d'API, de wrangler et de navigateur, vérifiés
+      // d'intégration. scripts/cloud.mjs, preview.mjs et lighthouse.mjs : appels d'API, de wrangler et de navigateur, vérifiés
       // sur de vraies previews (T-03b, T-04b) ; leurs règles pures sont testées à part.
       exclude: [
         '**/*.test.ts',
@@ -51,6 +57,8 @@ export default defineConfig({
         'server/routes/**',
         'server/plugins/**',
         'server/error-handler.ts',
+        'server/db/migrations/**', // SQL et journaux générés
+        'scripts/cloud.mjs',
         'scripts/preview.mjs',
         'scripts/lighthouse.mjs',
       ],

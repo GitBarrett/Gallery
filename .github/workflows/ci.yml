@@ -18,6 +18,17 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    # Postgres de CI (Q15), même version majeure que Neon : les tests d'intégration y appliquent les migrations sur une
+    # base vierge, et comptent dans la couverture avec les tests unitaires et de composants
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
@@ -36,39 +47,20 @@ jobs:
       - name: Architecture (dependency-cruiser)
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm arch
-      - name: Unit and component tests with coverage thresholds
+      - name: Unit, component and integration tests with coverage thresholds
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm test:coverage
       - name: Every acceptance criterion has a test
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm test:trace
+      - name: Migrations match the schema (pnpm db:generate was run)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm db:generate && test -z "$(git status --porcelain server/db/migrations)"
       - name: Production artifact has no test route
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm build && ! grep -rl "/__test" .output/server
         env:
           NITRO_PRESET: cloudflare_module
-
-  integration:
-    runs-on: ubuntu-latest
-    # Postgres de CI (Q15) ; les migrations s'y ajoutent avec Drizzle (T-05a)
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports: ['5432:5432']
-        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
-    env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test:int
 
   security:
     runs-on: ubuntu-latest
