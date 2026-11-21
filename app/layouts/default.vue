@@ -1,6 +1,5 @@
 <script setup lang="ts">
 // Shared layout: skip link first (US-75.1), header, content, footer and, below 768 px, the tab bar (US-67.1).
-// shortcut: English text, moved to i18n in T-07b
 import AppFooter from '~/features/layout/AppFooter.vue'
 import AppHeader from '~/features/layout/AppHeader.vue'
 import AppTabBar from '~/features/layout/AppTabBar.vue'
@@ -12,7 +11,7 @@ const username = undefined
 
 <template>
   <div class="layout">
-    <a href="#content" class="skip-link">Skip to content</a>
+    <a href="#content" class="skip-link">{{ $t('layout.skipToContent') }}</a>
     <AppHeader :flags="flags" :username="username" />
     <main id="content" tabindex="-1" class="content"><slot /></main>
     <AppFooter />

@@ -1,19 +1,28 @@
 <script setup lang="ts">
-// Site footer (Footer mockup): legal links. "Report a bug" (T-60) and the language switch (T-07b) come with their
-// task; the ad slot and "Support the site" with their flag (v1.x).
-// shortcut: English texts, moved to i18n in T-07b
-const links = [
-  { to: '/legal', label: 'Legal notice' },
-  { to: '/terms', label: 'Terms' },
-  { to: '/privacy', label: 'Privacy' },
-  { to: '/cookies', label: 'Cookie settings' },
-]
+// Site footer (Footer mockup): legal links and the language switch (US-62.2), named in its own language. "Report a
+// bug" comes with T-60; the ad slot and "Support the site" with their flag (v1.x).
+const { t, locale, locales } = useI18n()
+const localePath = useLocalePath()
+const switchLocalePath = useSwitchLocalePath()
+
+const links = computed(() => [
+  { to: localePath('/legal'), label: t('layout.legalNotice') },
+  { to: localePath('/terms'), label: t('layout.terms') },
+  { to: localePath('/privacy'), label: t('layout.privacy') },
+  { to: localePath('/cookies'), label: t('layout.cookieSettings') },
+])
+// shortcut: before hydration (or without JS), going from /fr to / is sent back to /fr by the cookie; add a server
+// route that sets the cookie if users report it
+const other = computed(() => locales.value.find((l) => l.code !== locale.value)!)
 </script>
 
 <template>
   <footer class="footer">
-    <nav aria-label="Footer" class="links">
+    <nav :aria-label="t('layout.footerNav')" class="links">
       <NuxtLink v-for="link in links" :key="link.to" :to="link.to" class="link">{{ link.label }}</NuxtLink>
+      <NuxtLink :to="switchLocalePath(other.code)" :lang="other.language" :hreflang="other.language" class="link">
+        {{ other.name }}
+      </NuxtLink>
     </nav>
     <p class="brand">© Legendary Shots</p>
   </footer>

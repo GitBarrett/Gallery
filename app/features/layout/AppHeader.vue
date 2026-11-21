@@ -1,19 +1,30 @@
 <script setup lang="ts">
 // Shared header (07-design.md § Header): one line from 1180 px, icon-only navigation from 768 px, below that the
 // emblem, search icon and profile or Sign in (the tab bar takes the navigation), hidden while scrolling down.
-// shortcut: English texts, moved to i18n in T-07b
 import type { FeatureFlags } from '~/composables/useFeatureFlags'
 import NavIcon, { type NavIconName } from './NavIcon.vue'
 
 const props = defineProps<{ flags: FeatureFlags; username?: string }>()
+const { t } = useI18n()
+const localePath = useLocalePath()
 
 const items = computed(() =>
   (
     [
-      { to: '/explore', label: 'Explore', icon: 'explore', on: true },
-      { to: '/leaderboard', label: 'Leaderboard', icon: 'leaderboard', on: props.flags.leaderboard },
-      { to: '/contests', label: 'Contests', icon: 'contests', on: props.flags.contests },
-      { to: '/collections', label: 'Collections', icon: 'collections', on: props.flags.collections },
+      { to: localePath('/explore'), label: t('layout.explore'), icon: 'explore', on: true },
+      {
+        to: localePath('/leaderboard'),
+        label: t('layout.leaderboard'),
+        icon: 'leaderboard',
+        on: props.flags.leaderboard,
+      },
+      { to: localePath('/contests'), label: t('layout.contests'), icon: 'contests', on: props.flags.contests },
+      {
+        to: localePath('/collections'),
+        label: t('layout.collections'),
+        icon: 'collections',
+        on: props.flags.collections,
+      },
     ] satisfies { to: string; label: string; icon: NavIconName; on: boolean }[]
   ).filter((item) => item.on),
 )
@@ -31,30 +42,46 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
 <template>
   <header class="header" :class="{ hidden }">
     <div class="bar">
-      <NuxtLink to="/" class="home">
+      <NuxtLink :to="localePath('/')" class="home">
         <UiLogoMark class="logo-full" />
         <UiLogoMark compact class="logo-compact" />
       </NuxtLink>
-      <nav aria-label="Main" class="nav">
+      <nav :aria-label="t('layout.mainNav')" class="nav">
         <NuxtLink v-for="item in items" :key="item.to" :to="item.to" class="nav-link">
           <NavIcon :name="item.icon" />
           <span class="label">{{ item.label }}</span>
         </NuxtLink>
       </nav>
-      <form class="search" role="search" action="/search" method="get">
+      <form class="search" role="search" :action="localePath('/search')" method="get">
         <NavIcon name="search" class="search-glyph" />
-        <label for="header-search" class="visually-hidden">Search</label>
-        <input id="header-search" type="search" name="q" placeholder="Zone, character, tag…" class="search-input" />
+        <label for="header-search" class="visually-hidden">{{ t('layout.search') }}</label>
+        <input
+          id="header-search"
+          type="search"
+          name="q"
+          :placeholder="t('layout.searchPlaceholder')"
+          class="search-input"
+        />
       </form>
-      <NuxtLink to="/search" class="icon-link mobile-only" aria-label="Search"><NavIcon name="search" /></NuxtLink>
-      <UiButton to="/upload" class="desktop-only"><NavIcon name="upload" />Upload</UiButton>
+      <NuxtLink :to="localePath('/search')" class="icon-link mobile-only" :aria-label="t('layout.search')">
+        <NavIcon name="search" />
+      </NuxtLink>
+      <UiButton :to="localePath('/upload')" class="desktop-only"
+        ><NavIcon name="upload" />{{ t('layout.upload') }}</UiButton
+      >
       <template v-if="username">
-        <NuxtLink to="/notifications" class="icon-link desktop-only" aria-label="Notifications">
+        <NuxtLink
+          :to="localePath('/notifications')"
+          class="icon-link desktop-only"
+          :aria-label="t('layout.notifications')"
+        >
           <NavIcon name="notifications" />
         </NuxtLink>
-        <NuxtLink :to="`/u/${username}`" class="icon-link" aria-label="My profile"><NavIcon name="profile" /></NuxtLink>
+        <NuxtLink :to="localePath(`/u/${username}`)" class="icon-link" :aria-label="t('layout.myProfile')">
+          <NavIcon name="profile" />
+        </NuxtLink>
       </template>
-      <UiButton v-else to="/signin" variant="secondary">Sign in</UiButton>
+      <UiButton v-else :to="localePath('/signin')" variant="secondary">{{ t('layout.signIn') }}</UiButton>
     </div>
   </header>
 </template>

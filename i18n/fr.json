@@ -1,0 +1,22 @@
+{
+  "layout": {
+    "skipToContent": "Aller au contenu",
+    "mainNav": "Principale",
+    "footerNav": "Pied de page",
+    "explore": "Explorer",
+    "leaderboard": "Classement",
+    "contests": "Concours",
+    "collections": "Collections",
+    "search": "Rechercher",
+    "searchPlaceholder": "Zone, personnage, tag…",
+    "upload": "Publier",
+    "notifications": "Notifications",
+    "profile": "Profil",
+    "myProfile": "Mon profil",
+    "signIn": "Se connecter",
+    "legalNotice": "Mentions légales",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Confidentialité",
+    "cookieSettings": "Gestion des cookies"
+  }
+}

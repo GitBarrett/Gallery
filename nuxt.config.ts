@@ -3,7 +3,7 @@ const r2Host = process.env.R2_ACCOUNT_ID ? [`https://${process.env.R2_ACCOUNT_ID
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-11-01',
-  modules: ['@nuxt/eslint', 'nuxt-security', '@sentry/nuxt/module', '@nuxt/fonts', '@nuxtjs/storybook'],
+  modules: ['@nuxt/eslint', 'nuxt-security', '@sentry/nuxt/module', '@nuxt/fonts', '@nuxtjs/storybook', '@nuxtjs/i18n'],
   // Design system (ADR-014): tokens then base, loaded everywhere
   css: ['~/assets/css/tokens.css', '~/assets/css/base.css'],
   // Self-hosted fonts (no call to Google from the browser); global: referenced through var(--font-*)
@@ -14,13 +14,23 @@ export default defineNuxtConfig({
       { name: 'Cinzel Decorative', weights: [700], global: true },
     ],
   },
+  // English at /, French under /fr/ (US-62). The browser language is only detected on /; the choice is then kept in
+  // an essential cookie, written on every language change. <html lang> is set in app.vue.
+  i18n: {
+    langDir: '.',
+    defaultLocale: 'en',
+    strategy: 'prefix_except_default',
+    locales: [
+      { code: 'en', language: 'en', name: 'English', file: 'en.json' },
+      { code: 'fr', language: 'fr', name: 'Français', file: 'fr.json' },
+    ],
+    detectBrowserLanguage: { useCookie: true, redirectOn: 'root', cookieSecure: process.env.NODE_ENV === 'production' },
+  },
   typescript: { strict: true },
   devtools: { enabled: false },
-  // Default language and title (English, i18n ADR); @nuxtjs/i18n will drive them per page in T-07b
   // viewport-fit=cover: the layout pads the notch and the iOS home bar itself with env(safe-area-inset-*)
   app: {
     head: {
-      htmlAttrs: { lang: 'en' },
       title: 'Legendary Shots',
       viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
     },

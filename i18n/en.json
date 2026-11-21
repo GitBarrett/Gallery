@@ -1,0 +1,22 @@
+{
+  "layout": {
+    "skipToContent": "Skip to content",
+    "mainNav": "Main",
+    "footerNav": "Footer",
+    "explore": "Explore",
+    "leaderboard": "Leaderboard",
+    "contests": "Contests",
+    "collections": "Collections",
+    "search": "Search",
+    "searchPlaceholder": "Zone, character, tag…",
+    "upload": "Upload",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "myProfile": "My profile",
+    "signIn": "Sign in",
+    "legalNotice": "Legal notice",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "cookieSettings": "Cookie settings"
+  }
+}
