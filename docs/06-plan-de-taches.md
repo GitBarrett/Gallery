@@ -64,8 +64,8 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   `wrangler.toml` de production (Worker `legendary-shots`, bindings R2 privé, Hyperdrive sans cache (ADR-016), Images, variables), build Nitro `cloudflare_module`, `/api/health` qui vérifie la base et R2 (503 si un contrôle échoue), bucket de production et sa politique CORS, démarrage refusé en production avec `NUXT_FAKE_PROVIDERS=true`, workflow `deploy-production` depuis `main` (secrets publiés avec la version, `--secrets-file`, T-00g) qui échoue si l'artefact contient une route `/__test`.
   DoD : `/api/health` de production OK (base et R2) ; l'artefact de production ne contient aucune route `/__test`.
 
-- [ ] **T-03e Queues et crons de production** (dép. T-03a)
-  Queues et DLQ de `03-architecture.md` § Files, binding Rate Limiting, Cron Triggers, aiguillage des hooks Nitro `cloudflare:queue` et `cloudflare:scheduled` vers les consommateurs par nom de file (acquittement message par message, T-00f), consommateur et cron de test.
+- [x] **T-03e Queues et crons de production** (dép. T-03a)
+  Queues et DLQ de `03-architecture.md` § Files, Cron Triggers du MVP (horaire et quotidien ; `*/5` et hebdomadaire avec leurs tâches v1.x), aiguillage des hooks Nitro `cloudflare:queue` et `cloudflare:scheduled` vers les consommateurs par nom de file (acquittement message par message, T-00f), consommateur et cron de test.
   DoD : un message et un cron de test traités en production.
 
 - [ ] **T-03f Sentry et Web Analytics** (dép. T-03a) — **action humaine** : compte et projet Sentry (DSN), jeton du beacon Web Analytics.
@@ -101,7 +101,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Tests : I (relais outbox, double livraison ignorée), contrat `UnitOfWork`.
 
 - [ ] **T-05c Limitation de débit** (dép. T-05a)
-  Port `RateLimiter` : adaptateur binding Workers (fenêtres courtes) et compteurs en base (fenêtres longues, `08-securite.md` § 8), purge horaire des fenêtres échues.
+  Port `RateLimiter` : bindings Workers Rate Limiting déclarés dans `wrangler.toml` (déplacés de T-03e, 20/11/2026) et leur adaptateur (fenêtres courtes) et compteurs en base (fenêtres longues, `08-securite.md` § 8), purge horaire des fenêtres échues.
   Tests : I (compteur exact sur une fenêtre d'une heure), contrat `RateLimiter`.
 
 - [ ] **T-06a Design system : fondations** (dép. T-01a)
