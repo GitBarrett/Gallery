@@ -18,5 +18,24 @@
     "terms": "Terms",
     "privacy": "Privacy",
     "cookieSettings": "Cookie settings"
+  },
+  "errorPage": {
+    "notFoundTitle": "Page not found",
+    "notFoundText": "This page does not exist or is no longer available. Try a search instead.",
+    "serverTitle": "Something went wrong",
+    "serverText": "The error has been reported to us. Please try again in a moment.",
+    "reference": "Error reference",
+    "searchLabel": "Search the gallery",
+    "home": "Back to home"
+  },
+  "errors": {
+    "VALIDATION_FAILED": "Some fields are not valid. Check them and try again.",
+    "UNAUTHENTICATED": "Please sign in to continue.",
+    "FORBIDDEN": "You are not allowed to do this.",
+    "NOT_FOUND": "This content does not exist or is no longer available.",
+    "CONFLICT": "This was changed in the meantime. Reload and try again.",
+    "PAYLOAD_TOO_LARGE": "This file is too large.",
+    "RATE_LIMITED": "Too many attempts. Wait a moment and try again.",
+    "INTERNAL": "Something went wrong. Please try again."
   }
 }

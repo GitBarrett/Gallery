@@ -17,7 +17,8 @@ const meta: Meta<typeof EmptyState> = {
 **When to use it**: as soon as a list, a grid or a module has nothing to show. Say what is missing and offer the
 action that fills it (Upload, Explore). For oneself: a call to act; for others: a sober statement.
 
-**Avoid**: an empty block, a "0", an error message for a mere lack of content.
+**Avoid**: an empty block, a "0", an error message for a mere lack of content. The 404 and 500 pages reuse it
+with \`headingLevel: 1\`.
 
 **Accessibility**: the heading follows the page hierarchy (\`headingLevel\`); the optional icon is decorative.`,
       },

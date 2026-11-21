@@ -30,4 +30,14 @@ describe('preview build', () => {
     expect(beacon).toContain(`nonce="${nonce}"`)
     expect(beacon).toContain('f'.repeat(32))
   })
+
+  it('US-69.2 a page error answers 500 with the cf-ray correlation id and no technical detail', async () => {
+    const response = await fetch('/__test/page-error', {
+      headers: { accept: 'text/html', 'cf-ray': '9a8b7c6d5e4f-CDG' },
+    })
+    const html = await response.text()
+    expect(response.status).toBe(500)
+    expect(html).toContain('9a8b7c6d5e4f-CDG')
+    expect(html).not.toContain('T-07c: test error')
+  })
 })
