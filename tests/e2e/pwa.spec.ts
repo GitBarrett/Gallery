@@ -8,10 +8,10 @@ test.beforeEach(({ browserName }) => {
 })
 
 async function controlledHome(page: Page) {
+  // Skipped only when the build has no service worker (pnpm dev); otherwise it must register
+  test.skip((await page.request.get('/sw.js')).status() !== 200, 'no service worker outside production builds')
   await page.goto('/')
-  const registered = await page.evaluate(async () => Boolean(await navigator.serviceWorker.getRegistration()))
-  test.skip(!registered, 'no service worker outside production builds')
-  await page.evaluate(() => navigator.serviceWorker.ready)
+  await page.evaluate(() => navigator.serviceWorker.ready) // registration happens after load, then activation
   await page.reload() // the active service worker now controls the page and has cached it
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true)
 }
