@@ -69,7 +69,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   DoD : un message et un cron de test traités en production.
 
 - [ ] **T-03f Sentry et Web Analytics** (dép. T-03a) — **action humaine** : compte et projet Sentry (DSN), jeton du beacon Web Analytics.
-  Sentry serveur (intégration Workers) et client (`sendDefaultPii: false`, rapport des violations CSP), beacon Web Analytics ajouté par Nuxt avec nonce (injection automatique désactivée dans le tableau de bord).
+  Sentry serveur (intégration Workers) et client (`dataCollection` restrictif, ex-`sendDefaultPii: false` ; rapport des violations CSP), beacon Web Analytics ajouté par Nuxt avec nonce (injection automatique désactivée dans le tableau de bord).
   DoD : une erreur de test reçue dans Sentry, sans donnée personnelle ; le beacon se charge sans violation CSP.
 
 - [ ] **T-03b Création des previews** (dép. T-03e) — **action humaine** : secret `NEON_API_KEY` et droits Queues, Hyperdrive et R2 du jeton de la CI.

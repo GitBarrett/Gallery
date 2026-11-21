@@ -11,6 +11,12 @@ const schema = z
       .string()
       .regex(/^(pr-\d+\/)?$/)
       .default(''),
+    // Valeurs publiques lues par Nuxt (runtimeConfig.public) et par le plugin Sentry ; vides en local (T-03f)
+    NUXT_PUBLIC_SENTRY_DSN: z.union([z.url(), z.literal('')]).optional(),
+    NUXT_PUBLIC_CF_BEACON_TOKEN: z
+      .string()
+      .regex(/^([0-9a-f]{32})?$/)
+      .optional(),
   })
   .refine((env) => !(env.NUXT_DEPLOY_ENV === 'production' && env.NUXT_FAKE_PROVIDERS === 'true'), {
     path: ['NUXT_FAKE_PROVIDERS'],
