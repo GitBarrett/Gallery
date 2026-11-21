@@ -1,6 +1,6 @@
 import postgres from 'postgres'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { copyJournal, migrate } from '../../scripts/database.mjs'
+import { copyJournal, migrate, setAppRole } from '../../scripts/database.mjs'
 
 // Base vierge créée pour ce fichier (11-strategie-de-tests.md § 7) : les migrations s'y appliquent depuis zéro.
 const base = process.env.DATABASE_URL
@@ -68,6 +68,23 @@ describe('migrations (T-05a)', () => {
       await target.end()
     } finally {
       await admin.unsafe(`drop database ${copy} with (force)`)
+    }
+  })
+
+  it('connect the Worker with a plain login role that can insert into audit_log but never update or delete it', async () => {
+    const appUrl = await setAppRole(url)
+    expect(appUrl.username).toBe('ls_app')
+    const app = postgres(String(appUrl), { max: 1, onnotice: () => {} })
+    try {
+      const [role] = await app`select rolsuper, rolcreaterole, rolcreatedb from pg_roles where rolname = current_user`
+      expect(role).toEqual({ rolsuper: false, rolcreaterole: false, rolcreatedb: false })
+      await app`insert into audit_log (action, target_type, target_id) values ('test', 'photo', '1')`
+      await expect(app`update audit_log set action = 'forged'`).rejects.toThrow(/permission denied/)
+      await expect(app`delete from audit_log`).rejects.toThrow(/permission denied/)
+      await expect(app`truncate audit_log`).rejects.toThrow(/permission denied/)
+      await app`update outbox set topic = topic` // les autres tables restent modifiables
+    } finally {
+      await app.end()
     }
   })
 })

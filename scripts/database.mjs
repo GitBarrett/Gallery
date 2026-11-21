@@ -1,12 +1,13 @@
 // Migrations et rôle applicatif (T-05a). Le propriétaire de la base ne sert qu'aux migrations ; le Worker se connecte
-// par Hyperdrive avec ls_app, membre du rôle app_rw (sans UPDATE ni DELETE sur audit_log, migration 0001).
+// par Hyperdrive avec ls_app, simple rôle de connexion membre de app_rw (sans UPDATE ni DELETE sur audit_log, 0001).
 //   node scripts/database.mjs migrate     applique les migrations sur DATABASE_URL (CI, local)
 //   node scripts/database.mjs production  branche production : migrations, rôle ls_app, Hyperdrive ls-prod sur ls_app
+import { randomBytes } from 'node:crypto'
 import { pathToFileURL } from 'node:url'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate as runMigrations } from 'drizzle-orm/postgres-js/migrator'
 import postgres from 'postgres'
-import { cf, env, findBranch, hyperdriveOrigin, log, neon, ownerUrl } from './cloud.mjs'
+import { cf, env, findBranch, hyperdriveOrigin, log, ownerUrl } from './cloud.mjs'
 
 const APP_ROLE = 'ls_app'
 const MIGRATIONS = 'server/db/migrations'
@@ -45,17 +46,20 @@ export async function copyJournal(fromUrl, toUrl) {
   })
 }
 
-/** Rôle de connexion du Worker (géré par Neon), membre de app_rw ; renvoie son URL de connexion. */
-export async function appUrl(branchId, owner) {
-  const { roles } = await neon('GET', `branches/${branchId}/roles`)
-  if (!roles.some((r) => r.name === APP_ROLE))
-    await neon('POST', `branches/${branchId}/roles`, { role: { name: APP_ROLE } })
-  const { password } = await neon('GET', `branches/${branchId}/roles/${APP_ROLE}/reveal_password`)
-  await withSql(owner, (sql) => sql`grant app_rw to ${sql(APP_ROLE)}`)
-  const url = new URL(owner)
-  url.username = APP_ROLE
-  url.password = password
-  return url
+/**
+ * Rôle de connexion du Worker, créé en SQL avec un nouveau mot de passe aléatoire ; renvoie son URL de connexion.
+ * Jamais par l'API Neon : un rôle créé ainsi est membre de neon_superuser et hérite des droits du propriétaire.
+ */
+export async function setAppRole(owner) {
+  const password = randomBytes(24).toString('base64url') // [A-Za-z0-9_-] : sûr dans une chaîne SQL
+  await withSql(owner, async (sql) => {
+    const exists = (await sql`select 1 from pg_roles where rolname = ${APP_ROLE}`).length > 0
+    // Attributs posés à la création ; les modifier ensuite exige un superutilisateur, seul le mot de passe change
+    const attributes = exists ? 'login' : 'login nosuperuser nocreatedb nocreaterole noreplication nobypassrls'
+    await sql.unsafe(`${exists ? 'alter' : 'create'} role ${APP_ROLE} ${attributes} password '${password}'`)
+    await sql.unsafe(`grant app_rw to ${APP_ROLE}`)
+  })
+  return Object.assign(new URL(owner), { username: APP_ROLE, password })
 }
 
 async function production() {
@@ -63,12 +67,12 @@ async function production() {
   const owner = await ownerUrl(branch.id)
   await migrate(owner)
   log('migrations de production appliquées')
-  const app = await appUrl(branch.id, owner)
+  // Une seule fois : changer le mot de passe à chaque déploiement couperait les nouvelles connexions un instant
   const config = (await cf('GET', 'hyperdrive/configs')).result.find((c) => c.name === 'ls-prod')
   if (config.origin.user !== APP_ROLE) {
     await cf('PUT', `hyperdrive/configs/${config.id}`, {
       name: config.name,
-      origin: hyperdriveOrigin(app),
+      origin: hyperdriveOrigin(await setAppRole(owner)),
       caching: { disabled: true },
     })
     log(`Hyperdrive ls-prod passe sur le rôle ${APP_ROLE}`)

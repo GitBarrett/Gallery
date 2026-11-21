@@ -60,12 +60,12 @@ async function neonBranch() {
 
 // Import dynamique : database.mjs dépend de drizzle et de postgres, absents du job de suppression (sans installation)
 async function migrateBranch(branch) {
-  const { appUrl, copyJournal, migrate } = await import('./database.mjs')
+  const { copyJournal, migrate, setAppRole } = await import('./database.mjs')
   const owner = await ownerUrl(branch.id)
   const copied = await copyJournal(await ownerUrl((await findBranch('production')).id), owner)
   await migrate(owner)
   log(`migrations appliquées${copied ? ` (journal de production recopié : ${copied})` : ''}`)
-  return appUrl(branch.id, owner)
+  return setAppRole(owner) // nouveau mot de passe à chaque passage, aussitôt posé dans Hyperdrive
 }
 
 async function hyperdrive(url) {
