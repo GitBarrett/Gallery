@@ -1,4 +1,4 @@
-# Suppression des previews (T-03c, ADR-013) : à la fermeture de la PR, et balayage hebdomadaire des orphelines.
+# Preview deletion (T-03c, ADR-013): when the pull request closes, and a weekly sweep of orphans.
 name: preview-cleanup
 
 on:
@@ -8,7 +8,7 @@ on:
     - cron: '0 4 * * 1'
   workflow_dispatch:
 
-# Même groupe que preview-deploy : la fermeture annule un déploiement en cours de la même PR
+# Same group as preview-deploy: closing cancels a running deployment of the same pull request
 concurrency:
   group: preview-${{ github.event.pull_request.number || 'sweep' }}
   cancel-in-progress: true

@@ -1,4 +1,4 @@
-/* Base (ADR-014) : remise à zéro légère, typographie, focus visible et mouvement réduit (US-75). */
+/* Base (ADR-014): light reset, typography, visible focus and reduced motion (US-75). */
 *,
 *::before,
 *::after {
@@ -58,7 +58,7 @@ textarea {
   box-shadow: var(--focus-ring);
 }
 
-/* Libellé réservé aux lecteurs d'écran */
+/* Label for screen readers only */
 .visually-hidden {
   position: absolute;
   width: 1px;

@@ -2,8 +2,8 @@ import type { Preview } from '@storybook-vue/nuxt'
 import { themes } from 'storybook/theming'
 import { h } from 'vue'
 
-// Thème sombre et fond du site sous chaque story : les composants sont dessinés pour le fond nuit (07-design.md).
-// Playbook d'abord, puis les composants du plus simple au plus composé (atomic design, ADR-019).
+// Dark theme and the site background under every story: components are drawn for the night background (07-design.md).
+// Playbook first, then components from the simplest to the most composed (atomic design, ADR-019).
 const preview: Preview = {
   decorators: [
     (story) => () => h('div', { style: 'background: var(--color-bg); padding: var(--space-6)' }, h(story())),
@@ -14,9 +14,9 @@ const preview: Preview = {
       storySort: {
         order: [
           'Playbook',
-          ['Introduction et principes', 'Fondations', 'Accessibilité', 'Rédaction', 'Contribuer'],
+          ['Introduction and principles', 'Foundations', 'Accessibility', 'Writing', 'Contributing'],
           'UI',
-          ['Atomes', 'Molécules'],
+          ['Atoms', 'Molecules'],
         ],
       },
     },

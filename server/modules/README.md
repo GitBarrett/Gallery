@@ -1,1 +1,1 @@
-Un dossier par module métier : domain/, application/, infrastructure/, interface/, index.ts. Un module n'importe que l'index.ts d'un autre.
+One folder per business module: domain/, application/, infrastructure/, interface/, index.ts. A module only imports another module's index.ts.

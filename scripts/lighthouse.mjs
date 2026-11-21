@@ -1,7 +1,7 @@
-// node scripts/lighthouse.mjs <url...> — Lighthouse mobile sur la preview, seuils de US-68.2 (T-04b).
-// Chromium est piloté par Playwright : le jeton de service Access n'est ajouté qu'aux requêtes vers la preview,
-// jamais vers les tiers (Web Analytics, Sentry) ; Lighthouse s'y branche par le port de débogage.
-// Variables : CF_ACCESS_CLIENT_ID, CF_ACCESS_CLIENT_SECRET (absentes : aucun en-tête, ex. site public).
+// node scripts/lighthouse.mjs <url...> — mobile Lighthouse on the preview, US-68.2 thresholds (T-04b).
+// Chromium is driven by Playwright: the Access service token is only added to requests for the preview,
+// never to third parties (Web Analytics, Sentry); Lighthouse attaches through the debugging port.
+// Variables: CF_ACCESS_CLIENT_ID, CF_ACCESS_CLIENT_SECRET (absent: no header, e.g. public site).
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -11,7 +11,7 @@ import { failedThresholds, median } from './lighthouse-thresholds.mjs'
 
 const urls = process.argv.slice(2)
 if (!urls.length) throw new Error('usage : node scripts/lighthouse.mjs <url...>')
-const RUNS = 3 // médiane de 3 passages : le score de performance varie d'un passage à l'autre
+const RUNS = 3 // median of 3 runs: the performance score varies from one run to the next
 const PORT = 9333
 
 const context = await chromium.launchPersistentContext(mkdtempSync(join(tmpdir(), 'lh-')), {

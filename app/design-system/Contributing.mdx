@@ -1,0 +1,33 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Playbook/Contributing" />
+
+# Contributing to the design system
+
+## Before creating a component
+
+1. Search this Storybook: an existing component, a variant or a composition is often enough.
+2. Pure presentation, reusable across screens: `app/components/ui`. Tied to a feature (data, API calls):
+   `app/features/<feature>/`.
+
+## Creating or changing a `ui` component
+
+1. **Tests first** (`Name.test.ts`, `component` project): rendering, behaviour, and `axeViolations` without serious or
+   critical violation.
+2. **Component** (`Name.vue`): typed props, outputs through events, `<style scoped>` styles in `var(--…)` only
+   (Stylelint), no hard-coded text (i18n), mobile first.
+3. **Story** (`Name.stories.ts`): one story per useful state (variants, disabled, error, focus, mobile), titled
+   `UI/Atoms/…` or `UI/Molecules/…`.
+4. **Playbook section** in the component description (`parameters.docs.description.component`): role, when to use it,
+   what to avoid, accessibility.
+5. Check the Accessibility panel of each story, then `pnpm check`.
+
+## Adding a token
+
+Only when no existing value fits. Add it to `tokens.css` with a role name (`--color-danger`, not `--color-red`), then
+to the Foundations page; a text colour joins the pairs checked by `tests/design-tokens.test.ts`.
+
+## Review
+
+The pull request shows the stories concerned (`/storybook/` link of the preview); every added or changed component has
+its story and its playbook section up to date (Definition of Done).

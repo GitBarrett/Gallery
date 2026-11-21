@@ -1,17 +1,17 @@
 import { z } from 'zod'
 
-// Variables validées au démarrage ; chaque tâche ajoute les siennes (03-architecture.md § Configuration et secrets).
+// Variables validated at startup; each task adds its own (03-architecture.md § Configuration et secrets).
 const schema = z
   .object({
     NUXT_PUBLIC_SITE_URL: z.url(),
     NUXT_FAKE_PROVIDERS: z.enum(['true', 'false']).default('false'),
     NUXT_DEPLOY_ENV: z.enum(['local', 'preview', 'production']).default('local'),
-    // Préfixe des objets R2 d'une preview dans le bucket partagé ls-preview (ADR-013) ; vide en production
+    // R2 object prefix of a preview in the shared ls-preview bucket (ADR-013); empty in production
     NUXT_R2_PREFIX: z
       .string()
       .regex(/^(pr-\d+\/)?$/)
       .default(''),
-    // Valeurs publiques lues par Nuxt (runtimeConfig.public) et par le plugin Sentry ; vides en local (T-03f)
+    // Public values read by Nuxt (runtimeConfig.public) and by the Sentry plugin; empty locally (T-03f)
     NUXT_PUBLIC_SENTRY_DSN: z.union([z.url(), z.literal('')]).optional(),
     NUXT_PUBLIC_CF_BEACON_TOKEN: z
       .string()
@@ -20,7 +20,7 @@ const schema = z
   })
   .refine((env) => !(env.NUXT_DEPLOY_ENV === 'production' && env.NUXT_FAKE_PROVIDERS === 'true'), {
     path: ['NUXT_FAKE_PROVIDERS'],
-    message: 'fournisseurs factices interdits en production',
+    message: 'fake providers are forbidden in production',
   })
 
 export interface Config {
@@ -30,12 +30,12 @@ export interface Config {
   r2Prefix: string
 }
 
-/** Valide l'environnement ; une variable manquante ou invalide fait échouer le démarrage, sans afficher sa valeur. */
+/** Validates the environment; a missing or invalid variable fails the startup, without printing its value. */
 export function loadConfig(env: Record<string, string | undefined>): Config {
   const parsed = schema.safeParse(env)
   if (!parsed.success) {
     const names = [...new Set(parsed.error.issues.map((issue) => String(issue.path[0])))]
-    throw new Error(`Configuration invalide ou manquante : ${names.join(', ')}`)
+    throw new Error(`Invalid or missing configuration: ${names.join(', ')}`)
   }
   return {
     siteUrl: parsed.data.NUXT_PUBLIC_SITE_URL,

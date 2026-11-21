@@ -1,6 +1,6 @@
 import { toErrorResponse } from './platform/http-errors'
 
-// Erreurs de /api au format commun ; les pages gardent la page d'erreur de Nuxt (T-07c).
+// /api errors in the common format; pages keep Nuxt's error page (T-07c).
 export default defineNitroErrorHandler((error, event) => {
   if (!event.path.startsWith('/api/')) return
   const { status, body, headers } = toErrorResponse(error, event.context.correlationId ?? 'unknown')

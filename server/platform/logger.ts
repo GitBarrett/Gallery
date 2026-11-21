@@ -1,4 +1,4 @@
-/** Logs JSON structurés, sans donnée personnelle ni secret (03-architecture.md § Observabilité). */
+/** Structured JSON logs, without personal data or secrets (03-architecture.md § Observabilité). */
 export interface Logger {
   info(msg: string, fields?: Record<string, unknown>): void
   warn(msg: string, fields?: Record<string, unknown>): void

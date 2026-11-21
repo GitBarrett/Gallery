@@ -1,1 +1,1 @@
-Composition root, config validée, logger, erreurs HTTP, contexte d'auth, rate limit, sécurité.
+Composition root, validated config, logger, HTTP errors, auth context, rate limit, security.

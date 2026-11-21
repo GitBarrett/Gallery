@@ -1,4 +1,4 @@
-# Production (T-03a). Les previews génèrent leur configuration à partir de ce fichier (T-03b, ADR-013).
+# Production (T-03a). Previews generate their configuration from this file (T-03b, ADR-013).
 name = "legendary-shots"
 main = ".output/server/index.mjs"
 compatibility_date = "2026-11-01"
@@ -13,22 +13,22 @@ binding = "ASSETS"
 [observability]
 enabled = true
 
-# Valeurs publiques ; les secrets passent par `wrangler deploy --secrets-file` (T-00g)
+# Public values; secrets go through `wrangler deploy --secrets-file` (T-00g)
 [vars]
 NUXT_PUBLIC_SITE_URL = "https://legendary-shots.aleygues.workers.dev"
 NUXT_DEPLOY_ENV = "production"
 NUXT_FAKE_PROVIDERS = "false"
 NUXT_R2_PREFIX = ""
-# Valeurs publiques servies au navigateur (T-03f, Q25)
+# Public values served to the browser (T-03f, Q25)
 NUXT_PUBLIC_SENTRY_DSN = "https://cdcf8f3e3a474494448cff10947009ea@o4512469379055616.ingest.de.sentry.io/4512469385412688"
-NUXT_PUBLIC_CF_BEACON_TOKEN = "458bbb78a91d42189f5b66bff09f87de" # gitleaks:allow (public : servi dans chaque page)
+NUXT_PUBLIC_CF_BEACON_TOKEN = "458bbb78a91d42189f5b66bff09f87de" # gitleaks:allow (public: served in every page)
 
-# Bucket privé : originaux et variantes, jamais publics (ADR-004, ADR-012)
+# Private bucket: originals and variants, never public (ADR-004, ADR-012)
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "ls-prod"
 
-# Neon, branche principale ; cache désactivé (ADR-016)
+# Neon, main branch; cache disabled (ADR-016)
 [[hyperdrive]]
 binding = "HYPERDRIVE"
 id = "232936a763ef4fcf8d7b25b9bad0e3cb"
@@ -36,14 +36,14 @@ id = "232936a763ef4fcf8d7b25b9bad0e3cb"
 [images]
 binding = "IMAGES"
 
-# Rafales (T-05c) : mutations /api par IP, en attendant les règles de zone (08-securite.md § 2, Q24) ; fenêtre de 10
-# ou 60 s comptée par emplacement Cloudflare, donc approximative. Les previews ont leur propre espace (1002).
+# Bursts (T-05c): /api mutations per IP, until zone rules exist (08-securite.md § 2, Q24); window of 10
+# or 60 s counted per Cloudflare location, hence approximate. Previews have their own namespace (1002).
 [[ratelimits]]
 name = "RATE_LIMITER_MUTATIONS"
 namespace_id = "1001"
 simple = { limit = 120, period = 60 }
 
-# Files de 03-architecture.md § Files d'attente ; chaque file a sa DLQ. Les previews suffixent les noms par -pr-{n}.
+# Queues of 03-architecture.md § Files d'attente; each queue has its DLQ. Previews suffix the names with -pr-{n}.
 [[queues.producers]]
 binding = "PHOTO_PROCESS_QUEUE"
 queue = "photo-process"
@@ -90,6 +90,6 @@ queue = "account-purge"
 max_retries = 5
 dead_letter_queue = "account-purge-dlq"
 
-# Crons du MVP ; */5 (concours) et hebdomadaire (récap) arrivent avec leurs tâches v1.x
+# MVP crons; */5 (contests) and weekly (digest) arrive with their v1.x tasks
 [triggers]
 crons = ["0 * * * *", "15 3 * * *"]

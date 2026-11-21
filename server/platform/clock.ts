@@ -1,4 +1,4 @@
-/** Port d'horloge : le code métier n'appelle jamais `Date.now()` directement (10-clean-architecture.md § 2). */
+/** Clock port: business code never calls `Date.now()` directly (10-clean-architecture.md § 2). */
 export interface Clock {
   now(): Date
 }

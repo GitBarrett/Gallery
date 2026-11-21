@@ -8,7 +8,7 @@ declare module 'h3' {
   }
 }
 
-// Configuration validée au démarrage : une variable manquante empêche le Worker de servir (T-02a).
+// Configuration validated at startup: a missing variable prevents the Worker from serving (T-02a).
 export default defineNitroPlugin((nitroApp) => {
   const config = loadConfig(process.env)
   nitroApp.hooks.hook('request', (event) => {

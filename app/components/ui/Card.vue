@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Surface encadrée (maquette Main) ; la balise suit le contexte : article pour une capture, section pour un bloc.
+// Framed surface (Main mockup); the tag follows the context: article for a capture, section for a block.
 withDefaults(defineProps<{ as?: 'div' | 'article' | 'section' }>(), { as: 'div' })
 </script>
 

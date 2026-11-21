@@ -3,7 +3,7 @@ import type { Config } from './config'
 import { uuidV7Generator, type IdGenerator } from './ids'
 import { createLogger, type Logger } from './logger'
 
-/** Composition root : construit, par requête, les dépendances des use cases (10-clean-architecture.md § 5). */
+/** Composition root: builds, per request, the dependencies of the use cases (10-clean-architecture.md § 5). */
 export interface Container {
   config: Config
   clock: Clock

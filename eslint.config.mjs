@@ -6,20 +6,20 @@ export default withNuxt(
     rules: {
       'vue/no-v-html': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
-      // Prettier écrit les éléments vides `<input />` : la règle suit Prettier, qui a le dernier mot sur la forme
+      // Prettier writes void elements as `<input />`: the rule follows Prettier, which has the last word on form
       'vue/html-self-closing': ['warn', { html: { void: 'always', normal: 'never', component: 'always' } }],
     },
   },
   {
-    // Design system : présentation pure. $fetch et useFetch sont injectés par Nuxt sans import,
-    // dependency-cruiser ne les voit pas (10-clean-architecture.md § 7).
+    // Design system: pure presentation. $fetch and useFetch are injected by Nuxt without an import,
+    // so dependency-cruiser cannot see them (10-clean-architecture.md § 7).
     files: ['app/components/ui/**'],
     rules: {
       'no-restricted-globals': [
         'error',
         ...['$fetch', 'useFetch', 'useLazyFetch', 'useAsyncData'].map((name) => ({
           name,
-          message: 'Le design system ne fait aucun appel réseau : passer la donnée par les props.',
+          message: 'The design system makes no network call: pass the data through props.',
         })),
       ],
     },

@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import type { UnitOfWork } from '../../server/platform/unit-of-work'
 
-/** Une implémentation à tester, avec les messages reçus par les files et une file qui peut refuser l'envoi. */
+/** An implementation under test, with the messages the queues received and a queue that can refuse to send. */
 export interface UnitOfWorkHarness {
   uow: UnitOfWork<object>
   sent(): { topic: string; payload: unknown }[]
 }
 
-// Contrat du port UnitOfWork (11-strategie-de-tests.md § 4) : vérifié sur l'implémentation Drizzle et sur le fake.
+// Contract of the UnitOfWork port (11-strategie-de-tests.md § 4): checked on the Drizzle implementation and the fake.
 export function unitOfWorkContract(
   name: string,
   make: (options: { queueFails: boolean }) => Promise<UnitOfWorkHarness>,
@@ -22,7 +22,7 @@ export function unitOfWorkContract(
       const { uow, sent } = await make({ queueFails: false })
       await uow.run(async (_, publish) => {
         publish({ topic: 'notifications', payload: { kind: 'contract', n: 1 } })
-        expect(sent()).toEqual([]) // rien ne part avant le commit
+        expect(sent()).toEqual([]) // nothing leaves before the commit
       })
       expect(sent()).toEqual([{ topic: 'notifications', payload: { kind: 'contract', n: 1 } }])
     })

@@ -13,7 +13,7 @@ import {
 } from '../platform/jobs'
 import { createLogger } from '../platform/logger'
 
-// Consommateurs par file (nom sans suffixe de preview) : chaque module ajoute le sien avec sa tâche.
+// Consumers per queue (name without preview suffix): each module adds its own with its task.
 const consumers: Record<string, MessageHandler> = {}
 
 const queuesOf = (env: Bindings): QueueProducers => ({
@@ -24,7 +24,7 @@ const queuesOf = (env: Bindings): QueueProducers => ({
   'account-purge': env.ACCOUNT_PURGE_QUEUE,
 })
 
-/** Exécute un traitement avec la base (Hyperdrive), puis ferme la connexion : chaque cron ouvre la sienne. */
+/** Runs a job with the database (Hyperdrive), then closes the connection: each cron opens its own. */
 const withDb =
   (env: Bindings, run: (db: ReturnType<typeof createDb>) => Promise<unknown>): CronHandler =>
   async () => {
@@ -41,15 +41,15 @@ const relayOf = (env: Bindings, db: ReturnType<typeof createDb>) => outboxRelay(
 const crons = (env: Bindings): Record<string, CronHandler[]> => ({
   '0 * * * *': [
     ...(env.NOTIFICATIONS_QUEUE ? [heartbeatCron(env.NOTIFICATIONS_QUEUE, systemClock)] : []),
-    // Relais des événements que la file a refusés après le commit (T-05b)
-    // shortcut: jusqu'à 1 h de retard et 100 événements par passage, passer à */5 avec le cron des concours (T-64a)
+    // Relay of the events a queue refused after the commit (T-05b)
+    // shortcut: up to 1 h of delay and 100 events per run, switch to */5 with the contests cron (T-64a)
     withDb(env, (db) => relayOf(env, db).publish()),
-    withDb(env, (db) => purgeRateLimitCounters(db, systemClock)), // fenêtres échues (T-05c)
+    withDb(env, (db) => purgeRateLimitCounters(db, systemClock)), // ended windows (T-05c)
   ],
   '15 3 * * *': [withDb(env, (db) => relayOf(env, db).purge())],
 })
 
-// Hooks Nitro validés par T-00f ; l'acquittement se fait message par message dans dispatchBatch.
+// Nitro hooks validated by T-00f; acknowledgement happens message by message in dispatchBatch.
 export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook('cloudflare:queue', async ({ batch }) => {
     const logger = createLogger({ correlationId: `queue:${batch.queue}`, module: 'jobs' })

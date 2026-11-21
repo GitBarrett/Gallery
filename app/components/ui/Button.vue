@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Bouton du design system (maquettes Main et SignIn) : action principale en or, secondaire en contour, discrète.
-// Devient un lien quand il mène à une page ; désactivé, il reste un bouton (un lien n'a pas d'état désactivé).
+// Design system button (Main and SignIn mockups): main action in gold, secondary outlined, ghost discreet.
+// Becomes a link when it leads to a page; disabled, it stays a button (a link has no disabled state).
 withDefaults(
   defineProps<{
     variant?: 'primary' | 'secondary' | 'ghost'

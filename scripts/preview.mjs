@@ -1,11 +1,11 @@
-// Previews par PR (ADR-013, ADR-016, prototype T-00g) :
-//   up <n>        crée ou met à jour la preview de la PR n (T-03b). Idempotent : relancé à chaque commit, il réutilise
-//                 la branche Neon et les files, applique les migrations (T-05a) et réécrit la configuration
-//                 Hyperdrive. Attend un build fait avec NITRO_PRESET=cloudflare_module et NUXT_DEPLOY_ENV=preview.
-//   down <n>      supprime toutes les ressources de la PR n et vérifie par l'API qu'il n'en reste aucune (T-03c).
-//   sweep [n...]  supprime les previews orphelines : toute PR qui a une ressource sans être dans la liste des ouvertes.
-// Variables : CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, NEON_API_KEY, NEON_PROJECT_ID ; pour up, CF_ACCESS_CLIENT_ID
-// et CF_ACCESS_CLIENT_SECRET (jeton de service Access de la CI, T-03d).
+// Previews per pull request (ADR-013, ADR-016, T-00g prototype):
+//   up <n>        creates or updates the preview of pull request n (T-03b). Idempotent: run on every commit, it reuses
+//                 the Neon branch and the queues, applies the migrations (T-05a) and rewrites the Hyperdrive
+//                 configuration. Expects a build made with NITRO_PRESET=cloudflare_module and NUXT_DEPLOY_ENV=preview.
+//   down <n>      deletes every resource of pull request n and checks through the APIs that none is left (T-03c).
+//   sweep [n...]  deletes orphan previews: any pull request owning a resource without being in the open list.
+// Variables: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, NEON_API_KEY, NEON_PROJECT_ID; for up, CF_ACCESS_CLIENT_ID
+// and CF_ACCESS_CLIENT_SECRET (the CI's Access service token, T-03d).
 import { execFileSync } from 'node:child_process'
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
 import { cf, env, findBranch, hyperdriveOrigin, log, neon, ownerUrl, sleep } from './cloud.mjs'
@@ -47,9 +47,9 @@ async function r2Keys(prefix) {
 async function neonBranch() {
   let branch = await findBranch(BRANCH)
   if (!branch) {
-    // Enfant de la branche modèle, sans données : jamais de données de production dans une preview (ADR-018)
+    // Child of the template branch, without data: never any production data in a preview (ADR-018)
     const template = await findBranch('preview-template')
-    if (!template) throw new Error('branche preview-template absente : node scripts/database.mjs template (ADR-018)')
+    if (!template) throw new Error('preview-template branch missing: node scripts/database.mjs template (ADR-018)')
     branch = (
       await neon('POST', 'branches', {
         branch: { name: BRANCH, parent_id: template.id },
@@ -57,22 +57,22 @@ async function neonBranch() {
       })
     ).branch
   }
-  log(`branche Neon ${BRANCH} prête`)
+  log(`Neon branch ${BRANCH} ready`)
   return branch
 }
 
-// Import dynamique : database.mjs dépend de drizzle et de postgres, absents du job de suppression (sans installation)
+// Dynamic import: database.mjs depends on drizzle and postgres, missing from the deletion job (no install)
 async function migrateBranch(branch) {
   const { migrate, setAppRole } = await import('./database.mjs')
   const owner = await ownerUrl(branch.id)
-  await migrate(owner) // seulement les migrations de la PR : le modèle a déjà celles de production
-  log('migrations appliquées')
-  return setAppRole(owner) // nouveau mot de passe à chaque passage, aussitôt posé dans Hyperdrive
+  await migrate(owner) // only the pull request migrations: the template already has the production ones
+  log('migrations applied')
+  return setAppRole(owner) // new password on every run, set in Hyperdrive right away
 }
 
 async function hyperdrive(url) {
   const existing = (await cf('GET', 'hyperdrive/configs')).result.find((c) => c.name === NAME)
-  // Toujours réécrite : une branche recréée change d'hôte et de mot de passe
+  // Always rewritten: a recreated branch changes host and password
   const [method, path] = existing ? ['PUT', `hyperdrive/configs/${existing.id}`] : ['POST', 'hyperdrive/configs']
   const origin = hyperdriveOrigin(url)
   for (let attempt = 1; ; attempt++) {
@@ -80,7 +80,7 @@ async function hyperdrive(url) {
       return (await cf(method, path, { name: NAME, origin, caching: { disabled: true } })).result.id
     } catch (error) {
       if (attempt >= 10) throw error
-      await sleep(5000) // le point d'accès de la nouvelle branche démarre encore
+      await sleep(5000) // the new branch's endpoint is still starting
     }
   }
 }
@@ -88,7 +88,7 @@ async function hyperdrive(url) {
 async function ensureQueues(names) {
   const existing = new Set((await listQueues()).map((q) => q.queue_name))
   for (const name of names.filter((n) => !existing.has(n))) await cf('POST', 'queues', { queue_name: name })
-  log(`${names.length} files prêtes`)
+  log(`${names.length} queues ready`)
 }
 
 async function ensureBucket() {
@@ -98,7 +98,7 @@ async function ensureBucket() {
 }
 
 async function waitForHealth() {
-  // Previews derrière Cloudflare Access (T-03d) : jeton de service ; sans lui, Access redirige vers sa page de connexion
+  // Previews behind Cloudflare Access (T-03d): service token; without it, Access redirects to its login page
   const headers = {
     'cf-access-client-id': env('CF_ACCESS_CLIENT_ID'),
     'cf-access-client-secret': env('CF_ACCESS_CLIENT_SECRET'),
@@ -106,33 +106,33 @@ async function waitForHealth() {
   for (let attempt = 1; attempt <= 30; attempt++) {
     const res = await fetch(`${URL_}/api/health`, { headers, redirect: 'manual' }).catch(() => null)
     if (res?.ok) return res.json()
-    await sleep(3000) // propagation de workers.dev
+    await sleep(3000) // workers.dev propagation
   }
-  throw new Error(`${URL_}/api/health ne répond pas`)
+  throw new Error(`${URL_}/api/health does not respond`)
 }
 
 async function up() {
   const app = await migrateBranch(await neonBranch())
   const hyperdriveId = await hyperdrive(app)
-  log(`Hyperdrive ${NAME} prête (rôle ls_app, cache désactivé)`)
+  log(`Hyperdrive ${NAME} ready (ls_app role, cache disabled)`)
   const { toml, queues } = previewConfig(readFileSync('wrangler.toml', 'utf8'), { pr, hyperdriveId })
   await ensureQueues(queues)
   await ensureBucket()
-  writeFileSync('wrangler.preview.toml', toml) // à la racine : main et assets sont relatifs au fichier de configuration
+  writeFileSync('wrangler.preview.toml', toml) // at the root: main and assets are relative to the configuration file
   wrangler('deploy', '-c', 'wrangler.preview.toml')
-  log(`santé : ${JSON.stringify(await waitForHealth())}`)
-  log(`preview prête : ${URL_}`)
+  log(`health: ${JSON.stringify(await waitForHealth())}`)
+  log(`preview ready: ${URL_}`)
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `url=${URL_}\n`)
 }
 
-// Noms de toutes les ressources du compte qui peuvent appartenir à une preview ; previewNumbers en tire les PR.
+// Names of every account resource that may belong to a preview; previewNumbers derives the pull requests.
 async function inventory() {
   const [workers, queues, configs, { branches }, keys] = await Promise.all([
     cf('GET', 'workers/scripts'),
     listQueues(),
     cf('GET', 'hyperdrive/configs'),
     neon('GET', 'branches'),
-    r2Keys(''), // shortcut: liste tout ls-preview (seed de démo par PR), passer à delimiter=/ s'il grossit
+    r2Keys(''), // shortcut: lists the whole ls-preview bucket (demo seed per PR), switch to delimiter=/ if it grows
   ])
   return [
     ...workers.result.map((w) => w.id),
@@ -147,15 +147,15 @@ async function down(n) {
   const name = `ls-pr-${n}`
   const queues = (await listQueues()).filter((q) => q.queue_name.endsWith(`-pr-${n}`))
   if ((await cf('GET', 'workers/scripts')).result.some((w) => w.id === name)) {
-    // Cloudflare refuse de supprimer un Worker encore consommateur d'une file (T-00g)
+    // Cloudflare refuses to delete a Worker that still consumes a queue (T-00g)
     for (const q of queues)
       for (const c of (await cf('GET', `queues/${q.queue_id}/consumers`)).result)
         await cf('DELETE', `queues/${q.queue_id}/consumers/${c.consumer_id}`)
     await cf('DELETE', `workers/scripts/${name}?force=true`)
-    log(`Worker ${name} supprimé`)
+    log(`Worker ${name} deleted`)
   }
   for (const q of queues) await cf('DELETE', `queues/${q.queue_id}`)
-  log(`${queues.length} files supprimées`)
+  log(`${queues.length} queues deleted`)
   const config = (await cf('GET', 'hyperdrive/configs')).result.find((c) => c.name === name)
   if (config) await cf('DELETE', `hyperdrive/configs/${config.id}`)
   const branch = (await neon('GET', 'branches')).branches.find((b) => b.name === `pr-${n}`)
@@ -163,14 +163,14 @@ async function down(n) {
   const keys = await r2Keys(`pr-${n}/`)
   for (const key of keys)
     await cf('DELETE', `r2/buckets/${BUCKET}/objects/${key.split('/').map(encodeURIComponent).join('/')}`)
-  log(`Hyperdrive, branche Neon et ${keys.length} objets R2 supprimés`)
-  if (previewNumbers(await inventory()).has(n)) throw new Error(`il reste des ressources de la preview ${n}`)
-  log(`preview ${n} supprimée, vérifié par l'API`)
+  log(`Hyperdrive, Neon branch and ${keys.length} R2 objects deleted`)
+  if (previewNumbers(await inventory()).has(n)) throw new Error(`resources of preview ${n} are left`)
+  log(`preview ${n} deleted, checked through the APIs`)
 }
 
 async function sweep(open) {
   const orphans = [...previewNumbers(await inventory())].filter((n) => !open.includes(n))
-  log(`previews orphelines : ${orphans.join(', ') || 'aucune'}`)
+  log(`orphan previews: ${orphans.join(', ') || 'none'}`)
   for (const n of orphans) await down(n)
 }
 

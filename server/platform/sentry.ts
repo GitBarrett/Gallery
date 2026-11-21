@@ -1,8 +1,8 @@
 import { toErrorResponse } from './http-errors'
 
 /**
- * Données envoyées à Sentry côté serveur (08-securite.md § 7, aucune donnée personnelle) : ni utilisateur, ni cookies,
- * ni corps, ni query, ni variables locales ; seuls quelques en-têtes techniques de la requête.
+ * Data sent to Sentry on the server (08-securite.md § 7, no personal data): no user, cookies,
+ * bodies, query or local variables; only a few technical request headers.
  */
 export const dataCollection = {
   userInfo: false,
@@ -15,7 +15,7 @@ export const dataCollection = {
   stackFrameVariables: false,
 }
 
-/** Seules les erreurs inattendues (réponse 5xx) sont envoyées ; les 4xx sont le fonctionnement normal de l'API. */
+/** Only unexpected errors (5xx response) are sent; 4xx are the normal behaviour of the API. */
 export function beforeSend<E>(event: E, hint: { originalException?: unknown }): E | null {
   if (hint.originalException !== undefined && toErrorResponse(hint.originalException, '').status < 500) return null
   return event

@@ -1,0 +1,88 @@
+import { ColorItem, ColorPalette, Meta, Typeset } from '@storybook/addon-docs/blocks'
+
+<Meta title="Playbook/Foundations" />
+
+# Foundations
+
+Every visual reads the variables of `app/assets/css/tokens.css`: this page shows them as they are, so it cannot drift
+from the code. To add a token, see Contributing.
+
+## Colours
+
+<ColorPalette>
+  <ColorItem
+    title="Backgrounds and surfaces"
+    subtitle="From the page background to raised surfaces (fields); borders"
+    colors={{
+      '--color-bg': 'var(--color-bg)',
+      '--color-surface': 'var(--color-surface)',
+      '--color-surface-raised': 'var(--color-surface-raised)',
+      '--color-surface-hover': 'var(--color-surface-hover)',
+      '--color-border-subtle': 'var(--color-border-subtle)',
+      '--color-border': 'var(--color-border)',
+    }}
+  />
+  <ColorItem
+    title="Text"
+    subtitle="From the strongest to the most discreet, all AA on every surface"
+    colors={{
+      '--color-text': 'var(--color-text)',
+      '--color-text-soft': 'var(--color-text-soft)',
+      '--color-text-muted': 'var(--color-text-muted)',
+      '--color-text-faint': 'var(--color-text-faint)',
+    }}
+  />
+  <ColorItem
+    title="Accents and states"
+    subtitle="Gold: main action and links; arcane: information; danger and success: forms"
+    colors={{
+      '--color-accent': 'var(--color-accent)',
+      '--color-on-accent': 'var(--color-on-accent)',
+      '--color-arcane': 'var(--color-arcane)',
+      '--color-danger': 'var(--color-danger)',
+      '--color-success': 'var(--color-success)',
+    }}
+  />
+  <ColorItem
+    title="Capture quality"
+    subtitle="From likes; never shown by colour alone (always the tier name)"
+    colors={{
+      '--quality-poor': 'var(--quality-poor)',
+      '--quality-uncommon': 'var(--quality-uncommon)',
+      '--quality-rare': 'var(--quality-rare)',
+      '--quality-epic': 'var(--quality-epic)',
+      '--quality-legendary': 'var(--quality-legendary)',
+    }}
+  />
+</ColorPalette>
+
+## Typography
+
+Titles in Cinzel (`--font-display`), text in Inter (`--font-body`), logotype in Cinzel Decorative (`--font-logo`);
+self-hosted fonts.
+
+<Typeset
+  fontFamily="var(--font-display)"
+  fontWeight={700}
+  sampleText="Dawn on the Plains"
+  fontSizes={['var(--text-5xl)', 'var(--text-4xl)', 'var(--text-3xl)', 'var(--text-2xl)', 'var(--text-xl)']}
+/>
+
+<Typeset
+  fontFamily="var(--font-body)"
+  sampleText="Azeroth, seen by its players."
+  fontSizes={['var(--text-lg)', 'var(--text-md)', 'var(--text-sm)', 'var(--text-xs)']}
+/>
+
+## Spacing, shapes and controls
+
+| Token                                  | Use                                                                                                                           |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `--space-1` to `--space-12`            | margins, gutters, inner spacing (4 to 48 px); `--space-2` (8 px) between related elements, `--space-4` (16 px) between blocks |
+| `--radius-md`                          | corners of buttons, fields and cards; `--radius-pill` for filters and tabs                                                    |
+| `--control-md`                         | default control height (44 px, minimum touch target); `--control-lg` and `--control-xl` for highlighted actions               |
+| `--focus-ring`                         | focus ring, set by `base.css` on `:focus-visible`                                                                             |
+| `--z-header` to `--z-toast`            | stacking: header, overlay, modal, toast                                                                                       |
+| `--duration-fast`, `--duration-normal` | transitions, neutralised when the user reduces motion                                                                         |
+
+Breakpoints (min-width, mobile first): 480, 768, 1024 and 1280 px.

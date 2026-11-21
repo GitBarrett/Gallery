@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { AppError } from './http-errors'
 import { beforeSend } from './sentry'
 
-// h3 enveloppe l'erreur lancée par une route : l'erreur d'origine est dans `cause`
+// h3 wraps the error thrown by a route: the original error is in `cause`
 const thrownByRoute = (error: Error) => Object.assign(new Error(error.message), { statusCode: 500, cause: error })
 
 describe('beforeSend (08-securite.md § 7)', () => {

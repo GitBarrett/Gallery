@@ -1,10 +1,10 @@
-// Appels aux API Cloudflare et Neon partagés par les scripts d'exploitation (preview.mjs, database.mjs).
+// Cloudflare and Neon API calls shared by the operations scripts (preview.mjs, database.mjs).
 // Variables : CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, NEON_API_KEY, NEON_PROJECT_ID.
 
 export const env = (name) =>
   process.env[name] ||
   (() => {
-    throw new Error(`variable manquante : ${name}`)
+    throw new Error(`missing variable: ${name}`)
   })()
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const t0 = Date.now()
@@ -18,7 +18,7 @@ async function api(base, token, method, path, body) {
       body: body && JSON.stringify(body),
     })
     const json = await res.json().catch(() => ({}))
-    // 423 : Neon termine encore une opération sur la branche (création, rôle…)
+    // 423: Neon is still finishing an operation on the branch (creation, role…)
     if (res.status === 423 && attempt < 20) {
       await sleep(2000)
       continue
@@ -42,7 +42,7 @@ export const neon = (method, path, body) =>
 
 export const findBranch = async (name) => (await neon('GET', 'branches')).branches.find((b) => b.name === name)
 
-/** URL directe (sans pooler) du propriétaire de la base : migrations uniquement. */
+/** Direct URL (no pooler) of the database owner: migrations only. */
 export async function ownerUrl(branchId) {
   const { uri } = await neon(
     'GET',
@@ -51,7 +51,7 @@ export async function ownerUrl(branchId) {
   return new URL(uri)
 }
 
-/** Origine Hyperdrive à partir d'une URL Postgres. */
+/** Hyperdrive origin from a Postgres URL. */
 export const hyperdriveOrigin = (url) => ({
   scheme: 'postgres',
   host: url.hostname,

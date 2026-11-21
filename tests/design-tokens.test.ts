@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-// Contrastes AA de la palette (US-75, 07-design.md) calculés sur tokens.css : un changement de couleur qui casse la
-// lisibilité échoue ici, avant toute revue visuelle.
+// AA contrasts of the palette (US-75, 07-design.md) computed on tokens.css: a colour change that breaks
+// readability fails here, before any visual review.
 const css = readFileSync(new URL('../app/assets/css/tokens.css', import.meta.url), 'utf8')
 const tokens = new Map([...css.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-f]{3,6})\b/gi)].map((m) => [m[1]!, m[2]!]))
 const token = (name: string) => {
   const hex = tokens.get(name)
-  if (!hex) throw new Error(`token --${name} absent ou non hexadécimal`)
+  if (!hex) throw new Error(`token --${name} missing or not hexadecimal`)
   return hex.length === 4 ? `#${[...hex.slice(1)].map((c) => c + c).join('')}` : hex
 }
 const luminance = (hex: string) => {

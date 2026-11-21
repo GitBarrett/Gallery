@@ -1,0 +1,33 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Playbook/Accessibility" />
+
+# Accessibility
+
+Rules from US-75 and `docs/07-design.md`, to follow in every component and every screen. The **Accessibility** panel
+of each story (axe) reports issues during development; component tests and Playwright tests make them blocking.
+
+## Colour and contrast
+
+- Normal text at 4.5:1 at least, large text (24 px and more) at 3:1: token pairs are checked by
+  `tests/design-tokens.test.ts`.
+- Information is never carried by colour alone: a quality tier also shows its name, a form error a message.
+- **Never put text directly on a photo**: always a scrim or a solid background (07-design.md § Texte sur image).
+
+## Keyboard and focus
+
+- Everything clickable is reachable by keyboard, in reading order; nothing is available on hover only.
+- Focus is always visible (`--focus-ring`); never remove it without replacing it.
+- A modal traps focus, closes with Escape and gives focus back to the element that opened it (T-06b).
+
+## Targets and layout
+
+- Touch targets of at least 44 × 44 px (`--control-md`).
+- No horizontal scrolling at 360 px.
+- Reduced motion respected: `base.css` neutralises animations and transitions.
+
+## Content
+
+- Every image has alternative text; a decorative image has `alt=""`.
+- Every field has a visible, tied label; hint and error are announced (`aria-describedby`, `aria-invalid`).
+- Headings follow the page hierarchy (a single `h1`, no skipped level).

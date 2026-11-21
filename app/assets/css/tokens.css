@@ -1,11 +1,11 @@
 /*
- * Tokens du design system (ADR-014, 07-design.md, direction A « Nuit d'Azeroth ») : seul fichier qui contient des
- * valeurs. Les composants n'emploient que var(--…), contrôlé par Stylelint. Thème sombre uniquement.
- * Points de rupture (les variables CSS ne s'emploient pas dans @media) : sm 480px · md 768px · lg 1024px · xl 1280px,
- * en min-width uniquement (mobile d'abord).
+ * Design system tokens (ADR-014, 07-design.md, direction A "Nuit d'Azeroth"): the only file that holds
+ * values. Components use var(--…) only, enforced by Stylelint. Dark theme only.
+ * Breakpoints (CSS variables cannot be used in @media): sm 480px · md 768px · lg 1024px · xl 1280px,
+ * in min-width only (mobile first).
  */
 :root {
-  /* Couleurs de fond et de surface */
+  /* Background and surface colours */
   --color-bg: #0b0e14;
   --color-surface: #10141d;
   --color-surface-raised: #151a25;
@@ -13,7 +13,7 @@
   --color-border-subtle: #232a38;
   --color-border: #2a3244;
 
-  /* Texte (contrastes AA vérifiés par tests/design-tokens.test.ts) */
+  /* Text (AA contrasts checked by tests/design-tokens.test.ts) */
   --color-text: #e6e9f0;
   --color-text-soft: #c3cad8;
   --color-text-muted: #a9b1c2;
@@ -25,11 +25,11 @@
   --color-on-accent: #14100a;
   --color-arcane: #4fa3ff;
 
-  /* États (absents des maquettes, Q30) */
+  /* States (missing from the mockups, Q30) */
   --color-danger: #ff7a7a;
   --color-success: #5fd88a;
 
-  /* Qualité des captures selon les likes (07-design.md § Codes visuels WoW) */
+  /* Capture quality from likes (07-design.md § Codes visuels WoW) */
   --quality-poor: #9d9d9d;
   --quality-uncommon: #1eff00;
   --quality-rare: #3d9bff;
@@ -40,7 +40,7 @@
   --color-logo-legendary: #ff8c1a;
   --shadow-logo: 0 2px 0 #2a1200, 0 0 18px rgb(255 128 0 / 35%);
 
-  /* Typographie : polices auto-hébergées par @nuxt/fonts */
+  /* Typography: fonts self-hosted by @nuxt/fonts */
   --font-body: 'Inter', system-ui, sans-serif;
   --font-display: 'Cinzel', serif;
   --font-logo: 'Cinzel Decorative', 'Cinzel', serif;
@@ -61,7 +61,7 @@
   --tracking-display: 0.04em;
   --tracking-wide: 0.14em;
 
-  /* Espacements (multiples de 2 px) */
+  /* Spacing (multiples of 2 px) */
   --space-0-5: 2px;
   --space-1: 4px;
   --space-1-5: 6px;
@@ -74,7 +74,7 @@
   --space-8: 32px;
   --space-12: 48px;
 
-  /* Formes et contrôles : cibles tactiles de 44 px au moins (US-67.5) */
+  /* Shapes and controls: touch targets of at least 44 px (US-67.5) */
   --radius-sm: 3px;
   --radius-md: 6px;
   --radius-pill: 999px;
@@ -85,11 +85,11 @@
   --control-xl: 52px;
   --content-max: 1280px;
 
-  /* Focus visible (US-75) et ombres */
+  /* Visible focus (US-75) and shadows */
   --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent);
   --shadow-raised: 0 8px 24px rgb(0 0 0 / 45%);
 
-  /* Mouvement : neutralisé par prefers-reduced-motion dans base.css */
+  /* Motion: neutralised by prefers-reduced-motion in base.css */
   --duration-fast: 120ms;
   --duration-normal: 200ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);

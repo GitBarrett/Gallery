@@ -1,10 +1,10 @@
 import { expect, test } from './fixtures'
 
-// Design system et playbook publiés avec le site (ADR-019), hors des moteurs de recherche. Seulement sur un
-// déploiement (preview, production) : `pnpm dev` ne sert pas Storybook.
+// Design system and playbook published with the site (ADR-019), out of search engines. Only on a
+// deployment (preview, production): `pnpm dev` does not serve Storybook.
 test('Storybook is served under /storybook/ without being indexed', async ({ page }) => {
   test.skip(!process.env.BASE_URL, 'Storybook is only published with a deployment')
-  // Via la page : la fixture n'ajoute le jeton Access qu'aux navigations du navigateur
+  // Through the page: the fixture only adds the Access token to the browser's navigations
   const response = await page.goto('/storybook/')
   expect(response?.status()).toBe(200)
   expect(response?.headers()['x-robots-tag']).toBe('noindex')

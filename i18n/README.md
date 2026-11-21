@@ -1,1 +1,1 @@
-Traductions en.json et fr.json (T-07b). Aucun texte d'interface en dur.
+Translations en.json and fr.json (T-07b). No hard-coded interface text.

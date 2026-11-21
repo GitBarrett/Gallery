@@ -1,4 +1,4 @@
-# Une preview complète par PR (T-03b, ADR-013, ADR-016) : Worker ls-pr-{n}, files, branche Neon, Hyperdrive, préfixe R2.
+# One full preview per pull request (T-03b, ADR-013, ADR-016): Worker ls-pr-{n}, queues, Neon branch, Hyperdrive, R2 prefix.
 name: preview-deploy
 
 on:
@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   deploy:
-    # Pas de preview pour Dependabot : GitHub ne lui transmet pas les secrets ; la CI de la PR s'applique
+    # No preview for Dependabot: GitHub does not pass it the secrets; the pull request CI still applies
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -43,8 +43,8 @@ jobs:
           NEON_PROJECT_ID: calm-mode-49605156
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-      # Tests de la preview (T-04b) : le jeton Access n'est envoyé qu'au domaine de la preview (fixture Playwright,
-      # scripts/lighthouse.mjs), jamais aux tiers
+      # Preview tests (T-04b): the Access token is only sent to the preview's domain (Playwright fixture,
+      # scripts/lighthouse.mjs), never to third parties
       - name: Install the browsers
         run: pnpm exec playwright install --with-deps chromium webkit
       - name: End-to-end tests (desktop, iPhone 14, Pixel 7)
@@ -61,7 +61,7 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
-      # Pages mesurées : l'accueil ; la PLP et la PDP s'y ajoutent avec leurs tâches (T-30, T-31a)
+      # Measured pages: the home page; the category and photo pages join with their tasks (T-30, T-31a)
       - name: Lighthouse (US-68.2)
         if: ${{ !cancelled() && steps.preview.outcome == 'success' }}
         run: node scripts/lighthouse.mjs "$BASE_URL/"

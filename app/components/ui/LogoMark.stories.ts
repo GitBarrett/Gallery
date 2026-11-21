@@ -2,20 +2,21 @@ import type { Meta, StoryObj } from '@storybook-vue/nuxt'
 import LogoMark from './LogoMark.vue'
 
 const meta: Meta<typeof LogoMark> = {
-  title: 'UI/Atomes/LogoMark',
+  title: 'UI/Atoms/LogoMark',
   component: LogoMark,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: `**Rôle** : signer le site (header, pages d'erreur, emails).
+        component: `**Role**: sign the site (header, error pages, emails).
 
-**Quand l'utiliser** : version complète dans le header à partir de 768 px ; \`compact\` (emblème seul) en dessous.
+**When to use it**: full version in the header from 768 px; \`compact\` (emblem only) below.
 
-**À éviter** : déformer, recolorer ou redessiner l'emblème ; le poser sur une photo sans voile ; traduire le nom.
+**Avoid**: distorting, recolouring or redrawing the emblem; placing it on a photo without a scrim; translating the
+name.
 
-**Accessibilité** : en version complète, l'emblème est décoratif et le texte donne le nom ; en version compacte,
-l'emblème porte le nom « Legendary Shots ».`,
+**Accessibility**: in the full version, the emblem is decorative and the text gives the name; in the compact version,
+the emblem carries the name "Legendary Shots".`,
       },
     },
   },

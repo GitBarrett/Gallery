@@ -1,7 +1,7 @@
-// pnpm test:trace — chaque critère d'acceptation exigé a au moins un test (11-strategie-de-tests.md § 2).
-// Exigés : les critères [MVP] des tâches cochées dans 06-plan-de-taches.md. Une story (citée avec ou sans numéro)
-// est exigée en entier quand toutes les tâches qui la citent sont cochées ; un critère `[v1.x, T-xx]`
-// l'est quand T-xx est cochée. À la fin du MVP, toutes les tâches étant cochées, tout est exigé.
+// pnpm test:trace — every required acceptance criterion has at least one test (11-strategie-de-tests.md § 2).
+// Required: the [MVP] criteria of the tasks checked in 06-plan-de-taches.md. A story (cited with or without a number)
+// is required as a whole once every task citing it is checked; a `[v1.x, T-xx]` criterion
+// is required once T-xx is checked. At the end of the MVP, every task being checked, everything is required.
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -11,7 +11,7 @@ const REF = /US-(\d+)(?:\.(\d+)(?:–(\d+))?)?/g
 const AC = /US-\d+\.\d+/g
 
 function parseStories(storiesText) {
-  const stories = new Map() // story -> [{ id, v1Task }] pour les stories [MVP] seulement
+  const stories = new Map() // story -> [{ id, v1Task }] for [MVP] stories only
   let current = null
   for (const line of storiesText.split('\n')) {
     const heading = line.match(/^### (US-\d+) (\[MVP\])?/)
@@ -32,7 +32,7 @@ function parseTasks(planText) {
     const task = line.match(TASK)
     if (task) tasks.push({ id: task[2], checked: task[1] === 'x', text: line })
     else if (line.startsWith('#'))
-      tasks.push(null) // une section clôt la tâche en cours
+      tasks.push(null) // a section closes the current task
     else if (tasks.at(-1)) tasks.at(-1).text += '\n' + line
   }
   return tasks.filter(Boolean)
@@ -44,7 +44,7 @@ export function requiredAcs(planText, storiesText) {
   const checked = new Set(tasks.filter((t) => t.checked).map((t) => t.id))
   const eligible = (ac) => !ac.v1Task || checked.has(ac.v1Task)
   const required = new Set()
-  const citingTasks = new Map() // story -> tâches qui la citent
+  const citingTasks = new Map() // story -> tasks citing it
 
   for (const task of tasks) {
     for (const [, story, from, to] of task.text.matchAll(REF)) {
@@ -54,7 +54,7 @@ export function requiredAcs(planText, storiesText) {
         const ac = stories.get(id)?.find((a) => a.id === `${id}.${n}`)
         if (ac) cited.push(ac)
       }
-      // Une tâche qui ne cite que des critères v1.x ne retarde pas l'exigence de la story entière
+      // A task that only cites v1.x criteria does not delay the requirement of the whole story
       if (!from || cited.some((ac) => !ac.v1Task)) citingTasks.set(id, [...(citingTasks.get(id) ?? []), task])
       if (task.checked) for (const ac of cited) if (eligible(ac)) required.add(ac.id)
     }
@@ -71,7 +71,7 @@ export function foundAcs(testTexts) {
   return new Set(testTexts.flatMap((text) => text.match(AC) ?? []))
 }
 
-/* v8 ignore start -- lecture des fichiers et sortie CLI, exécutées par `pnpm test:trace` dans `pnpm check` */
+/* v8 ignore start -- file reading and CLI output, run by `pnpm test:trace` in `pnpm check` */
 function testFiles(dir) {
   return readdirSync(dir, { withFileTypes: true, recursive: true })
     .filter((f) => f.isFile() && /\.(test|spec)\.ts$/.test(f.name))
@@ -85,14 +85,14 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     try {
       return testFiles(dir)
     } catch {
-      return [] // dossier pas encore créé
+      return [] // folder not created yet
     }
   })
   const found = foundAcs(files.map(read))
   const missing = [...required].filter((ac) => !found.has(ac)).sort()
-  console.log(`test:trace — ${required.size} critère(s) exigé(s), ${missing.length} sans test`)
+  console.log(`test:trace — ${required.size} required criteria, ${missing.length} without a test`)
   if (missing.length) {
-    console.error(`Critères sans test : ${missing.join(', ')}`)
+    console.error(`Criteria without a test: ${missing.join(', ')}`)
     process.exit(1)
   }
 }

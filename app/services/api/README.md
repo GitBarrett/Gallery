@@ -1,1 +1,1 @@
-Client API typé : seul endroit qui appelle /api.
+Typed API client: the only place that calls /api.

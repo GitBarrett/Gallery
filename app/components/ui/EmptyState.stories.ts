@@ -4,7 +4,7 @@ import Button from './Button.vue'
 import EmptyState from './EmptyState.vue'
 
 const meta: Meta<typeof EmptyState> = {
-  title: 'UI/Molécules/EmptyState',
+  title: 'UI/Molecules/EmptyState',
   component: EmptyState,
   tags: ['autodocs'],
   args: { title: 'Be the first to capture WoW Forever', description: 'No capture yet for this version.' },
@@ -12,14 +12,14 @@ const meta: Meta<typeof EmptyState> = {
   parameters: {
     docs: {
       description: {
-        component: `**Rôle** : remplacer un bloc qui serait vide (07-design.md § États vides et démarrage à froid).
+        component: `**Role**: replace a block that would be empty (07-design.md § États vides et démarrage à froid).
 
-**Quand l'utiliser** : dès qu'une liste, une grille ou un module n'a rien à montrer. Dire ce qui manque et proposer
-l'action qui le comble (Upload, Explore). Pour soi : un appel à agir ; pour les autres : un constat sobre.
+**When to use it**: as soon as a list, a grid or a module has nothing to show. Say what is missing and offer the
+action that fills it (Upload, Explore). For oneself: a call to act; for others: a sober statement.
 
-**À éviter** : un bloc vide, un « 0 », un message d'erreur pour un simple manque de contenu.
+**Avoid**: an empty block, a "0", an error message for a mere lack of content.
 
-**Accessibilité** : le titre suit la hiérarchie de la page (\`headingLevel\`) ; l'icône éventuelle est décorative.`,
+**Accessibility**: the heading follows the page hierarchy (\`headingLevel\`); the optional icon is decorative.`,
       },
     },
   },

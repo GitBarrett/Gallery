@@ -1,1 +1,1 @@
-Routes Nitro fines (≈ 20 lignes) : contexte, validation, appel d'un use case, mapping. Aucun accès base ni règle métier.
+Thin Nitro routes (≈ 20 lines): context, validation, use case call, mapping. No database access nor business rule.

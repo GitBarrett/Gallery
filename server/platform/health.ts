@@ -2,7 +2,7 @@ import type { HealthResponse } from '../../shared/contracts/health'
 
 type Check = () => Promise<unknown>
 
-/** Lance tous les contrôles, même si l'un échoue, pour que la sonde voie chaque dépendance (03-architecture.md § Observabilité). */
+/** Runs every check, even when one fails, so that the probe sees each dependency (03-architecture.md § Observabilité). */
 export async function runHealthChecks(checks: Record<string, Check>): Promise<HealthResponse> {
   const names = Object.keys(checks)
   const results = await Promise.allSettled(names.map((name) => checks[name]!()))

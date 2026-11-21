@@ -1,11 +1,11 @@
 import type { Clock } from './clock'
 
-/** Port de génération d'identifiants : UUID v7 pour toutes les clés (CLAUDE.md). */
+/** Identifier generation port: UUID v7 for every key (CLAUDE.md). */
 export interface IdGenerator {
   next(): string
 }
 
-/** UUID v7 (RFC 9562) : 48 bits d'horodatage en ms, version 7, variante 10, 74 bits aléatoires. */
+/** UUID v7 (RFC 9562): 48-bit millisecond timestamp, version 7, variant 10, 74 random bits. */
 export function uuidV7(timestampMs: number, random: Uint8Array): string {
   const bytes = new Uint8Array(16)
   for (let i = 0; i < 6; i++) bytes[i] = Math.floor(timestampMs / 2 ** (8 * (5 - i))) & 0xff

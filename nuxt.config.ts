@@ -1,12 +1,12 @@
-// Hôte R2 des uploads directs (URL présignées), connu au build ; absent en local tant que R2 n'est pas configuré (T-21)
+// R2 host of direct uploads (presigned URLs), known at build time; absent locally until R2 is configured (T-21)
 const r2Host = process.env.R2_ACCOUNT_ID ? [`https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`] : []
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-11-01',
   modules: ['@nuxt/eslint', 'nuxt-security', '@sentry/nuxt/module', '@nuxt/fonts', '@nuxtjs/storybook'],
-  // Design system (ADR-014) : tokens puis base, chargés partout
+  // Design system (ADR-014): tokens then base, loaded everywhere
   css: ['~/assets/css/tokens.css', '~/assets/css/base.css'],
-  // Polices auto-hébergées (aucun appel à Google depuis le navigateur) ; global : référencées par des var(--font-*)
+  // Self-hosted fonts (no call to Google from the browser); global: referenced through var(--font-*)
   fonts: {
     families: [
       { name: 'Inter', weights: [400, 600, 700], global: true },
@@ -16,20 +16,20 @@ export default defineNuxtConfig({
   },
   typescript: { strict: true },
   devtools: { enabled: false },
-  // Langue et titre par défaut (anglais, ADR i18n) ; @nuxtjs/i18n les pilotera par page en T-07b
+  // Default language and title (English, i18n ADR); @nuxtjs/i18n will drive them per page in T-07b
   app: { head: { htmlAttrs: { lang: 'en' }, title: 'Legendary Shots' } },
-  // Valeurs publiques lues au démarrage (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN), vides en local (T-03f)
+  // Public values read at startup (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN), empty locally (T-03f)
   runtimeConfig: { public: { sentryDsn: '', cfBeaconToken: '' } },
-  // Pas d'envoi des source maps (jeton d'organisation non requis au MVP) ni de télémétrie du plugin de build
+  // No source map upload (organisation token not needed for the MVP) and no build plugin telemetry
   sentry: { sourcemaps: { disable: true }, telemetry: false },
-  // Routes /__test (réinitialisation, boîte mail factice, file…) : uniquement dans les builds de preview (ADR-013)
+  // /__test routes (reset, fake mailbox, queue…): only in preview builds (ADR-013)
   nitro: { ignore: process.env.NUXT_DEPLOY_ENV === 'preview' ? [] : ['routes/__test/**'] },
-  // En-têtes de sécurité de 08-securite.md § 5
+  // Security headers of 08-securite.md § 5
   security: {
     nonce: true,
-    rateLimiter: false, // compteurs en mémoire, inadaptés à Workers : port RateLimiter en T-05c
-    xssValidator: false, // rendu en texte et validation Zod stricte
-    corsHandler: false, // aucun en-tête CORS : l'API ne sert que le site
+    rateLimiter: false, // in-memory counters, unsuited to Workers: RateLimiter port in T-05c
+    xssValidator: false, // text rendering and strict Zod validation
+    corsHandler: false, // no CORS header: the API only serves the site
     headers: {
       contentSecurityPolicy: {
         'default-src': ["'self'"],
@@ -61,18 +61,18 @@ export default defineNuxtConfig({
         'frame-ancestors': ["'none'"],
         'upgrade-insecure-requests': process.env.NODE_ENV === 'production',
       },
-      crossOriginEmbedderPolicy: false, // non exigé par la spec ; bloquerait l'iframe Turnstile
+      crossOriginEmbedderPolicy: false, // not required by the spec; would block the Turnstile iframe
       crossOriginOpenerPolicy: 'same-origin',
       crossOriginResourcePolicy: 'same-site',
       referrerPolicy: 'strict-origin-when-cross-origin',
       strictTransportSecurity: { maxAge: 63072000, includeSubdomains: true, preload: true },
-      // fusionné avec les valeurs par défaut du module : plein écran autorisé au site (vue photo plein écran)
+      // merged with the module defaults: fullscreen allowed to the site (full-screen photo view)
       permissionsPolicy: { camera: [], microphone: [], geolocation: [], payment: [], fullscreen: ['self'] },
     },
   },
   hooks: {
-    // Notre gestionnaire (format commun des erreurs /api) passe d'abord ; celui de Nuxt (page d'erreur) reste
-    // derrière. Déclarer `nitro.errorHandler` remplacerait celui de Nuxt au lieu de s'y ajouter.
+    // Our handler (common /api error format) runs first; Nuxt's (error page) stays behind it.
+    // Declaring `nitro.errorHandler` would replace Nuxt's handler instead of adding ours.
     'nitro:config'(config) {
       config.errorHandler = ['~~/server/error-handler', ...[config.errorHandler ?? []].flat()]
     },

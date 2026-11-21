@@ -1,8 +1,8 @@
-// Seuils Lighthouse de US-68.2 (03-architecture.md § Budgets de performance), en score sur 100.
-// L'installabilité PWA n'est plus mesurée par Lighthouse 12+ : vérifiée par un test E2E du manifest (Q27, T-09a).
+// Lighthouse thresholds of US-68.2 (03-architecture.md § Budgets de performance), as scores out of 100.
+// PWA installability is no longer measured by Lighthouse 12+: checked by an E2E test of the manifest (Q27, T-09a).
 const THRESHOLDS = { performance: 85, accessibility: 95, 'best-practices': 95 }
 
-/** Seuils non atteints, lisibles ; une catégorie absente compte comme un échec. */
+/** Readable unmet thresholds; a missing category counts as a failure. */
 export function failedThresholds(scores) {
   return Object.entries(THRESHOLDS).flatMap(([category, min]) => {
     if (typeof scores[category] !== 'number') return [`${category} absent`]
@@ -11,7 +11,7 @@ export function failedThresholds(scores) {
   })
 }
 
-/** Score médian de chaque catégorie sur plusieurs passages. */
+/** Median score of each category over several runs. */
 export function median(runs) {
   return Object.fromEntries(
     Object.keys(runs[0]).map((category) => {
