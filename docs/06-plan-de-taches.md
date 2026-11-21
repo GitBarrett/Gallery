@@ -121,7 +121,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Layout, header partagé (une ligne ≥ 1180 px, barre d'onglets < 768 px, entrées pilotées par les flags : `07-design.md` § Header), footer, safe areas, lien d'évitement, focus visible, mouvement réduit.
   Stories : US-67 (structure), US-75.1, US-75.4. Tests : E (US-67.1, US-67.5–6, US-75.1).
 
-- [ ] **T-07b Bilingue** (dép. T-07a)
+- [x] **T-07b Bilingue** (dép. T-07a)
   @nuxtjs/i18n (`/` en, `/fr/` fr), détection, sélecteur, contrôle de complétude des clés.
   Stories : US-62.1–3. Tests : U (complétude), E (US-62.1–3).
 

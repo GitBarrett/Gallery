@@ -76,3 +76,13 @@ describe('layout parts', () => {
       expect(await axeViolations(wrapper.element)).toEqual([])
   })
 })
+
+describe('AppFooter', () => {
+  it('US-62.2 offers the other language, named in that language', async () => {
+    const wrapper = await mountSuspended(AppFooter)
+    const link = wrapper.get('a[hreflang="fr"]')
+    expect(link.text()).toBe('Français')
+    expect(link.attributes('href')).toBe('/fr')
+    expect(link.attributes('lang')).toBe('fr')
+  })
+})

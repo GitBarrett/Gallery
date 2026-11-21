@@ -6,6 +6,9 @@ import { Meta } from '@storybook/addon-docs/blocks'
 
 - **Languages**: English by default, full French. No hard-coded text in a component or a page: everything goes
   through i18n (`i18n/en.json`, `i18n/fr.json`). Only the name "Legendary Shots" is never translated.
+- **Keys**: grouped by feature (`layout.signIn`), written as literals (`t('layout.signIn')`) so that the
+  completeness test (`tests/i18n.test.ts`, US-62.3) sees them; a key missing in either file fails the build.
+  `ui` components take their texts as props from the caller.
 - **Tone**: a player talking to a player. Clear, warm, a touch of the universe ("Quest log", "Accept quest")
   without ever getting in the way of understanding. No technical jargon.
 - **Buttons**: a verb and its object ("Upload a capture", "Sign in"), never "OK" or "Submit" alone.
