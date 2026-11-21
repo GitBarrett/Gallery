@@ -109,6 +109,8 @@ Conventions : UUID v7 pour toutes les clés ; `created_at`/`updated_at` en `time
 
 Compteurs dénormalisés (`likes_count`…) mis à jour en transaction.
 
+**Rôles de base (T-05a)** : le propriétaire `neondb_owner` sert uniquement aux migrations (`scripts/database.mjs`, URL obtenue par l'API Neon, jamais stockée) ; le Worker se connecte par Hyperdrive avec `ls_app`, rôle de connexion créé en SQL (`NOSUPERUSER NOCREATEDB NOCREATEROLE` : un rôle créé par l'API Neon serait membre de `neon_superuser` et hériterait des droits du propriétaire), membre du rôle `app_rw` qui a lecture et écriture sur les tables, sauf `UPDATE`, `DELETE` et `TRUNCATE` sur `audit_log`. Les droits sont posés par migration et s'appliquent aux tables futures (`ALTER DEFAULT PRIVILEGES`). En production, les migrations s'exécutent dans `deploy-production` avant le déploiement du code ; sur une preview (branche schema-only), le journal des migrations de production est recopié pour que seules les nouvelles migrations s'appliquent.
+
 ## Sécurité
 Voir `08-securite.md` (modèle de menaces, contrôles par couche, en-têtes, upload, sessions, secrets, tests de sécurité). Ce document fait foi.
 
@@ -241,7 +243,7 @@ Tous les consommateurs sont **idempotents** (`processed_messages` + opérations 
 | `NUXT_PUBLIC_POSTHOG_KEY`, `NUXT_PUBLIC_SITE_URL` | public | analytics, URLs absolues |
 | `NUXT_FAKE_PROVIDERS` | variable de build | `true` uniquement en local et en preview ; refusée au démarrage en production |
 
-**Secrets de la CI (GitHub Actions, jamais dans le Worker)** : `CLOUDFLARE_API_TOKEN` (déploiement Workers, Queues, R2 de preview), `CLOUDFLARE_ACCOUNT_ID`, `NEON_API_KEY` (branches de preview), `CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` (jeton de service pour les E2E), `BACKUP_R2_ACCESS_KEY_ID` / `BACKUP_R2_SECRET_ACCESS_KEY` et `BACKUP_AGE_RECIPIENT` (sauvegardes), `DATABASE_URL_PROD_MIGRATIONS` (migrations, rôle dédié).
+**Secrets de la CI (GitHub Actions, jamais dans le Worker)** : `CLOUDFLARE_API_TOKEN` (déploiement Workers, Queues, R2 de preview), `CLOUDFLARE_ACCOUNT_ID`, `NEON_API_KEY` (branches de preview), `CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` (jeton de service pour les E2E), `BACKUP_R2_ACCESS_KEY_ID` / `BACKUP_R2_SECRET_ACCESS_KEY` et `BACKUP_AGE_RECIPIENT` (sauvegardes).
 
 Validation au démarrage par un schéma Zod (`server/config.ts`) : variable manquante = échec du déploiement. `.env.example` liste tout, sans valeur réelle.
 

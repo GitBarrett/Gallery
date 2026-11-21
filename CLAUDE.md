@@ -69,7 +69,7 @@ docs/             specs (ce dossier fait foi)
 ## Commandes
 
 - `pnpm dev` — dev local (wrangler / Miniflare, fournisseurs factices)
-- `pnpm check` — lint + typecheck + `arch` + `test` + `test:int` + couverture + `test:trace`
+- `pnpm check` — lint + typecheck + `arch` + `test:coverage` (unitaires, composants et intégration, base dans `.env.test` en local) + `test:trace`
 - `pnpm test` — Vitest unitaires et composants
 - `pnpm test:int` — Vitest intégration (Postgres local)
 - `pnpm test:e2e` — Playwright (desktop, iPhone 14, Pixel 7)

@@ -88,7 +88,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Workflow `ci` (`11-strategie-de-tests.md` § 7) : lint, typecheck, `arch`, unitaires et couverture, `test:trace`, artefact de production sans route de test, intégration (Postgres de CI, Q15), gitleaks, Semgrep CE (à la place de CodeQL, Q26), `pnpm audit` ; actions épinglées par SHA ; Dependabot. Pas de protection de `main` (Q26). L'étape de CI des migrations arrive avec leur runner (T-05a).
   Tests : une PR de démonstration échoue sur chaque garde.
 
-- [ ] **T-04b CI : preview, E2E et production** (dép. T-04a, T-03d)
+- [x] **T-04b CI : preview, E2E et production** (dép. T-04a, T-03d)
   Playwright smoke sur la preview (jeton Access), Lighthouse CI, smoke de production après déploiement et retour arrière.
   Tests : la CI elle-même.
 

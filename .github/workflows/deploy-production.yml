@@ -37,6 +37,15 @@ jobs:
           NITRO_PRESET: cloudflare_module
       - name: No test route in the production artifact
         run: '! grep -rl "/__test" .output/server'
+      # Avant le code : migrations rétrocompatibles (expand → contract, 08-securite.md § 9), propriétaire de la base ;
+      # Hyperdrive ls-prod passe sur le rôle applicatif ls_app au premier passage (T-05a)
+      - name: Migrate the database
+        run: node scripts/database.mjs production
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: calm-mode-49605156
       - name: Deploy
         run: pnpm exec wrangler deploy
         env:

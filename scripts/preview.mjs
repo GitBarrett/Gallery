@@ -1,13 +1,14 @@
 // Previews par PR (ADR-013, ADR-016, prototype T-00g) :
 //   up <n>        crée ou met à jour la preview de la PR n (T-03b). Idempotent : relancé à chaque commit, il réutilise
-//                 la branche Neon et les files, et réécrit la configuration Hyperdrive. Attend un build fait avec
-//                 NITRO_PRESET=cloudflare_module et NUXT_DEPLOY_ENV=preview.
+//                 la branche Neon et les files, applique les migrations (T-05a) et réécrit la configuration
+//                 Hyperdrive. Attend un build fait avec NITRO_PRESET=cloudflare_module et NUXT_DEPLOY_ENV=preview.
 //   down <n>      supprime toutes les ressources de la PR n et vérifie par l'API qu'il n'en reste aucune (T-03c).
 //   sweep [n...]  supprime les previews orphelines : toute PR qui a une ressource sans être dans la liste des ouvertes.
 // Variables : CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, NEON_API_KEY, NEON_PROJECT_ID ; pour up, CF_ACCESS_CLIENT_ID
 // et CF_ACCESS_CLIENT_SECRET (jeton de service Access de la CI, T-03d).
 import { execFileSync } from 'node:child_process'
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
+import { cf, env, findBranch, hyperdriveOrigin, log, neon, ownerUrl, sleep } from './cloud.mjs'
 import { previewConfig, previewNumbers } from './preview-config.mjs'
 
 const [action, ...prs] = process.argv.slice(2)
@@ -17,40 +18,10 @@ if (
   !(action === 'sweep' || (['up', 'down'].includes(action) && prs.length === 1))
 )
   throw new Error('usage : node scripts/preview.mjs up|down <n> | sweep [PR ouvertes...]')
-const env = (name) =>
-  process.env[name] ||
-  (() => {
-    throw new Error(`variable manquante : ${name}`)
-  })()
 const BUCKET = 'ls-preview'
 const NAME = `ls-pr-${pr}`
 const BRANCH = `pr-${pr}`
 const URL_ = `https://${NAME}.aleygues.workers.dev`
-const t0 = Date.now()
-const log = (msg) => console.log(`[${((Date.now() - t0) / 1000).toFixed(0)} s] ${msg}`)
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-
-async function api(base, token, method, path, body) {
-  const res = await fetch(`${base}/${path}`, {
-    method,
-    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
-    body: body && JSON.stringify(body),
-  })
-  const json = await res.json().catch(() => ({}))
-  if (!res.ok)
-    throw new Error(`${method} ${path} → ${res.status} ${JSON.stringify(json.errors ?? json.message ?? json)}`)
-  return json
-}
-const cf = (method, path, body) =>
-  api(
-    `https://api.cloudflare.com/client/v4/accounts/${env('CLOUDFLARE_ACCOUNT_ID')}`,
-    env('CLOUDFLARE_API_TOKEN'),
-    method,
-    path,
-    body,
-  )
-const neon = (method, path, body) =>
-  api(`https://console.neon.tech/api/v2/projects/${env('NEON_PROJECT_ID')}`, env('NEON_API_KEY'), method, path, body)
 const wrangler = (...args) =>
   execFileSync('pnpm', ['exec', 'wrangler', ...args], { stdio: 'inherit', shell: process.platform === 'win32' })
 
@@ -74,7 +45,7 @@ async function r2Keys(prefix) {
 }
 
 async function neonBranch() {
-  let branch = (await neon('GET', 'branches')).branches.find((b) => b.name === BRANCH)
+  let branch = await findBranch(BRANCH)
   if (!branch)
     // schema-only : jamais de données de production dans une preview (seed de démo, 03-architecture.md § Environnements)
     branch = (
@@ -83,26 +54,25 @@ async function neonBranch() {
         endpoints: [{ type: 'read_write' }],
       })
     ).branch
-  const { uri } = await neon(
-    'GET',
-    `connection_uri?branch_id=${branch.id}&database_name=neondb&role_name=neondb_owner&pooled=false`,
-  )
   log(`branche Neon ${BRANCH} prête`)
-  return new URL(uri)
+  return branch
 }
 
-async function hyperdrive(uri) {
+// Import dynamique : database.mjs dépend de drizzle et de postgres, absents du job de suppression (sans installation)
+async function migrateBranch(branch) {
+  const { copyJournal, migrate, setAppRole } = await import('./database.mjs')
+  const owner = await ownerUrl(branch.id)
+  const copied = await copyJournal(await ownerUrl((await findBranch('production')).id), owner)
+  await migrate(owner)
+  log(`migrations appliquées${copied ? ` (journal de production recopié : ${copied})` : ''}`)
+  return setAppRole(owner) // nouveau mot de passe à chaque passage, aussitôt posé dans Hyperdrive
+}
+
+async function hyperdrive(url) {
   const existing = (await cf('GET', 'hyperdrive/configs')).result.find((c) => c.name === NAME)
   // Toujours réécrite : une branche recréée change d'hôte et de mot de passe
   const [method, path] = existing ? ['PUT', `hyperdrive/configs/${existing.id}`] : ['POST', 'hyperdrive/configs']
-  const origin = {
-    scheme: 'postgres',
-    host: uri.hostname,
-    port: 5432,
-    database: uri.pathname.slice(1),
-    user: decodeURIComponent(uri.username),
-    password: decodeURIComponent(uri.password),
-  }
+  const origin = hyperdriveOrigin(url)
   for (let attempt = 1; ; attempt++) {
     try {
       return (await cf(method, path, { name: NAME, origin, caching: { disabled: true } })).result.id
@@ -140,9 +110,9 @@ async function waitForHealth() {
 }
 
 async function up() {
-  const uri = await neonBranch()
-  const hyperdriveId = await hyperdrive(uri)
-  log(`Hyperdrive ${NAME} prête (cache désactivé)`)
+  const app = await migrateBranch(await neonBranch())
+  const hyperdriveId = await hyperdrive(app)
+  log(`Hyperdrive ${NAME} prête (rôle ls_app, cache désactivé)`)
   const { toml, queues } = previewConfig(readFileSync('wrangler.toml', 'utf8'), { pr, hyperdriveId })
   await ensureQueues(queues)
   await ensureBucket()
