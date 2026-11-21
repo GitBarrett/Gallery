@@ -41,7 +41,8 @@ export default defineConfig({
         'app/services/**',
       ],
       // Colle Nitro (routes, middlewares, plugins, gestionnaire d'erreurs) : exécutée dans le serveur des tests
-      // d'intégration. scripts/preview.mjs : appels d'API et de wrangler, vérifié sur de vraies previews (T-03b).
+      // d'intégration. scripts/preview.mjs et lighthouse.mjs : appels d'API, de wrangler et de navigateur, vérifiés
+      // sur de vraies previews (T-03b, T-04b) ; leurs règles pures sont testées à part.
       exclude: [
         '**/*.test.ts',
         '**/README.md',
@@ -51,6 +52,7 @@ export default defineConfig({
         'server/plugins/**',
         'server/error-handler.ts',
         'scripts/preview.mjs',
+        'scripts/lighthouse.mjs',
       ],
       thresholds: {
         lines: 80,

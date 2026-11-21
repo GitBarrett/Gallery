@@ -6,6 +6,8 @@ export default defineNuxtConfig({
   modules: ['@nuxt/eslint', 'nuxt-security', '@sentry/nuxt/module'],
   typescript: { strict: true },
   devtools: { enabled: false },
+  // Langue et titre par défaut (anglais, ADR i18n) ; @nuxtjs/i18n les pilotera par page en T-07b
+  app: { head: { htmlAttrs: { lang: 'en' }, title: 'Legendary Shots' } },
   // Valeurs publiques lues au démarrage (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN), vides en local (T-03f)
   runtimeConfig: { public: { sentryDsn: '', cfBeaconToken: '' } },
   // Pas d'envoi des source maps (jeton d'organisation non requis au MVP) ni de télémétrie du plugin de build
