@@ -134,7 +134,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
 
 - [ ] **T-09a PWA : manifest et service worker** (dép. T-07b)
   @vite-pwa/nuxt `injectManifest` (ADR-008), manifest et icônes depuis `Logo.dc.html` (raccourcis MVP Upload, Search, Notifications ; pas de `share_target` avant T-66), stratégies de `03-architecture.md` § PWA (sans `/img`, ajouté en T-25b), page `/offline`.
-  Stories : US-63.1, US-64.2–3. Tests : E (Chromium avec service worker).
+  Stories : US-63.1, US-64.2–3. Tests : E (Chromium avec service worker ; installabilité vérifiée par ce test E2E, Lighthouse ne la mesurant plus, Q27).
 
 - [ ] **T-09b PWA : hors ligne, mise à jour, installation** (dép. T-09a)
   Bandeau hors ligne et actions désactivées, toast de mise à jour (`skipWaiting` à la demande), invitation discrète à l'installation.
