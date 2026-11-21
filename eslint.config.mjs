@@ -1,12 +1,13 @@
 import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
-  // Prototypes jetables de la phase T-00 : conservés pour mémoire, jamais importés par l'application
   { ignores: ['docs/**'] },
   {
     rules: {
       'vue/no-v-html': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
+      // Prettier écrit les éléments vides `<input />` : la règle suit Prettier, qui a le dernier mot sur la forme
+      'vue/html-self-closing': ['warn', { html: { void: 'always', normal: 'never', component: 'always' } }],
     },
   },
   {

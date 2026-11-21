@@ -75,6 +75,7 @@ docs/             specs (ce dossier fait foi)
 - `pnpm test:e2e` — Playwright (desktop, iPhone 14, Pixel 7)
 - `pnpm test:trace` — vérifie que chaque AC [MVP] a un test
 - `pnpm arch` — dependency-cruiser
+- `pnpm storybook` — design system et playbook (ADR-019) ; publiés sous `/storybook/` en production et sur les previews
 - `pnpm lint` (ESLint + Stylelint) / `pnpm typecheck`
 - `pnpm db:generate` / `pnpm db:migrate` / `pnpm db:seed` — Drizzle
 

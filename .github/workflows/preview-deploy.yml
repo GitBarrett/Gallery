@@ -31,6 +31,8 @@ jobs:
         env:
           NITRO_PRESET: cloudflare_module
           NUXT_DEPLOY_ENV: preview
+      - name: Storybook under /storybook/ (ADR-019)
+        run: pnpm exec storybook build --quiet -o .output/public/storybook
       - name: Create or update the preview
         id: preview
         run: node scripts/preview.mjs up ${{ github.event.pull_request.number }}

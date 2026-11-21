@@ -51,6 +51,7 @@ export default defineConfig({
       // sur de vraies previews (T-03b, T-04b) ; leurs règles pures sont testées à part.
       exclude: [
         '**/*.test.ts',
+        '**/*.stories.ts', // documentation (Storybook), vérifiée par son build en CI
         '**/README.md',
         'server/api/**',
         'server/middleware/**',

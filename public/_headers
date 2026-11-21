@@ -1,0 +1,3 @@
+# Documentation du design system (ADR-019) : publique mais hors des moteurs de recherche
+/storybook/*
+  X-Robots-Tag: noindex

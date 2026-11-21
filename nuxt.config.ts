@@ -3,7 +3,17 @@ const r2Host = process.env.R2_ACCOUNT_ID ? [`https://${process.env.R2_ACCOUNT_ID
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-11-01',
-  modules: ['@nuxt/eslint', 'nuxt-security', '@sentry/nuxt/module'],
+  modules: ['@nuxt/eslint', 'nuxt-security', '@sentry/nuxt/module', '@nuxt/fonts', '@nuxtjs/storybook'],
+  // Design system (ADR-014) : tokens puis base, chargés partout
+  css: ['~/assets/css/tokens.css', '~/assets/css/base.css'],
+  // Polices auto-hébergées (aucun appel à Google depuis le navigateur) ; global : référencées par des var(--font-*)
+  fonts: {
+    families: [
+      { name: 'Inter', weights: [400, 600, 700], global: true },
+      { name: 'Cinzel', weights: [700], global: true },
+      { name: 'Cinzel Decorative', weights: [700], global: true },
+    ],
+  },
   typescript: { strict: true },
   devtools: { enabled: false },
   // Langue et titre par défaut (anglais, ADR i18n) ; @nuxtjs/i18n les pilotera par page en T-07b

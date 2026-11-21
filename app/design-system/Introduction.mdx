@@ -1,0 +1,37 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Playbook/Introduction et principes" />
+
+# Playbook du design system — Legendary Shots
+
+Ce playbook dit **comment** construire les écrans de Legendary Shots avec le design system : quels éléments
+employer, quand, et ce qu'il faut éviter. La charte (couleurs, identité, règles de contraste, responsive) fait foi
+dans `docs/07-design.md` ; les maquettes de `docs/design/` sont une référence visuelle, jamais du code à copier.
+
+## Principes
+
+1. **Les captures d'abord.** L'interface reste en retrait : fond bleu nuit, cadres fins, peu d'ornements. Une photo
+   n'est jamais recouverte d'interface sans voile.
+2. **Nuit d'Azeroth.** Thème sombre uniquement, or (`--color-accent`) pour l'action principale et les titres forts,
+   Cinzel pour les titres, Inter pour le texte. Les codes WoW (qualité, marqueurs de quête, infobulle d'objet) sont
+   dessinés maison, jamais repris du jeu.
+3. **Mobile d'abord.** Tout fonctionne à 360 px de large ; les écrans s'enrichissent au-delà (768, 1024, 1280 px).
+4. **Accessible par construction.** Contraste AA, clavier, cibles de 44 px, mouvement réduit : voir la page
+   Accessibilité.
+5. **Des tokens, jamais de valeurs.** Une couleur, une taille ou un espacement vient d'une variable de
+   `tokens.css` ; Stylelint refuse le reste.
+6. **Aucun bloc vide.** Un module sans contenu montre un état vide utile (EmptyState) ou disparaît.
+
+## Organisation (atomic design)
+
+| Niveau     | Où                                      | Exemples                                |
+| ---------- | --------------------------------------- | --------------------------------------- |
+| Fondations | `app/assets/css/tokens.css`, `base.css` | couleurs, typographie, espacements      |
+| Atomes     | `app/components/ui`                     | Button, Input, LogoMark                 |
+| Molécules  | `app/components/ui`                     | Card, EmptyState                        |
+| Organismes | `app/features/<fonctionnalité>/`        | grille de captures, formulaire d'upload |
+| Templates  | `app/layouts`                           | mise en page avec header et footer      |
+| Pages      | `app/pages`                             | accueil, page photo                     |
+
+Les composants de `app/components/ui` sont de la présentation pure : ils reçoivent des props, émettent des
+événements, n'appellent jamais l'API.

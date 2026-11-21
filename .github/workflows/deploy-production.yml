@@ -35,6 +35,8 @@ jobs:
         run: pnpm build
         env:
           NITRO_PRESET: cloudflare_module
+      - name: Storybook under /storybook/ (ADR-019)
+        run: pnpm exec storybook build --quiet -o .output/public/storybook
       - name: No test route in the production artifact
         run: '! grep -rl "/__test" .output/server'
       # Avant le code : migrations rétrocompatibles (expand → contract, 08-securite.md § 9), propriétaire de la base ;
