@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import * as schema from './schema'
 
-// Une connexion par requête : le pool est tenu par Hyperdrive ; fetch_types désactivé (T-00e, ADR-016)
+// One connection per request: Hyperdrive holds the pool; fetch_types disabled (T-00e, ADR-016)
 export const createDb = (connectionString: string) =>
   drizzle(postgres(connectionString, { max: 1, fetch_types: false }), { schema })
 

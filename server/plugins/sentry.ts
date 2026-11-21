@@ -1,7 +1,7 @@
 import { sentryCloudflareNitroPlugin } from '@sentry/nuxt/module/plugins'
 import { beforeSend, dataCollection } from '../platform/sentry'
 
-// Sentry côté Worker (T-03f, @sentry/cloudflare). Options lues à chaque requête ; sans DSN (local, tests), inactif.
+// Worker Sentry (T-03f, @sentry/cloudflare). Options read on every request; without a DSN (local, tests), inactive.
 export default defineNitroPlugin(
   sentryCloudflareNitroPlugin(() => ({
     dsn: process.env.NUXT_PUBLIC_SENTRY_DSN || undefined,

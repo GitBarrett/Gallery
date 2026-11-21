@@ -1,7 +1,7 @@
 import type { Clock } from './clock'
 import type { Logger } from './logger'
 
-/** Message de Cloudflare Queues, réduit à ce que l'application utilise. */
+/** Cloudflare Queues message, reduced to what the application uses. */
 export interface QueueMessage {
   id: string
   body: unknown
@@ -12,14 +12,14 @@ export interface QueueMessage {
 export type MessageHandler = (body: unknown, message: QueueMessage) => Promise<void>
 export type CronHandler = () => Promise<unknown>
 
-/** `emails-pr-42` → `emails` : les previews utilisent les consommateurs de production (ADR-013). */
+/** `emails-pr-42` → `emails`: previews use the production consumers (ADR-013). */
 export const baseQueueName = (queue: string) => queue.replace(/-pr-\d+$/, '')
 
 const isHeartbeat = (body: unknown) => (body as { type?: unknown } | null)?.type === 'heartbeat'
 
 /**
- * Aiguille chaque message vers le consommateur de sa file et l'acquitte un par un (T-00f) :
- * un échec ne renvoie que ce message ; après `max_retries`, Cloudflare le place dans la DLQ.
+ * Routes each message to its queue's consumer and acknowledges them one by one (T-00f):
+ * a failure only sends that message back; after `max_retries`, Cloudflare moves it to the DLQ.
  */
 export async function dispatchBatch(
   batch: { queue: string; messages: readonly QueueMessage[] },
@@ -47,7 +47,7 @@ export async function dispatchBatch(
   }
 }
 
-/** Lance tous les traitements d'un cron, même si l'un échoue, puis signale l'échec à Cloudflare. */
+/** Runs every handler of a cron, even when one fails, then reports the failure to Cloudflare. */
 export async function dispatchCron(
   cron: string,
   handlers: Record<string, CronHandler[]>,
@@ -60,7 +60,7 @@ export async function dispatchCron(
   if (failed.length) throw new Error(`${failed.length} cron handler(s) failed`)
 }
 
-/** Battement horaire : prouve en continu que la chaîne cron → file → consommateur fonctionne. */
+/** Hourly heartbeat: continuously proves that the cron → queue → consumer chain works. */
 export const heartbeatCron =
   (queue: { send(body: unknown): Promise<unknown> }, clock: Clock): CronHandler =>
   () =>

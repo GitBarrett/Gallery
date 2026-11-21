@@ -1,6 +1,6 @@
 import type { ErrorCode, ErrorResponse } from '../../shared/contracts/errors'
 
-/** Erreur à renvoyer au client avec un code stable ; tout autre erreur devient un 500 générique. */
+/** Error returned to the client with a stable code; any other error becomes a generic 500. */
 export class AppError extends Error {
   constructor(
     readonly code: ErrorCode,
@@ -11,7 +11,7 @@ export class AppError extends Error {
   }
 }
 
-// Mapping centralisé erreur métier → statut HTTP (10-clean-architecture.md § 4)
+// Central mapping business error → HTTP status (10-clean-architecture.md § 4)
 const STATUS: Record<ErrorCode, number> = {
   VALIDATION_FAILED: 400,
   UNAUTHENTICATED: 401,
@@ -28,12 +28,12 @@ export function toErrorResponse(
   thrown: unknown,
   correlationId: string,
 ): { status: number; body: ErrorResponse; headers: Record<string, string> } {
-  // h3 enveloppe toute erreur lancée par une route : l'AppError d'origine est alors dans `cause`
+  // h3 wraps any error thrown by a route: the original AppError is then in `cause`
   const cause = (thrown as { cause?: unknown } | null)?.cause
   const error = cause instanceof AppError ? cause : thrown
   if (error instanceof AppError) {
     const details = error.details === undefined ? {} : { details: error.details }
-    // 429 : délai avant nouvel essai, fourni par le RateLimiter
+    // 429: delay before retrying, given by the RateLimiter
     const retryAfter = (error.details as { retryAfterSeconds?: unknown } | undefined)?.retryAfterSeconds
     return {
       status: STATUS[error.code],
@@ -42,7 +42,7 @@ export function toErrorResponse(
         error.code === 'RATE_LIMITED' && typeof retryAfter === 'number' ? { 'retry-after': String(retryAfter) } : {},
     }
   }
-  // Erreurs du framework (route inconnue, corps illisible…) : seul leur statut est repris
+  // Framework errors (unknown route, unreadable body…): only their status is kept
   const status = (error as { statusCode?: number } | null)?.statusCode
   const code = status === undefined ? undefined : CODE_BY_STATUS.get(status)
   if (code && code !== 'INTERNAL')

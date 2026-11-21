@@ -11,8 +11,8 @@ const BATCH = 100
 const DAY = 86_400_000
 
 /**
- * Relais outbox → Queues : envoie les événements non publiés (ou ceux de `ids`) puis les marque publiés. Un envoi
- * qui réussit sans que le marquage aboutisse sera renvoyé : les consommateurs sont idempotents sur `eventId`.
+ * Outbox → Queues relay: sends the unpublished events (or those in `ids`), then marks them published. A send
+ * that succeeds without the mark being saved is sent again: consumers are idempotent on `eventId`.
  */
 export const outboxRelay = (db: Db, queues: QueueProducers, clock: Clock) => ({
   async publish(ids?: string[]): Promise<number> {
@@ -31,7 +31,7 @@ export const outboxRelay = (db: Db, queues: QueueProducers, clock: Clock) => ({
     return rows.length
   },
 
-  /** Purge quotidienne : outbox publiée depuis 7 jours, messages traités depuis 30 jours (Queues garde 4 jours). */
+  /** Daily purge: outbox published over 7 days ago, messages processed over 30 days ago (Queues keeps 4 days). */
   async purge(): Promise<void> {
     const now = clock.now().getTime()
     await db.delete(outbox).where(lt(outbox.publishedAt, new Date(now - 7 * DAY)))

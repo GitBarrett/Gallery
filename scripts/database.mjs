@@ -1,8 +1,8 @@
-// Migrations et rôle applicatif (T-05a). Le propriétaire de la base ne sert qu'aux migrations ; le Worker se connecte
-// par Hyperdrive avec ls_app, simple rôle de connexion membre de app_rw (sans UPDATE ni DELETE sur audit_log, 0001).
-//   node scripts/database.mjs migrate     applique les migrations sur DATABASE_URL (CI, local)
-//   node scripts/database.mjs production  production puis branche modèle : migrations ; Hyperdrive ls-prod sur ls_app
-//   node scripts/database.mjs template    crée la branche modèle des previews si elle manque (ADR-018)
+// Migrations and application role (T-05a). The database owner is only used for migrations; the Worker connects
+// through Hyperdrive as ls_app, a plain login role member of app_rw (no UPDATE nor DELETE on audit_log, 0001).
+//   node scripts/database.mjs migrate     applies the migrations to DATABASE_URL (CI, local)
+//   node scripts/database.mjs production  production then template branch: migrations; Hyperdrive ls-prod on ls_app
+//   node scripts/database.mjs template    creates the previews' template branch when missing (ADR-018)
 import { randomBytes } from 'node:crypto'
 import { pathToFileURL } from 'node:url'
 import { drizzle } from 'drizzle-orm/postgres-js'
@@ -23,12 +23,12 @@ async function withSql(url, run) {
   }
 }
 
-/** Applique les migrations en attente (rôle propriétaire). */
+/** Applies the pending migrations (owner role). */
 export async function migrate(url) {
   await withSql(url, (sql) => runMigrations(drizzle(sql), { migrationsFolder: MIGRATIONS }))
 }
 
-/** Vide toutes les tables sauf les réglages du site, dont l'auteur est effacé : aucune donnée personnelle ne reste. */
+/** Empties every table except the site settings, whose author is erased: no personal data remains. */
 export async function emptyData(url) {
   await withSql(url, async (sql) => {
     const tables =
@@ -39,8 +39,8 @@ export async function emptyData(url) {
 }
 
 /**
- * Branche modèle des previews et du développement (ADR-018) : schéma, journal des migrations et rôles de production,
- * sans aucune donnée. Neon refuse les branches schema-only dès qu'un rôle a été créé en SQL (app_rw, ls_app).
+ * Template branch of previews and development (ADR-018): production schema, migration journal and roles,
+ * without any data. Neon refuses schema-only branches once a role was created in SQL (app_rw, ls_app).
  */
 export async function ensureTemplate() {
   const existing = await findBranch(TEMPLATE)
@@ -50,19 +50,19 @@ export async function ensureTemplate() {
     endpoints: [{ type: 'read_write' }],
   })
   await emptyData(await ownerUrl(branch.id))
-  log(`branche modèle ${TEMPLATE} créée et vidée de ses données`)
+  log(`template branch ${TEMPLATE} created and emptied of its data`)
   return branch
 }
 
 /**
- * Rôle de connexion du Worker, créé en SQL avec un nouveau mot de passe aléatoire ; renvoie son URL de connexion.
- * Jamais par l'API Neon : un rôle créé ainsi est membre de neon_superuser et hérite des droits du propriétaire.
+ * The Worker's login role, created in SQL with a new random password; returns its connection URL.
+ * Never through the Neon API: a role created that way joins neon_superuser and inherits the owner's rights.
  */
 export async function setAppRole(owner) {
-  const password = randomBytes(24).toString('base64url') // [A-Za-z0-9_-] : sûr dans une chaîne SQL
+  const password = randomBytes(24).toString('base64url') // [A-Za-z0-9_-]: safe inside an SQL string
   await withSql(owner, async (sql) => {
     const exists = (await sql`select 1 from pg_roles where rolname = ${APP_ROLE}`).length > 0
-    // Attributs posés à la création ; les modifier ensuite exige un superutilisateur, seul le mot de passe change
+    // Attributes are set at creation; changing them later needs a superuser, so only the password changes
     const attributes = exists ? 'login' : 'login nosuperuser nocreatedb nocreaterole noreplication nobypassrls'
     await sql.unsafe(`${exists ? 'alter' : 'create'} role ${APP_ROLE} ${attributes} password '${password}'`)
     await sql.unsafe(`grant app_rw to ${APP_ROLE}`)
@@ -74,20 +74,20 @@ async function production() {
   const branch = await findBranch('production')
   const owner = await ownerUrl(branch.id)
   await migrate(owner)
-  await migrate(await ownerUrl((await ensureTemplate()).id)) // le modèle suit le schéma de production
-  log('migrations appliquées : production et branche modèle')
-  // Une seule fois : changer le mot de passe à chaque déploiement couperait les nouvelles connexions un instant
+  await migrate(await ownerUrl((await ensureTemplate()).id)) // the template follows the production schema
+  log('migrations applied: production and template branch')
+  // Only once: changing the password on every deployment would cut new connections for a moment
   const config = (await cf('GET', 'hyperdrive/configs')).result.find((c) => c.name === 'ls-prod')
   if (config.origin.user !== APP_ROLE) {
     const app = await setAppRole(owner)
-    // Vérifiée avant de basculer : le retour arrière du code ne rétablirait pas l'ancienne configuration Hyperdrive
+    // Checked before switching: a code rollback would not restore the previous Hyperdrive configuration
     await withSql(app, (sql) => sql`select 1 from audit_log limit 1`)
     await cf('PUT', `hyperdrive/configs/${config.id}`, {
       name: config.name,
       origin: hyperdriveOrigin(app),
       caching: { disabled: true },
     })
-    log(`Hyperdrive ls-prod passe sur le rôle ${APP_ROLE}`)
+    log(`Hyperdrive ls-prod switches to the ${APP_ROLE} role`)
   }
 }
 

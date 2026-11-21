@@ -5,8 +5,8 @@ import type { OutboxRelay } from './outbox'
 import { outbox } from './schema'
 
 /**
- * UnitOfWork Drizzle : les événements sont écrits dans l'outbox dans la transaction du travail, puis publiés juste
- * après le commit. Si la file refuse, le travail reste réussi et le cron horaire relaie l'événement.
+ * Drizzle UnitOfWork: events are written to the outbox in the transaction of the work, then published right
+ * after the commit. If the queue refuses, the work still succeeds and the hourly cron relays the event.
  */
 export function drizzleUnitOfWork<Scope>(
   db: Db,

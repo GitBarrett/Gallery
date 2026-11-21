@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Champ de formulaire (maquettes SignIn et Upload) : libellé visible toujours relié, aide et erreur annoncées.
-// Les autres attributs (autocomplete, maxlength, placeholder…) passent au champ.
+// Form field (SignIn and Upload mockups): visible label always tied to the field, hint and error announced.
+// Other attributes (autocomplete, maxlength, placeholder…) go to the field.
 defineOptions({ inheritAttrs: false })
 const props = defineProps<{ label: string; hint?: string; error?: string; required?: boolean; type?: string }>()
 const model = defineModel<string>({ default: '' })

@@ -1,37 +1,35 @@
 import { Meta } from '@storybook/addon-docs/blocks'
 
-<Meta title="Playbook/Introduction et principes" />
+<Meta title="Playbook/Introduction and principles" />
 
-# Playbook du design system — Legendary Shots
+# Design system playbook — Legendary Shots
 
-Ce playbook dit **comment** construire les écrans de Legendary Shots avec le design system : quels éléments
-employer, quand, et ce qu'il faut éviter. La charte (couleurs, identité, règles de contraste, responsive) fait foi
-dans `docs/07-design.md` ; les maquettes de `docs/design/` sont une référence visuelle, jamais du code à copier.
+This playbook explains **how** to build Legendary Shots screens with the design system: which elements to use, when,
+and what to avoid. The visual charter (colours, identity, contrast rules, responsive) is defined in
+`docs/07-design.md`; the mockups in `docs/design/` are a visual reference, never code to copy.
 
-## Principes
+## Principles
 
-1. **Les captures d'abord.** L'interface reste en retrait : fond bleu nuit, cadres fins, peu d'ornements. Une photo
-   n'est jamais recouverte d'interface sans voile.
-2. **Nuit d'Azeroth.** Thème sombre uniquement, or (`--color-accent`) pour l'action principale et les titres forts,
-   Cinzel pour les titres, Inter pour le texte. Les codes WoW (qualité, marqueurs de quête, infobulle d'objet) sont
-   dessinés maison, jamais repris du jeu.
-3. **Mobile d'abord.** Tout fonctionne à 360 px de large ; les écrans s'enrichissent au-delà (768, 1024, 1280 px).
-4. **Accessible par construction.** Contraste AA, clavier, cibles de 44 px, mouvement réduit : voir la page
-   Accessibilité.
-5. **Des tokens, jamais de valeurs.** Une couleur, une taille ou un espacement vient d'une variable de
-   `tokens.css` ; Stylelint refuse le reste.
-6. **Aucun bloc vide.** Un module sans contenu montre un état vide utile (EmptyState) ou disparaît.
+1. **Captures first.** The interface stays in the background: night-blue background, thin frames, few ornaments. A
+   photo is never covered by interface without a scrim.
+2. **Nuit d'Azeroth.** Dark theme only, gold (`--color-accent`) for the main action and strong titles, Cinzel for
+   titles, Inter for text. WoW codes (quality, quest markers, item tooltip) are drawn in-house, never taken from the
+   game.
+3. **Mobile first.** Everything works at 360 px wide; screens get richer beyond (768, 1024, 1280 px).
+4. **Accessible by construction.** AA contrast, keyboard, 44 px targets, reduced motion: see the Accessibility page.
+5. **Tokens, never values.** A colour, a size or a spacing comes from a variable of `tokens.css`; Stylelint refuses
+   anything else.
+6. **No empty block.** A module without content shows a useful empty state (EmptyState) or disappears.
 
 ## Organisation (atomic design)
 
-| Niveau     | Où                                      | Exemples                                |
-| ---------- | --------------------------------------- | --------------------------------------- |
-| Fondations | `app/assets/css/tokens.css`, `base.css` | couleurs, typographie, espacements      |
-| Atomes     | `app/components/ui`                     | Button, Input, LogoMark                 |
-| Molécules  | `app/components/ui`                     | Card, EmptyState                        |
-| Organismes | `app/features/<fonctionnalité>/`        | grille de captures, formulaire d'upload |
-| Templates  | `app/layouts`                           | mise en page avec header et footer      |
-| Pages      | `app/pages`                             | accueil, page photo                     |
+| Level       | Where                                   | Examples                      |
+| ----------- | --------------------------------------- | ----------------------------- |
+| Foundations | `app/assets/css/tokens.css`, `base.css` | colours, typography, spacing  |
+| Atoms       | `app/components/ui`                     | Button, Input, LogoMark       |
+| Molecules   | `app/components/ui`                     | Card, EmptyState              |
+| Organisms   | `app/features/<feature>/`               | capture grid, upload form     |
+| Templates   | `app/layouts`                           | layout with header and footer |
+| Pages       | `app/pages`                             | home page, photo page         |
 
-Les composants de `app/components/ui` sont de la présentation pure : ils reçoivent des props, émettent des
-événements, n'appellent jamais l'API.
+Components in `app/components/ui` are pure presentation: they receive props, emit events and never call the API.

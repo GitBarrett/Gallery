@@ -1,53 +1,53 @@
-// Règles de dépendance de 10-clean-architecture.md § 2 et § 7 (`pnpm arch`), testées par tests/architecture.test.ts.
-// Limite : les imports automatiques de Nuxt (composables, composants) ne sont pas des `import` et échappent à ce contrôle.
+// Dependency rules of 10-clean-architecture.md § 2 and § 7 (`pnpm arch`), tested by tests/architecture.test.ts.
+// Limit: Nuxt auto-imports (composables, components) are not `import`s and escape this check.
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
   forbidden: [
     {
       name: 'domain-pure',
-      comment: "Le domaine n'importe que son propre domaine, shared/domain et la bibliothèque standard.",
+      comment: 'The domain imports only its own domain, shared/domain and the standard library.',
       severity: 'error',
       from: { path: '^server/modules/([^/]+)/domain/' },
       to: { pathNot: ['^server/modules/$1/domain/', '^shared/domain/'], dependencyTypesNot: ['core'] },
     },
     {
       name: 'application-no-tech',
-      comment: "L'application ne connaît ni l'infrastructure, ni l'interface, ni Drizzle, h3 ou Nuxt.",
+      comment: 'The application knows neither infrastructure, nor interface, nor Drizzle, h3 or Nuxt.',
       severity: 'error',
       from: { path: '^server/modules/[^/]+/application/' },
       to: { path: ['/infrastructure/', '/interface/', 'node_modules/(drizzle-orm|h3|nuxt|nitropack|@nuxt)/'] },
     },
     {
       name: 'module-boundary',
-      comment: "Un module n'importe que l'index.ts d'un autre module.",
+      comment: "A module only imports another module's index.ts.",
       severity: 'error',
       from: { path: '^server/modules/([^/]+)/' },
       to: { path: '^server/modules/[^/]+/.+', pathNot: ['^server/modules/$1/', '^server/modules/[^/]+/index\\.ts$'] },
     },
     {
       name: 'api-thin',
-      comment: "Les routes n'accèdent ni à l'infrastructure ni à la base.",
+      comment: 'Routes reach neither infrastructure nor the database.',
       severity: 'error',
       from: { path: '^server/api/' },
       to: { path: ['^server/modules/[^/]+/infrastructure/', '^server/db/'] },
     },
     {
       name: 'ui-pure',
-      comment: 'Le design system est de la présentation pure.',
+      comment: 'The design system is pure presentation.',
       severity: 'error',
       from: { path: '^app/components/ui/' },
       to: { path: ['^app/services/', '^app/features/'] },
     },
     {
       name: 'pages-no-api',
-      comment: 'Les pages passent par les features, jamais par le client API.',
+      comment: 'Pages go through features, never through the API client.',
       severity: 'error',
       from: { path: '^app/pages/' },
       to: { path: '^app/services/api/' },
     },
     {
       name: 'shared-isolated',
-      comment: 'shared/ est commun au client et au serveur, sans dépendance à Nuxt.',
+      comment: 'shared/ is common to client and server, with no dependency on Nuxt.',
       severity: 'error',
       from: { path: '^shared/' },
       to: { path: ['^app/', '^server/', 'node_modules/(nuxt|nitropack|h3|@nuxt)/'] },

@@ -1,1 +1,1 @@
-Règles métier pures partagées client et serveur (qualité, validation de fichier…). Aucune dépendance à Nuxt.
+Pure business rules shared by client and server (quality, file validation…). No dependency on Nuxt.

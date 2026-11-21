@@ -1,1 +1,1 @@
-Un dossier par fonctionnalité : composables et composants propres à la feature.
+One folder per feature: composables and components specific to the feature.

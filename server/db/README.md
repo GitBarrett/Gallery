@@ -1,1 +1,1 @@
-Schéma Drizzle, migrations et seed (T-05a).
+Drizzle schema, migrations and seed (T-05a).

@@ -1,8 +1,8 @@
 import type { DomainEvent, UnitOfWork } from '../../server/platform/unit-of-work'
 
 /**
- * UnitOfWork en mémoire pour les tests de use cases (10-clean-architecture.md § 5) : le scope est fourni tel quel,
- * les événements ne partent qu'après le succès du travail. `published` liste ce que les files ont reçu.
+ * In-memory UnitOfWork for use case tests (10-clean-architecture.md § 5): the scope is given as is,
+ * events only leave after the work succeeded. `published` lists what the queues received.
  */
 export function inMemoryUnitOfWork<Scope extends object>(scope: Scope, { queueFails = false } = {}) {
   const published: DomainEvent[] = []
@@ -10,7 +10,7 @@ export function inMemoryUnitOfWork<Scope extends object>(scope: Scope, { queueFa
     async run(work) {
       const pending: DomainEvent[] = []
       const result = await work(scope, (event) => pending.push(event))
-      if (!queueFails) published.push(...pending) // comme le relais : un envoi refusé ne fait pas échouer le travail
+      if (!queueFails) published.push(...pending) // like the relay: a refused send does not fail the work
       return result
     },
   }

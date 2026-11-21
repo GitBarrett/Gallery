@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { ErrorResponse } from '../../shared/contracts/errors'
 import { AppError, toErrorResponse } from './http-errors'
 
-// Forme d'une erreur h3 (Nitro) : une Error portant un statusCode
+// Shape of an h3 (Nitro) error: an Error carrying a statusCode
 const createError = ({ statusCode, statusMessage = '' }: { statusCode: number; statusMessage?: string }) =>
   Object.assign(new Error(statusMessage), { statusCode })
 

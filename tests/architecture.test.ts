@@ -3,8 +3,8 @@ import { fileURLToPath } from 'node:url'
 import { cruise } from 'dependency-cruiser'
 import { describe, expect, it } from 'vitest'
 
-// Règles de 10-clean-architecture.md § 7, vérifiées sur une arborescence de démonstration :
-// une violation par règle, plus des imports autorisés qui ne doivent rien déclencher.
+// Rules of 10-clean-architecture.md § 7, checked on a demo tree:
+// one violation per rule, plus allowed imports that must trigger nothing.
 const { forbidden, options } = createRequire(import.meta.url)('../.dependency-cruiser.cjs')
 const fixture = fileURLToPath(new URL('./fixtures/architecture', import.meta.url))
 

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { RateLimiter, RateLimitRule } from '../../server/platform/rate-limiter'
 
-// Contrat du port RateLimiter (11-strategie-de-tests.md § 4) : vérifié sur le fake, la base et le binding.
-// `rule` doit correspondre à ce que l'implémentation sait limiter (binding : limite fixée dans wrangler.toml).
+// Contract of the RateLimiter port (11-strategie-de-tests.md § 4): checked on the fake, the database and the binding.
+// `rule` must match what the implementation can limit (binding: limit set in wrangler.toml).
 export function rateLimiterContract(name: string, make: () => Promise<RateLimiter>, rule: RateLimitRule) {
   describe(`RateLimiter contract: ${name}`, () => {
     const subject = () => `subject-${crypto.randomUUID()}`

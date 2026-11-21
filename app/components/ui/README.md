@@ -1,1 +1,1 @@
-Design system : composants de présentation purs (props en entrée, événements en sortie, aucun appel réseau).
+Design system: pure presentation components (props in, events out, no network call).

@@ -1,6 +1,6 @@
-// Configuration wrangler d'une preview, dérivée du wrangler.toml de production (ADR-013, ADR-016).
-// Une preview ne doit jamais toucher une ressource de production : chaque remplacement attendu doit
-// trouver sa ligne, et le résultat est refusé s'il contient encore une ressource de production.
+// Wrangler configuration of a preview, derived from the production wrangler.toml (ADR-013, ADR-016).
+// A preview must never touch a production resource: each expected replacement must find its line,
+// and the result is refused if it still contains a production resource.
 
 const SUBDOMAIN = 'aleygues.workers.dev'
 
@@ -8,7 +8,7 @@ export function previewConfig(productionToml, { pr, hyperdriveId }) {
   const suffix = `-pr-${pr}`
   let toml = productionToml
   const replace = (pattern, replacement, label) => {
-    if (!pattern.test(toml)) throw new Error(`wrangler.toml : ${label} introuvable`)
+    if (!pattern.test(toml)) throw new Error(`wrangler.toml: ${label} not found`)
     toml = toml.replace(pattern, replacement)
   }
 
@@ -26,13 +26,12 @@ export function previewConfig(productionToml, { pr, hyperdriveId }) {
   replace(/^namespace_id = "1001"$/m, 'namespace_id = "1002"', 'ratelimits namespace_id')
   replace(/^(queue|dead_letter_queue) = "([a-z-]+)"$/gm, `$1 = "$2${suffix}"`, 'queues')
 
-  if (/ls-prod|legendary-shots/.test(toml))
-    throw new Error('la configuration de preview référence encore la production')
+  if (/ls-prod|legendary-shots/.test(toml)) throw new Error('the preview configuration still references production')
   const queues = [...new Set([...toml.matchAll(/^(?:queue|dead_letter_queue) = "([^"]+)"$/gm)].map((m) => m[1]))]
   return { toml, queues }
 }
 
-// Numéros des PR dont il reste une ressource : ls-pr-{n}, <file>-pr-{n}, branche pr-{n}, préfixe R2 pr-{n}/
+// Numbers of the pull requests that still own a resource: ls-pr-{n}, <queue>-pr-{n}, branch pr-{n}, R2 prefix pr-{n}/
 export function previewNumbers(names) {
   return new Set(names.map((name) => /(?:^|-)pr-(\d+)\/?$/.exec(name)?.[1]).filter(Boolean))
 }

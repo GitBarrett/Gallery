@@ -1,9 +1,9 @@
 import axe from 'axe-core'
 
 /**
- * Violations axe-core d'un composant monté (11-strategie-de-tests.md : aucune violation « serious » ou « critical »).
- * Le contraste n'est pas calculable sans moteur de rendu : il est vérifié sur les tokens (design-tokens.test.ts) et
- * par Playwright sur les pages. `region` exige une page complète, hors sujet pour un composant isolé.
+ * axe-core violations of a mounted component (11-strategie-de-tests.md: no "serious" or "critical" violation).
+ * Contrast cannot be computed without a rendering engine: it is checked on the tokens (design-tokens.test.ts) and
+ * by Playwright on pages. `region` needs a full page, off-topic for an isolated component.
  */
 export async function axeViolations(element: Element): Promise<string[]> {
   const host = document.createElement('main')

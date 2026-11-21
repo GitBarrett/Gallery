@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-/** Liste unique des codes d'erreur de l'API (03-architecture.md § Conventions d'API), traduits côté client. */
+/** Single list of the API error codes (03-architecture.md § Conventions d'API), translated on the client. */
 export const ERROR_CODES = [
   'VALIDATION_FAILED',
   'UNAUTHENTICATED',

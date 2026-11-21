@@ -2,24 +2,23 @@ import type { Meta, StoryObj } from '@storybook-vue/nuxt'
 import Input from './Input.vue'
 
 const meta: Meta<typeof Input> = {
-  title: 'UI/Atomes/Input',
+  title: 'UI/Atoms/Input',
   component: Input,
   tags: ['autodocs'],
   args: { label: 'Email', type: 'email' },
   parameters: {
     docs: {
       description: {
-        component: `**Rôle** : saisir une valeur courte (email, pseudo, titre, zone).
+        component: `**Role**: enter a short value (email, username, title, zone).
 
-**Quand l'utiliser** : tout champ texte d'un formulaire, avec \`v-model\`. Donner le bon \`type\` et \`autocomplete\`
-(email, username, current-password, new-password) : le clavier mobile et le gestionnaire de mots de passe en
-dépendent.
+**When to use it**: any text field of a form, with \`v-model\`. Give the right \`type\` and \`autocomplete\` (email,
+username, current-password, new-password): the mobile keyboard and the password manager depend on them.
 
-**À éviter** : un champ sans libellé visible ; un placeholder à la place du libellé ; une erreur signalée seulement
-par la couleur de la bordure.
+**Avoid**: a field without a visible label; a placeholder instead of the label; an error shown only by the colour of
+the border.
 
-**Accessibilité** : le libellé est relié au champ ; l'aide et l'erreur sont annoncées par \`aria-describedby\` et
-\`aria-invalid\` ; l'astérisque des champs obligatoires est décoratif, \`required\` porte l'information.`,
+**Accessibility**: the label is tied to the field; hint and error are announced through \`aria-describedby\` and
+\`aria-invalid\`; the asterisk of required fields is decorative, \`required\` carries the information.`,
       },
     },
   },

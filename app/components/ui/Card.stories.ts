@@ -3,7 +3,7 @@ import { h } from 'vue'
 import Card from './Card.vue'
 
 const meta: Meta<typeof Card> = {
-  title: 'UI/Molécules/Card',
+  title: 'UI/Molecules/Card',
   component: Card,
   tags: ['autodocs'],
   args: { as: 'section' },
@@ -11,14 +11,14 @@ const meta: Meta<typeof Card> = {
   parameters: {
     docs: {
       description: {
-        component: `**Rôle** : regrouper un contenu sur une surface encadrée.
+        component: `**Role**: group content on a framed surface.
 
-**Quand l'utiliser** : un bloc qui se distingue du fond (réglages, carte de capture, encart). Choisir la balise :
-\`article\` pour un contenu autonome (une capture), \`section\` pour un bloc titré de la page, \`div\` sinon.
+**When to use it**: a block that stands out from the background (settings, capture card, inset). Pick the tag:
+\`article\` for self-contained content (a capture), \`section\` for a titled block of the page, \`div\` otherwise.
 
-**À éviter** : des cartes imbriquées ; une carte autour d'une photo seule (les photos priment, UI en retrait).
+**Avoid**: nested cards; a card around a single photo (captures first, interface in the background).
 
-**Accessibilité** : la balise sémantique aide la navigation au lecteur d'écran ; une \`section\` porte un titre.`,
+**Accessibility**: the semantic tag helps screen reader navigation; a \`section\` carries a heading.`,
       },
     },
   },

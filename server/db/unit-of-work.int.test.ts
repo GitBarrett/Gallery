@@ -13,7 +13,7 @@ const db = createDb(process.env.DATABASE_URL!)
 const clock = fixedClock('2026-11-21T12:00:00Z')
 const logger: Logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
 
-/** Files de test : enregistrent ce qu'elles reçoivent, ou refusent tout envoi. */
+/** Test queues: record what they receive, or refuse every send. */
 function recordingQueues(fails = false) {
   const sent: { topic: string; body: { eventId: string; payload: unknown } }[] = []
   const queue = (topic: string) => ({

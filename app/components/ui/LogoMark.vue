@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Logo horizontal (docs/design/LogoMark.dc.html) : emblème « diaphragme légendaire » et wordmark ; seul l'emblème
-// sur mobile. Le nom de la marque ne se traduit pas.
+// Horizontal logo (docs/design/LogoMark.dc.html): "legendary aperture" emblem and wordmark; the emblem alone
+// on mobile. The brand name is never translated.
 withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
 </script>
 

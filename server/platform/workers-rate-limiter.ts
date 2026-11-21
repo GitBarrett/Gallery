@@ -1,14 +1,14 @@
 import type { RateLimiter } from './rate-limiter'
 
-/** Binding Workers Rate Limiting (`[[ratelimits]]` de wrangler.toml), réduit à ce que l'application utilise. */
+/** Workers Rate Limiting binding (`[[ratelimits]]` of wrangler.toml), reduced to what the application uses. */
 export interface RateLimitBinding {
   limit(options: { key: string }): Promise<{ success: boolean }>
 }
 
 /**
- * Adaptateur des rafales (fenêtre de 10 ou 60 s comptée par emplacement Cloudflare, donc approximative) : la règle
- * porte le nom du binding et recopie sa limite et sa période, fixées dans wrangler.toml. Sans binding (local, tests
- * Node), tout passe : les limites strictes relèvent des compteurs en base.
+ * Burst adapter (window of 10 or 60 s counted per Cloudflare location, hence approximate): the rule carries
+ * the binding name and copies its limit and period, set in wrangler.toml. Without a binding (local, Node
+ * tests), everything passes: strict limits belong to the database counters.
  */
 export const bindingRateLimiter = (bindings: Record<string, RateLimitBinding | undefined>): RateLimiter => ({
   async consume(rule, subject) {

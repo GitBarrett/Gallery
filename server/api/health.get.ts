@@ -2,7 +2,7 @@ import postgres from 'postgres'
 import type { Bindings } from '../platform/bindings'
 import { databaseCheck, r2Check, runHealthChecks } from '../platform/health'
 
-// Sonde de disponibilité : base (Hyperdrive) et R2 quand leurs bindings existent ; 503 si l'un échoue
+// Availability probe: database (Hyperdrive) and R2 when their bindings exist; 503 if one fails
 export default defineEventHandler(async (event) => {
   const env: Bindings = event.context.cloudflare?.env ?? {}
   const sql = env.HYPERDRIVE && postgres(env.HYPERDRIVE.connectionString, { max: 1, fetch_types: false })

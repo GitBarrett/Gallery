@@ -4,7 +4,7 @@ import { bindingRateLimiter, type RateLimitBinding } from './workers-rate-limite
 
 const rule = { name: 'RATE_LIMITER_TEST', limit: 3, windowSeconds: 60 }
 
-/** Binding simulé : compte par clé jusqu'à la limite déclarée dans wrangler.toml. */
+/** Simulated binding: counts per key up to the limit declared in wrangler.toml. */
 function fakeBinding(limit: number): RateLimitBinding {
   const counts = new Map<string, number>()
   return {

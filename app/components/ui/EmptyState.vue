@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// État vide (07-design.md § États vides) : jamais un bloc vide ni un « 0 », toujours un message et, si possible, une
-// action. Les textes viennent de l'appelant (i18n).
+// Empty state (07-design.md § États vides): never an empty block nor a "0", always a message and, when possible, an
+// action. Texts come from the caller (i18n).
 withDefaults(defineProps<{ title: string; description?: string; headingLevel?: 2 | 3 | 4 }>(), {
   description: undefined,
   headingLevel: 2,

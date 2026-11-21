@@ -2,9 +2,9 @@ import type { Db, Transaction } from './client'
 import { processedMessages } from './schema'
 
 /**
- * Garde d'idempotence des consommateurs (Queues livre au moins une fois) : `work` ne s'exécute qu'une fois par
- * (consommateur, événement), dans la transaction qui enregistre le message. S'il échoue, rien n'est enregistré et la
- * livraison suivante le relance. Renvoie `false` pour un doublon ignoré.
+ * Idempotency guard of consumers (Queues delivers at least once): `work` runs only once per
+ * (consumer, event), in the transaction that records the message. If it fails, nothing is recorded and the
+ * next delivery runs it again. Returns `false` for an ignored duplicate.
  */
 export async function onceOnly(
   db: Db,

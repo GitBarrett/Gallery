@@ -1,7 +1,7 @@
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 
-// Build de preview (ADR-013) : variables lues au build (routes /__test) et au démarrage (noindex)
+// Preview build (ADR-013): variables read at build time (/__test routes) and at startup (noindex)
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
 process.env.NUXT_DEPLOY_ENV = 'preview'
 process.env.NUXT_FAKE_PROVIDERS = 'true'

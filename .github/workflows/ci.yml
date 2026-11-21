@@ -1,6 +1,6 @@
-# Contrôles de PR (T-04a, 11-strategie-de-tests.md § 7). Chaque garde est une étape distincte qui s'exécute même
-# si une autre échoue, pour tout voir en un passage. Pas de protection de main (Q26) : une PR ne se fusionne
-# qu'avec cette CI verte.
+# Pull request checks (T-04a, 11-strategie-de-tests.md § 7). Each guard is a separate step that runs even when
+# another one fails, to see everything in one pass. No protection of main (Q26): a pull request is only merged
+# with this CI green.
 name: ci
 
 on:
@@ -18,8 +18,8 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    # Postgres de CI (Q15), même version majeure que Neon : les tests d'intégration y appliquent les migrations sur une
-    # base vierge, et comptent dans la couverture avec les tests unitaires et de composants
+    # CI Postgres (Q15), same major version as Neon: integration tests apply the migrations to a blank database
+    # and count in the coverage along with unit and component tests
     services:
       postgres:
         image: postgres:18
@@ -61,7 +61,7 @@ jobs:
         run: pnpm build && ! grep -rl "/__test" .output/server
         env:
           NITRO_PRESET: cloudflare_module
-      # Après le build Nuxt, qui télécharge les polices (ADR-019) : une story cassée fait échouer la PR
+      # After the Nuxt build, which downloads the fonts (ADR-019): a broken story fails the pull request
       - name: Storybook builds
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm storybook:build
@@ -71,7 +71,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0 # gitleaks analyse tout l'historique de la branche testée
+          fetch-depth: 0 # gitleaks scans the whole history of the tested branch
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -81,7 +81,7 @@ jobs:
       - name: Vulnerable dependencies (high and critical)
         if: ${{ !cancelled() }}
         run: pnpm audit --prod --audit-level high
-      # Semgrep CE remplace CodeQL, indisponible sur un dépôt privé d'un compte Free (Q26)
+      # Semgrep CE replaces CodeQL, unavailable on a private repository of a Free account (Q26)
       - name: Static analysis (Semgrep CE)
         if: ${{ !cancelled() }}
         run: pipx run semgrep==1.183.0 scan --config p/default --error --metrics=off

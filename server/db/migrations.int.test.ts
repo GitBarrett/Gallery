@@ -2,9 +2,9 @@ import postgres from 'postgres'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { emptyData, migrate, setAppRole } from '../../scripts/database.mjs'
 
-// Base vierge créée pour ce fichier (11-strategie-de-tests.md § 7) : les migrations s'y appliquent depuis zéro.
+// Blank database created for this file (11-strategie-de-tests.md § 7): migrations apply from scratch.
 const base = process.env.DATABASE_URL
-if (!base) throw new Error('DATABASE_URL manquante : service Postgres en CI, .env.test en local')
+if (!base) throw new Error('DATABASE_URL missing: Postgres service in CI, .env.test locally')
 const name = `migrations_${Date.now()}`
 const url = Object.assign(new URL(base), { pathname: `/${name}` })
 const admin = postgres(base, { max: 1, onnotice: () => {} })
@@ -77,7 +77,7 @@ describe('migrations (T-05a)', () => {
       await expect(app`update audit_log set action = 'forged'`).rejects.toThrow(/permission denied/)
       await expect(app`delete from audit_log`).rejects.toThrow(/permission denied/)
       await expect(app`truncate audit_log`).rejects.toThrow(/permission denied/)
-      await app`update outbox set topic = topic` // les autres tables restent modifiables
+      await app`update outbox set topic = topic` // the other tables stay writable
     } finally {
       await app.end()
     }

@@ -2,11 +2,11 @@ import stylelint from 'stylelint'
 import { describe, expect, it } from 'vitest'
 import config from '../stylelint.config.mjs'
 
-// ADR-014 : hors de tokens.css, une valeur en dur est refusée ; un composant n'emploie que var(--…).
+// ADR-014: outside tokens.css, a hard-coded value is refused; a component only uses var(--…).
 const lint = async (code: string, codeFilename = 'app/components/ui/Example.vue') =>
   (await stylelint.lint({ code, codeFilename, config })).results[0]!.warnings.map((w) => w.rule)
 
-// Une déclaration par ligne, comme dans un vrai composant
+// One declaration per line, as in a real component
 const vue = (css: string) =>
   `<template><p class="x">x</p></template>\n<style scoped>\n.x {\n  ${css.split('; ').join(';\n  ')}\n}\n</style>\n`
 

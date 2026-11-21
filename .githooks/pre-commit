@@ -1,7 +1,7 @@
 #!/bin/sh
-# Refuse un commit qui contient un secret (CLAUDE.md : aucun secret dans le code).
+# Refuses a commit that contains a secret (CLAUDE.md: no secret in the code).
 if ! command -v gitleaks >/dev/null 2>&1; then
-  echo "gitleaks est introuvable : installez-le (Windows : winget install Gitleaks.Gitleaks), puis rouvrez le terminal." >&2
+  echo "gitleaks not found: install it (Windows: winget install Gitleaks.Gitleaks), then reopen the terminal." >&2
   exit 1
 fi
 exec gitleaks git --pre-commit --staged --redact --no-banner

@@ -13,3 +13,4 @@ test-results/
 playwright-report/
 wrangler.preview.toml
 storybook-static/
+Cloudflare proto.txt

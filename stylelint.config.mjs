@@ -1,5 +1,5 @@
-// Stylelint (ADR-014) : couleurs, tailles de police, espacements, z-index et ombres uniquement en var(--…) hors de
-// tokens.css. Les fichiers .vue sont lus par postcss-html (blocs <style>).
+// Stylelint (ADR-014): colours, font sizes, spacing, z-index and shadows only as var(--…) outside
+// tokens.css. .vue files are read by postcss-html (<style> blocks).
 export default {
   extends: ['stylelint-config-standard'],
   plugins: ['stylelint-declaration-strict-value'],

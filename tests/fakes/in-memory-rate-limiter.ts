@@ -1,7 +1,7 @@
 import type { Clock } from '../../server/platform/clock'
 import { fixedWindow, type RateLimiter } from '../../server/platform/rate-limiter'
 
-/** RateLimiter en mémoire pour les tests de use cases : même fenêtre fixe que les compteurs en base. */
+/** In-memory RateLimiter for use case tests: same fixed window as the database counters. */
 export function inMemoryRateLimiter(clock: Clock): RateLimiter {
   const counts = new Map<string, number>()
   return {

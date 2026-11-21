@@ -1,8 +1,8 @@
 import type { RateLimitBinding } from './workers-rate-limiter'
 
 /**
- * Bindings Cloudflare utilisés par l'application (wrangler.toml), typés au plus juste, sans dépendre des types Workers.
- * Absents en développement local et dans les tests d'intégration Node.
+ * Cloudflare bindings used by the application (wrangler.toml), typed as narrowly as possible, without Workers types.
+ * Absent in local development and in Node integration tests.
  */
 export interface QueueProducer {
   send(body: unknown): Promise<unknown>

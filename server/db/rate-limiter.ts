@@ -15,8 +15,8 @@ async function hmacHex(secret: string, message: string): Promise<string> {
 }
 
 /**
- * Compteurs exacts en base (`rate_limit_counters`, 08-securite.md § 8) pour les fenêtres longues et les limites
- * strictes : incrément atomique par fenêtre fixe ; la clé est un HMAC de la règle et du sujet (aucune IP en clair).
+ * Exact database counters (`rate_limit_counters`, 08-securite.md § 8) for long windows and strict limits:
+ * atomic increment per fixed window; the key is an HMAC of the rule and the subject (no IP in clear).
  */
 export function dbRateLimiter(db: Db, hmacKey: string, clock: Clock): RateLimiter {
   return {
@@ -38,8 +38,8 @@ export function dbRateLimiter(db: Db, hmacKey: string, clock: Clock): RateLimite
 }
 
 /**
- * Purge horaire des fenêtres échues.
- * shortcut: suppose des fenêtres d'au plus 24 h (vrai pour 08-securite.md § 8), stocker la durée si une règle dépasse
+ * Hourly purge of ended windows.
+ * shortcut: assumes windows of at most 24 h (true for 08-securite.md § 8), store the length if a rule exceeds it
  */
 export async function purgeRateLimitCounters(db: Db, clock: Clock): Promise<void> {
   await db

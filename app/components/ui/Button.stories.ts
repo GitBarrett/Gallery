@@ -3,7 +3,7 @@ import { h } from 'vue'
 import Button from './Button.vue'
 
 const meta: Meta<typeof Button> = {
-  title: 'UI/Atomes/Button',
+  title: 'UI/Atoms/Button',
   component: Button,
   tags: ['autodocs'],
   args: { variant: 'primary', size: 'md', disabled: false, block: false },
@@ -12,18 +12,17 @@ const meta: Meta<typeof Button> = {
   parameters: {
     docs: {
       description: {
-        component: `**Rôle** : déclencher une action ou mener à une page.
+        component: `**Role**: trigger an action or lead to a page.
 
-**Quand l'utiliser** : \`primary\` pour **une seule** action principale par écran (Upload, Sign in) ; \`secondary\`
-pour les actions d'accompagnement (Explore, Filters) ; \`ghost\` pour les actions discrètes dans une liste ou une
-barre. Avec \`to\`, le bouton devient un lien : c'est la bonne forme pour une navigation.
+**When to use it**: \`primary\` for **a single** main action per screen (Upload, Sign in); \`secondary\` for supporting
+actions (Explore, Filters); \`ghost\` for discreet actions in a list or a bar. With \`to\`, the button becomes a link:
+the right form for navigation.
 
-**À éviter** : deux boutons \`primary\` côte à côte ; un bouton qui ne contient qu'une icône (prendre ActionIcon,
-T-06b) ; un bouton pour naviguer sans \`to\`.
+**Avoid**: two \`primary\` buttons side by side; a button holding only an icon (use ActionIcon, T-06b); a button that
+navigates without \`to\`.
 
-**Accessibilité** : hauteur de 44 px au moins (cible tactile) ; libellé toujours visible et explicite (« Upload a
-capture » plutôt que « OK ») ; désactivé, il reste un bouton et n'est plus focalisable ; \`type="submit"\` seulement
-dans un formulaire.`,
+**Accessibility**: at least 44 px high (touch target); label always visible and explicit ("Upload a capture" rather
+than "OK"); disabled, it stays a button and is no longer focusable; \`type="submit"\` only inside a form.`,
       },
     },
   },

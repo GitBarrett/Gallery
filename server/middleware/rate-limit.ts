@@ -2,8 +2,8 @@ import type { Bindings } from '../platform/bindings'
 import { AppError } from '../platform/http-errors'
 import { bindingRateLimiter } from '../platform/workers-rate-limiter'
 
-// Rafales de mutations /api par IP (T-05c) : remplace la règle de zone de 08-securite.md § 2 tant qu'il n'y a pas
-// de domaine (Q24). Limite et période recopiées du binding RATE_LIMITER_MUTATIONS de wrangler.toml.
+// Bursts of /api mutations per IP (T-05c): replaces the zone rule of 08-securite.md § 2 as long as there is no
+// domain (Q24). Limit and period copied from the RATE_LIMITER_MUTATIONS binding of wrangler.toml.
 const MUTATIONS = { name: 'RATE_LIMITER_MUTATIONS', limit: 120, windowSeconds: 60 }
 const READS = ['GET', 'HEAD', 'OPTIONS']
 

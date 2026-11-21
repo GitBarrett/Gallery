@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Cloudflare Web Analytics (ADR-006) : balise ajoutée par Nuxt pour porter le nonce CSP ; l'injection automatique
-// de Cloudflare est désactivée (08-securite.md § 5). Sans jeton (local, tests), pas de beacon.
+// Cloudflare Web Analytics (ADR-006): tag added by Nuxt so that it carries the CSP nonce; Cloudflare automatic
+// injection is disabled (08-securite.md § 5). Without a token (local, tests), no beacon.
 const { cfBeaconToken } = useRuntimeConfig().public
 if (cfBeaconToken)
   useHead({
