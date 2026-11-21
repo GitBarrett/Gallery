@@ -117,7 +117,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   `shared/domain/quality.ts` (`qualityFromLikes(likes, thresholds)`, seuils en paramètre), QualityBadge, ItemTooltip, QuestMarker, ImageScrim, WowImage (prop `src`, sans route `/img`), avec leurs stories et leur section du playbook (ADR-019 : un badge par palier de qualité, scrim sur fonds clair et sombre).
   Tests : U (qualité), composants (contraste d'ImageScrim avec fixtures blanche et noire, axe).
 
-- [ ] **T-07a Mise en page** (dép. T-06b)
+- [x] **T-07a Mise en page** (dép. T-06b)
   Layout, header partagé (une ligne ≥ 1180 px, barre d'onglets < 768 px, entrées pilotées par les flags : `07-design.md` § Header), footer, safe areas, lien d'évitement, focus visible, mouvement réduit.
   Stories : US-67 (structure), US-75.1, US-75.4. Tests : E (US-67.1, US-67.5–6, US-75.1).
 
