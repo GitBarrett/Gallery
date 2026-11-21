@@ -96,7 +96,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Drizzle, conventions (UUID v7, `timestamptz`, `created_at`/`updated_at`, index), runner de migrations, tables transverses `outbox`, `processed_messages`, `site_settings`, `audit_log` (rôle base sans UPDATE/DELETE), `rate_limit_counters`, `donations` (flag désactivé), seed de base, transaction de test annulée.
   Tests : I (migration sur base vierge, rôle d'audit sans UPDATE/DELETE). Étape `ci` des migrations (`11-strategie-de-tests.md` § 7 : base vierge et copie du schéma de production).
 
-- [ ] **T-05b Unité de travail et outbox** (dép. T-05a)
+- [x] **T-05b Unité de travail et outbox** (dép. T-05a)
   `UnitOfWork`, relais outbox → Queues, garde d'idempotence `processed_messages` pour les consommateurs.
   Tests : I (relais outbox, double livraison ignorée), contrat `UnitOfWork`.
 

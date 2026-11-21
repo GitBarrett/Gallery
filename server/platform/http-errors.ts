@@ -24,21 +24,28 @@ const STATUS: Record<ErrorCode, number> = {
 }
 const CODE_BY_STATUS = new Map(Object.entries(STATUS).map(([code, status]) => [status, code as ErrorCode]))
 
-export function toErrorResponse(thrown: unknown, correlationId: string): { status: number; body: ErrorResponse } {
+export function toErrorResponse(
+  thrown: unknown,
+  correlationId: string,
+): { status: number; body: ErrorResponse; headers: Record<string, string> } {
   // h3 enveloppe toute erreur lancée par une route : l'AppError d'origine est alors dans `cause`
   const cause = (thrown as { cause?: unknown } | null)?.cause
   const error = cause instanceof AppError ? cause : thrown
   if (error instanceof AppError) {
     const details = error.details === undefined ? {} : { details: error.details }
+    // 429 : délai avant nouvel essai, fourni par le RateLimiter
+    const retryAfter = (error.details as { retryAfterSeconds?: unknown } | undefined)?.retryAfterSeconds
     return {
       status: STATUS[error.code],
       body: { error: { code: error.code, message: error.message, ...details, correlationId } },
+      headers:
+        error.code === 'RATE_LIMITED' && typeof retryAfter === 'number' ? { 'retry-after': String(retryAfter) } : {},
     }
   }
   // Erreurs du framework (route inconnue, corps illisible…) : seul leur statut est repris
   const status = (error as { statusCode?: number } | null)?.statusCode
   const code = status === undefined ? undefined : CODE_BY_STATUS.get(status)
   if (code && code !== 'INTERNAL')
-    return { status: STATUS[code], body: { error: { code, message: code, correlationId } } }
-  return { status: 500, body: { error: { code: 'INTERNAL', message: 'Internal error', correlationId } } }
+    return { status: STATUS[code], body: { error: { code, message: code, correlationId } }, headers: {} }
+  return { status: 500, body: { error: { code: 'INTERNAL', message: 'Internal error', correlationId } }, headers: {} }
 }

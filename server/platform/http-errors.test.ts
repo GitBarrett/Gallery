@@ -42,4 +42,11 @@ describe('toErrorResponse', () => {
     expect(status).toBe(500)
     expect(body.error).toEqual({ code: 'INTERNAL', message: 'Internal error', correlationId: 'ray-3' })
   })
+
+  it('tells the client when to retry after a rate limit (08-securite.md § 8)', () => {
+    const limited = toErrorResponse(new AppError('RATE_LIMITED', 'Too many requests', { retryAfterSeconds: 42 }), 'r')
+    expect(limited.status).toBe(429)
+    expect(limited.headers).toEqual({ 'retry-after': '42' })
+    expect(toErrorResponse(new AppError('CONFLICT', 'x'), 'r').headers).toEqual({})
+  })
 })

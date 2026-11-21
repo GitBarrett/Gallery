@@ -24,6 +24,12 @@ describe('previewConfig (ADR-013)', () => {
     expect(preview.toml).not.toMatch(/legendary-shots/)
   })
 
+  it('counts preview bursts apart from production (own rate limiting namespace)', () => {
+    expect(production).toContain('namespace_id = "1001"')
+    expect(preview.toml).toContain('namespace_id = "1002"')
+    expect(preview.toml).not.toContain('namespace_id = "1001"')
+  })
+
   it('suffixes every queue and dead letter queue, and lists them for creation', () => {
     expect(preview.queues).toContain('photo-process-pr-42')
     expect(preview.queues).toContain('photo-process-dlq-pr-42')
