@@ -19,6 +19,9 @@ NUXT_PUBLIC_SITE_URL = "https://legendary-shots.aleygues.workers.dev"
 NUXT_DEPLOY_ENV = "production"
 NUXT_FAKE_PROVIDERS = "false"
 NUXT_R2_PREFIX = ""
+# Valeurs publiques servies au navigateur (T-03f, Q25)
+NUXT_PUBLIC_SENTRY_DSN = "https://cdcf8f3e3a474494448cff10947009ea@o4512469379055616.ingest.de.sentry.io/4512469385412688"
+NUXT_PUBLIC_CF_BEACON_TOKEN = "458bbb78a91d42189f5b66bff09f87de" # gitleaks:allow (public : servi dans chaque page)
 
 # Bucket privé : originaux et variantes, jamais publics (ADR-004, ADR-012)
 [[r2_buckets]]
