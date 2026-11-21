@@ -285,8 +285,8 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Précédent/suivant, swipe, « More from » avec replis.
   Stories : US-67.2–3, US-70.1–2. Tests : E.
 
-- [ ] **T-32 Page d'accueil** (dép. T-30, T-08)
-  Hero administrable avec voile, « Capture of the week » et ses replis, bandeau de quête (masqué tant que `features.contests` est désactivé).
+- [ ] **T-32 Page d'accueil** (dép. T-30, T-08, T-31a)
+  Hero administrable avec voile, « Capture of the week » et ses replis, bandeau de quête (masqué tant que `features.contests` est désactivé), captures d'écran du manifest PWA (home et PDP, 2 `narrow` et 2 `wide` ; Q35).
   Stories : US-24, US-70.4. Tests : U (replis), E.
 
 - [ ] **T-33a Recherche : moteur** (dép. T-30, T-20b)

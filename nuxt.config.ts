@@ -85,7 +85,7 @@ export default defineNuxtConfig({
         { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         { src: '/icons/monochrome-512.png', sizes: '512x512', type: 'image/png', purpose: 'monochrome' },
       ],
-      // shortcut: no screenshots until the home page and the photo page exist (T-32, T-31a), see Q35
+      // Screenshots come with the home page (T-32, Q35)
       shortcuts: [
         { name: 'Upload', url: '/upload', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
         { name: 'Search', url: '/search', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
