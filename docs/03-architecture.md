@@ -109,7 +109,7 @@ Conventions : UUID v7 pour toutes les clés ; `created_at`/`updated_at` en `time
 
 Compteurs dénormalisés (`likes_count`…) mis à jour en transaction.
 
-**Rôles de base (T-05a)** : le propriétaire `neondb_owner` sert uniquement aux migrations (`scripts/database.mjs`, URL obtenue par l'API Neon, jamais stockée) ; le Worker se connecte par Hyperdrive avec `ls_app`, rôle de connexion créé en SQL (`NOSUPERUSER NOCREATEDB NOCREATEROLE` : un rôle créé par l'API Neon serait membre de `neon_superuser` et hériterait des droits du propriétaire), membre du rôle `app_rw` qui a lecture et écriture sur les tables, sauf `UPDATE`, `DELETE` et `TRUNCATE` sur `audit_log`. Les droits sont posés par migration et s'appliquent aux tables futures (`ALTER DEFAULT PRIVILEGES`). En production, les migrations s'exécutent dans `deploy-production` avant le déploiement du code ; sur une preview (branche schema-only), le journal des migrations de production est recopié pour que seules les nouvelles migrations s'appliquent.
+**Rôles de base (T-05a)** : le propriétaire `neondb_owner` sert uniquement aux migrations (`scripts/database.mjs`, URL obtenue par l'API Neon, jamais stockée) ; le Worker se connecte par Hyperdrive avec `ls_app`, rôle de connexion créé en SQL (`NOSUPERUSER NOCREATEDB NOCREATEROLE` : un rôle créé par l'API Neon serait membre de `neon_superuser` et hériterait des droits du propriétaire), membre du rôle `app_rw` qui a lecture et écriture sur les tables, sauf `UPDATE`, `DELETE` et `TRUNCATE` sur `audit_log`. Les droits sont posés par migration et s'appliquent aux tables futures (`ALTER DEFAULT PRIVILEGES`). En production, les migrations s'exécutent dans `deploy-production` avant le déploiement du code ; la branche modèle des previews (`preview-template`, sans données, ADR-018) reçoit les mêmes migrations, et chaque preview n'applique que celles de sa PR.
 
 ## Sécurité
 Voir `08-securite.md` (modèle de menaces, contrôles par couche, en-têtes, upload, sessions, secrets, tests de sécurité). Ce document fait foi.
@@ -251,7 +251,7 @@ Validation au démarrage par un schéma Zod (`server/config.ts`) : variable manq
 | Env | Hébergement | Base | Données |
 |---|---|---|---|
 | local | `wrangler dev` (Miniflare : R2, Queues, API Cache locaux) | branche Neon `dev-{prénom}` ou Postgres Docker | seed de démo (`pnpm db:seed`) |
-| preview | Worker `ls-pr-{n}` par pull request (ADR-013) | branche Neon `pr-{n}` créée par la CI depuis `main`, via sa propre configuration Hyperdrive (ADR-016) | seed de démo + fixtures E2E |
+| preview | Worker `ls-pr-{n}` par pull request (ADR-013) | branche Neon `pr-{n}` créée par la CI depuis la branche modèle `preview-template`, sans données (ADR-018), via sa propre configuration Hyperdrive (ADR-016) | seed de démo + fixtures E2E |
 | production | Worker `main` | branche Neon principale | réelles |
 
 Fournisseurs externes en local et en preview : adaptateurs factices activés par `NUXT_FAKE_PROVIDERS=true` (Sightengine, Resend → boîte mail de test consultable, GitHub, OAuth) ; jamais en production.

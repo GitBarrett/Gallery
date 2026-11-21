@@ -1,6 +1,6 @@
 import postgres from 'postgres'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { copyJournal, migrate, setAppRole } from '../../scripts/database.mjs'
+import { emptyData, migrate, setAppRole } from '../../scripts/database.mjs'
 
 // Base vierge créée pour ce fichier (11-strategie-de-tests.md § 7) : les migrations s'y appliquent depuis zéro.
 const base = process.env.DATABASE_URL
@@ -53,22 +53,17 @@ describe('migrations (T-05a)', () => {
     expect(setting!.value).toBe(false)
   })
 
-  it('copy the production journal to a schema-only branch, so that only new migrations run there', async () => {
-    // Branche schema-only simulée : mêmes tables, journal des migrations vide
-    const copy = `${name}_copy`
-    const copyUrl = Object.assign(new URL(base), { pathname: `/${copy}` })
-    await admin.unsafe(`create database ${copy}`)
-    try {
-      await migrate(copyUrl)
-      const target = postgres(String(copyUrl), { max: 1, onnotice: () => {} })
-      await target`delete from drizzle.__drizzle_migrations`
-      expect(await copyJournal(url, copyUrl)).toBe(2)
-      await expect(migrate(copyUrl)).resolves.toBeUndefined() // sans le journal : « relation already exists »
-      expect(await copyJournal(url, copyUrl)).toBe(0) // journal déjà présent : rien à recopier
-      await target.end()
-    } finally {
-      await admin.unsafe(`drop database ${copy} with (force)`)
-    }
+  it('empty every table of the preview template except the site settings, without their author', async () => {
+    const author = '0197a000-0000-7000-8000-000000000001'
+    await sql`insert into outbox (topic, payload) values ('emails', '{"to":"someone@example.com"}')`
+    await sql`insert into audit_log (actor_id, action, target_type, target_id) values (${author}, 'ban', 'user', '1')`
+    await sql`update site_settings set updated_by = ${author}`
+    await emptyData(url)
+    for (const table of ['outbox', 'processed_messages', 'audit_log', 'rate_limit_counters', 'donations'])
+      expect((await sql.unsafe(`select count(*)::int as n from ${table}`))[0]!.n).toBe(0)
+    expect(await sql`select key, updated_by from site_settings`).toEqual([
+      { key: 'features.donations', updated_by: null },
+    ])
   })
 
   it('connect the Worker with a plain login role that can insert into audit_log but never update or delete it', async () => {
