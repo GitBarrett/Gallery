@@ -109,7 +109,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   CSS natif selon ADR-014 : `tokens.css` (tokens de `07-design.md`), `base.css`, polices auto-hébergées via `@nuxt/fonts`, Stylelint (valeurs en dur interdites hors tokens) ; composants Button, Input, Card, EmptyState, LogoMark. Storybook (ADR-019) : `@nuxtjs/storybook`, addon a11y, page « Fondations » (tokens), une story par composant, build en CI, publication sous `/storybook/` en production (publique, `noindex`) et sur les previews ; **playbook** en pages MDX (introduction et principes, fondations, accessibilité, rédaction, contribuer) et section d'usage de chaque composant.
   Tests : composants (rendu, axe), Stylelint qui échoue sur une couleur en dur d'exemple, build Storybook en CI, `/storybook/` servi en production avec `noindex`.
 
-- [ ] **T-06b Design system : superpositions** (dép. T-06a)
+- [x] **T-06b Design system : superpositions** (dép. T-06a)
   Modal, BottomSheet, Toast, ActionIcon (gestion du focus, Échap, mouvement réduit), avec leurs stories et leur section du playbook (ADR-019).
   Tests : composants (clavier, focus piégé et rendu, axe).
 

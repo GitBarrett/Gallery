@@ -23,13 +23,13 @@ and what to avoid. The visual charter (colours, identity, contrast rules, respon
 
 ## Organisation (atomic design)
 
-| Level       | Where                                   | Examples                      |
-| ----------- | --------------------------------------- | ----------------------------- |
-| Foundations | `app/assets/css/tokens.css`, `base.css` | colours, typography, spacing  |
-| Atoms       | `app/components/ui`                     | Button, Input, LogoMark       |
-| Molecules   | `app/components/ui`                     | Card, EmptyState              |
-| Organisms   | `app/features/<feature>/`               | capture grid, upload form     |
-| Templates   | `app/layouts`                           | layout with header and footer |
-| Pages       | `app/pages`                             | home page, photo page         |
+| Level       | Where                                   | Examples                                    |
+| ----------- | --------------------------------------- | ------------------------------------------- |
+| Foundations | `app/assets/css/tokens.css`, `base.css` | colours, typography, spacing                |
+| Atoms       | `app/components/ui`                     | Button, ActionIcon, Input, LogoMark         |
+| Molecules   | `app/components/ui`                     | Card, EmptyState, Modal, BottomSheet, Toast |
+| Organisms   | `app/features/<feature>/`               | capture grid, upload form                   |
+| Templates   | `app/layouts`                           | layout with header and footer               |
+| Pages       | `app/pages`                             | home page, photo page                       |
 
 Components in `app/components/ui` are pure presentation: they receive props, emit events and never call the API.
