@@ -81,7 +81,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   DoD : la fermeture d'une PR supprime toutes ses ressources, vérifié par l'API.
 
 - [ ] **T-03d Protection des previews et périmètre** (dép. T-03b) — **action humaine** : activer Zero Trust.
-  Cloudflare Access « tous les Workers » avec bypass du seul Worker de production, jeton de service pour la CI, WAF et règle de limitation selon le plan de zone (`08-securite.md` § 2).
+  Cloudflare Access « tous les Workers » avec bypass du seul Worker de production, jeton de service pour la CI. WAF, règle de limitation et Bot Fight Mode (`08-securite.md` § 2) exigent une zone : reportés au branchement du domaine en T-58 (Q24).
   DoD : une preview sans jeton Access est refusée ; la CI y accède avec le jeton de service ; la production reste publique.
 
 - [ ] **T-04a CI : contrôles de PR** (dép. T-03b)
@@ -377,7 +377,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Stories : US-68, US-75. Tests : I, E, ZAP, Lighthouse.
 
 - [ ] **T-58 Recette MVP et bêta fermée** (dép. T-57) — **action humaine** : validation de Q6, Q7, Q8, Q11, Q13 ; registre des traitements et accords de sous-traitance signés (Q11).
-  Exécution de tous les parcours de `11-strategie-de-tests.md` § 5 sur la preview de release, puis **bêta en production** avec `features.inviteOnly` (20 à 30 photographes, ≥ 200 captures ; jamais sur une preview, protégée par Access), correction des retours. **Action humaine avant l'ouverture** : domaine (Q3) branché sur le Worker de production (API Cache de `/img` active), domaine d'envoi Resend (SPF, DKIM, DMARC), Resend Pro et Neon Launch actifs (`05-finops.md`), décision sur le plan Cloudflare Pro.
+  Exécution de tous les parcours de `11-strategie-de-tests.md` § 5 sur la preview de release, puis **bêta en production** avec `features.inviteOnly` (20 à 30 photographes, ≥ 200 captures ; jamais sur une preview, protégée par Access), correction des retours. **Action humaine avant l'ouverture** : domaine (Q3) branché sur le Worker de production (API Cache de `/img` active), WAF, règle de limitation et Bot Fight Mode de la zone (`08-securite.md` § 2, Q24), domaine d'envoi Resend (SPF, DKIM, DMARC), Resend Pro et Neon Launch actifs (`05-finops.md`), décision sur le plan Cloudflare Pro.
 
 **Jalon : ouverture publique (désactivation du mode invitation).**
 

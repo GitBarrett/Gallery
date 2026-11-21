@@ -4,7 +4,8 @@
 //                 NITRO_PRESET=cloudflare_module et NUXT_DEPLOY_ENV=preview.
 //   down <n>      supprime toutes les ressources de la PR n et vérifie par l'API qu'il n'en reste aucune (T-03c).
 //   sweep [n...]  supprime les previews orphelines : toute PR qui a une ressource sans être dans la liste des ouvertes.
-// Variables : CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, NEON_API_KEY, NEON_PROJECT_ID.
+// Variables : CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, NEON_API_KEY, NEON_PROJECT_ID ; pour up, CF_ACCESS_CLIENT_ID
+// et CF_ACCESS_CLIENT_SECRET (jeton de service Access de la CI, T-03d).
 import { execFileSync } from 'node:child_process'
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
 import { previewConfig, previewNumbers } from './preview-config.mjs'
@@ -125,8 +126,13 @@ async function ensureBucket() {
 }
 
 async function waitForHealth() {
+  // Previews derrière Cloudflare Access (T-03d) : jeton de service ; sans lui, Access redirige vers sa page de connexion
+  const headers = {
+    'cf-access-client-id': env('CF_ACCESS_CLIENT_ID'),
+    'cf-access-client-secret': env('CF_ACCESS_CLIENT_SECRET'),
+  }
   for (let attempt = 1; attempt <= 30; attempt++) {
-    const res = await fetch(`${URL_}/api/health`).catch(() => null)
+    const res = await fetch(`${URL_}/api/health`, { headers, redirect: 'manual' }).catch(() => null)
     if (res?.ok) return res.json()
     await sleep(3000) // propagation de workers.dev
   }
