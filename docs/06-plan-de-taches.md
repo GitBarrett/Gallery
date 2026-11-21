@@ -76,7 +76,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Workflow `preview-deploy` repris de `prototypes/t00g-preview` (ADR-013, ADR-016) : Worker `ls-pr-{n}`, Queues et DLQ suffixées, branche Neon `pr-{n}`, configuration Hyperdrive dédiée sans cache, préfixe `pr-{n}/` du bucket `ls-preview` (CORS des previews), secrets publiés avec la version, `noindex`, commentaire de la PR avec l'URL.
   DoD : la preview d'une PR répond sur `/api/health` ; un message de Queue est traité sur la preview ; deux PR en parallèle ne partagent ni Queue ni base ; un PUT navigateur vers une URL présignée du bucket de preview passe le CORS.
 
-- [ ] **T-03c Suppression des previews** (dép. T-03b)
+- [x] **T-03c Suppression des previews** (dép. T-03b)
   Workflow `preview-cleanup` à la fermeture de la PR (consommateurs retirés avant le Worker, T-00g), balayage hebdomadaire des ressources orphelines.
   DoD : la fermeture d'une PR supprime toutes ses ressources, vérifié par l'API.
 
