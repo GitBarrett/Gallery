@@ -17,7 +17,14 @@ export default defineNuxtConfig({
   typescript: { strict: true },
   devtools: { enabled: false },
   // Default language and title (English, i18n ADR); @nuxtjs/i18n will drive them per page in T-07b
-  app: { head: { htmlAttrs: { lang: 'en' }, title: 'Legendary Shots' } },
+  // viewport-fit=cover: the layout pads the notch and the iOS home bar itself with env(safe-area-inset-*)
+  app: {
+    head: {
+      htmlAttrs: { lang: 'en' },
+      title: 'Legendary Shots',
+      viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
+    },
+  },
   // Public values read at startup (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN), empty locally (T-03f)
   runtimeConfig: { public: { sentryDsn: '', cfBeaconToken: '' } },
   // No source map upload (organisation token not needed for the MVP) and no build plugin telemetry
