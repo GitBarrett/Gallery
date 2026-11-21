@@ -88,4 +88,4 @@ jobs:
       # Semgrep CE remplace CodeQL, indisponible sur un dépôt privé d'un compte Free (Q26)
       - name: Static analysis (Semgrep CE)
         if: ${{ !cancelled() }}
-        run: pipx run semgrep==1.183.0 scan --config p/javascript --config p/typescript --error --metrics=off
+        run: pipx run semgrep==1.183.0 scan --config p/default --error --metrics=off
