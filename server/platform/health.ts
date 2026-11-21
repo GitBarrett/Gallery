@@ -18,6 +18,6 @@ export const databaseCheck =
     sql`select 1`
 
 export const r2Check =
-  (bucket: { head(key: string): Promise<unknown> }): Check =>
+  (bucket: { head(key: string): Promise<unknown> }, prefix = ''): Check =>
   () =>
-    bucket.head('health')
+    bucket.head(`${prefix}health`)

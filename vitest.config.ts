@@ -40,8 +40,18 @@ export default defineConfig({
         'app/composables/**',
         'app/services/**',
       ],
-      // Colle Nitro (routes, plugins, gestionnaire d'erreurs) : exécutée dans le serveur des tests d'intégration
-      exclude: ['**/*.test.ts', '**/README.md', 'server/api/**', 'server/plugins/**', 'server/error-handler.ts'],
+      // Colle Nitro (routes, middlewares, plugins, gestionnaire d'erreurs) : exécutée dans le serveur des tests
+      // d'intégration. scripts/preview.mjs : appels d'API et de wrangler, vérifié sur de vraies previews (T-03b).
+      exclude: [
+        '**/*.test.ts',
+        '**/README.md',
+        'server/api/**',
+        'server/middleware/**',
+        'server/routes/**',
+        'server/plugins/**',
+        'server/error-handler.ts',
+        'scripts/preview.mjs',
+      ],
       thresholds: {
         lines: 80,
         branches: 70,

@@ -18,6 +18,7 @@ enabled = true
 NUXT_PUBLIC_SITE_URL = "https://legendary-shots.aleygues.workers.dev"
 NUXT_DEPLOY_ENV = "production"
 NUXT_FAKE_PROVIDERS = "false"
+NUXT_R2_PREFIX = ""
 
 # Bucket privé : originaux et variantes, jamais publics (ADR-004, ADR-012)
 [[r2_buckets]]

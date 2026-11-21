@@ -5,7 +5,7 @@ describe('createContainer', () => {
   it('tags every log line of the request with its correlation id', () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {})
     const { logger } = createContainer({
-      config: { siteUrl: 'http://x', fakeProviders: true, deployEnv: 'local' },
+      config: { siteUrl: 'http://x', fakeProviders: true, deployEnv: 'local', r2Prefix: '' },
       correlationId: 'ray-9',
     })
     logger.info('hello')
