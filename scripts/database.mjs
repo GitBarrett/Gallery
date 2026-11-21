@@ -70,9 +70,12 @@ async function production() {
   // Une seule fois : changer le mot de passe à chaque déploiement couperait les nouvelles connexions un instant
   const config = (await cf('GET', 'hyperdrive/configs')).result.find((c) => c.name === 'ls-prod')
   if (config.origin.user !== APP_ROLE) {
+    const app = await setAppRole(owner)
+    // Vérifiée avant de basculer : le retour arrière du code ne rétablirait pas l'ancienne configuration Hyperdrive
+    await withSql(app, (sql) => sql`select 1 from audit_log limit 1`)
     await cf('PUT', `hyperdrive/configs/${config.id}`, {
       name: config.name,
-      origin: hyperdriveOrigin(await setAppRole(owner)),
+      origin: hyperdriveOrigin(app),
       caching: { disabled: true },
     })
     log(`Hyperdrive ls-prod passe sur le rôle ${APP_ROLE}`)
