@@ -88,7 +88,7 @@ docs/             specs (ce dossier fait foi)
 | docs/04-user-stories.md | Epics, stories et critères d'acceptation (font foi pour le comportement) |
 | docs/05-finops.md | Budget par tranche d'utilisateurs |
 | docs/06-plan-de-taches.md | Plan de tâches ordonné, DoR, DoD (à exécuter) |
-| docs/07-design.md | Design, identité visuelle, responsive, contraste ; maquettes dans `docs/design/` |
+| docs/07-design.md | Design, identité visuelle, responsive, contraste ; maquettes dans `docs/design/` ; composants et playbook dans Storybook (`/storybook/`, ADR-019) |
 | docs/08-securite.md | Sécurité de bout en bout, matrice d'autorisation (fait foi pour la sécurité) |
 | docs/09-questions-ouvertes.md | Points à trancher |
 | docs/10-clean-architecture.md | Couches, règles de dépendance, front et back, contrôles |
