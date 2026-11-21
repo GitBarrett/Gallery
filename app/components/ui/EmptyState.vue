@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Empty state (07-design.md § États vides): never an empty block nor a "0", always a message and, when possible, an
 // action. Texts come from the caller (i18n).
-withDefaults(defineProps<{ title: string; description?: string; headingLevel?: 2 | 3 | 4 }>(), {
+withDefaults(defineProps<{ title: string; description?: string; headingLevel?: 1 | 2 | 3 | 4 }>(), {
   description: undefined,
   headingLevel: 2,
 })

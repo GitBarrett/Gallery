@@ -125,7 +125,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   @nuxtjs/i18n (`/` en, `/fr/` fr), détection, sélecteur, contrôle de complétude des clés.
   Stories : US-62.1–3. Tests : U (complétude), E (US-62.1–3).
 
-- [ ] **T-07c Client API et pages d'erreur** (dép. T-07a, T-02a)
+- [x] **T-07c Client API et pages d'erreur** (dép. T-07a, T-02a)
   Client API typé `app/services/api` et gestion d'erreur commune, pages 404/500 avec identifiant de corrélation.
   Stories : US-69. Tests : E (US-69.1–2).
 

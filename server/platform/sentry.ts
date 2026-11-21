@@ -2,14 +2,14 @@ import { toErrorResponse } from './http-errors'
 
 /**
  * Data sent to Sentry on the server (08-securite.md § 7, no personal data): no user, cookies,
- * bodies, query or local variables; only a few technical request headers.
+ * bodies, query or local variables; only a few technical request headers, cf-ray being the correlation id shown on the 500 page.
  */
 export const dataCollection = {
   userInfo: false,
   cookies: false,
   httpBodies: [],
   urlQueryParams: false,
-  httpHeaders: { request: { allow: ['accept', 'content-type', 'user-agent'] }, response: false },
+  httpHeaders: { request: { allow: ['accept', 'content-type', 'user-agent', 'cf-ray'] }, response: false },
   databaseQueryData: false,
   queues: false,
   stackFrameVariables: false,

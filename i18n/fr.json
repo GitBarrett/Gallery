@@ -18,5 +18,24 @@
     "terms": "Conditions d'utilisation",
     "privacy": "Confidentialité",
     "cookieSettings": "Gestion des cookies"
+  },
+  "errorPage": {
+    "notFoundTitle": "Page introuvable",
+    "notFoundText": "Cette page n'existe pas ou n'est plus disponible. Essayez plutôt une recherche.",
+    "serverTitle": "Une erreur est survenue",
+    "serverText": "L'erreur nous a été signalée. Réessayez dans un instant.",
+    "reference": "Référence de l'erreur",
+    "searchLabel": "Rechercher dans la galerie",
+    "home": "Retour à l'accueil"
+  },
+  "errors": {
+    "VALIDATION_FAILED": "Certains champs ne sont pas valides. Vérifiez-les puis réessayez.",
+    "UNAUTHENTICATED": "Connectez-vous pour continuer.",
+    "FORBIDDEN": "Vous n'avez pas le droit de faire cela.",
+    "NOT_FOUND": "Ce contenu n'existe pas ou n'est plus disponible.",
+    "CONFLICT": "Ce contenu a changé entre-temps. Rechargez puis réessayez.",
+    "PAYLOAD_TOO_LARGE": "Ce fichier est trop lourd.",
+    "RATE_LIMITED": "Trop de tentatives. Patientez un instant puis réessayez.",
+    "INTERNAL": "Une erreur est survenue. Réessayez."
   }
 }

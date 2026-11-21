@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { ERROR_CODES } from '../shared/contracts/errors'
 
 // US-62.3: a key missing in en.json or fr.json fails the build (pnpm check runs this test in CI).
 type Messages = { [key: string]: string | Messages }
@@ -35,5 +36,9 @@ describe('i18n', () => {
     const used = usedKeys()
     expect(used.length).toBeGreaterThan(0)
     expect(used.filter((key) => !en.includes(key) || !fr.includes(key))).toEqual([])
+  })
+
+  it('US-69.3 every API error code has a message (errors.<CODE>, computed key)', () => {
+    expect(ERROR_CODES.map((code) => `errors.${code}`).filter((key) => !en.includes(key))).toEqual([])
   })
 })
