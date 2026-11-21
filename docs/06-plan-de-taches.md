@@ -68,7 +68,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Queues et DLQ de `03-architecture.md` § Files, Cron Triggers du MVP (horaire et quotidien ; `*/5` et hebdomadaire avec leurs tâches v1.x), aiguillage des hooks Nitro `cloudflare:queue` et `cloudflare:scheduled` vers les consommateurs par nom de file (acquittement message par message, T-00f), consommateur et cron de test.
   DoD : un message et un cron de test traités en production.
 
-- [ ] **T-03f Sentry et Web Analytics** (dép. T-03a) — **action humaine** : compte et projet Sentry (DSN), jeton du beacon Web Analytics.
+- [x] **T-03f Sentry et Web Analytics** (dép. T-03a) — **action humaine** : compte et projet Sentry (DSN), jeton du beacon Web Analytics.
   Sentry serveur (intégration Workers) et client (`dataCollection` restrictif, ex-`sendDefaultPii: false` ; rapport des violations CSP), beacon Web Analytics ajouté par Nuxt avec nonce (injection automatique désactivée dans le tableau de bord).
   DoD : une erreur de test reçue dans Sentry, sans donnée personnelle ; le beacon se charge sans violation CSP.
 
