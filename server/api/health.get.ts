@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   try {
     const health = await runHealthChecks({
       ...(sql && { database: databaseCheck(sql) }),
-      ...(env.R2 && { r2: r2Check(env.R2) }),
+      ...(env.R2 && { r2: r2Check(env.R2, event.context.container.config.r2Prefix) }),
     })
     if (health.status === 'fail') setResponseStatus(event, 503)
     return health

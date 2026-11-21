@@ -25,4 +25,14 @@ describe('platform API', () => {
     expect(response.status).toBe(404)
     expect(response.headers.get('content-type')).toContain('text/html')
   })
+
+  it('has no test route outside preview builds', async () => {
+    expect(
+      (await fetch('/__test/queue-ping', { method: 'POST', headers: { origin: 'http://localhost:3000' } })).status,
+    ).toBe(404)
+  })
+
+  it('lets search engines index outside previews', async () => {
+    expect((await fetch('/', { headers: { accept: 'text/html' } })).headers.get('x-robots-tag')).toBeNull()
+  })
 })

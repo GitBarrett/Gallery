@@ -6,6 +6,8 @@ export default defineNuxtConfig({
   modules: ['@nuxt/eslint', 'nuxt-security'],
   typescript: { strict: true },
   devtools: { enabled: false },
+  // Routes /__test (réinitialisation, boîte mail factice, file…) : uniquement dans les builds de preview (ADR-013)
+  nitro: { ignore: process.env.NUXT_DEPLOY_ENV === 'preview' ? [] : ['routes/__test/**'] },
   // En-têtes de sécurité de 08-securite.md § 5
   security: {
     nonce: true,

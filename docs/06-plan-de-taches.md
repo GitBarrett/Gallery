@@ -72,7 +72,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Sentry serveur (intégration Workers) et client (`sendDefaultPii: false`, rapport des violations CSP), beacon Web Analytics ajouté par Nuxt avec nonce (injection automatique désactivée dans le tableau de bord).
   DoD : une erreur de test reçue dans Sentry, sans donnée personnelle ; le beacon se charge sans violation CSP.
 
-- [ ] **T-03b Création des previews** (dép. T-03e)
+- [ ] **T-03b Création des previews** (dép. T-03e) — **action humaine** : secret `NEON_API_KEY` et droits Queues, Hyperdrive et R2 du jeton de la CI.
   Workflow `preview-deploy` repris de `prototypes/t00g-preview` (ADR-013, ADR-016) : Worker `ls-pr-{n}`, Queues et DLQ suffixées, branche Neon `pr-{n}`, configuration Hyperdrive dédiée sans cache, préfixe `pr-{n}/` du bucket `ls-preview` (CORS des previews), secrets publiés avec la version, `noindex`, commentaire de la PR avec l'URL.
   DoD : la preview d'une PR répond sur `/api/health` ; un message de Queue est traité sur la preview ; deux PR en parallèle ne partagent ni Queue ni base ; un PUT navigateur vers une URL présignée du bucket de preview passe le CORS.
 

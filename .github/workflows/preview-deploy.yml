@@ -1,0 +1,45 @@
+# Une preview complète par PR (T-03b, ADR-013, ADR-016) : Worker ls-pr-{n}, files, branche Neon, Hyperdrive, préfixe R2.
+name: preview-deploy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build for the preview (test routes included)
+        run: pnpm build
+        env:
+          NITRO_PRESET: cloudflare_module
+          NUXT_DEPLOY_ENV: preview
+      - name: Create or update the preview
+        id: preview
+        run: node scripts/preview.mjs up ${{ github.event.pull_request.number }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: calm-mode-49605156
+      - name: Comment the preview URL
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last --create-if-none \
+            --body "Preview : ${{ steps.preview.outputs.url }}"
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -37,7 +37,7 @@ describe('checks', () => {
 
   it('R2 check reads object metadata without downloading anything', async () => {
     const keys: string[] = []
-    await r2Check({ head: async (key) => keys.push(key) })()
-    expect(keys).toEqual(['health'])
+    await r2Check({ head: async (key) => keys.push(key) }, 'pr-7/')()
+    expect(keys).toEqual(['pr-7/health'])
   })
 })

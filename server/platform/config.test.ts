@@ -9,6 +9,7 @@ describe('loadConfig', () => {
       siteUrl: 'https://legendaryshots.example',
       fakeProviders: false,
       deployEnv: 'local',
+      r2Prefix: '',
     })
   })
 
@@ -29,5 +30,10 @@ describe('loadConfig', () => {
       /NUXT_FAKE_PROVIDERS/,
     )
     expect(loadConfig({ ...valid, NUXT_DEPLOY_ENV: 'preview', NUXT_FAKE_PROVIDERS: 'true' }).fakeProviders).toBe(true)
+  })
+
+  it('accepts only an empty R2 prefix or the pr-{n}/ prefix of a preview', () => {
+    expect(loadConfig({ ...valid, NUXT_R2_PREFIX: 'pr-42/' }).r2Prefix).toBe('pr-42/')
+    expect(() => loadConfig({ ...valid, NUXT_R2_PREFIX: '../originals/' })).toThrow(/NUXT_R2_PREFIX/)
   })
 })
