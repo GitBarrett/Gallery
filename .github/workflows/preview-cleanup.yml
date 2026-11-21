@@ -1,0 +1,42 @@
+# Suppression des previews (T-03c, ADR-013) : à la fermeture de la PR, et balayage hebdomadaire des orphelines.
+name: preview-cleanup
+
+on:
+  pull_request:
+    types: [closed]
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+# Même groupe que preview-deploy : la fermeture annule un déploiement en cours de la même PR
+concurrency:
+  group: preview-${{ github.event.pull_request.number || 'sweep' }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      NEON_PROJECT_ID: calm-mode-49605156
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Delete the preview of the closed pull request
+        if: github.event_name == 'pull_request'
+        run: node scripts/preview.mjs down ${{ github.event.pull_request.number }}
+      - name: Delete the previews of pull requests that are no longer open
+        if: github.event_name != 'pull_request'
+        run: |
+          open=$(gh pr list --state open --limit 1000 --json number --jq '.[].number')
+          node scripts/preview.mjs sweep $open
+        env:
+          GH_TOKEN: ${{ github.token }}
