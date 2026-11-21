@@ -12,7 +12,7 @@
    - migrations rétrocompatibles (expand → migrate → contract) et seed mis à jour ;
    - textes en i18n EN et FR ; écrans conformes aux maquettes `docs/design/` en desktop et à 360 px — pour un écran sans maquette (réglages, back-office, cookies, 404/500), composer uniquement avec le design system et joindre à la PR des captures desktop et mobile pour validation ;
    - accessibilité : navigation clavier et axe-core sans violation sérieuse sur les écrans touchés (US-75) ;
-   - tout composant ajouté ou modifié dans `app/components/ui` a sa story Storybook à jour, tous ses états compris (ADR-019) ;
+   - tout composant ajouté ou modifié dans `app/components/ui` a sa story Storybook à jour, tous ses états compris, et sa section du playbook (ADR-019) ;
    - preview déployée, E2E et Lighthouse verts ;
    - si la tâche ajoute des données personnelles : cascade de suppression (US-09) et rétention mises à jour ;
    - tâche cochée ici, écarts et décisions résumés dans la PR, ADR si nouvelle décision d'architecture.
@@ -106,15 +106,15 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Tests : I (compteur exact sur une fenêtre d'une heure), contrat `RateLimiter`.
 
 - [ ] **T-06a Design system : fondations** (dép. T-01a)
-  CSS natif selon ADR-014 : `tokens.css` (tokens de `07-design.md`), `base.css`, polices auto-hébergées via `@nuxt/fonts`, Stylelint (valeurs en dur interdites hors tokens) ; composants Button, Input, Card, EmptyState, LogoMark. Storybook (ADR-019) : `@nuxtjs/storybook`, addon a11y, page « Fondations » (tokens), une story par composant, build en CI, publication sur les previews sous `/storybook/` et absence en production.
-  Tests : composants (rendu, axe), Stylelint qui échoue sur une couleur en dur d'exemple, build Storybook en CI, `/storybook/` absent de l'artefact de production.
+  CSS natif selon ADR-014 : `tokens.css` (tokens de `07-design.md`), `base.css`, polices auto-hébergées via `@nuxt/fonts`, Stylelint (valeurs en dur interdites hors tokens) ; composants Button, Input, Card, EmptyState, LogoMark. Storybook (ADR-019) : `@nuxtjs/storybook`, addon a11y, page « Fondations » (tokens), une story par composant, build en CI, publication sous `/storybook/` en production (publique, `noindex`) et sur les previews ; **playbook** en pages MDX (introduction et principes, fondations, accessibilité, rédaction, contribuer) et section d'usage de chaque composant.
+  Tests : composants (rendu, axe), Stylelint qui échoue sur une couleur en dur d'exemple, build Storybook en CI, `/storybook/` servi en production avec `noindex`.
 
 - [ ] **T-06b Design system : superpositions** (dép. T-06a)
-  Modal, BottomSheet, Toast, ActionIcon (gestion du focus, Échap, mouvement réduit), avec leurs stories (ADR-019).
+  Modal, BottomSheet, Toast, ActionIcon (gestion du focus, Échap, mouvement réduit), avec leurs stories et leur section du playbook (ADR-019).
   Tests : composants (clavier, focus piégé et rendu, axe).
 
 - [ ] **T-06c Design system : identité WoW** (dép. T-06a)
-  `shared/domain/quality.ts` (`qualityFromLikes(likes, thresholds)`, seuils en paramètre), QualityBadge, ItemTooltip, QuestMarker, ImageScrim, WowImage (prop `src`, sans route `/img`), avec leurs stories (ADR-019 : un badge par palier de qualité, scrim sur fonds clair et sombre).
+  `shared/domain/quality.ts` (`qualityFromLikes(likes, thresholds)`, seuils en paramètre), QualityBadge, ItemTooltip, QuestMarker, ImageScrim, WowImage (prop `src`, sans route `/img`), avec leurs stories et leur section du playbook (ADR-019 : un badge par palier de qualité, scrim sur fonds clair et sombre).
   Tests : U (qualité), composants (contraste d'ImageScrim avec fixtures blanche et noire, axe).
 
 - [ ] **T-07a Mise en page** (dép. T-06b)
