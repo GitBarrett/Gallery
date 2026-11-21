@@ -1,0 +1,102 @@
+/*
+ * Tokens du design system (ADR-014, 07-design.md, direction A « Nuit d'Azeroth ») : seul fichier qui contient des
+ * valeurs. Les composants n'emploient que var(--…), contrôlé par Stylelint. Thème sombre uniquement.
+ * Points de rupture (les variables CSS ne s'emploient pas dans @media) : sm 480px · md 768px · lg 1024px · xl 1280px,
+ * en min-width uniquement (mobile d'abord).
+ */
+:root {
+  /* Couleurs de fond et de surface */
+  --color-bg: #0b0e14;
+  --color-surface: #10141d;
+  --color-surface-raised: #151a25;
+  --color-surface-hover: #161c29;
+  --color-border-subtle: #232a38;
+  --color-border: #2a3244;
+
+  /* Texte (contrastes AA vérifiés par tests/design-tokens.test.ts) */
+  --color-text: #e6e9f0;
+  --color-text-soft: #c3cad8;
+  --color-text-muted: #a9b1c2;
+  --color-text-faint: #8c95a8;
+  --color-white: #fff;
+
+  /* Accents */
+  --color-accent: #e8b54a;
+  --color-on-accent: #14100a;
+  --color-arcane: #4fa3ff;
+
+  /* États (absents des maquettes, Q30) */
+  --color-danger: #ff7a7a;
+  --color-success: #5fd88a;
+
+  /* Qualité des captures selon les likes (07-design.md § Codes visuels WoW) */
+  --quality-poor: #9d9d9d;
+  --quality-uncommon: #1eff00;
+  --quality-rare: #3d9bff;
+  --quality-epic: #c77dff;
+  --quality-legendary: #ff8000;
+
+  /* Logotype */
+  --color-logo-legendary: #ff8c1a;
+  --shadow-logo: 0 2px 0 #2a1200, 0 0 18px rgb(255 128 0 / 35%);
+
+  /* Typographie : polices auto-hébergées par @nuxt/fonts */
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-display: 'Cinzel', serif;
+  --font-logo: 'Cinzel Decorative', 'Cinzel', serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-md: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.25rem;
+  --text-3xl: 1.5rem;
+  --text-4xl: 2.125rem;
+  --text-5xl: 2.5rem;
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --tracking-display: 0.04em;
+  --tracking-wide: 0.14em;
+
+  /* Espacements (multiples de 2 px) */
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Formes et contrôles : cibles tactiles de 44 px au moins (US-67.5) */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --control-sm: 36px;
+  --control-md: 44px;
+  --control-lg: 48px;
+  --control-xl: 52px;
+  --content-max: 1280px;
+
+  /* Focus visible (US-75) et ombres */
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent);
+  --shadow-raised: 0 8px 24px rgb(0 0 0 / 45%);
+
+  /* Mouvement : neutralisé par prefers-reduced-motion dans base.css */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Empilement */
+  --z-header: 100;
+  --z-overlay: 1000;
+  --z-modal: 1100;
+  --z-toast: 1200;
+}
