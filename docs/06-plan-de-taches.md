@@ -105,7 +105,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Port `RateLimiter` : bindings Workers Rate Limiting déclarés dans `wrangler.toml` (déplacés de T-03e, 20/11/2026) et leur adaptateur (fenêtres courtes) et compteurs en base (fenêtres longues, `08-securite.md` § 8), purge horaire des fenêtres échues.
   Tests : I (compteur exact sur une fenêtre d'une heure), contrat `RateLimiter`.
 
-- [ ] **T-06a Design system : fondations** (dép. T-01a)
+- [x] **T-06a Design system : fondations** (dép. T-01a)
   CSS natif selon ADR-014 : `tokens.css` (tokens de `07-design.md`), `base.css`, polices auto-hébergées via `@nuxt/fonts`, Stylelint (valeurs en dur interdites hors tokens) ; composants Button, Input, Card, EmptyState, LogoMark. Storybook (ADR-019) : `@nuxtjs/storybook`, addon a11y, page « Fondations » (tokens), une story par composant, build en CI, publication sous `/storybook/` en production (publique, `noindex`) et sur les previews ; **playbook** en pages MDX (introduction et principes, fondations, accessibilité, rédaction, contribuer) et section d'usage de chaque composant.
   Tests : composants (rendu, axe), Stylelint qui échoue sur une couleur en dur d'exemple, build Storybook en CI, `/storybook/` servi en production avec `noindex`.
 
@@ -113,7 +113,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Modal, BottomSheet, Toast, ActionIcon (gestion du focus, Échap, mouvement réduit), avec leurs stories et leur section du playbook (ADR-019).
   Tests : composants (clavier, focus piégé et rendu, axe).
 
-- [ ] **T-06c Design system : identité WoW** (dép. T-06a)
+- [x] **T-06c Design system : identité WoW** (dép. T-06a)
   `shared/domain/quality.ts` (`qualityFromLikes(likes, thresholds)`, seuils en paramètre), QualityBadge, ItemTooltip, QuestMarker, ImageScrim, WowImage (prop `src`, sans route `/img`), avec leurs stories et leur section du playbook (ADR-019 : un badge par palier de qualité, scrim sur fonds clair et sombre).
   Tests : U (qualité), composants (contraste d'ImageScrim avec fixtures blanche et noire, axe).
 
