@@ -229,7 +229,7 @@ Tous les consommateurs sont **idempotents** (`processed_messages` + opérations 
 | `IMAGES` | binding | transformations d'images |
 | `CF_API_TOKEN_PURGE`, `CF_ZONE_ID` | secret (permission « Cache Purge » sur la zone uniquement) | purge des `/img/*` d'une capture masquée ou supprimée |
 | `PHOTO_PROCESS_QUEUE`, `NOTIFICATIONS_QUEUE`, `EMAILS_QUEUE`, `FEEDBACK_QUEUE`, `ACCOUNT_PURGE_QUEUE` | bindings | Queues |
-| `RATE_LIMITER_*` | bindings Workers Rate Limiting | limites courtes (fenêtre de 10 ou 60 s, comptées **par emplacement Cloudflare**, donc approximatives) ; les fenêtres longues et les limites strictes passent par `rate_limit_counters` |
+| `RATE_LIMITER_*` | bindings Workers Rate Limiting | limites courtes (fenêtre de 10 ou 60 s, comptées **par emplacement Cloudflare**, donc approximatives) ; les fenêtres longues et les limites strictes passent par `rate_limit_counters`. T-05c : `RATE_LIMITER_MUTATIONS` (120 mutations `/api` / 60 s / IP, espace 1001 en production, 1002 pour les previews). Mesuré sur une preview : exact au sein d'une requête, mais entre requêtes les compteurs se synchronisent avec retard (1 210 sur 1 500 mutations parallèles acceptées en 26 s) : il coupe les rafales massives, jamais une limite fine |
 | `NUXT_OAUTH_GOOGLE_CLIENT_ID/SECRET`, `NUXT_OAUTH_BATTLEDOTNET_CLIENT_ID/SECRET` | secrets | OAuth |
 | `TURNSTILE_SECRET_KEY` / `NUXT_PUBLIC_TURNSTILE_SITE_KEY` | secret / public | anti-bot |
 | `SIGHTENGINE_API_USER/SECRET` | secrets | modération |

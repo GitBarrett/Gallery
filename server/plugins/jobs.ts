@@ -1,5 +1,6 @@
 import { createDb } from '../db/client'
 import { outboxRelay, type QueueProducers } from '../db/outbox'
+import { purgeRateLimitCounters } from '../db/rate-limiter'
 import type { Bindings } from '../platform/bindings'
 import { systemClock } from '../platform/clock'
 import {
@@ -24,26 +25,28 @@ const queuesOf = (env: Bindings): QueueProducers => ({
 })
 
 /** Exécute un traitement avec la base (Hyperdrive), puis ferme la connexion : chaque cron ouvre la sienne. */
-const withRelay =
-  (env: Bindings, run: (relay: ReturnType<typeof outboxRelay>) => Promise<unknown>): CronHandler =>
+const withDb =
+  (env: Bindings, run: (db: ReturnType<typeof createDb>) => Promise<unknown>): CronHandler =>
   async () => {
     if (!env.HYPERDRIVE) return
     const db = createDb(env.HYPERDRIVE.connectionString)
     try {
-      return await run(outboxRelay(db, queuesOf(env), systemClock))
+      return await run(db)
     } finally {
       await db.$client.end()
     }
   }
+const relayOf = (env: Bindings, db: ReturnType<typeof createDb>) => outboxRelay(db, queuesOf(env), systemClock)
 
 const crons = (env: Bindings): Record<string, CronHandler[]> => ({
   '0 * * * *': [
     ...(env.NOTIFICATIONS_QUEUE ? [heartbeatCron(env.NOTIFICATIONS_QUEUE, systemClock)] : []),
     // Relais des événements que la file a refusés après le commit (T-05b)
     // shortcut: jusqu'à 1 h de retard et 100 événements par passage, passer à */5 avec le cron des concours (T-64a)
-    withRelay(env, (relay) => relay.publish()),
+    withDb(env, (db) => relayOf(env, db).publish()),
+    withDb(env, (db) => purgeRateLimitCounters(db, systemClock)), // fenêtres échues (T-05c)
   ],
-  '15 3 * * *': [withRelay(env, (relay) => relay.purge())],
+  '15 3 * * *': [withDb(env, (db) => relayOf(env, db).purge())],
 })
 
 // Hooks Nitro validés par T-00f ; l'acquittement se fait message par message dans dispatchBatch.

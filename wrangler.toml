@@ -36,6 +36,13 @@ id = "232936a763ef4fcf8d7b25b9bad0e3cb"
 [images]
 binding = "IMAGES"
 
+# Rafales (T-05c) : mutations /api par IP, en attendant les règles de zone (08-securite.md § 2, Q24) ; fenêtre de 10
+# ou 60 s comptée par emplacement Cloudflare, donc approximative. Les previews ont leur propre espace (1002).
+[[ratelimits]]
+name = "RATE_LIMITER_MUTATIONS"
+namespace_id = "1001"
+simple = { limit = 120, period = 60 }
+
 # Files de 03-architecture.md § Files d'attente ; chaque file a sa DLQ. Les previews suffixent les noms par -pr-{n}.
 [[queues.producers]]
 binding = "PHOTO_PROCESS_QUEUE"
