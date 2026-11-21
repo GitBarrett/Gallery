@@ -78,7 +78,7 @@ export const likePhoto = (deps: { photos: PhotoReadPort; likes: LikeRepository; 
 ## 6. Front (Nuxt / Vue)
 - **Pages** : récupèrent les paramètres de route, appellent un composable de feature, composent des composants. Pas d'appel `$fetch` direct, pas de règle métier.
 - **Features** (`app/features/*`) : composables d'application (`useUploadCapture`, `useGalleryFeed`, `useLike`) qui orchestrent le client API, l'état et les règles partagées (`shared/domain`), et composants spécifiques à la feature.
-- **Composants UI** (`app/components/ui`) : présentation pure, entrées par props, sorties par événements, aucun appel réseau ni accès au store ; documentés et testés isolément.
+- **Composants UI** (`app/components/ui`) : présentation pure, entrées par props, sorties par événements, aucun appel réseau ni accès au store ; documentés et testés isolément : une story Storybook par composant (ADR-019) et des tests de composants Vitest.
 - **Styles** (ADR-014) : valeurs uniquement dans `app/assets/css/tokens.css` ; composants en `<style scoped>` avec `var(--…)` ; pas de style inline statique ; les pages ne stylent que la mise en page (grille, espacements entre blocs).
 - **Client API** (`app/services/api`) : fonctions typées générées à partir de `shared/contracts` ; gère le format d'erreur commun, l'identifiant de corrélation, les retries idempotents ; seul point de contact avec `/api`.
 - **État** : `useState`/`useAsyncData` de Nuxt ; Pinia uniquement si un état global non dérivable apparaît (ADR requis).
