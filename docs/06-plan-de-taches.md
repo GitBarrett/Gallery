@@ -133,7 +133,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Module `settings` : lecture typée de `site_settings` (seuils de qualité, de modération, d'affichage, hero, editor's pick, flags), cache 60 s, valeurs par défaut de lancement (seuils 3/15/50/150, `moderation.reportsToHide` = 3, `features.inviteOnly` = true jusqu'à l'ouverture), exposition publique en lecture des valeurs non sensibles (`GET /api/settings/public`).
   Stories : US-56 (lecture), US-71.5. Tests : U (validation des réglages US-56.2), I.
 
-- [ ] **T-09a PWA : manifest et service worker** (dép. T-07b)
+- [x] **T-09a PWA : manifest et service worker** (dép. T-07b)
   @vite-pwa/nuxt `injectManifest` (ADR-008), manifest et icônes depuis `Logo.dc.html` (raccourcis MVP Upload, Search, Notifications ; pas de `share_target` avant T-66), stratégies de `03-architecture.md` § PWA (sans `/img`, ajouté en T-25b), page `/offline`.
   Stories : US-63.1, US-64.2–3. Tests : E (Chromium avec service worker ; installabilité vérifiée par ce test E2E, Lighthouse ne la mesurant plus, Q27).
 

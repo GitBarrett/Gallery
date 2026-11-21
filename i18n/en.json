@@ -37,5 +37,11 @@
     "PAYLOAD_TOO_LARGE": "This file is too large.",
     "RATE_LIMITED": "Too many attempts. Wait a moment and try again.",
     "INTERNAL": "Something went wrong. Please try again."
+  },
+  "offline": {
+    "title": "You're offline",
+    "text": "This page is not available offline. Pages you visited recently:",
+    "none": "No page saved yet.",
+    "banner": "You're offline"
   }
 }

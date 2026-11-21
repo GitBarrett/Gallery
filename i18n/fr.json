@@ -37,5 +37,11 @@
     "PAYLOAD_TOO_LARGE": "Ce fichier est trop lourd.",
     "RATE_LIMITED": "Trop de tentatives. Patientez un instant puis réessayez.",
     "INTERNAL": "Une erreur est survenue. Réessayez."
+  },
+  "offline": {
+    "title": "Vous êtes hors ligne",
+    "text": "Cette page n'est pas disponible hors ligne. Pages consultées récemment :",
+    "none": "Aucune page enregistrée pour le moment.",
+    "banner": "Vous êtes hors ligne"
   }
 }
