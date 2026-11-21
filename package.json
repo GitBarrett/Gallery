@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@sentry/nuxt": "^11.11.0",
+    "lodash": "4.17.20",
     "nuxt": "^4.6.4",
     "nuxt-security": "^2.7.0",
     "postgres": "^4.1.1",

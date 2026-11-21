@@ -154,7 +154,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Module `identity` (domain, application, infrastructure) : tables `users`, `sessions`, `email_tokens` ; règles de pseudo et de mot de passe ; hachage Argon2id `@noble/hashes` au format PHC (ADR-015) ; vérification HIBP ; port `Mailer` (Resend + fake).
   Tests : U (règles, hachage et vérification), I (contrat `Mailer`).
 
-- [ ] **T-11b Inscription et vérification d'email : API** (dép. T-11a, T-05c, T-10b)
+- [x] **T-11b Inscription et vérification d'email : API** (dép. T-11a, T-05c, T-10b)
   `POST /api/auth/signup`, `verify-email`, `resend-verification` : Turnstile, âge 15 ans et Terms (version acceptée enregistrée), limites de débit, politique « email vérifié requis ».
   Stories : US-01 (API), US-08. Tests : U, I (US-01.1–7, US-08.1–2).
 
