@@ -36,6 +36,27 @@
   --quality-epic: #c77dff;
   --quality-legendary: #ff8000;
 
+  /* Text on image (07-design.md § Texte sur image): a veil of --color-bg, strong on the text side, faint on the
+     image side; max level for bright photos (luma > 0.6). Contrast checked by ImageScrim.test.ts. */
+  --color-veil: rgb(11 14 20 / 88%);
+  --color-veil-max: rgb(11 14 20 / 95%);
+  --color-veil-faint: rgb(11 14 20 / 15%);
+
+  /* Item-style tooltip (Identite mockup) */
+  --color-tooltip-bg: rgb(6 10 32 / 96%);
+  --color-tooltip-border: #9aa3b5;
+  --color-tooltip-caption: #ffd100;
+  --shadow-tooltip: 0 0 0 1px #000, 0 8px 24px rgb(0 0 0 / 60%);
+
+  /* Quest markers: yellow (to do) and white (read or done) gradients, soft halo */
+  --marker-yellow-top: #fff27a;
+  --marker-yellow-mid: #ffd100;
+  --marker-yellow-low: #ff9a00;
+  --marker-yellow-bottom: #ff7a00;
+  --marker-white-top: #fff;
+  --marker-white-mid: #e6eaf0;
+  --marker-white-bottom: #aeb6c2;
+
   /* Logotype */
   --color-logo-legendary: #ff8c1a;
   --shadow-logo: 0 2px 0 #2a1200, 0 0 18px rgb(255 128 0 / 35%);
