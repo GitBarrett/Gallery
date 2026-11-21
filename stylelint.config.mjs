@@ -6,6 +6,8 @@ export default {
   ignoreFiles: ['app/assets/css/tokens.css', '.output/**', '.nuxt/**', 'node_modules/**', 'coverage/**'],
   overrides: [{ files: ['**/*.vue'], customSyntax: 'postcss-html' }],
   rules: {
+    // Vue scoped-style selectors
+    'selector-pseudo-class-no-unknown': [true, { ignorePseudoClasses: ['deep', 'slotted', 'global'] }],
     'scale-unlimited/declaration-strict-value': [
       [
         '/color$/',

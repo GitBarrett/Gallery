@@ -58,6 +58,11 @@ textarea {
   box-shadow: var(--focus-ring);
 }
 
+/* An open modal (Modal, BottomSheet) stops the page behind it from scrolling */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
 /* Label for screen readers only */
 .visually-hidden {
   position: absolute;
