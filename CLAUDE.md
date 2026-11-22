@@ -14,7 +14,7 @@ Site communautaire de galeries de captures d'écran World of Warcraft (focus WoW
 8. Phase **T-00 (prototypes)** avant T-02 : scripts jetables dans `prototypes/`, aucun code applicatif, résultats consignés en ADR.
 9. Tâche marquée **action humaine** : préparer tout ce qui est possible, documenter les étapes pour Adrien dans la PR, et s'arrêter.
 10. Code non structurel : solution la plus simple qui marche (pas d'abstraction, de wrapper ni de dépendance pour quelques lignes ; supprimer plutôt qu'ajouter). Ne déroge jamais aux règles 3 à 9, à l'architecture ni au découpage en tâches. Un raccourci connu porte un commentaire `shortcut: <limite>, <quand monter en charge>`.
-11. Maquettes `docs/design/*.dc.html` = référence visuelle uniquement : ne jamais copier leur HTML ni leurs styles en ligne. Reconstruire avec les composants `app/components/ui` et les tokens CSS (ADR-014).
+11. Maquettes `docs/design/*.dc.html` = référence visuelle uniquement : ne jamais copier leur HTML ni leurs styles en ligne. Reconstruire avec les composants `app/components/ui` et les tokens CSS (ADR-014). Elles viennent du canevas « Legendary Shots – Design » (artifact Claude Design, fichiers `project/*.dc.html`) : au début de chaque tâche front, les relire depuis l'artifact, comparer aux copies du dépôt et committer celles qui ont changé (`docs: …`) avant de coder.
 
 ## Stack (non négociable sans ADR)
 
