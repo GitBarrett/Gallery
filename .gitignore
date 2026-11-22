@@ -14,3 +14,6 @@ playwright-report/
 wrangler.preview.toml
 storybook-static/
 Cloudflare proto.txt
+
+# UX Pilot exports, kept locally only
+legendary-shots-uxpilot/
