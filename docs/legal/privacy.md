@@ -10,6 +10,8 @@ Controller: [PUBLISHER NAME], [ADDRESS] — privacy contact: [PRIVACY EMAIL].
 |---|---|---|---|
 | Email, username, password hash, sign-in provider ID (Battle.net, Google) | Create and secure your account | Contract | Life of the account + 30 days |
 | Captures, titles, captions, tags, comments, likes, follows, collections | Run the gallery | Contract | Until you delete them or your account |
+| Links to your social networks (optional, public on your profile) | Show them on your profile | Contract | Until you remove them or delete your account |
+| Secret quest progress and badges, Hall of Seekers entry (optional, you can leave it) | Run the secret quests | Contract | Until you delete your account |
 | Download log (which capture you downloaded, per day) | Count each download once | Legitimate interest | 30 days |
 | Moderation scores and decisions, reports, sanctions | Keep the community safe, meet legal duties | Legitimate interest; legal obligation (DSA) | 1 year after the decision, longer if a dispute is ongoing; pseudonymised if you delete your account |
 | Keyed fingerprint (HMAC) of the email and sign-in IDs of a **banned** account | Prevent banned users from signing up again | Legitimate interest | 1 year |

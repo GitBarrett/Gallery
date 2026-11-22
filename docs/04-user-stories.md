@@ -11,7 +11,7 @@
 
 | Epic | Objectif | Stories | Priorité |
 |---|---|---|---|
-| E-AUTH Comptes | S'inscrire, se connecter, gérer son compte, partir | US-01 à US-09 | MVP (US-06 v1.x) |
+| E-AUTH Comptes | S'inscrire, se connecter, gérer son compte, partir | US-01 à US-09, US-82 | MVP (US-06 v1.x) |
 | E-UPLOAD Publication | Publier une capture propre et sûre | US-10 à US-14 | MVP |
 | E-DISCOVER Découverte | Parcourir, chercher, voir, télécharger, partager | US-20 à US-25 | MVP (US-22 v1.x) |
 | E-SOCIAL Communauté | Liker, commenter, suivre, collectionner, être notifié | US-30 à US-36 | MVP (US-33, US-34, US-36 v1.x) |
@@ -20,6 +20,7 @@
 | E-PLATFORM Transverse | Langues, PWA, mobile, accessibilité, consentement, erreurs, légal | US-60 à US-69, US-72 à US-75 | MVP (US-66, US-73 v1.x) |
 | E-QUALITY Qualité et démarrage | Rendre le système de qualité lisible, éviter les pages vides | US-70, US-71 | MVP |
 | E-SUPPORT Soutien du site | Dons ponctuels de 2 € minimum, badge Supporter, historique | US-76 à US-78 | v1.1 |
+| E-SECRETS Secrets et easter eggs | Surprises cachées et quête à indices, purement cosmétiques | US-79 à US-81 | MVP (US-79), v1.x (US-80, US-81) |
 
 ---
 
@@ -86,6 +87,15 @@ En tant que membre, je veux gérer mes informations dans `/settings`.
 - US-07.4 Given mes comptes liés (Google, Battle.net), When j'en délie un, Then c'est refusé s'il ne me resterait aucun moyen de connexion.
 - US-07.5 Given mes préférences de notification (US-35), When je les modifie, Then elles s'appliquent aux prochaines notifications.
 - Tests : U, I, E.
+
+### US-82 [MVP] Réseaux sociaux du profil
+- US-82.1 Given `/settings`, When je renseigne un ou plusieurs réseaux parmi une liste fixe (Twitch, YouTube, X, Bluesky, Instagram, TikTok, Reddit, Discord, site web), Then seul l'**identifiant** est saisi et enregistré (ex. `luneblade` pour Twitch), jamais une URL libre, sauf pour le site web.
+- US-82.2 Given un identifiant saisi, When je l'enregistre, Then il est validé par le format propre au réseau (ex. Twitch `^[a-zA-Z0-9_]{4,25}$`, YouTube `^@[A-Za-z0-9._-]{3,30}$`, Bluesky nom de domaine) et par le filtre d'insultes ; sinon une erreur précise s'affiche.
+- US-82.3 Given le site web, When je le saisis, Then seule une URL `https://` est acceptée (pas d'IP, pas de raccourcisseur de liens connu, ≤ 200 caractères) et le profil en affiche le **domaine** seul.
+- US-82.4 Given un profil public avec des réseaux, When un visiteur l'ouvre, Then chaque réseau s'affiche avec une icône maison et un lien construit par le serveur à partir d'un gabarit fixe (ex. `https://twitch.tv/{id}`), avec `rel="nofollow ugc noopener noreferrer"` et `target="_blank"` ; Discord n'a pas de lien : un bouton copie l'identifiant.
+- US-82.5 Given un compte sanctionné (suspendu ou banni) ou créé il y a moins de 7 jours, When son profil s'affiche, Then les liens ne sont pas affichés (anti-spam), les identifiants restent dans les réglages.
+- US-82.6 Given un lien signalé par un visiteur (signalement de profil, US-50), When un modérateur le juge abusif, Then il peut l'effacer ; l'action est auditée et notifiée avec son motif.
+- Tests : U (validation par réseau, construction des URL), I (stockage, masquage US-82.5), E (saisie puis affichage).
 
 ### US-08 [MVP] Vérification d'email avant publication
 - US-08.1 Given un membre non vérifié, When il ouvre `/upload`, commente ou participe à un concours, Then l'action est bloquée avec un bandeau « Verify your email » et un bouton de renvoi.
@@ -528,3 +538,34 @@ Dons ponctuels uniquement pour l'instant. Aucune récurrence. Aucune contreparti
 - US-78.1 Given un utilisateur connecté qui a donné, When j'ouvre `/settings`, Then je vois mes dons (date, montant, reçu téléchargeable) ; le montant n'est jamais affiché publiquement.
 - US-78.2 Given un utilisateur qui n'a jamais donné, When j'ouvre `/settings`, Then la section « Historique des dons » est masquée.
 - Tests : U, E.
+
+---
+
+## E-SECRETS — Secrets et easter eggs
+
+Règles communes : contenu maison (aucun nom, texte, son ni image de Blizzard) ; purement cosmétique (aucun effet sur la qualité, le classement, les concours ni la modération) ; textes EN et FR ; `prefers-reduced-motion` respecté (aucune animation) ; aucun son, ou son activable et coupé par défaut ; messages annoncés aux lecteurs d'écran (`aria-live="polite"`) ; jamais actif dans un champ de saisie ; aucune touche bloquée (les flèches gardent leur rôle de navigation, T-31b).
+
+### US-79 [MVP] Petites surprises
+- US-79.1 Given la page 404, When elle s'affiche, Then le titre est « You have wandered into an uncharted zone » (FR : « Vous vous êtes aventuré en zone inexplorée ») et le bouton principal « Use Hearthstone » (FR : « Utiliser la pierre de foyer ») ramène à l'accueil, en plus de l'identifiant de corrélation existant (US-69).
+- US-79.2 Given la console du navigateur ouverte sur n'importe quelle page, When le site se charge, Then un logo ASCII et la ligne « Looking for guild? Report bugs: {lien vers /feedback} » s'affichent une seule fois par session, en production comme en preview.
+- Tests : E (404), U (message console émis une fois).
+
+### US-80 [v1.x] Easter eggs (`features.easterEggs`)
+- US-80.1 Given la séquence ↑ ↑ ↓ ↓ ← → ← → B A tapée hors d'un champ de saisie, When elle est complète, Then une fenêtre « Need / Greed / Pass » s'ouvre sur la Capture of the week ; « Need » affiche « You won: [Legendary Shot] » et toutes les miniatures visibles prennent la bordure Legendary pendant 30 s (sans animation si `prefers-reduced-motion`).
+- US-80.2 Given un utilisateur connecté qui choisit « Need » pour la première fois, When la fenêtre se ferme, Then le badge cosmétique « Ninja Looter » est ajouté à son profil (une seule fois).
+- US-80.3 Given la recherche, When je tape `/dance`, `/afk`, `mrglglgl` ou `leeroy`, Then respectivement : le logo danse 5 s ; l'onglet devient « <AFK> Legendary Shots » jusqu'à la prochaine action ; le message « aucun résultat » est sous-titré « Mrgl mrgl, no captures found » ; le bouton devient « LEEEROY » et ouvre une capture au hasard.
+- US-80.4 Given 10 clics sur le logo en moins de 5 s, When le 10e arrive, Then une bulle « Stop poking me! » apparaît 3 s.
+- US-80.5 Given 5 minutes sans interaction, When l'onglet est visible, Then son titre est préfixé « <AFK> », retiré à la première interaction.
+- US-80.6 Given le 23 novembre (anniversaire de WoW, fuseau Europe/Paris) ou le 31 octobre, When j'ouvre le site, Then le logo porte un accessoire de saison ; le 23 novembre, un bandeau de quête « Happy birthday, Azeroth » s'affiche sur l'accueil.
+- US-80.7 Given `features.easterEggs` désactivé, When je tape la séquence ou une commande, Then rien ne se passe.
+- Tests : U (détection de séquence, ignorée dans les champs, flèches non bloquées), E (US-80.1, US-80.3).
+
+### US-81 [v1.x] Quête secrète « The Lost Shot » (`features.secrets`)
+- US-81.1 Given une quête active, When un utilisateur découvre le point de départ (indice public : message console ou détail du footer), Then il peut soumettre la première réponse ; chaque bonne réponse révèle l'indice suivant, **renvoyé par le serveur** (aucun indice ni réponse dans le bundle JavaScript).
+- US-81.2 Given une réponse soumise, When le serveur la reçoit, Then elle est normalisée (NFKC, minuscules, espaces réduits) et comparée au HMAC-SHA256 stocké pour l'étape courante de l'utilisateur, avec le contexte exigé par l'étape (ex. identifiant de la capture sur laquelle le Konami code doit être tapé) ; une mauvaise réponse renvoie `{ ok: false }` sans indiquer ce qui est faux ni le nombre d'étapes.
+- US-81.3 Given un utilisateur, When il dépasse 10 essais par minute ou 100 par jour sur une quête, Then 429 avec `retry-after` (`rate_limit_counters`).
+- US-81.4 Given la dernière étape réussie, When elle est validée, Then le badge et le titre de la quête (ex. « Keeper of the Lost Shot ») sont attribués, affichables sur le profil si l'utilisateur le souhaite ; les 10 premiers sont inscrits au « Hall of Seekers » de la quête (pseudo et date), avec possibilité de s'en retirer.
+- US-81.5 Given un visiteur non connecté, When il trouve une étape, Then l'indice s'affiche avec « Sign in to keep your progress » ; la progression n'est enregistrée qu'une fois connecté.
+- US-81.6 Given un admin, When il gère les quêtes dans `/admin/secrets`, Then il crée une quête (titre EN/FR, saison, dates), ses étapes (ordre, déclencheur, contexte, réponse saisie une fois puis seulement stockée en HMAC, indice EN/FR), l'active ou la clôt ; chaque action est auditée ; une quête close reste visible avec son Hall of Seekers.
+- US-81.7 Given `features.secrets` désactivé ou aucune quête active, When un essai est soumis, Then 404.
+- Tests : U (normalisation, ordre des étapes, attribution unique), I (HMAC, limites, contexte exigé, aucune fuite d'indice d'étape suivante), E (parcours complet d'une quête de test à 3 étapes).

@@ -129,6 +129,10 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Client API typé `app/services/api` et gestion d'erreur commune, pages 404/500 avec identifiant de corrélation.
   Stories : US-69. Tests : E (US-69.1–2).
 
+- [ ] **T-07d Petites surprises** (dép. T-07c)
+  Page 404 « uncharted zone » avec le bouton « Use Hearthstone » (identifiant de corrélation conservé), message console (logo ASCII et lien vers `/feedback`, une fois par session).
+  Stories : US-79. Tests : U (message console émis une fois), E (US-79.1).
+
 - [ ] **T-08 Réglages du site et flags** (dép. T-05a)
   Module `settings` : lecture typée de `site_settings` (seuils de qualité, de modération, d'affichage, hero, editor's pick, flags), cache 60 s, valeurs par défaut de lancement (seuils 3/15/50/150, `moderation.reportsToHide` = 3, `features.inviteOnly` = true jusqu'à l'ouverture), exposition publique en lecture des valeurs non sensibles (`GET /api/settings/public`).
   Stories : US-56 (lecture), US-71.5. Tests : U (validation des réglages US-56.2), I.
@@ -187,12 +191,12 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Stories : US-02.6. Tests : I, E.
 
 - [ ] **T-16 Pseudo et profil public** (dép. T-12a, T-07c)
-  Pseudos réservés, changement limité, redirections, page `/u/{pseudo}` (état vide pour les captures).
-  Stories : US-05. Tests : U, I, E.
+  Pseudos réservés, changement limité, redirections, page `/u/{pseudo}` (état vide pour les captures), réseaux sociaux du profil (table `user_social_links`, gabarits `shared/domain/social-links.ts`, liens masqués pour un compte sanctionné ou de moins de 7 jours).
+  Stories : US-05, US-82.4–5. Tests : U, I, E.
 
 - [ ] **T-17a Réglages du compte : profil et mot de passe** (dép. T-16)
-  `/settings` : bio, langue, mot de passe (réauthentification).
-  Stories : US-07.1, US-07.3. Tests : U, I, E.
+  `/settings` : bio, langue, mot de passe (réauthentification), réseaux sociaux (`PUT /api/me/social-links`, validation par réseau, site web en `https://` seul).
+  Stories : US-07.1, US-07.3, US-82.1–3. Tests : U, I, E.
 
 - [ ] **T-17b Réglages du compte : email et comptes liés** (dép. T-17a, T-14)
   Changement d'email avec confirmation (ancienne et nouvelle adresse), comptes liés (refus si plus aucun moyen de connexion).
@@ -334,8 +338,8 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Stories : US-51. Tests : U, I, E.
 
 - [ ] **T-51 File de modération et décisions** (dép. T-50, T-18c)
-  File `/admin/moderation`, décisions motivées (Digital Services Act : motif, règle, automatisation), notification de l'auteur avec la **voie de recours par email** (recours traités à la main au MVP, 20/11/2026), annulation d'une décision par un modérateur (capture republiée, auteur notifié). Recours dans l'application : T-71 (v1.x).
-  Stories : US-52.1–3, US-52.6. Tests : U, I, E.
+  File `/admin/moderation`, décisions motivées (Digital Services Act : motif, règle, automatisation), notification de l'auteur avec la **voie de recours par email** (recours traités à la main au MVP, 20/11/2026), annulation d'une décision par un modérateur (capture republiée, auteur notifié), effacement d'un lien de réseau social jugé abusif (audité, notifié avec son motif). Recours dans l'application : T-71 (v1.x).
+  Stories : US-52.1–3, US-52.6, US-82.6. Tests : U, I, E.
 
 - [ ] **T-52 Sanctions** (dép. T-51)
   Avertissement, suspension, bannissement (admin + réauthentification), effets sur toutes les politiques, `banned_identities` contre la réinscription.
@@ -399,3 +403,6 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
 - [ ] **T-69 Soutien : badge et historique** (dép. T-68) — US-77, US-78. Tests : U, E.
 - [ ] **T-70 Versions des Terms** (dép. T-58) — publication d'une nouvelle version avec date d'effet à J+15 minimum, notification in-app et email, écran de réacceptation (`/api/admin/legal`, `/api/me/terms/accept`). Au MVP : version acceptée enregistrée à l'inscription, changements annoncés à la main par email (20/11/2026). US-74.2–3. Tests : U, I, E.
 - [ ] **T-71 Recours dans l'application** (dép. T-58) — table `appeals`, bouton « Appeal » sur la notification (6 mois, 20 à 2000 caractères, un recours par décision), traitement par un autre modérateur. Au MVP : recours par email, traités à la main (20/11/2026). US-52.4–5. Tests : U, I, E.
+- [ ] **T-72 Easter eggs** (dép. T-58) — composable de détection de séquence (sans bloquer les touches), commandes de recherche, logo, AFK, dates, badge « Ninja Looter » (`user_badges`). US-80. Tests : U, E.
+- [ ] **T-73 Quête secrète : moteur** (dép. T-58, T-18c, T-05c) — module `secrets`, tables, `attempt` avec HMAC et limites, attribution badge et titre, Hall of Seekers. US-81.1–5, US-81.7. Tests : U, I, E.
+- [ ] **T-74 Quête secrète : back-office** (dép. T-73, T-53b) — **action humaine** : textes des indices et réponses de la première quête « The Lost Shot », rédigés avec Adrien. `/admin/secrets`, audit. US-81.6. Tests : I, E.
