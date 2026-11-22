@@ -9,6 +9,7 @@ import { ErrorResponse } from '../../shared/contracts/errors'
 
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
 process.env.NUXT_FAKE_PROVIDERS = 'true' // Turnstile accepts only the dummy token of its test keys
+process.env.NUXT_APP_SECRET = 'test-only-app-secret-of-32-characters-or-more' // seals the session cookie
 await setup({ server: true, browser: false })
 
 const db = createDb(process.env.DATABASE_URL!)
@@ -128,6 +129,90 @@ describe('invite-only beta', () => {
     })
     for (let i = 0; i < 3; i++) await post('/api/waitlist', body(), ip)
     expect((await post('/api/waitlist', body(), ip)).status).toBe(429)
+  })
+})
+
+describe('sessions', () => {
+  const sessionCookie = (response: Response) => {
+    const cookie = response.headers.get('set-cookie') ?? ''
+    return { header: cookie, value: cookie.split(';')[0]! }
+  }
+  const me = (cookie?: string) => fetch('/api/me', { headers: cookie ? { cookie } : {} })
+  const account = async () => {
+    const body = await signupBody()
+    await post('/api/auth/signup', body)
+    return { email: body.email, password: body.password, username: body.username }
+  }
+  const signin = ({ email, password }: { email: string; password: string }, cookie?: string) =>
+    fetch('/api/auth/signin', {
+      method: 'POST',
+      headers: {
+        'sec-fetch-site': 'same-origin',
+        'content-type': 'application/json',
+        ...(cookie ? { cookie } : {}),
+      },
+      body: JSON.stringify({ email, password }),
+    })
+
+  it('US-03.1 signs in with a secure, HttpOnly, Lax session cookie of 30 days, then knows the member', async () => {
+    const { email, password, username } = await account()
+    const response = await signin({ email, password })
+    expect(response.status).toBe(204)
+    const { header, value } = sessionCookie(response)
+    expect(header).toMatch(/^__Host-ls-session=/)
+    expect(header).toMatch(/HttpOnly/i)
+    expect(header).toMatch(/Secure/i)
+    expect(header).toMatch(/SameSite=Lax/i)
+    expect(header).toMatch(/Path=\//)
+    expect(header).toMatch(/Max-Age=2592000/)
+    expect(await (await me(value)).json()).toMatchObject({ username, role: 'user', emailVerified: false })
+  })
+
+  it('US-03.1 issues a new session id at each sign-in and revokes the previous one', async () => {
+    const credentials = await account()
+    const first = sessionCookie(await signin(credentials)).value
+    const second = sessionCookie(await signin(credentials, first)).value
+    expect(second).not.toBe(first)
+    expect((await me(first)).status).toBe(401)
+    expect((await me(second)).status).toBe(200)
+  })
+
+  it('US-03.2 answers the same 401 for a wrong password and an unknown email', async () => {
+    const { email } = await account()
+    const wrong = await signin({ email, password: 'not the password' })
+    const unknown = await signin({ email: `nobody.${email}`, password: 'not the password' })
+    expect(wrong.status).toBe(401)
+    const wrongError = await errorOf(wrong)
+    expect(wrongError).toMatchObject({ code: 'UNAUTHENTICATED', details: { reason: 'invalid_credentials' } })
+    expect(unknown.status).toBe(401)
+    expect((await errorOf(unknown)).details).toEqual(wrongError.details)
+    expect(wrong.headers.get('set-cookie')).toBeNull()
+  })
+
+  it('US-03.4 revokes the session on sign-out and deletes the cookie', async () => {
+    const session = sessionCookie(await signin(await account())).value
+    const response = await fetch('/api/auth/signout', {
+      method: 'POST',
+      headers: { 'sec-fetch-site': 'same-origin', cookie: session },
+    })
+    expect(response.status).toBe(204)
+    expect(response.headers.get('set-cookie')).toMatch(/^__Host-ls-session=;.*Max-Age=0/)
+    expect((await me(session)).status).toBe(401) // the copied cookie is useless too
+  })
+
+  it('US-03.5 refuses with 401 and revokes the session of a banned account', async () => {
+    const credentials = await account()
+    const session = sessionCookie(await signin(credentials)).value
+    await db.update(users).set({ status: 'banned' }).where(eq(users.email, credentials.email))
+    expect((await me(session)).status).toBe(401)
+    await db.update(users).set({ status: 'active' }).where(eq(users.email, credentials.email))
+    expect((await me(session)).status).toBe(401)
+  })
+
+  it('answers 401 without session and sets no cookie for a visitor', async () => {
+    const response = await me()
+    expect(response.status).toBe(401)
+    expect(response.headers.get('set-cookie')).toBeNull()
   })
 })
 

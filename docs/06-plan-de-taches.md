@@ -175,9 +175,13 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Tables `beta_invites`, `waitlist_entries`, inscription refusée sans invitation, liste d'attente (`POST /api/waitlist`).
   Stories : US-56.4. Tests : U, I ; E avec l'écran d'inscription en T-11c (Q43).
 
-- [ ] **T-12a Sessions : API** (dép. T-11b)
-  Sessions en base vérifiées à chaque requête via Hyperdrive sans cache (ADR-010, ADR-016), rotation d'identifiant, `signin` / `signout`, verrouillage progressif, `requireContext`, session ouverte par `signup` (US-01.1, « je suis connecté »).
-  Stories : US-03.1–5. Tests : U, I.
+- [x] **T-12a Sessions : API** (dép. T-11b)
+  Sessions en base vérifiées à chaque requête via Hyperdrive sans cache (ADR-010, ADR-016), cookie scellé nuxt-auth-utils, rotation d'identifiant, `signin` / `signout`, `requireContext`, session ouverte par `verify-email` (US-01.1, Q44). Découpée le 22/11/2026 : verrouillage progressif en T-12c.
+  Stories : US-03.1–2, US-03.4–5, US-01.1 (connexion par le lien). Tests : U, I.
+
+- [ ] **T-12c Verrouillage progressif de la connexion** (dép. T-12a)
+  Turnstile exigé après 5 échecs en 15 min (compte ou IP), connexion par mot de passe bloquée 1 h après 20 échecs en 1 h, email d'alerte au titulaire (`rate_limit_counters`).
+  Stories : US-03.3. Tests : U, I.
 
 - [ ] **T-12b Sessions : écrans et appareils** (dép. T-12a, T-11c)
   Page de connexion, redirection sûre, liste et révocation des sessions (`/api/me/sessions*`), vidage des caches du service worker à la déconnexion.

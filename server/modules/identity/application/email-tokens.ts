@@ -10,6 +10,7 @@ export type IdentityError =
   | { kind: 'rate_limited'; retryAfterSeconds: number }
   | { kind: 'invite_required' }
   | { kind: 'not_found' }
+  | { kind: 'invalid_credentials' }
 export type IdentityResult = Result<void, IdentityError>
 
 export const invalid = (field: string, reason: string): IdentityError => ({ kind: 'invalid', field, reason })

@@ -7,7 +7,10 @@
 // Variables: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, NEON_API_KEY, NEON_PROJECT_ID; for up, CF_ACCESS_CLIENT_ID
 // and CF_ACCESS_CLIENT_SECRET (the CI's Access service token, T-03d).
 import { execFileSync } from 'node:child_process'
-import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
+import { randomBytes } from 'node:crypto'
+import { appendFileSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { cf, env, findBranch, hyperdriveOrigin, log, neon, ownerUrl, sleep } from './cloud.mjs'
 import { previewConfig, previewNumbers } from './preview-config.mjs'
 
@@ -119,7 +122,14 @@ async function up() {
   await ensureQueues(queues)
   await ensureBucket()
   writeFileSync('wrangler.preview.toml', toml) // at the root: main and assets are relative to the configuration file
-  wrangler('deploy', '-c', 'wrangler.preview.toml')
+  // Seal of the session cookie (NUXT_APP_SECRET): random at each deploy, the sessions of a preview are throwaway
+  const secrets = join(tmpdir(), `${NAME}-secrets.json`)
+  writeFileSync(secrets, JSON.stringify({ NUXT_APP_SECRET: randomBytes(32).toString('base64') }))
+  try {
+    wrangler('deploy', '-c', 'wrangler.preview.toml', '--secrets-file', secrets)
+  } finally {
+    rmSync(secrets)
+  }
   log(`health: ${JSON.stringify(await waitForHealth())}`)
   log(`preview ready: ${URL_}`)
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `url=${URL_}\n`)

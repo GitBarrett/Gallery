@@ -59,7 +59,25 @@ export interface BetaInvite {
   expiresAt: Date
 }
 
-/** Port: accounts, email tokens, beta invitations and waiting list. Email and username comparisons ignore case. */
+/** Member behind a session (re-read at each request: a ban applies at once, 08-securite.md § 4). */
+export interface Actor {
+  id: string
+  username: string
+  role: 'user' | 'moderator' | 'admin'
+  status: string
+  emailVerified: boolean
+}
+
+export interface NewSession {
+  /** SHA-256 of the 256-bit id carried by the sealed cookie (ADR-010). */
+  idHash: string
+  userId: string
+  lastSeenAt: Date
+  expiresAt: Date
+  userAgentSummary: string | null
+}
+
+/** Port: accounts, email tokens, sessions, beta invitations and waiting list. Email and username comparisons ignore case. */
 export interface IdentityRepository {
   findUserIdByEmail(email: string): Promise<string | null>
   usernameTaken(username: string): Promise<boolean>
@@ -71,6 +89,13 @@ export interface IdentityRepository {
   /** Marks the token used; `false` if it already was (concurrent use). */
   useEmailToken(id: string, at: Date): Promise<boolean>
   markEmailVerified(userId: string, at: Date): Promise<void>
+  findCredentials(email: string): Promise<{ userId: string; passwordHash: string | null; status: string } | null>
+  createSession(session: NewSession): Promise<void>
+  findSession(
+    idHash: string,
+  ): Promise<{ lastSeenAt: Date; expiresAt: Date; revokedAt: Date | null; account: Actor } | null>
+  touchSession(idHash: string, lastSeenAt: Date, expiresAt: Date): Promise<void>
+  revokeSession(idHash: string, at: Date): Promise<void>
   createInvite(invite: BetaInvite): Promise<void>
   /** Id of the invitation of this token if it is unused and not expired at `at`. */
   findUsableInvite(tokenHash: string, at: Date): Promise<string | null>

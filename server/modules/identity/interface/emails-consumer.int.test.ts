@@ -5,7 +5,7 @@ import { recordingMailer } from '../../../../tests/fakes/recording-mailer'
 import { createDb } from '../../../db/client'
 import { emailTokens, users } from '../../../db/schema'
 import type { QueueMessage } from '../../../platform/jobs'
-import { purgeExpiredEmailTokens } from '../infrastructure/drizzle-identity-repository'
+import { purgeExpiredTokens } from '../infrastructure/drizzle-identity-repository'
 import { emailsConsumer } from './emails-consumer'
 
 const db = createDb(process.env.DATABASE_URL!)
@@ -29,7 +29,7 @@ describe('emails consumer', () => {
     expect(sent).toHaveLength(1)
     expect(await db.select().from(emailTokens).where(eq(emailTokens.userId, userId))).toHaveLength(1)
 
-    await purgeExpiredEmailTokens(db, fixedClock('2026-11-23T12:00:01Z')) // 24 h later
+    await purgeExpiredTokens(db, fixedClock('2026-11-23T12:00:01Z')) // 24 h later
     expect(await db.select().from(emailTokens).where(eq(emailTokens.userId, userId))).toEqual([])
   })
 

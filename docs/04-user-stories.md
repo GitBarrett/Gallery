@@ -28,7 +28,7 @@
 
 ### US-01 [MVP] Inscription par email
 En tant que visiteur, je veux créer un compte avec email et mot de passe afin de publier des captures.
-- US-01.1 Given un email libre, un pseudo valide, un mot de passe de 10 à 128 caractères et la case « I am at least 15 and accept the Terms and Privacy policy » cochée, When je valide avec Turnstile OK, Then un compte non vérifié est créé (`terms_accepted_at`, `terms_version` enregistrés), je suis connecté et un email de vérification (lien valable 24 h) est envoyé.
+- US-01.1 Given un email libre, un pseudo valide, un mot de passe de 10 à 128 caractères et la case « I am at least 15 and accept the Terms and Privacy policy » cochée, When je valide avec Turnstile OK, Then un compte non vérifié est créé (`terms_accepted_at`, `terms_version` enregistrés) et un email de vérification (lien valable 24 h) est envoyé ; le message neutre « Check your inbox » s'affiche (sans session, comme pour un email déjà utilisé) et l'ouverture du lien vérifie l'email et me connecte (Q44).
 - US-01.7 Given la case d'acceptation non cochée, When je valide, Then l'inscription est refusée (client et serveur).
 - US-01.2 Given un email déjà utilisé, When je valide, Then le même message neutre « Check your inbox » s'affiche et l'email reçu par le titulaire indique qu'un compte existe déjà (pas d'énumération).
 - US-01.3 Given un mot de passe présent dans une fuite connue (HIBP, k-anonymat), When je valide, Then il est refusé avec un message explicite.

@@ -1,8 +1,8 @@
 import { and, eq, gt, isNull, lt, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import type { Clock } from '../../../platform/clock'
-import { betaInvites, emailTokens, users, waitlistEntries } from '../../../db/schema'
-import type { EmailTokenType, IdentityRepository, Locale } from '../application/ports'
+import { betaInvites, emailTokens, sessions, users, waitlistEntries } from '../../../db/schema'
+import type { Actor, EmailTokenType, IdentityRepository, Locale } from '../application/ports'
 
 const sameEmail = (email: string) => sql`lower(${users.email}) = lower(${email})`
 
@@ -60,6 +60,45 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
   async markEmailVerified(userId, at) {
     await db.update(users).set({ emailVerifiedAt: at }).where(eq(users.id, userId))
   },
+  async findCredentials(email) {
+    const [row] = await db
+      .select({ userId: users.id, passwordHash: users.passwordHash, status: users.status })
+      .from(users)
+      .where(sameEmail(email))
+    return row ?? null
+  },
+  async createSession(session) {
+    await db.insert(sessions).values(session)
+  },
+  async findSession(idHash) {
+    const [row] = await db
+      .select({
+        lastSeenAt: sessions.lastSeenAt,
+        expiresAt: sessions.expiresAt,
+        revokedAt: sessions.revokedAt,
+        id: users.id,
+        username: users.username,
+        role: users.role,
+        status: users.status,
+        emailVerifiedAt: users.emailVerifiedAt,
+      })
+      .from(sessions)
+      .innerJoin(users, eq(users.id, sessions.userId))
+      .where(eq(sessions.idHash, idHash))
+    if (!row) return null
+    const { lastSeenAt, expiresAt, revokedAt, id, username, role, status, emailVerifiedAt } = row
+    const account = { id, username, role: role as Actor['role'], status, emailVerified: Boolean(emailVerifiedAt) }
+    return { lastSeenAt, expiresAt, revokedAt, account }
+  },
+  async touchSession(idHash, lastSeenAt, expiresAt) {
+    await db.update(sessions).set({ lastSeenAt, expiresAt }).where(eq(sessions.idHash, idHash))
+  },
+  async revokeSession(idHash, at) {
+    await db
+      .update(sessions)
+      .set({ revokedAt: at })
+      .where(and(eq(sessions.idHash, idHash), isNull(sessions.revokedAt)))
+  },
   async createInvite(invite) {
     await db.insert(betaInvites).values(invite)
   },
@@ -83,7 +122,8 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
   },
 })
 
-/** Hourly purge of the expired email tokens (03-architecture.md § Crons). */
-export async function purgeExpiredEmailTokens(db: Db, clock: Clock): Promise<void> {
+/** Hourly purge of the expired email tokens and sessions, revoked ones included (03-architecture.md § Crons). */
+export async function purgeExpiredTokens(db: Db, clock: Clock): Promise<void> {
   await db.delete(emailTokens).where(lt(emailTokens.expiresAt, clock.now()))
+  await db.delete(sessions).where(lt(sessions.expiresAt, clock.now()))
 }

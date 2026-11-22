@@ -115,7 +115,7 @@ Pour toute tâche qui expose une route, un formulaire ou un traitement :
 - Revue manuelle avant ouverture publique : checklist OWASP ASVS niveau 2 (sections V2, V3, V4, V5, V12, V13).
 
 ## 12. Réponse à incident
-Runbook `docs/runbooks/incident.md` (à écrire, tâche dédiée) : qualification, révocation globale des sessions (rotation de `NUXT_SESSION_PASSWORD`), rotation des clés, mode maintenance (flag `features.readonly`), notification CNIL sous 72 h si fuite de données personnelles, information des membres concernés.
+Runbook `docs/runbooks/incident.md` (à écrire, tâche dédiée) : qualification, révocation globale des sessions (`revoked_at` posé sur toutes les lignes de `sessions`, ou rotation de `NUXT_APP_SECRET` qui rend tous les cookies illisibles), rotation des clés, mode maintenance (flag `features.readonly`), notification CNIL sous 72 h si fuite de données personnelles, information des membres concernés.
 
 ---
 

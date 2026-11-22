@@ -228,7 +228,7 @@ Tous les consommateurs sont **idempotents** (`processed_messages` + opérations 
 ## Configuration et secrets
 | Nom | Type | Usage |
 |---|---|---|
-| `NUXT_SESSION_PASSWORD` | secret (≥ 32 car.) | scellement du cookie de session |
+| `NUXT_APP_SECRET` | secret (≥ 32 car.) | secret racine de Nuxt ; nuxt-auth-utils en dérive le scellement du cookie de session (le cookie ne porte qu'un identifiant aléatoire vérifié en base, ADR-010) ; preview : tiré au hasard à chaque déploiement |
 | `DATABASE_URL` / binding `HYPERDRIVE` | secret / binding | Neon |
 | `R2` (binding), `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | binding / public / secrets (jeton S3 limité au bucket, lecture-écriture objets) | stockage, URLs présignées |
 | `IMAGES` | binding | transformations d'images |

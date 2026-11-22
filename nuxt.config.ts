@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     '@nuxtjs/storybook',
     '@nuxtjs/i18n',
     '@vite-pwa/nuxt',
+    'nuxt-auth-utils',
   ],
   // Design system (ADR-014): tokens then base, loaded everywhere
   css: ['~/assets/css/tokens.css', '~/assets/css/base.css'],
@@ -103,9 +104,17 @@ export default defineNuxtConfig({
     },
     devOptions: { enabled: false },
   },
-  // Public values read at startup (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN, NUXT_PUBLIC_POSTHOG_KEY,
-  // NUXT_PUBLIC_TURNSTILE_SITE_KEY), empty locally (T-03f, T-10a); Turnstile: test key locally (always passes)
+  // Session cookie (ADR-010): sealed with a secret derived from NUXT_APP_SECRET, it only carries a random id
+  // checked in the database; no client plugin, the app asks GET /api/me
+  auth: { loadStrategy: 'none' },
   runtimeConfig: {
+    session: {
+      name: '__Host-ls-session',
+      maxAge: 30 * 86_400, // sliding: resealed when the session is extended (auth-context.ts)
+      cookie: { httpOnly: true, secure: true, sameSite: 'lax', path: '/' },
+    },
+    // Public values read at startup (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN, NUXT_PUBLIC_POSTHOG_KEY,
+    // NUXT_PUBLIC_TURNSTILE_SITE_KEY), empty locally (T-03f, T-10a); Turnstile: test key locally (always passes)
     public: { sentryDsn: '', cfBeaconToken: '', posthogKey: '', turnstileSiteKey: '1x00000000000000000000AA' },
   },
   // No source map upload (organisation token not needed for the MVP) and no build plugin telemetry
