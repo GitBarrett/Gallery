@@ -127,7 +127,16 @@
       "invalid": "Wrong email or password.",
       "turnstileRequired": "Several attempts failed. Confirm you are not a robot, then sign in again."
     },
-    "signout": "Sign out"
+    "signout": "Sign out",
+    "verify": {
+      "title": "Verify your email",
+      "checking": "Checking your link…",
+      "expired": "This link has expired. Links are valid for 24 hours.",
+      "invalid": "This link is not valid: it was already used or is incomplete.",
+      "resend": "Resend",
+      "sent": "New link sent. Check your inbox.",
+      "signIn": "Sign in to get a new link"
+    }
   },
   "settings": {
     "title": "Settings"

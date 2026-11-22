@@ -5,7 +5,14 @@ import { z } from '~~/shared/contracts/zod'
 import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
 import { PublicSettings } from '~~/shared/contracts/settings'
-import { MeResponse, type SigninBody, type SignupBody, type WaitlistBody } from '~~/shared/contracts/auth'
+import {
+  MeResponse,
+  type ResendVerificationBody,
+  type SigninBody,
+  type SignupBody,
+  type VerifyEmailBody,
+  type WaitlistBody,
+} from '~~/shared/contracts/auth'
 
 export class ApiError extends Error {
   constructor(
@@ -63,4 +70,8 @@ export const api = {
   signin: (body: SigninBody) => call('/api/auth/signin', z.unknown(), { method: 'POST', body }),
   signout: () => call('/api/auth/signout', z.unknown(), { method: 'POST' }),
   me: (fetch?: typeof $fetch) => call('/api/me', MeResponse, {}, fetch),
+  // 204: email verified and session opened (US-01.4, Q44)
+  verifyEmail: (body: VerifyEmailBody) => call('/api/auth/verify-email', z.unknown(), { method: 'POST', body }),
+  resendVerification: (body: ResendVerificationBody) =>
+    call('/api/auth/resend-verification', z.unknown(), { method: 'POST', body }),
 }
