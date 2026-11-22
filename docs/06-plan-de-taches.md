@@ -203,7 +203,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   `POST /api/auth/password/forgot` (Turnstile, 3/h par email, 10/h par IP, ignorée en silence au-delà) et `POST /api/auth/password/reset` (lien valable 1 h, usage unique, toutes les sessions révoquées puis reconnexion), modèle d'email EN/FR. Découpée le 22/11/2026 : écrans et E2E en T-13b.
   Stories : US-04. Tests : U, I (US-04.1–4).
 
-- [ ] **T-13b Mot de passe oublié : écrans** (dép. T-13a, T-12b)
+- [x] **T-13b Mot de passe oublié : écrans** (dép. T-13a, T-12b)
   Lien « Forgot password? » de la connexion, formulaire de demande conforme à `SignIn.dc.html`, page `/reset#<jeton>` (nouveau mot de passe, lien expiré ou utilisé avec lien pour recommencer).
   Stories : US-04 (parcours). Tests : composants, E (US-04.1–3 : oubli → reset → anciennes sessions invalides).
 

@@ -1,5 +1,6 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
+import { h } from 'vue'
 import { axeViolations } from '../../../tests/axe'
 import Input from './Input.vue'
 
@@ -10,6 +11,15 @@ describe('UiInput', () => {
     expect(wrapper.get('label').attributes('for')).toBe(input.attributes('id'))
     expect(input.attributes('type')).toBe('email')
     expect(input.attributes('autocomplete')).toBe('email')
+  })
+
+  it('shows an action next to its label, outside the label', async () => {
+    const wrapper = await mountSuspended(Input, {
+      props: { label: 'Password' },
+      slots: { action: () => h('a', { href: '/reset' }, 'Forgot password?') },
+    })
+    expect(wrapper.get('a').text()).toBe('Forgot password?')
+    expect(wrapper.get('label').text()).toBe('Password')
   })
 
   it('updates its model as the user types', async () => {

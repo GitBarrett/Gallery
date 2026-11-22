@@ -125,7 +125,24 @@
       "title": "Sign in",
       "submit": "Sign in",
       "invalid": "Wrong email or password.",
-      "turnstileRequired": "Several attempts failed. Confirm you are not a robot, then sign in again."
+      "turnstileRequired": "Several attempts failed. Confirm you are not a robot, then sign in again.",
+      "forgot": "Forgot password?"
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "text": "Enter your email. If an account exists, we'll send a reset link valid for 1 hour.",
+      "submit": "Send reset link",
+      "sent": "Check your inbox: if this email is registered, the link is on its way.",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "text": "Your new password signs you out on every device, then signs you in here.",
+      "password": "New password",
+      "submit": "Change my password",
+      "expired": "This link has expired. Links are valid for 1 hour.",
+      "invalid": "This link is not valid: it was already used or is incomplete.",
+      "again": "Get a new link"
     },
     "signout": "Sign out",
     "verify": {

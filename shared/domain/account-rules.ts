@@ -7,7 +7,7 @@ export type PasswordProblem = 'too_short' | 'too_long'
 
 // Staff names and every top-level route of the site (03-architecture.md, 02-specs-fonctionnelles.md)
 const RESERVED = new Set(
-  'admin administrator moderator mod staff support help root system api img avatar u v fr en settings upload search notifications following leaderboard contests legal terms privacy cookies offline manifest robots sitemap sw share-target storybook signin signup login logout'.split(
+  'admin administrator moderator mod staff support help root system api img avatar u v fr en settings upload search notifications following leaderboard contests legal terms privacy cookies offline manifest robots sitemap sw share-target storybook signin signup login logout reset verify-email'.split(
     ' ',
   ),
 )

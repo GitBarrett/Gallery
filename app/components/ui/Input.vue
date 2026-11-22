@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Form field (SignIn and Upload mockups): visible label always tied to the field, hint and error announced.
-// Other attributes (autocomplete, maxlength, placeholder…) go to the field.
+// Other attributes (autocomplete, maxlength, placeholder…) go to the field. Slot `action`: a link beside the label.
 defineOptions({ inheritAttrs: false })
 const props = defineProps<{ label: string; hint?: string; error?: string; required?: boolean; type?: string }>()
 const model = defineModel<string>({ default: '' })
@@ -12,9 +12,12 @@ const describedBy = computed(
 
 <template>
   <div class="field">
-    <label :for="id" class="label">
-      {{ label }}<span v-if="required" class="required" aria-hidden="true"> *</span>
-    </label>
+    <div class="label-row">
+      <label :for="id" class="label">
+        {{ label }}<span v-if="required" class="required" aria-hidden="true"> *</span>
+      </label>
+      <slot name="action" />
+    </div>
     <input
       :id="id"
       v-model="model"
@@ -36,6 +39,15 @@ const describedBy = computed(
   display: flex;
   flex-direction: column;
   gap: var(--space-1-5);
+}
+
+.label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
 }
 
 .label {
