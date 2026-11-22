@@ -111,7 +111,15 @@ export function createContainer({
           ids,
           inviteOnly,
         })(cmd),
-      signin: (cmd) => signin({ repo: drizzleIdentityRepository(db()), hasher: argon2idHasher(), clock })(cmd),
+      signin: (cmd) =>
+        signin({
+          repo: drizzleIdentityRepository(db()),
+          uow: identityUow(),
+          hasher: argon2idHasher(),
+          human: human(),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
+          clock,
+        })(cmd),
       signout: (cmd) => signout({ repo: drizzleIdentityRepository(db()), clock })(cmd),
       // Read through Hyperdrive without cache (ADR-016): a revoked session is refused at once
       resolveSession: (cmd) => resolveSession({ repo: drizzleIdentityRepository(db()), clock })(cmd),
