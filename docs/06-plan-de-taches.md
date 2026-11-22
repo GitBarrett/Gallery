@@ -195,8 +195,13 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Liste et révocation des sessions (`/api/me/sessions*`), résumé lisible de l'appareil, écran dans `/settings`.
   Stories : US-03 (sessions). Tests : I, E.
 
-- [ ] **T-13 Mot de passe oublié** (dép. T-12a)
-  Stories : US-04. Tests : U, I, E.
+- [x] **T-13a Mot de passe oublié : API** (dép. T-12a)
+  `POST /api/auth/password/forgot` (Turnstile, 3/h par email, 10/h par IP, ignorée en silence au-delà) et `POST /api/auth/password/reset` (lien valable 1 h, usage unique, toutes les sessions révoquées puis reconnexion), modèle d'email EN/FR. Découpée le 22/11/2026 : écrans et E2E en T-13b.
+  Stories : US-04. Tests : U, I (US-04.1–4).
+
+- [ ] **T-13b Mot de passe oublié : écrans** (dép. T-13a, T-12b)
+  Lien « Forgot password? » de la connexion, formulaire de demande conforme à `SignIn.dc.html`, page `/reset#<jeton>` (nouveau mot de passe, lien expiré ou utilisé avec lien pour recommencer).
+  Stories : US-04 (parcours). Tests : composants, E (US-04.1–3 : oubli → reset → anciennes sessions invalides).
 
 - [ ] **T-14 OAuth Google** (dép. T-12b) — **action humaine** : client OAuth Google.
   State + PKCE, règles de liaison, bouton conforme à la charte Google.
