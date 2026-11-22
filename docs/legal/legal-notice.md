@@ -3,7 +3,7 @@
 _Last updated: 22/11/2026_
 
 ## Publisher
-Legendary Shots (legendaryshots.com) is published by:
+Legendary Shots is published by:
 - Bootleygues
 - Publisher details held by the host, Cloudflare, Inc.
 - Contact: aleygues@yahoo.fr

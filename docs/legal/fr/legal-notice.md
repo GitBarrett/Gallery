@@ -3,7 +3,7 @@
 _Dernière mise à jour : 22/11/2026_
 
 ## Éditeur
-Legendary Shots (legendaryshots.com) est édité par :
+Legendary Shots est édité par :
 - Bootleygues
 - Coordonnées de l'éditeur détenues par l'hébergeur, Cloudflare, Inc.
 - Contact : aleygues@yahoo.fr
