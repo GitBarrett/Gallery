@@ -115,6 +115,21 @@
       "turnstileToken": {
         "failed": "The anti-bot check failed. Try again."
       }
-    }
+    },
+    "tabs": {
+      "label": "Account",
+      "signin": "Sign in",
+      "signup": "Create account"
+    },
+    "signin": {
+      "title": "Sign in",
+      "submit": "Sign in",
+      "invalid": "Wrong email or password.",
+      "turnstileRequired": "Several attempts failed. Confirm you are not a robot, then sign in again."
+    },
+    "signout": "Sign out"
+  },
+  "settings": {
+    "title": "Settings"
   }
 }

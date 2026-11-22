@@ -5,7 +5,7 @@ import { z } from '~~/shared/contracts/zod'
 import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
 import { PublicSettings } from '~~/shared/contracts/settings'
-import type { SignupBody, WaitlistBody } from '~~/shared/contracts/auth'
+import { MeResponse, type SigninBody, type SignupBody, type WaitlistBody } from '~~/shared/contracts/auth'
 
 export class ApiError extends Error {
   constructor(
@@ -22,12 +22,17 @@ export class ApiError extends Error {
 
 type Options = NonNullable<Parameters<typeof $fetch>[1]>
 
-// shortcut: $fetch does not forward the visitor's cookies during SSR, switch to useRequestFetch with the session (T-12a)
-export async function call<S extends z.ZodType>(path: string, schema: S, options: Options = {}): Promise<z.infer<S>> {
+// `fetch`: useRequestFetch() for a read that needs the visitor's cookies during SSR (plain $fetch drops them)
+export async function call<S extends z.ZodType>(
+  path: string,
+  schema: S,
+  options: Options = {},
+  fetch: typeof $fetch = $fetch,
+): Promise<z.infer<S>> {
   let body: unknown
   try {
     // Idempotent requests are retried once by $fetch; not on 409 (conflict) nor 429 (wait for Retry-After)
-    body = await $fetch(path, { retryStatusCodes: [408, 500, 502, 503, 504], ...options })
+    body = await fetch(path, { retryStatusCodes: [408, 500, 502, 503, 504], ...options })
   } catch (error) {
     const response = ErrorResponse.safeParse((error as FetchError).data)
     const status = (error as FetchError).statusCode ?? 0
@@ -54,4 +59,8 @@ export const api = {
   // 204 without body (US-01.2, US-56.4: the same answer whatever the email)
   signup: (body: SignupBody) => call('/api/auth/signup', z.unknown(), { method: 'POST', body }),
   waitlist: (body: WaitlistBody) => call('/api/waitlist', z.unknown(), { method: 'POST', body }),
+  // 204, the session cookie is set (US-03.1)
+  signin: (body: SigninBody) => call('/api/auth/signin', z.unknown(), { method: 'POST', body }),
+  signout: () => call('/api/auth/signout', z.unknown(), { method: 'POST' }),
+  me: (fetch?: typeof $fetch) => call('/api/me', MeResponse, {}, fetch),
 }

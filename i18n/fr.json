@@ -115,6 +115,21 @@
       "turnstileToken": {
         "failed": "La vérification anti-robot a échoué. Réessayez."
       }
-    }
+    },
+    "tabs": {
+      "label": "Compte",
+      "signin": "Se connecter",
+      "signup": "Créer un compte"
+    },
+    "signin": {
+      "title": "Se connecter",
+      "submit": "Se connecter",
+      "invalid": "Email ou mot de passe incorrect.",
+      "turnstileRequired": "Plusieurs tentatives ont échoué. Confirmez que vous n'êtes pas un robot, puis reconnectez-vous."
+    },
+    "signout": "Se déconnecter"
+  },
+  "settings": {
+    "title": "Réglages"
   }
 }

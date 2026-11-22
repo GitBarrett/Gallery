@@ -11,6 +11,9 @@ declare const self: ServiceWorkerGlobalScope
 
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') void self.skipWaiting()
+  // Sign-out (US-64.4): no page or public read of the previous member stays on a shared device
+  if (event.data?.type === 'CLEAR_USER_CACHES')
+    event.waitUntil(Promise.all(['pages', 'api-public'].map((name) => caches.delete(name))))
 })
 
 precacheAndRoute(self.__WB_MANIFEST)

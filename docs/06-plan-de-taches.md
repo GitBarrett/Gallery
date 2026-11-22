@@ -187,9 +187,13 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Turnstile exigé après 5 échecs en 15 min (compte ou IP), connexion par mot de passe bloquée 1 h après 20 échecs en 1 h, email d'alerte au titulaire (`rate_limit_counters`).
   Stories : US-03.3. Tests : U, I.
 
-- [ ] **T-12b Sessions : écrans et appareils** (dép. T-12a, T-11c)
-  Page de connexion, redirection sûre, liste et révocation des sessions (`/api/me/sessions*`), vidage des caches du service worker à la déconnexion.
-  Stories : US-03.6, US-64.4. Tests : I, E.
+- [x] **T-12b Connexion et déconnexion : écrans** (dép. T-12a, T-11c)
+  Page de connexion, redirection sûre, membre connecté dans l'en-tête, déconnexion avec vidage des caches du service worker (`CLEAR_USER_CACHES`). Découpée le 22/11/2026 : liste et révocation des sessions en T-12d.
+  Stories : US-03.6, US-03.4 (client), US-64.4. Tests : U, E.
+
+- [ ] **T-12d Sessions : appareils** (dép. T-12b)
+  Liste et révocation des sessions (`/api/me/sessions*`), résumé lisible de l'appareil, écran dans `/settings`.
+  Stories : US-03 (sessions). Tests : I, E.
 
 - [ ] **T-13 Mot de passe oublié** (dép. T-12a)
   Stories : US-04. Tests : U, I, E.
