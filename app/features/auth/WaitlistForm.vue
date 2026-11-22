@@ -54,12 +54,11 @@ async function submit() {
     />
     <label class="consent">
       <input v-model="consent" type="checkbox" required class="checkbox" />
-      <i18n-t keypath="auth.waitlist.consent" tag="span">
-        <template #privacy>
-          <NuxtLink :to="localePath('/privacy')" class="link">{{ t('auth.signup.privacyLink') }}</NuxtLink>
-        </template>
-      </i18n-t>
+      <span>{{ t('auth.waitlist.consent') }}</span>
     </label>
+    <p class="policies">
+      <NuxtLink :to="localePath('/privacy')" class="link">{{ t('auth.signup.privacyLink') }}</NuxtLink>
+    </p>
     <TurnstileCheck ref="turnstile" v-model="turnstileToken" action="waitlist" />
     <p v-if="error" class="error" role="alert">{{ t(error.key) }}</p>
     <UiButton type="submit" size="lg" block :disabled="sending || !turnstileToken">
@@ -104,7 +103,15 @@ async function submit() {
   accent-color: var(--color-accent);
 }
 
+.policies {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
 .link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-md);
   color: var(--color-accent);
 }
 

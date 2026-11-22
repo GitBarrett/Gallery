@@ -29,7 +29,14 @@ test('US-67.5 every interactive element has a touch target of at least 44 × 44 
     await page.goto(path)
     const small = await page.locator(INTERACTIVE).evaluateAll((elements) =>
       elements
-        .map((element) => ({ element, box: element.getBoundingClientRect() }))
+        // A checkbox is touched through its whole label
+        .map((element) => ({
+          element,
+          box: (element.matches('[type=checkbox]')
+            ? (element.closest('label') ?? element)
+            : element
+          ).getBoundingClientRect(),
+        }))
         .filter(({ box }) => box.width > 0 && (box.width < 44 || box.height < 44))
         .map(({ element, box }) => `${element.outerHTML.slice(0, 60)} ${box.width}×${box.height}`),
     )
@@ -66,10 +73,14 @@ test('US-75.1 skip link first, every element reachable by keyboard with a visibl
     const withoutFocusRing: string[] = []
     for (let i = 1; i < reachable; i++) {
       await page.keyboard.press('Tab')
-      // The search field shows its ring on its frame (the form)
-      const focused = page.locator(':focus')
-      const shadow = await focused.evaluate((e) => getComputedStyle(e.closest('form') ?? e).boxShadow)
-      if (shadow === 'none') withoutFocusRing.push(await focused.evaluate((e) => e.outerHTML.slice(0, 60)))
+      // The search field shows its ring on its frame (the form); the Turnstile frame draws its own, inside
+      const missing = await page.evaluate(() => {
+        const e = document.activeElement
+        if (!e || e.tagName === 'IFRAME') return null
+        const shadow = getComputedStyle(e.closest('form[role=search]') ?? e).boxShadow
+        return shadow === 'none' ? e.outerHTML.slice(0, 60) : null
+      })
+      if (missing) withoutFocusRing.push(missing)
     }
     expect(withoutFocusRing, path).toEqual([])
     expect(await seriousAxeViolations(page), path).toEqual([])

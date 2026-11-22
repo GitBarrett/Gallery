@@ -15,12 +15,13 @@ async function testRoute(page: Page, path: string, method: 'POST' | 'DELETE') {
 }
 
 async function fill(page: Page, { username, email, password }: { username: string; email: string; password: string }) {
+  // Test site key: the check passes by itself once the page is hydrated (typing before would be lost)
+  const submit = page.getByRole('button', { name: 'Create my account' })
+  await expect(submit).toBeEnabled({ timeout: 15_000 })
   await page.getByLabel('Username').fill(username)
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Password').fill(password)
   await page.getByRole('checkbox', { name: /at least 15/ }).check()
-  // Test site key: the check passes by itself and enables the button
-  await expect(page.getByRole('button', { name: 'Create my account' })).toBeEnabled({ timeout: 15_000 })
 }
 
 const someone = () => {

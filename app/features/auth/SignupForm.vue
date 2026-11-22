@@ -86,15 +86,12 @@ async function submit() {
         />
         <label class="terms">
           <input v-model="terms" type="checkbox" required class="checkbox" />
-          <i18n-t keypath="auth.signup.terms" tag="span">
-            <template #terms>
-              <NuxtLink :to="localePath('/terms')" class="link">{{ t('auth.signup.termsLink') }}</NuxtLink>
-            </template>
-            <template #privacy>
-              <NuxtLink :to="localePath('/privacy')" class="link">{{ t('auth.signup.privacyLink') }}</NuxtLink>
-            </template>
-          </i18n-t>
+          <span>{{ t('auth.signup.terms') }}</span>
         </label>
+        <p class="policies">
+          <NuxtLink :to="localePath('/terms')" class="link">{{ t('auth.signup.termsLink') }}</NuxtLink>
+          <NuxtLink :to="localePath('/privacy')" class="link">{{ t('auth.signup.privacyLink') }}</NuxtLink>
+        </p>
         <TurnstileCheck ref="turnstile" v-model="turnstileToken" action="signup" />
         <p v-if="fieldError('turnstileToken')" class="error" role="alert">{{ fieldError('turnstileToken') }}</p>
         <p v-if="error && !error.field" class="error" role="alert">{{ t(error.key) }}</p>
@@ -156,7 +153,18 @@ async function submit() {
   accent-color: var(--color-accent);
 }
 
+.policies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
 .link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-md);
   color: var(--color-accent);
 }
 
