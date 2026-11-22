@@ -35,6 +35,9 @@ test.beforeEach(async ({ page }, testInfo) => {
   test.skip(reset.status === 404, 'test routes are only built for previews')
 })
 
+// Two sign-ins, two emails through the queue (a few seconds each): longer than the default 30 s
+test.describe.configure({ timeout: 120_000 })
+
 test('US-01.1 US-01.4 US-01.5 the mailed link verifies the email and signs in, once; a member asks for a new one', async ({
   page,
   context,
