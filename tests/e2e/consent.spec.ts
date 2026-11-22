@@ -2,7 +2,8 @@ import type { BrowserContext, Page } from '@playwright/test'
 import { expect, test } from './fixtures'
 
 // Cookie consent (T-10a, docs/legal/cookies.md). Every PostHog request of the test is recorded.
-const ESSENTIAL = ['ls-consent', 'i18n_redirected', 'CF_Authorization']
+// CF_Authorization and CF_AppSession: Cloudflare Access, on previews only (ADR-013)
+const ESSENTIAL = ['ls-consent', 'i18n_redirected', 'CF_Authorization', 'CF_AppSession']
 const posthogCalls = (page: Page) => {
   const calls: string[] = []
   page.on('request', (request) => {
