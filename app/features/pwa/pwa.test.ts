@@ -11,7 +11,9 @@ mockNuxtImport('useNuxtApp', (original) => () => Object.assign(original(), { $pw
 const off = { leaderboard: false, contests: false, collections: false }
 
 describe('UpdateToast', () => {
-  it('US-65.1 shows "A new version is available · Reload", which activates the new version', async () => {
+  // US-65.3 end to end (new worker active after Reload) cannot run behind Cloudflare Access: the browser's update
+  // check of sw.js escapes Playwright routing, so it lacks the service token and is redirected (check by hand)
+  it('US-65.1 US-65.3 shows "A new version is available · Reload", which activates the new version', async () => {
     const wrapper = await mountSuspended(UpdateToast)
     expect(wrapper.text()).toContain('A new version is available')
     await wrapper.get('button').trigger('click')

@@ -65,27 +65,3 @@ test('US-64.3 offline, a banner says so', async ({ page, context }) => {
   await context.setOffline(false)
   await expect(page.getByRole('status').filter({ hasText: "You're offline" })).toBeHidden()
 })
-
-test('US-65.1 US-65.3 a new version shows "A new version is available · Reload", which activates it', async ({
-  page,
-  context,
-}) => {
-  await controlledHome(page)
-  const before = await page.evaluate(() => navigator.serviceWorker.controller!.scriptURL)
-  // A new deployment: the same service worker with one more line. Read by the page itself (its requests carry the
-  // Access token), then served by the test: a fetch made from the route is redirected by Cloudflare Access
-  const script = (await fetchInPage(page, '/sw.js')).body
-  await context.route('**/sw.js', (route) =>
-    route.fulfill({ status: 200, contentType: 'text/javascript', body: `${script}\n// next version` }),
-  )
-  await page.evaluate(async () => (await navigator.serviceWorker.getRegistration())!.update())
-  const toast = page.getByRole('status').filter({ hasText: 'A new version is available' })
-  await expect(toast).toBeVisible({ timeout: 15_000 })
-  await toast.getByRole('button', { name: 'Reload' }).click()
-  await page.waitForLoadState('load')
-  await expect
-    .poll(() => page.evaluate(async () => !(await navigator.serviceWorker.getRegistration())!.waiting))
-    .toBe(true)
-  expect(await page.evaluate(() => navigator.serviceWorker.controller!.scriptURL)).toBe(before)
-  await expect(toast).toBeHidden()
-})
