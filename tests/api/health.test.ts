@@ -1,10 +1,11 @@
-import { $fetch, fetch, setup } from '@nuxt/test-utils/e2e'
+import { $fetch, fetch } from '@nuxt/test-utils/e2e'
+import { startTestServer } from './server'
 import { describe, expect, it } from 'vitest'
 import { ErrorResponse } from '../../shared/contracts/errors'
 import { HealthResponse } from '../../shared/contracts/health'
 
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
-await setup({ server: true, browser: false })
+await startTestServer()
 
 describe('platform API', () => {
   it('GET /api/health answers ok', async () => {

@@ -1,4 +1,5 @@
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { fetch } from '@nuxt/test-utils/e2e'
+import { startTestServer } from './server'
 import { describe, expect, it } from 'vitest'
 
 // Preview build (ADR-013): variables read at build time (/__test routes) and at startup (noindex)
@@ -6,7 +7,7 @@ process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
 process.env.NUXT_DEPLOY_ENV = 'preview'
 process.env.NUXT_FAKE_PROVIDERS = 'true'
 process.env.NUXT_PUBLIC_CF_BEACON_TOKEN = 'f'.repeat(32)
-await setup({ server: true, browser: false })
+await startTestServer('preview')
 
 describe('preview build', () => {
   it('asks search engines not to index the preview', async () => {

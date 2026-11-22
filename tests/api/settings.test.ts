@@ -1,9 +1,10 @@
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
+import { $fetch } from '@nuxt/test-utils/e2e'
+import { startTestServer } from './server'
 import { describe, expect, it } from 'vitest'
 import { PublicSettings } from '../../shared/contracts/settings'
 
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
-await setup({ server: true, browser: false })
+await startTestServer()
 
 describe('GET /api/settings/public', () => {
   it('US-71.5 serves the quality thresholds and the feature flags to an anonymous visitor', async () => {

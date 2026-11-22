@@ -1,4 +1,5 @@
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { fetch } from '@nuxt/test-utils/e2e'
+import { startTestServer } from './server'
 import { createHash } from 'node:crypto'
 import { eq, like } from 'drizzle-orm'
 import { afterAll, describe, expect, it } from 'vitest'
@@ -11,7 +12,7 @@ import { ErrorResponse } from '../../shared/contracts/errors'
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
 process.env.NUXT_FAKE_PROVIDERS = 'true' // Turnstile accepts only the dummy token of its test keys
 process.env.NUXT_APP_SECRET = 'test-only-app-secret-of-32-characters-or-more' // seals the session cookie
-await setup({ server: true, browser: false })
+await startTestServer()
 
 const db = createDb(process.env.DATABASE_URL!)
 

@@ -1,9 +1,10 @@
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { fetch } from '@nuxt/test-utils/e2e'
+import { startTestServer } from './server'
 import { describe, expect, it } from 'vitest'
 import { ErrorResponse } from '../../shared/contracts/errors'
 
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
-await setup({ server: true, browser: false })
+await startTestServer()
 
 describe('HTTP security (08-securite.md § 5)', () => {
   it('sends a nonce-based CSP whose nonce is on every script of the page', async () => {
