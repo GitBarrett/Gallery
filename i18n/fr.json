@@ -20,13 +20,14 @@
     "cookieSettings": "Gestion des cookies"
   },
   "errorPage": {
-    "notFoundTitle": "Page introuvable",
+    "notFoundTitle": "Vous vous êtes aventuré en zone inexplorée",
     "notFoundText": "Cette page n'existe pas ou n'est plus disponible. Essayez plutôt une recherche.",
     "serverTitle": "Une erreur est survenue",
     "serverText": "L'erreur nous a été signalée. Réessayez dans un instant.",
     "reference": "Référence de l'erreur",
     "searchLabel": "Rechercher dans la galerie",
-    "home": "Retour à l'accueil"
+    "home": "Retour à l'accueil",
+    "hearthstone": "Utiliser la pierre de foyer"
   },
   "errors": {
     "VALIDATION_FAILED": "Certains champs ne sont pas valides. Vérifiez-les puis réessayez.",
@@ -43,5 +44,8 @@
     "text": "Cette page n'est pas disponible hors ligne. Pages consultées récemment :",
     "none": "Aucune page enregistrée pour le moment.",
     "banner": "Vous êtes hors ligne"
+  },
+  "surprises": {
+    "console": "En recherche de guilde ? Signalez les bugs : {link}"
   }
 }

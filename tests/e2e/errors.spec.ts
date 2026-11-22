@@ -1,22 +1,27 @@
 import { expect, test } from './fixtures'
 
-// Error pages (T-07c): no mockup, composed with the design system.
+// Error pages (T-07c, T-07d): no mockup, composed with the design system.
 
-test('US-69.1 an unknown URL shows the 404 page with search and a way home, with status 404', async ({ page }) => {
+test('US-69.1 US-79.1 an unknown URL shows the "uncharted zone" 404 page with search, Hearthstone and its reference, with status 404', async ({
+  page,
+}) => {
   const response = await page.goto('/this-page-does-not-exist')
   expect(response?.status()).toBe(404)
   const main = page.getByRole('main')
-  await expect(main.getByRole('heading', { level: 1 })).toHaveText('Page not found')
+  await expect(main.getByRole('heading', { level: 1 })).toHaveText('You have wandered into an uncharted zone')
   await expect(main.getByRole('searchbox')).toBeVisible()
-  await expect(main.getByRole('link', { name: 'Back to home' })).toHaveAttribute('href', '/')
+  await expect(main.getByRole('link', { name: 'Use Hearthstone' })).toHaveAttribute('href', '/')
+  await expect(main.getByTestId('correlation-id')).toHaveText(/\S{8,}/)
   // The site layout stays around the error
   await expect(page.getByRole('banner')).toBeVisible()
 })
 
-test('US-69.1 the 404 page follows the language of the URL', async ({ page }) => {
+test('US-69.1 US-79.1 the 404 page follows the language of the URL', async ({ page }) => {
   const response = await page.goto('/fr/cette-page-n-existe-pas')
   expect(response?.status()).toBe(404)
-  await expect(page.getByRole('main').getByRole('link', { name: "Retour à l'accueil" })).toHaveAttribute('href', '/fr')
+  const main = page.getByRole('main')
+  await expect(main.getByRole('heading', { level: 1 })).toHaveText('Vous vous êtes aventuré en zone inexplorée')
+  await expect(main.getByRole('link', { name: 'Utiliser la pierre de foyer' })).toHaveAttribute('href', '/fr')
 })
 
 test('US-69.2 a server error shows the 500 page with a correlation id and no technical detail', async ({ page }) => {

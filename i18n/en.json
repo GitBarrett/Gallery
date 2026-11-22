@@ -20,13 +20,14 @@
     "cookieSettings": "Cookie settings"
   },
   "errorPage": {
-    "notFoundTitle": "Page not found",
+    "notFoundTitle": "You have wandered into an uncharted zone",
     "notFoundText": "This page does not exist or is no longer available. Try a search instead.",
     "serverTitle": "Something went wrong",
     "serverText": "The error has been reported to us. Please try again in a moment.",
     "reference": "Error reference",
     "searchLabel": "Search the gallery",
-    "home": "Back to home"
+    "home": "Back to home",
+    "hearthstone": "Use Hearthstone"
   },
   "errors": {
     "VALIDATION_FAILED": "Some fields are not valid. Check them and try again.",
@@ -43,5 +44,8 @@
     "text": "This page is not available offline. Pages you visited recently:",
     "none": "No page saved yet.",
     "banner": "You're offline"
+  },
+  "surprises": {
+    "console": "Looking for guild? Report bugs: {link}"
   }
 }

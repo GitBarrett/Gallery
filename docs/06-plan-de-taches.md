@@ -129,7 +129,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Client API typé `app/services/api` et gestion d'erreur commune, pages 404/500 avec identifiant de corrélation.
   Stories : US-69. Tests : E (US-69.1–2).
 
-- [ ] **T-07d Petites surprises** (dép. T-07c)
+- [x] **T-07d Petites surprises** (dép. T-07c)
   Page 404 « uncharted zone » avec le bouton « Use Hearthstone » (identifiant de corrélation conservé), message console (logo ASCII et lien vers `/feedback`, une fois par session).
   Stories : US-79. Tests : U (message console émis une fois), E (US-79.1).
 
