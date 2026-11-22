@@ -165,6 +165,8 @@ async function submit() {
   display: inline-flex;
   align-items: center;
   min-height: var(--control-md);
+  min-width: var(--control-md);
+  justify-content: center;
   color: var(--color-accent);
 }
 

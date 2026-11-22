@@ -44,7 +44,7 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="box" class="turnstile">
+  <div ref="box" class="turnstile" data-turnstile>
     <p v-if="failed" class="failed" role="alert">{{ t('auth.turnstileUnavailable') }}</p>
   </div>
 </template>

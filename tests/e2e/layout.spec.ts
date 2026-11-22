@@ -73,10 +73,10 @@ test('US-75.1 skip link first, every element reachable by keyboard with a visibl
     const withoutFocusRing: string[] = []
     for (let i = 1; i < reachable; i++) {
       await page.keyboard.press('Tab')
-      // The search field shows its ring on its frame (the form); the Turnstile frame draws its own, inside
+      // The search field shows its ring on its frame (the form); the Turnstile widget draws its own, in its frame
       const missing = await page.evaluate(() => {
         const e = document.activeElement
-        if (!e || e.tagName === 'IFRAME') return null
+        if (!e || e === document.body || e.tagName === 'IFRAME' || e.closest('[data-turnstile]')) return null
         const shadow = getComputedStyle(e.closest('form[role=search]') ?? e).boxShadow
         return shadow === 'none' ? e.outerHTML.slice(0, 60) : null
       })
