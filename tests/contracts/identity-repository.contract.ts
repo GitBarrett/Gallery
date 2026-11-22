@@ -4,7 +4,7 @@ import type { IdentityRepository, NewUser } from '../../server/modules/identity'
 // Contract of the IdentityRepository port (11-strategie-de-tests.md § 4): checked on the fake and the database.
 // `make` returns an empty repository (or one where the run's unique values are unused).
 export function identityRepositoryContract(name: string, make: () => Promise<IdentityRepository>) {
-  const user = (): NewUser => {
+  const user = (): NewUser & { email: string; passwordHash: string } => {
     const run = crypto.randomUUID().slice(0, 8)
     return {
       id: crypto.randomUUID(),
@@ -82,6 +82,25 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect((await repo.findEmailToken(reset.tokenHash, 'reset'))?.usedAt).toEqual(now)
       expect((await repo.findEmailToken(verify.tokenHash, 'verify'))?.usedAt).toBeNull()
       expect((await repo.findEmailToken(other.tokenHash, 'reset'))?.usedAt).toBeNull()
+    })
+
+    it('US-02.1 creates an OAuth account without password, its email verified, and finds it by its subject', async () => {
+      const repo = await make()
+      const ash = { ...user(), passwordHash: null, emailVerifiedAt: new Date('2026-11-22T12:00:00Z') }
+      expect(await repo.createUser(ash)).toBe('created')
+      const subject = `google-${ash.id}`
+      const link = { id: crypto.randomUUID(), userId: ash.id, provider: 'google' as const, subject }
+      expect(await repo.linkOAuthAccount(link)).toBe(true)
+      expect(await repo.linkOAuthAccount({ ...link, id: crypto.randomUUID() })).toBe(false) // already linked
+      expect(await repo.findOAuthAccount('google', subject)).toEqual({ userId: ash.id, status: 'active' })
+      expect(await repo.findOAuthAccount('google', `${subject}x`)).toBeNull()
+      expect(await repo.findCredentials(ash.email)).toMatchObject({ passwordHash: null })
+    })
+
+    it('US-02.1 creates accounts without email, any number of them', async () => {
+      const repo = await make()
+      expect(await repo.createUser({ ...user(), email: null })).toBe('created')
+      expect(await repo.createUser({ ...user(), email: null })).toBe('created')
     })
 
     it('US-03.1 finds the credentials of an email in any case', async () => {

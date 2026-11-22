@@ -13,13 +13,15 @@ export type IdentityError =
   | { kind: 'invite_required' }
   | { kind: 'not_found' }
   | { kind: 'invalid_credentials' }
+  | { kind: 'oauth_failed' }
 export type IdentityResult = Result<void, IdentityError>
 
 export const invalid = (field: string, reason: string): IdentityError => ({ kind: 'invalid', field, reason })
 
 /** Link token: 256 random bits, base64url (08-securite.md § 3). Only its hash is stored. */
-export function newToken(): string {
-  const bytes = crypto.getRandomValues(new Uint8Array(32))
+export const newToken = (): string => base64url(crypto.getRandomValues(new Uint8Array(32)))
+
+export function base64url(bytes: Uint8Array): string {
   return btoa(String.fromCharCode(...bytes))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')

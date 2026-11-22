@@ -7,7 +7,7 @@ import type {
   NewUser,
 } from '../../server/modules/identity'
 
-type StoredUser = Omit<NewUser, 'passwordHash'> & {
+type StoredUser = Omit<NewUser, 'passwordHash' | 'emailVerifiedAt'> & {
   passwordHash: string | null
   emailVerifiedAt: Date | null
   role: 'user' | 'moderator' | 'admin'
@@ -23,7 +23,8 @@ export function inMemoryIdentityRepository() {
     sessions.filter((s) => s.userId === userId && !s.revokedAt && s.expiresAt > at)
   const invites: (BetaInvite & { usedAt: Date | null })[] = []
   const waitlist: { id: string; email: string; locale: Locale }[] = []
-  const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase()
+  const same = (a: string | null, b: string) => a?.toLowerCase() === b.toLowerCase()
+  const oauth: { id: string; userId: string; provider: string; subject: string }[] = []
   const repo: IdentityRepository = {
     async findUserIdByEmail(email) {
       return users.find((u) => same(u.email, email))?.id ?? null
@@ -32,14 +33,15 @@ export function inMemoryIdentityRepository() {
       return users.some((u) => same(u.username, username))
     },
     async createUser(user) {
-      if (users.some((u) => same(u.email, user.email))) return 'email_taken'
+      const { email } = user
+      if (email && users.some((u) => same(u.email, email))) return 'email_taken'
       if (users.some((u) => same(u.username, user.username))) return 'username_taken'
-      users.push({ ...user, emailVerifiedAt: null, role: 'user', status: 'active' })
+      users.push({ ...user, emailVerifiedAt: user.emailVerifiedAt ?? null, role: 'user', status: 'active' })
       return 'created'
     },
     async findRecipient(userId) {
       const user = users.find((u) => u.id === userId)
-      return user ? { email: user.email, username: user.username, locale: user.locale } : null
+      return user?.email ? { email: user.email, username: user.username, locale: user.locale } : null
     },
     async createEmailToken(token) {
       tokens.push({ ...token, usedAt: null })
@@ -67,6 +69,16 @@ export function inMemoryIdentityRepository() {
     async findCredentials(email) {
       const user = users.find((u) => same(u.email, email))
       return user ? { userId: user.id, passwordHash: user.passwordHash, status: user.status } : null
+    },
+    async findOAuthAccount(provider, subject) {
+      const link = oauth.find((o) => o.provider === provider && o.subject === subject)
+      const user = users.find((u) => u.id === link?.userId)
+      return user ? { userId: user.id, status: user.status } : null
+    },
+    async linkOAuthAccount(link) {
+      if (oauth.some((o) => o.provider === link.provider && o.subject === link.subject)) return false
+      oauth.push(link)
+      return true
     },
     async createSession(session) {
       sessions.push({ ...session, createdAt: session.lastSeenAt, revokedAt: null })
@@ -124,5 +136,5 @@ export function inMemoryIdentityRepository() {
       if (!waitlist.some((e) => same(e.email, entry.email))) waitlist.push(entry)
     },
   }
-  return { repo, users, tokens, sessions, invites, waitlist }
+  return { repo, users, tokens, sessions, invites, waitlist, oauth }
 }

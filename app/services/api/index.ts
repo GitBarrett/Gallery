@@ -8,6 +8,8 @@ import { PublicSettings } from '~~/shared/contracts/settings'
 import {
   type ForgotPasswordBody,
   MeResponse,
+  type OAuthCompleteBody,
+  OAuthPendingResponse,
   type ResendVerificationBody,
   type ResetPasswordBody,
   SessionsResponse,
@@ -86,4 +88,8 @@ export const api = {
   // 204 (US-03.8, US-03.9)
   revokeSession: (id: string) => call(`/api/me/sessions/${id}`, z.unknown(), { method: 'DELETE' }),
   revokeOtherSessions: () => call('/api/me/sessions/revoke-others', z.unknown(), { method: 'POST' }),
+  // identity back from the provider, waiting for its account or its link (US-02.1, US-02.3); 404 once gone
+  oauthPending: () => call('/api/auth/oauth/pending', OAuthPendingResponse),
+  // 204: account created and session opened (US-02.1)
+  completeOAuth: (body: OAuthCompleteBody) => call('/api/auth/oauth/complete', z.unknown(), { method: 'POST', body }),
 }

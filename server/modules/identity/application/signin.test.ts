@@ -27,7 +27,15 @@ async function setup() {
   const human = {
     verify: async (token: string, _ip: string | undefined, action: string) => token === 'human' && action === 'signin',
   }
-  const run = signin({ repo: fake.repo, uow, hasher, human, limiter: inMemoryRateLimiter(clock), clock })
+  const run = signin({
+    repo: fake.repo,
+    uow,
+    hasher,
+    human,
+    limiter: inMemoryRateLimiter(clock),
+    clock,
+    ids: { next: () => 'link-1' },
+  })
   return { ...fake, hasher, sent, run }
 }
 
@@ -108,5 +116,16 @@ describe('signin', () => {
       })
       expect(sent()).toEqual([])
     })
+  })
+
+  it('US-02.3 links the pending OAuth identity whose email is the signed-in account', async () => {
+    const { run, oauth } = await setup()
+    const link = { provider: 'google' as const, subject: 'g-1', email: 'Ash@Example.com', emailTaken: true }
+    await run({ ...body, password: 'wrong password', oauthLink: link })
+    expect(oauth).toEqual([])
+    await run({ ...body, oauthLink: { ...link, email: 'other@example.com' } })
+    expect(oauth).toEqual([])
+    await run({ ...body, oauthLink: link })
+    expect(oauth).toEqual([{ id: 'link-1', userId: 'ash', provider: 'google', subject: 'g-1' }])
   })
 })

@@ -211,7 +211,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Après un reset réussi : autres liens de reset annulés, email marqué vérifié, email « mot de passe modifié » EN/FR.
   Stories : US-04.5–6. Tests : U, I.
 
-- [ ] **T-14 OAuth Google** (dép. T-12b) — **action humaine** : client OAuth Google.
+- [x] **T-14 OAuth Google** (dép. T-12b) — **action humaine** : client OAuth Google.
   State + PKCE, règles de liaison, bouton conforme à la charte Google.
   Stories : US-02.1–5. Tests : U, I (fournisseur factice), E.
 

@@ -26,6 +26,8 @@ const schema = z
     TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
     RESEND_API_KEY: z.string().min(1).optional(),
     IP_HASH_KEY_CURRENT: z.string().min(32).optional(),
+    NUXT_OAUTH_GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    NUXT_OAUTH_GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
   })
   .refine((env) => !(env.NUXT_DEPLOY_ENV === 'production' && env.NUXT_FAKE_PROVIDERS === 'true'), {
     path: ['NUXT_FAKE_PROVIDERS'],
@@ -40,6 +42,8 @@ export interface Config {
   turnstileSecret?: string
   resendApiKey?: string
   ipHashKey?: string
+  googleClientId?: string
+  googleClientSecret?: string
 }
 
 /** Validates the environment; a missing or invalid variable fails the startup, without printing its value. */
@@ -57,5 +61,7 @@ export function loadConfig(env: Record<string, string | undefined>): Config {
     turnstileSecret: parsed.data.TURNSTILE_SECRET_KEY,
     resendApiKey: parsed.data.RESEND_API_KEY,
     ipHashKey: parsed.data.IP_HASH_KEY_CURRENT,
+    googleClientId: parsed.data.NUXT_OAUTH_GOOGLE_CLIENT_ID,
+    googleClientSecret: parsed.data.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
   }
 }

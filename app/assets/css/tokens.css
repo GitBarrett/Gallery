@@ -61,6 +61,9 @@
   --color-logo-legendary: #ff8c1a;
   --shadow-logo: 0 2px 0 #2a1200, 0 0 18px rgb(255 128 0 / 35%);
 
+  /* Provider buttons: colors imposed by their brand guidelines (Google: white, text #1f1f1f) */
+  --color-google-text: #1f1f1f;
+
   /* Typography: fonts self-hosted by @nuxt/fonts */
   --font-body: 'Inter', system-ui, sans-serif;
   --font-display: 'Cinzel', serif;

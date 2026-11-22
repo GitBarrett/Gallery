@@ -133,7 +133,7 @@ Une ligne par groupe de routes de `03-architecture.md` § Inventaire ; le test d
 | Routes | Visiteur | Non vérifié | Membre | Propriétaire | Suspendu | Modérateur | Admin |
 |---|---|---|---|---|---|---|---|
 | Lectures publiques : `GET /api/photos`, `/api/photos/{id}` (publiée), `/related`, `/comments`, `/api/users/*`, `/api/home`, `/api/settings/public`, `/api/game-versions`, `/api/zones/suggest`, `/api/tags/suggest`, `/api/search`, `/api/usernames/{name}/availability`, `/img/*` dont `og.jpg` (publiées), `/avatar/*`, sitemap, robots, health | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Auth sans session : `signup`, `signin`, `password/*`, `verify-email`, `email/confirm`, `deletion/cancel`, `GET /auth/*`, `oauth/complete`, `POST /api/waitlist` | ✓ (Turnstile, § 8) | ✓ | ✓ | — | ✓ (banni : refusé) | ✓ | ✓ |
+| Auth sans session : `signup`, `signin`, `password/*`, `verify-email`, `email/confirm`, `deletion/cancel`, `GET /auth/*`, `oauth/pending`, `oauth/complete`, `POST /api/waitlist` | ✓ (Turnstile, § 8) | ✓ | ✓ | — | ✓ (banni : refusé) | ✓ | ✓ |
 | `signout`, `resend-verification`, `reauth` | 401 | ✓ | ✓ | — | ✓ | ✓ | ✓ |
 | `POST /api/auth/mfa/*` | 401 | 403 | 403 | — | 403 | ✓ | ✓ |
 | Compte : `GET/PATCH /api/me`, `/api/me/sessions*`, `email`, `password`, `oauth/*`, `terms/accept` (v1.x, T-70), `decisions`, `GET /api/me/photos`, `POST /api/me/deletion` | 401 | ✓ | ✓ | — | ✓ (PATCH bio : 403) | ✓ | ✓ (dernier admin : suppression 409) |

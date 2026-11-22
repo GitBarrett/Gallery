@@ -77,3 +77,35 @@ export const ResetPasswordBody = z.strictObject({
   password: z.string().max(512),
 })
 export type ResetPasswordBody = z.infer<typeof ResetPasswordBody>
+
+/** /auth/{provider} and its callback (US-02); Battle.net comes with T-15. */
+export const OAuthProviderParams = z.strictObject({ provider: z.enum(['google']) })
+
+/** GET /auth/{provider}: language of the pages to come back to, invitation of the beta (US-56.4). */
+export const OAuthStartQuery = z.strictObject({
+  locale: z.enum(['en', 'fr']).default('en'),
+  invite: z.string().min(1).max(128).optional(),
+})
+
+/** GET /auth/{provider}/callback: the provider adds other parameters (scope, authuser…), ignored. */
+export const OAuthCallbackQuery = z.object({
+  state: z.string().max(256).optional(),
+  code: z.string().max(2048).optional(),
+  error: z.string().max(256).optional(),
+})
+
+/** GET /api/auth/oauth/pending: the identity waiting for its account (US-02.1) or for the link (US-02.3). */
+export const OAuthPendingResponse = z.strictObject({
+  provider: z.enum(['google']),
+  email: z.string().nullable(),
+  emailTaken: z.boolean(),
+})
+export type OAuthPendingResponse = z.infer<typeof OAuthPendingResponse>
+
+/** POST /api/auth/oauth/complete (US-02.1): username and Terms of a first OAuth sign-in; signs in. */
+export const OAuthCompleteBody = z.strictObject({
+  username: z.string().max(64),
+  termsAccepted: z.literal(true), // "I am at least 15 and accept the Terms and Privacy policy" (US-01.7)
+  locale: z.enum(['en', 'fr']).default('en'),
+})
+export type OAuthCompleteBody = z.infer<typeof OAuthCompleteBody>

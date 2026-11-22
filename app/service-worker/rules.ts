@@ -2,8 +2,8 @@
 // (/img) get their rule in T-25b; anything not listed goes to the network (analytics, OAuth, Turnstile, R2…).
 export type CacheRule = 'pages' | 'api-public' | 'network'
 
-// Private pages, with or without the /fr prefix: never cached
-const PRIVATE_PAGE = /^(\/fr)?\/(settings|admin|notifications|upload)(\/|$)/
+// Private pages and OAuth navigations, with or without the /fr prefix: never cached
+const PRIVATE_PAGE = /^(\/fr)?\/(settings|admin|notifications|upload|auth|oauth)(\/|$)/
 // Public API reads (lists, photo page, profiles, search, home, public settings, leaderboard)
 const PUBLIC_API = /^\/api\/(photos|users|game-versions|search|home|settings\/public|leaderboard)(\/|$)/
 // Not part of the app: Storybook (ADR-019), test routes

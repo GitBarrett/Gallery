@@ -86,6 +86,25 @@ export const users = pgTable(
   ],
 )
 
+/** Provider identities linked to an account (US-02): one account per (provider, subject). */
+export const oauthAccounts = pgTable(
+  'oauth_accounts',
+  {
+    id: id(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    provider: text('provider').notNull(),
+    providerUserId: text('provider_user_id').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('oauth_accounts_subject_unique').on(t.provider, t.providerUserId),
+    index('oauth_accounts_user_idx').on(t.userId),
+    check('oauth_accounts_provider_check', sql`${t.provider} in ('google', 'battlenet')`),
+  ],
+)
+
 /** Server sessions: the sealed cookie carries a 256-bit id, only its SHA-256 is stored (ADR-010). */
 export const sessions = pgTable(
   'sessions',
