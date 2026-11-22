@@ -163,9 +163,9 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   `POST /api/auth/signup`, `verify-email` : Turnstile, âge 15 ans et Terms (version acceptée enregistrée), limite de débit, consommateur `emails` (vérification, « compte existant ») et modèles EN/FR. Découpée le 22/11/2026 : renvoi et politique « email vérifié requis » en T-11e (il leur faut la session de T-12a), session ouverte à l'inscription en T-12a.
   Stories : US-01 (API). Tests : U, I (US-01.1–4, US-01.6–7).
 
-- [ ] **T-11e Renvoi de vérification et email vérifié requis** (dép. T-11b, T-12a)
+- [x] **T-11e Renvoi de vérification et email vérifié requis** (dép. T-11b, T-12a)
   `POST /api/auth/resend-verification` (Turnstile, 3/h par compte, 10/h par IP), politique `requireVerified`.
-  Stories : US-01.5, US-08. Tests : U, I (US-01.5, US-08.1–2).
+  Stories : US-01.5, US-08 (politique ; appliquée et testée par les routes qui l'utilisent : T-21, T-41, T-40, Q46). Tests : U, I (US-01.5), U (politique).
 
 - [ ] **T-11c Inscription : écrans** (dép. T-11e, T-11d, T-07c)
   Pages d'inscription et de vérification conformes à `SignIn.dc.html` ; en mode invitation, refus de l'inscription avec le formulaire de liste d'attente (test E de T-11d, Q43).
@@ -234,7 +234,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
 
 - [ ] **T-21 Demande d'upload** (dép. T-18a, T-20a, T-05c)
   Module `media` : `requestUploadUrl` (politiques, quotas, URL présignée du bucket privé signée sur taille et type), `completeUpload` (idempotent, contrôle `R2.head`), nettoyage des orphelins (cron horaire).
-  Stories : US-10.1–2, US-10.5–7. Tests : U, I, contrat `ObjectStorage`, E (PUT navigateur réel sur la preview : CORS et CSP).
+  Stories : US-10.1–2, US-10.5–7, US-08.1 (email vérifié requis). Tests : U, I, contrat `ObjectStorage`, E (PUT navigateur réel sur la preview : CORS et CSP).
 
 - [ ] **T-22a Suppression des métadonnées** (dép. T-01b)
   Traitement d'octets pur dans `media/domain` (ADR-011) : JPEG (APP1, APP3–APP13, APP15, COM retirés ; APP0, ICC, APP14 conservés), PNG (`eXIf`, `tEXt`, `iTXt`, `zTXt`, `tIME`), WebP (`EXIF`, `XMP ` et drapeaux `VP8X`), refus d'une orientation ≠ 1, calcul de la taille finale.
@@ -321,11 +321,11 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
 
 - [ ] **T-40 Likes et qualité** (dép. T-31a, T-23a)
   Like idempotent, interdiction de l'auto-like, limites, recalcul de qualité, notification de palier (une fois par palier).
-  Stories : US-30, US-71.4. Tests : U, I (concurrence), E.
+  Stories : US-30, US-71.4, US-08.2 (like permis sans email vérifié). Tests : U, I (concurrence), E.
 
 - [ ] **T-41 Commentaires** (dép. T-31a, T-23a)
   Rendu texte, filtre d'insultes (Q8), édition 15 min, suppression, limites.
-  Stories : US-31. Tests : U, I, E (dont XSS).
+  Stories : US-31, US-08.1 (email vérifié requis). Tests : U, I, E (dont XSS).
 
 - [ ] **T-42 Partage** (dép. T-31a)
   `navigator.share`, menu de repli, événement analytics.
