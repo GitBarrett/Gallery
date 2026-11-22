@@ -9,8 +9,8 @@ import InstallBanner from '~/features/pwa/InstallBanner.vue'
 import UpdateToast from '~/features/pwa/UpdateToast.vue'
 
 const flags = useFeatureFlags()
-// shortcut: always signed out, the username comes from the session in T-12a
-const username = undefined
+const { me } = await useMe()
+const username = computed(() => me.value?.username)
 </script>
 
 <template>

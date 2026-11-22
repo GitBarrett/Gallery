@@ -83,7 +83,8 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
         >
           <NavIcon name="notifications" />
         </NuxtLink>
-        <NuxtLink :to="localePath(`/u/${username}`)" class="icon-link" :aria-label="t('layout.myProfile')">
+        <!-- shortcut: settings (sign-out) until the public profile /u/<username> exists, T-16 -->
+        <NuxtLink :to="localePath('/settings')" class="icon-link" :aria-label="t('layout.myProfile')">
           <NavIcon name="profile" />
         </NuxtLink>
       </template>

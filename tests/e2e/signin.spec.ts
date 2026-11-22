@@ -1,0 +1,89 @@
+import type { Page } from '@playwright/test'
+import { expect, test } from './fixtures'
+
+// Sign-in and sign-out screens (T-12b). They need the preview's test routes (invitation, counters: ADR-013) and run
+// on desktop Chromium only: the sign-up and sign-in limits are shared by the CI address, and WebKit in Playwright
+// runs no service worker.
+const testRoute = (page: Page, path: string, method: 'POST' | 'DELETE') =>
+  page.evaluate(
+    async ([url, verb]) => {
+      const r = await fetch(url!, { method: verb })
+      return { status: r.status, body: r.status === 200 ? await r.json() : null }
+    },
+    [path, method],
+  )
+
+// An invited sign-up through the screen (an unverified account may sign in: Q46)
+async function member(page: Page) {
+  const run = crypto.randomUUID().slice(0, 8)
+  const ash = { username: `e2e_${run}`, email: `e2e.${run}@example.com`, password: `a long passphrase ${run}` }
+  const { body } = await testRoute(page, '/__test/invite', 'POST')
+  await page.goto(`/signup?invite=${body.token}`)
+  const submit = page.getByRole('button', { name: 'Create my account' })
+  await expect(submit).toBeEnabled({ timeout: 15_000 }) // hydrated, test Turnstile passed
+  await page.getByLabel('Username').fill(ash.username)
+  await page.getByLabel('Email').fill(ash.email)
+  await page.getByLabel('Password').fill(ash.password)
+  await page.getByRole('checkbox', { name: /at least 15/ }).check()
+  await submit.click()
+  await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible()
+  return ash
+}
+
+async function signIn(page: Page, { email, password }: { email: string; password: string }) {
+  await page.waitForLoadState('networkidle') // hydrated: typing before would be lost
+  await page.getByLabel('Email').fill(email)
+  await page.getByLabel('Password').fill(password)
+  await page.getByRole('main').getByRole('button', { name: 'Sign in' }).click()
+}
+
+test.beforeEach(async ({ page, browserName }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop' || browserName !== 'chromium', 'limits shared by the CI address')
+  await page.goto('/signin')
+  const reset = await testRoute(page, '/__test/rate-limits', 'DELETE')
+  test.skip(reset.status === 404, 'test routes are only built for previews')
+})
+
+test('US-03.6 a redirect outside the site is ignored after sign-in', async ({ page }) => {
+  const ash = await member(page)
+  await page.goto('/signin?redirect=//evil.example')
+  await signIn(page, ash)
+  await expect(page).toHaveURL('/')
+  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible()
+})
+
+test('US-03.6 a visitor sent to sign in comes back to the page of the site', async ({ page }) => {
+  const ash = await member(page)
+  await page.goto('/settings')
+  await expect(page).toHaveURL('/signin?redirect=/settings')
+  await signIn(page, ash)
+  await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
+})
+
+test('US-03.2 wrong credentials get one message', async ({ page }) => {
+  await signIn(page, { email: 'nobody@example.com', password: 'not the password' })
+  await expect(page.getByRole('alert')).toHaveText('Wrong email or password.')
+})
+
+test('US-03.4 US-64.4 sign-out ends the session and empties the pages and api-public caches', async ({ page }) => {
+  const ash = await member(page)
+  await page.goto('/signin')
+  await signIn(page, ash)
+  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible()
+  // A page of the member, cached by the service worker once it controls the page
+  await page.evaluate(() => navigator.serviceWorker.ready)
+  await page.goto('/legal')
+  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true)
+  await page.reload()
+  const cached = () => page.evaluate(async () => (await caches.has('pages')) || (await caches.has('api-public')))
+  await expect.poll(cached).toBe(true)
+
+  await page.goto('/settings')
+  await page.waitForLoadState('networkidle')
+  await page.getByRole('button', { name: 'Sign out' }).click()
+  await expect(page).toHaveURL('/')
+  await expect(page.getByRole('banner').getByRole('link', { name: 'Sign in' })).toBeVisible()
+  const legalCached = () => page.evaluate(async () => Boolean(await (await caches.open('pages')).match('/legal')))
+  await expect.poll(legalCached).toBe(false)
+  expect(await page.evaluate(async () => (await fetch('/api/me')).status)).toBe(401)
+})

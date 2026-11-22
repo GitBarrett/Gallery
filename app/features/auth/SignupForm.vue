@@ -1,11 +1,12 @@
 <script setup lang="ts">
 // Sign-up (US-01, SignIn mockup "Create account"). Every accepted request ends on the same "Check your inbox",
 // a used email included (US-01.2); during the beta, a refusal without invitation opens the waiting list
-// (US-56.4). Social buttons come with T-14/T-15, the sign-in tab with T-12b (Q47).
+// (US-56.4). Social buttons come with T-14/T-15, the sign-in tab is in AuthCard.
 import { api } from '~/services/api'
 import { localSignupError, signupError, type FormError } from './signup-errors'
 import TurnstileCheck from './TurnstileCheck.vue'
 import WaitlistForm from './WaitlistForm.vue'
+import AuthCard from './AuthCard.vue'
 
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
@@ -52,7 +53,7 @@ async function submit() {
 </script>
 
 <template>
-  <section class="card" aria-labelledby="signup-title">
+  <AuthCard :tab="step === 'form' ? 'signup' : undefined" aria-labelledby="signup-title">
     <template v-if="step === 'form'">
       <h1 id="signup-title" class="title">{{ t('auth.signup.title') }}</h1>
       <form class="form" @submit.prevent="submit">
@@ -106,24 +107,10 @@ async function submit() {
       <p class="text">{{ t('auth.signup.inboxText') }}</p>
     </div>
     <WaitlistForm v-else :email="email" />
-  </section>
+  </AuthCard>
 </template>
 
 <style scoped>
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  width: 100%;
-  max-width: var(--auth-card-max);
-  margin: var(--space-8) auto;
-  padding: var(--space-6);
-  border: var(--border-width) solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-raised);
-}
-
 .title {
   margin: 0;
   font-family: var(--font-display);

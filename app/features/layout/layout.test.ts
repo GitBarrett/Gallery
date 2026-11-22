@@ -25,7 +25,7 @@ describe('AppHeader', () => {
     const visitor = await mountSuspended(AppHeader, { props: { flags: off } })
     expect(hrefs(visitor, 'a')).toContain('/signin')
     const member = await mountSuspended(AppHeader, { props: { flags: off, username: 'jaina' } })
-    expect(hrefs(member, 'a')).toEqual(expect.arrayContaining(['/notifications', '/u/jaina']))
+    expect(hrefs(member, 'a')).toEqual(expect.arrayContaining(['/notifications', '/settings']))
     expect(hrefs(member, 'a')).not.toContain('/signin')
   })
 
@@ -61,7 +61,7 @@ describe('AppTabBar', () => {
 
   it('switches to the target tabs with the leaderboard and contests flags', async () => {
     const wrapper = await mountSuspended(AppTabBar, { props: { flags: on, username: 'jaina' } })
-    expect(hrefs(wrapper, 'a')).toEqual(['/explore', '/leaderboard', '/upload', '/contests', '/u/jaina'])
+    expect(hrefs(wrapper, 'a')).toEqual(['/explore', '/leaderboard', '/upload', '/contests', '/settings'])
   })
 })
 

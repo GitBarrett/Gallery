@@ -19,7 +19,8 @@ const tabs = computed((): { to: string; label: string; icon: NavIconName }[] =>
     props.flags.contests
       ? { to: '/contests', label: t('layout.contests'), icon: 'contests' as const }
       : { to: '/notifications', label: t('layout.notifications'), icon: 'notifications' as const },
-    { to: props.username ? `/u/${props.username}` : '/signin', label: t('layout.profile'), icon: 'profile' as const },
+    // shortcut: settings (sign-out) until the public profile /u/<username> exists, T-16
+    { to: props.username ? '/settings' : '/signin', label: t('layout.profile'), icon: 'profile' as const },
   ].map((tab) => ({ ...tab, to: localePath(tab.to) })),
 )
 </script>
