@@ -24,6 +24,7 @@ afterAll(async () => {
 describe('migrations (T-05a)', () => {
   it('create every cross-cutting table on a blank database', async () => {
     const tables = ['outbox', 'processed_messages', 'site_settings', 'audit_log', 'rate_limit_counters', 'donations']
+    tables.push('users', 'sessions', 'email_tokens') // T-11a
     const found = await sql`select tablename from pg_tables where schemaname = 'public'`
     expect(found.map((t) => t.tablename).sort()).toEqual(tables.sort())
   })
@@ -54,16 +55,40 @@ describe('migrations (T-05a)', () => {
   })
 
   it('empty every table of the preview template except the site settings, without their author', async () => {
-    const author = '0197a000-0000-7000-8000-000000000001'
+    const author = (
+      await sql`insert into users (email, username) values ('admin@example.com', 'Admin') returning id`
+    )[0]!.id
+    await sql`insert into sessions (id_hash, user_id, expires_at) values ('h', ${author}, now())`
     await sql`insert into outbox (topic, payload) values ('emails', '{"to":"someone@example.com"}')`
     await sql`insert into audit_log (actor_id, action, target_type, target_id) values (${author}, 'ban', 'user', '1')`
     await sql`update site_settings set updated_by = ${author}`
     await emptyData(url)
-    for (const table of ['outbox', 'processed_messages', 'audit_log', 'rate_limit_counters', 'donations'])
+    for (const table of [
+      'outbox',
+      'processed_messages',
+      'audit_log',
+      'rate_limit_counters',
+      'donations',
+      'users',
+      'sessions',
+    ])
       expect((await sql.unsafe(`select count(*)::int as n from ${table}`))[0]!.n).toBe(0)
     expect(await sql`select key, updated_by from site_settings`).toEqual([
       { key: 'features.donations', updated_by: null },
     ])
+  })
+
+  it('make email and username unique ignoring case, keeping the display case (T-11a)', async () => {
+    await sql`insert into users (email, username) values ('Ash@Example.com', 'Ash_Barrett')`
+    await expect(sql`insert into users (email, username) values ('ash@example.com', 'other')`).rejects.toThrow(
+      /users_email_unique/,
+    )
+    await expect(sql`insert into users (email, username) values ('other@example.com', 'ash_barrett')`).rejects.toThrow(
+      /users_username_unique/,
+    )
+    expect((await sql`select username from users where lower(username) = 'ash_barrett'`)[0]!.username).toBe(
+      'Ash_Barrett',
+    )
   })
 
   it('connect the Worker with a plain login role that can insert into audit_log but never update or delete it', async () => {
@@ -78,6 +103,11 @@ describe('migrations (T-05a)', () => {
       await expect(app`delete from audit_log`).rejects.toThrow(/permission denied/)
       await expect(app`truncate audit_log`).rejects.toThrow(/permission denied/)
       await app`update outbox set topic = topic` // the other tables stay writable
+      // Deleting an account detaches its audit entries, although the role cannot update audit_log (T-11a)
+      const id = (await app`insert into users (username) values ('Leaving') returning id`)[0]!.id
+      await app`insert into audit_log (actor_id, action, target_type, target_id) values (${id}, 'test', 'user', '1')`
+      await app`delete from users where id = ${id}`
+      expect((await app`select count(*)::int as n from audit_log where actor_id = ${id}`)[0]!.n).toBe(0)
     } finally {
       await app.end()
     }

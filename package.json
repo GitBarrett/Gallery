@@ -27,6 +27,7 @@
     "storybook:build": "storybook build --quiet"
   },
   "dependencies": {
+    "@noble/hashes": "^2.4.0",
     "@nuxt/fonts": "1.2.0",
     "@nuxtjs/i18n": "10.6.0",
     "@sentry/nuxt": "^11.12.0",

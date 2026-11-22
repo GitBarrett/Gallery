@@ -175,6 +175,9 @@ importers:
 
   .:
     dependencies:
+      '@noble/hashes':
+        specifier: ^2.4.0
+        version: 2.4.0
       '@nuxt/fonts':
         specifier: 1.2.0
         version: 1.2.0(@devframes/agentic@1.4.0)(@nuxt/schema@4.6.4)(cac@7.1.0)(confbox@0.3.2)(db0@0.3.4(drizzle-orm@0.45.4(@opentelemetry/api@1.10.0)(postgres@4.1.1)))(dotenv@17.4.2)(esbuild@0.28.2)(giget@3.3.1)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lightningcss@1.33.0)(magic-string@1.4.5)(mlly@1.8.2)(oxc-parser@0.141.0)(postcss@8.5.33)(rolldown@1.2.19)(rollup@4.68.7)(srvx@1.0.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -2028,6 +2031,10 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1 || 2.0.0-beta.2
       '@emnapi/runtime': ^1.7.1 || 2.0.0-beta.2
+
+  '@noble/hashes@2.4.0':
+    resolution: {integrity: sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==}
+    engines: {node: '>= 20.19.0'}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -8439,7 +8446,7 @@ snapshots:
       '@babel/core': 7.29.13(supports-color@10.2.2)
       '@babel/helper-annotate-as-pure': 7.29.7
       '@babel/helper-wrap-function': 7.29.15(supports-color@10.2.2)
-      '@babel/traverse': 7.29.14(supports-color@10.2.2)
+      '@babel/traverse': 7.29.15(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -8500,7 +8507,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.29.13(supports-color@10.2.2)
       '@babel/helper-plugin-utils': 7.29.7
-      '@babel/traverse': 7.29.14(supports-color@10.2.2)
+      '@babel/traverse': 7.29.15(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -8535,7 +8542,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.29.13(supports-color@10.2.2)
       '@babel/helper-plugin-utils': 7.29.7
-      '@babel/traverse': 7.29.14(supports-color@10.2.2)
+      '@babel/traverse': 7.29.15(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -8579,7 +8586,7 @@ snapshots:
       '@babel/core': 7.29.13(supports-color@10.2.2)
       '@babel/helper-plugin-utils': 7.29.7
       '@babel/helper-remap-async-to-generator': 7.29.7(@babel/core@7.29.13(supports-color@10.2.2))(supports-color@10.2.2)
-      '@babel/traverse': 7.29.14(supports-color@10.2.2)
+      '@babel/traverse': 7.29.15(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -8626,7 +8633,7 @@ snapshots:
       '@babel/helper-globals': 7.29.7
       '@babel/helper-plugin-utils': 7.29.7
       '@babel/helper-replace-supers': 7.29.7(@babel/core@7.29.13(supports-color@10.2.2))(supports-color@10.2.2)
-      '@babel/traverse': 7.29.14(supports-color@10.2.2)
+      '@babel/traverse': 7.29.15(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -8640,7 +8647,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.29.13(supports-color@10.2.2)
       '@babel/helper-plugin-utils': 7.29.7
-      '@babel/traverse': 7.29.14(supports-color@10.2.2)
+      '@babel/traverse': 7.29.15(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -8697,7 +8704,7 @@ snapshots:
       '@babel/core': 7.29.13(supports-color@10.2.2)
       '@babel/helper-compilation-targets': 7.29.13
       '@babel/helper-plugin-utils': 7.29.7
-      '@babel/traverse': 7.29.14(supports-color@10.2.2)
+      '@babel/traverse': 7.29.15(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -8783,7 +8790,7 @@ snapshots:
       '@babel/helper-plugin-utils': 7.29.7
       '@babel/plugin-transform-destructuring': 7.29.13(@babel/core@7.29.13(supports-color@10.2.2))(supports-color@10.2.2)
       '@babel/plugin-transform-parameters': 7.29.7(@babel/core@7.29.13(supports-color@10.2.2))
-      '@babel/traverse': 7.29.14(supports-color@10.2.2)
+      '@babel/traverse': 7.29.15(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -8994,7 +9001,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.29.13(supports-color@10.2.2)
       '@babel/helper-plugin-utils': 7.29.7
-      '@babel/types': 7.29.14
+      '@babel/types': 7.29.15
       esutils: 2.0.3
 
   '@babel/runtime@7.29.15': {}
@@ -10029,6 +10036,8 @@ snapshots:
       '@emnapi/runtime': 2.0.0-beta.2
       '@tybys/wasm-util': 0.10.5
     optional: true
+
+  '@noble/hashes@2.4.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
