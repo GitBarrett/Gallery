@@ -103,9 +103,11 @@ export default defineNuxtConfig({
     },
     devOptions: { enabled: false },
   },
-  // Public values read at startup (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN, NUXT_PUBLIC_POSTHOG_KEY),
-  // empty locally (T-03f, T-10a)
-  runtimeConfig: { public: { sentryDsn: '', cfBeaconToken: '', posthogKey: '' } },
+  // Public values read at startup (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN, NUXT_PUBLIC_POSTHOG_KEY,
+  // NUXT_PUBLIC_TURNSTILE_SITE_KEY), empty locally (T-03f, T-10a); Turnstile: test key locally (always passes)
+  runtimeConfig: {
+    public: { sentryDsn: '', cfBeaconToken: '', posthogKey: '', turnstileSiteKey: '1x00000000000000000000AA' },
+  },
   // No source map upload (organisation token not needed for the MVP) and no build plugin telemetry
   sentry: { sourcemaps: { disable: true }, telemetry: false },
   // /__test routes (reset, fake mailbox, queue…): only in preview builds (ADR-013)

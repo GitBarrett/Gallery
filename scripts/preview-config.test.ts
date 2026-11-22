@@ -17,6 +17,11 @@ describe('previewConfig (ADR-013)', () => {
     expect(preview.toml).toContain('NUXT_R2_PREFIX = "pr-42/"')
   })
 
+  it('uses the Turnstile test site key, whose dummy token the fake verifier accepts', () => {
+    expect(preview.toml).toContain('NUXT_PUBLIC_TURNSTILE_SITE_KEY = "1x00000000000000000000AA"')
+    expect(preview.toml).not.toContain('0x4AAAAAAGNPHoTNovZ8sqtK')
+  })
+
   it('points to the preview bucket and the dedicated Hyperdrive config, never to production', () => {
     expect(preview.toml).toContain('bucket_name = "ls-preview"')
     expect(preview.toml).toContain('id = "aaaabbbbccccddddeeeeffff00001111"')

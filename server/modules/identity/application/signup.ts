@@ -35,7 +35,8 @@ export const signup =
     clock: Clock
   }) =>
   async (cmd: SignupCommand): Promise<IdentityResult> => {
-    if (!(await deps.human.verify(cmd.turnstileToken, cmd.ip))) return err(invalid('turnstileToken', 'failed'))
+    const human = await deps.human.verify(cmd.turnstileToken, cmd.ip, 'signup')
+    if (!human) return err(invalid('turnstileToken', 'failed'))
     const limit = await deps.limiter.consume(SIGNUP_PER_IP, cmd.ip ?? 'unknown')
     if (!limit.allowed) return err({ kind: 'rate_limited', retryAfterSeconds: limit.retryAfterSeconds })
     const username = validateUsername(cmd.username)

@@ -76,7 +76,11 @@ export function createContainer({
           breaches: hibpBreachChecker({ fetch: fetcher, logger }),
           human: config.fakeProviders
             ? fakeHumanVerifier
-            : turnstileVerifier({ secret: required(config.turnstileSecret, 'TURNSTILE_SECRET_KEY'), fetch: fetcher }),
+            : turnstileVerifier({
+                secret: required(config.turnstileSecret, 'TURNSTILE_SECRET_KEY'),
+                hostname: new URL(config.siteUrl).hostname,
+                fetch: fetcher,
+              }),
           limiter: dbRateLimiter(db(), ipHashKey(), clock),
           ids,
           clock,
