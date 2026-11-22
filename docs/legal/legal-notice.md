@@ -11,7 +11,9 @@ Legendary Shots (legendaryshots.[TLD]) is published by:
 
 Publication director: [FULL NAME].
 
-> If the publisher is an individual without a company, French law allows the name and address to be held by the host instead of being published; in that case write "Publisher details held by the host, Cloudflare, Inc." and keep a contact email.
+<!-- If the publisher is an individual without a company, French law allows the name and address to be held by the host instead of being published; in that case write "Publisher details held by the host, Cloudflare, Inc." and keep a contact email. -->
+
+
 
 ## Hosting
 - Website and image storage: Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA — cloudflare.com

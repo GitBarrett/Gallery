@@ -70,5 +70,8 @@
     "analytics": "Mesure d'usage",
     "analyticsDescription": "PostHog (UE) : pages visitées et actions comme publier, aimer ou partager. Conservé 12 mois.",
     "policy": "Lire la politique de cookies"
+  },
+  "legal": {
+    "table": "Tableau défilant"
   }
 }

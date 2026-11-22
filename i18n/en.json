@@ -70,5 +70,8 @@
     "analytics": "Product analytics",
     "analyticsDescription": "PostHog (EU): pages visited and actions such as upload, like or share. Kept 12 months.",
     "policy": "Read the cookie policy"
+  },
+  "legal": {
+    "table": "Scrollable table"
   }
 }

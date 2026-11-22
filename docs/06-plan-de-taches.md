@@ -149,7 +149,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Panneau cookies conforme à `docs/legal/cookies.md`, chargement conditionnel de PostHog EU, Cloudflare Web Analytics.
   Stories : US-61, US-72 (mécanique). Tests : E (aucun appel PostHog ni cookie avant consentement, retrait).
 
-- [ ] **T-10b Pages légales** (dép. T-07b)
+- [x] **T-10b Pages légales** (dép. T-07b)
   Pages `/legal`, `/terms`, `/privacy`, `/cookies` depuis `docs/legal/*.md`, date de mise à jour, repli anglais.
   Stories : US-74.1. Tests : E.
 
