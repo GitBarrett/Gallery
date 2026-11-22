@@ -1,11 +1,19 @@
 import { and, asc, eq, inArray, isNull, lt } from 'drizzle-orm'
-import type { QueueProducer } from '../platform/bindings'
+import type { Bindings, QueueProducer } from '../platform/bindings'
 import type { Clock } from '../platform/clock'
 import type { QueueTopic } from '../platform/unit-of-work'
 import type { Db } from './client'
 import { outbox, processedMessages } from './schema'
 
 export type QueueProducers = Record<QueueTopic, QueueProducer | undefined>
+
+export const queuesOf = (env: Bindings): QueueProducers => ({
+  'photo-process': env.PHOTO_PROCESS_QUEUE,
+  notifications: env.NOTIFICATIONS_QUEUE,
+  emails: env.EMAILS_QUEUE,
+  feedback: env.FEEDBACK_QUEUE,
+  'account-purge': env.ACCOUNT_PURGE_QUEUE,
+})
 
 const BATCH = 100
 const DAY = 86_400_000

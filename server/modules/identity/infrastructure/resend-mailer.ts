@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { Mailer } from '../application/ports'
+import type { Logger } from '../../../platform/logger'
 
 type Fetch = (url: string, init?: RequestInit) => Promise<Response>
 
@@ -16,5 +17,12 @@ export const resendMailer = ({ apiKey, from, fetch }: { apiKey: string; from: st
     })
     if (!response.ok) throw new Error(`Resend refused the email (status ${response.status})`)
     sent.parse(await response.json())
+  },
+})
+
+/** Fake provider (local, previews): nothing is sent, only the subject is logged (no address, no link). */
+export const fakeMailer = (logger: Logger): Mailer => ({
+  async send({ subject }) {
+    logger.info('email not sent: fake provider', { subject })
   },
 })
