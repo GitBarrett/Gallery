@@ -41,3 +41,7 @@ export const MeResponse = z.strictObject({
   emailVerified: z.boolean(),
 })
 export type MeResponse = z.infer<typeof MeResponse>
+
+/** POST /api/auth/resend-verification (signed-in member, US-01.5). */
+export const ResendVerificationBody = z.strictObject({ turnstileToken: z.string().min(1).max(2048) })
+export type ResendVerificationBody = z.infer<typeof ResendVerificationBody>

@@ -209,6 +209,24 @@ describe('sessions', () => {
     expect((await me(session)).status).toBe(401)
   })
 
+  it('US-01.5 resends the verification link to a signed-in member, 3 times an hour, 401 for a visitor', async () => {
+    const session = sessionCookie(await signin(await account())).value
+    const resend = (cookie?: string) =>
+      fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: {
+          'sec-fetch-site': 'same-origin',
+          'content-type': 'application/json',
+          'cf-connecting-ip': crypto.randomUUID(),
+          ...(cookie ? { cookie } : {}),
+        },
+        body: JSON.stringify({ turnstileToken: TURNSTILE_DUMMY_TOKEN }),
+      })
+    expect((await resend()).status).toBe(401)
+    for (let i = 0; i < 3; i++) expect((await resend(session)).status).toBe(204)
+    expect((await resend(session)).status).toBe(429)
+  })
+
   it('answers 401 without session and sets no cookie for a visitor', async () => {
     const response = await me()
     expect(response.status).toBe(401)

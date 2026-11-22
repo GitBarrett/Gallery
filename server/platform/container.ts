@@ -8,6 +8,7 @@ import {
   fakeHumanVerifier,
   hibpBreachChecker,
   joinWaitlist,
+  resendVerification,
   resolveSession,
   signin,
   signout,
@@ -38,6 +39,7 @@ export interface Container {
     signin: UseCase<typeof signin>
     signout: UseCase<typeof signout>
     resolveSession: UseCase<typeof resolveSession>
+    resendVerification: UseCase<typeof resendVerification>
   }
 }
 
@@ -113,6 +115,10 @@ export function createContainer({
       signout: (cmd) => signout({ repo: drizzleIdentityRepository(db()), clock })(cmd),
       // Read through Hyperdrive without cache (ADR-016): a revoked session is refused at once
       resolveSession: (cmd) => resolveSession({ repo: drizzleIdentityRepository(db()), clock })(cmd),
+      resendVerification: (cmd) =>
+        resendVerification({ uow: identityUow(), human: human(), limiter: dbRateLimiter(db(), ipHashKey(), clock) })(
+          cmd,
+        ),
     },
   }
 }
