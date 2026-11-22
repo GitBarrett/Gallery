@@ -20,9 +20,12 @@ export interface Mailer {
   send(message: EmailMessage): Promise<void>
 }
 
-/** Port: anti-bot check of a form (Turnstile siteverify). `false` for a missing, invalid or reused token. */
+/**
+ * Port: anti-bot check of a form (Turnstile siteverify). `false` for a missing, invalid or reused token, or one
+ * solved for another form (`action`: the `data-action` of the widget).
+ */
 export interface HumanVerifier {
-  verify(token: string, ip: string | undefined): Promise<boolean>
+  verify(token: string, ip: string | undefined, action: string): Promise<boolean>
 }
 
 export type Locale = 'en' | 'fr'

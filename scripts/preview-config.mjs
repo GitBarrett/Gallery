@@ -3,6 +3,7 @@
 // and the result is refused if it still contains a production resource.
 
 const SUBDOMAIN = 'aleygues.workers.dev'
+const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA'
 
 export function previewConfig(productionToml, { pr, hyperdriveId }) {
   const suffix = `-pr-${pr}`
@@ -21,6 +22,12 @@ export function previewConfig(productionToml, { pr, hyperdriveId }) {
   replace(/^NUXT_DEPLOY_ENV = "production"$/m, 'NUXT_DEPLOY_ENV = "preview"', 'NUXT_DEPLOY_ENV')
   replace(/^NUXT_FAKE_PROVIDERS = "false"$/m, 'NUXT_FAKE_PROVIDERS = "true"', 'NUXT_FAKE_PROVIDERS')
   replace(/^NUXT_R2_PREFIX = ""$/m, `NUXT_R2_PREFIX = "pr-${pr}/"`, 'NUXT_R2_PREFIX')
+  // Turnstile test key (always passes, dummy token): the production widget only accepts the site's domain
+  replace(
+    /^NUXT_PUBLIC_TURNSTILE_SITE_KEY = .*$/m,
+    `NUXT_PUBLIC_TURNSTILE_SITE_KEY = "${TURNSTILE_TEST_SITE_KEY}"`,
+    'NUXT_PUBLIC_TURNSTILE_SITE_KEY',
+  )
   replace(/^bucket_name = "ls-prod"$/m, 'bucket_name = "ls-preview"', 'bucket_name = "ls-prod"')
   replace(/(\[\[hyperdrive\]\]\nbinding = "HYPERDRIVE"\nid = )"[0-9a-f]+"/, `$1"${hyperdriveId}"`, 'hyperdrive')
   replace(/^namespace_id = "1001"$/m, 'namespace_id = "1002"', 'ratelimits namespace_id')

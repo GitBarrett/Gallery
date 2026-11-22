@@ -23,6 +23,7 @@ NUXT_R2_PREFIX = ""
 NUXT_PUBLIC_SENTRY_DSN = "https://cdcf8f3e3a474494448cff10947009ea@o4512469379055616.ingest.de.sentry.io/4512469385412688"
 NUXT_PUBLIC_CF_BEACON_TOKEN = "458bbb78a91d42189f5b66bff09f87de" # gitleaks:allow (public: served in every page)
 NUXT_PUBLIC_POSTHOG_KEY = "phc_BGKnTyctYSLV3X9RHXfBWxaHDFJQRmYnxSevmfk6pZGt" # gitleaks:allow (public: project key, capture only)
+NUXT_PUBLIC_TURNSTILE_SITE_KEY = "0x4AAAAAAGNPHoTNovZ8sqtK" # gitleaks:allow (public: rendered in the signup form)
 
 # Private bucket: originals and variants, never public (ADR-004, ADR-012)
 [[r2_buckets]]
