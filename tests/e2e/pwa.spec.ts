@@ -56,8 +56,10 @@ test('US-64.2 offline, a page never visited shows /offline with the pages availa
   await expect(page.getByRole('main').getByRole('link', { name: '/', exact: true })).toBeVisible()
 })
 
+// Independent of the service worker: with a page it controls, Playwright's offline emulation fires no `offline` event
 test('US-64.3 offline, a banner says so', async ({ page, context }) => {
-  await controlledHome(page)
+  await page.goto('/')
+  await page.waitForLoadState('networkidle') // hydrated
   await context.setOffline(true)
   await expect(page.getByRole('status').filter({ hasText: "You're offline" })).toBeVisible()
   await context.setOffline(false)
