@@ -2,8 +2,8 @@ import { createRequire } from 'node:module'
 import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
 
-// Shared layout (T-07a). shortcut: only the home page exists, extend PAGES as pages are added.
-const PAGES = ['/']
+// Shared layout (T-07a). shortcut: extend PAGES as pages are added; the privacy page holds the widest table.
+const PAGES = ['/', '/privacy', '/terms']
 const INTERACTIVE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
 const axePath = createRequire(import.meta.url).resolve('axe-core')
 
