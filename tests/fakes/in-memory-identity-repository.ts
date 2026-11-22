@@ -1,9 +1,24 @@
-import type { BetaInvite, EmailToken, IdentityRepository, Locale, NewUser } from '../../server/modules/identity'
+import type {
+  BetaInvite,
+  EmailToken,
+  IdentityRepository,
+  Locale,
+  NewSession,
+  NewUser,
+} from '../../server/modules/identity'
+
+type StoredUser = Omit<NewUser, 'passwordHash'> & {
+  passwordHash: string | null
+  emailVerifiedAt: Date | null
+  role: 'user' | 'moderator' | 'admin'
+  status: string
+}
 
 /** In-memory IdentityRepository with the same case-insensitive uniqueness as the database indexes. */
 export function inMemoryIdentityRepository() {
-  const users: (NewUser & { emailVerifiedAt: Date | null })[] = []
+  const users: StoredUser[] = []
   const tokens: EmailToken[] = []
+  const sessions: (NewSession & { revokedAt: Date | null })[] = []
   const invites: (BetaInvite & { usedAt: Date | null })[] = []
   const waitlist: { id: string; email: string; locale: Locale }[] = []
   const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase()
@@ -17,7 +32,7 @@ export function inMemoryIdentityRepository() {
     async createUser(user) {
       if (users.some((u) => same(u.email, user.email))) return 'email_taken'
       if (users.some((u) => same(u.username, user.username))) return 'username_taken'
-      users.push({ ...user, emailVerifiedAt: null })
+      users.push({ ...user, emailVerifiedAt: null, role: 'user', status: 'active' })
       return 'created'
     },
     async findRecipient(userId) {
@@ -40,6 +55,33 @@ export function inMemoryIdentityRepository() {
       const user = users.find((u) => u.id === userId)
       if (user) user.emailVerifiedAt = at
     },
+    async findCredentials(email) {
+      const user = users.find((u) => same(u.email, email))
+      return user ? { userId: user.id, passwordHash: user.passwordHash, status: user.status } : null
+    },
+    async createSession(session) {
+      sessions.push({ ...session, revokedAt: null })
+    },
+    async findSession(idHash) {
+      const session = sessions.find((s) => s.idHash === idHash)
+      const user = users.find((u) => u.id === session?.userId)
+      if (!session || !user) return null
+      const { id, username, role, status } = user
+      return {
+        lastSeenAt: session.lastSeenAt,
+        expiresAt: session.expiresAt,
+        revokedAt: session.revokedAt,
+        account: { id, username, role, status, emailVerified: Boolean(user.emailVerifiedAt) },
+      }
+    },
+    async touchSession(idHash, lastSeenAt, expiresAt) {
+      const session = sessions.find((s) => s.idHash === idHash)
+      if (session) Object.assign(session, { lastSeenAt, expiresAt })
+    },
+    async revokeSession(idHash, at) {
+      const session = sessions.find((s) => s.idHash === idHash && !s.revokedAt)
+      if (session) session.revokedAt = at
+    },
     async createInvite(invite) {
       invites.push({ ...invite, usedAt: null })
     },
@@ -55,5 +97,5 @@ export function inMemoryIdentityRepository() {
       if (!waitlist.some((e) => same(e.email, entry.email))) waitlist.push(entry)
     },
   }
-  return { repo, users, tokens, invites, waitlist }
+  return { repo, users, tokens, sessions, invites, waitlist }
 }

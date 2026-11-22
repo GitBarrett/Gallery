@@ -50,6 +50,8 @@ describe('signup', () => {
         termsAcceptedAt: clock.now(),
         termsVersion: TERMS_VERSION,
         emailVerifiedAt: null,
+        role: 'user',
+        status: 'active',
       },
     ])
     expect(sent()).toEqual([{ topic: 'emails', payload: { template: 'verify', userId: 'user-1' } }])

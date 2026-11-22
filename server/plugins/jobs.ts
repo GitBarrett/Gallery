@@ -11,7 +11,7 @@ import {
   type MessageHandler,
   type QueueMessage,
 } from '../platform/jobs'
-import { emailsConsumer, fakeMailer, purgeExpiredEmailTokens, resendMailer, type Mailer } from '../modules/identity'
+import { emailsConsumer, fakeMailer, purgeExpiredTokens, resendMailer, type Mailer } from '../modules/identity'
 import { loadConfig } from '../platform/config'
 import { uuidV7Generator } from '../platform/ids'
 import { createLogger, type Logger } from '../platform/logger'
@@ -64,7 +64,7 @@ const crons = (env: Bindings): Record<string, CronHandler[]> => ({
     // shortcut: up to 1 h of delay and 100 events per run, switch to */5 with the contests cron (T-64a)
     withDb(env, (db) => relayOf(env, db).publish()),
     withDb(env, (db) => purgeRateLimitCounters(db, systemClock)), // ended windows (T-05c)
-    withDb(env, (db) => purgeExpiredEmailTokens(db, systemClock)),
+    withDb(env, (db) => purgeExpiredTokens(db, systemClock)),
   ],
   '15 3 * * *': [withDb(env, (db) => relayOf(env, db).purge())],
 })

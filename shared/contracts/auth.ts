@@ -22,6 +22,22 @@ export const WaitlistBody = z.strictObject({
 })
 export type WaitlistBody = z.infer<typeof WaitlistBody>
 
-/** POST /api/auth/verify-email: the token of the link (fragment of the URL, never sent to the server logs). */
+/** POST /api/auth/verify-email: the token of the link (fragment of the URL, never sent to the server logs); opens the session. */
 export const VerifyEmailBody = z.strictObject({ token: z.string().min(1).max(128) })
 export type VerifyEmailBody = z.infer<typeof VerifyEmailBody>
+
+/** POST /api/auth/signin. The Turnstile token required after failures comes with the lockout (T-12c). */
+export const SigninBody = z.strictObject({
+  email: z.email().max(254),
+  password: z.string().min(1).max(512),
+})
+export type SigninBody = z.infer<typeof SigninBody>
+
+/** GET /api/me: the signed-in member. */
+export const MeResponse = z.strictObject({
+  id: z.uuid(),
+  username: z.string(),
+  role: z.enum(['user', 'moderator', 'admin']),
+  emailVerified: z.boolean(),
+})
+export type MeResponse = z.infer<typeof MeResponse>

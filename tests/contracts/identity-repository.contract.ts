@@ -60,6 +60,46 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       await repo.markEmailVerified(ash.id, now)
     })
 
+    it('US-03.1 finds the credentials of an email in any case', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      expect(await repo.findCredentials(ash.email.toUpperCase())).toEqual({
+        userId: ash.id,
+        passwordHash: ash.passwordHash,
+        status: 'active',
+      })
+      expect(await repo.findCredentials(`other.${ash.email}`)).toBeNull()
+    })
+
+    it('US-03.1 stores a session with its account, slides it and revokes it', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      const at = new Date('2026-11-22T12:00:00Z')
+      const session = {
+        idHash: crypto.randomUUID(),
+        userId: ash.id,
+        lastSeenAt: at,
+        expiresAt: new Date('2026-12-22T12:00:00Z'),
+        userAgentSummary: 'Firefox',
+      }
+      await repo.createSession(session)
+      const account = { id: ash.id, username: ash.username, role: 'user', status: 'active', emailVerified: false }
+      expect(await repo.findSession(session.idHash)).toEqual({
+        lastSeenAt: at,
+        expiresAt: session.expiresAt,
+        revokedAt: null,
+        account,
+      })
+      const later = new Date('2026-11-23T12:00:00Z')
+      await repo.touchSession(session.idHash, later, new Date('2026-12-23T12:00:00Z'))
+      expect(await repo.findSession(session.idHash)).toMatchObject({ lastSeenAt: later })
+      await repo.revokeSession(session.idHash, later)
+      expect(await repo.findSession(session.idHash)).toMatchObject({ revokedAt: later })
+      expect(await repo.findSession(crypto.randomUUID())).toBeNull()
+    })
+
     it('US-56.4 finds an invitation only while it is unused and unexpired, and uses it once', async () => {
       const repo = await make()
       const invite = {
