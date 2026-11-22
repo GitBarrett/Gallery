@@ -1,10 +1,12 @@
-import { and, eq, gt, isNull, lt, sql } from 'drizzle-orm'
+import { and, desc, eq, gt, isNull, lt, ne, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import type { Clock } from '../../../platform/clock'
 import { betaInvites, emailTokens, sessions, users, waitlistEntries } from '../../../db/schema'
 import type { Actor, EmailTokenType, IdentityRepository, Locale } from '../application/ports'
 
 const sameEmail = (email: string) => sql`lower(${users.email}) = lower(${email})`
+const activeOf = (userId: string, at: Date) =>
+  and(eq(sessions.userId, userId), isNull(sessions.revokedAt), gt(sessions.expiresAt, at))
 
 /** users and email_tokens tables; uniqueness ignoring case comes from the lower(…) indexes. */
 export const drizzleIdentityRepository = (db: Db | Transaction): IdentityRepository => ({
@@ -98,6 +100,32 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .update(sessions)
       .set({ revokedAt: at })
       .where(and(eq(sessions.idHash, idHash), isNull(sessions.revokedAt)))
+  },
+  async listSessions(userId, at) {
+    return db
+      .select({
+        idHash: sessions.idHash,
+        createdAt: sessions.createdAt,
+        lastSeenAt: sessions.lastSeenAt,
+        userAgentSummary: sessions.userAgentSummary,
+      })
+      .from(sessions)
+      .where(activeOf(userId, at))
+      .orderBy(desc(sessions.lastSeenAt))
+  },
+  async revokeUserSession(userId, idHash, at) {
+    const revoked = await db
+      .update(sessions)
+      .set({ revokedAt: at })
+      .where(and(activeOf(userId, at), eq(sessions.idHash, idHash)))
+      .returning({ idHash: sessions.idHash })
+    return revoked.length > 0
+  },
+  async revokeOtherSessions(userId, keptIdHash, at) {
+    await db
+      .update(sessions)
+      .set({ revokedAt: at })
+      .where(and(activeOf(userId, at), ne(sessions.idHash, keptIdHash)))
   },
   async createInvite(invite) {
     await db.insert(betaInvites).values(invite)

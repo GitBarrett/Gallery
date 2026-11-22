@@ -139,6 +139,17 @@
     }
   },
   "settings": {
-    "title": "Réglages"
+    "title": "Réglages",
+    "sessions": {
+      "title": "Appareils",
+      "device": "{browser} sur {os}",
+      "unknown": "Appareil inconnu",
+      "current": "Cet appareil",
+      "opened": "Connecté le {date}",
+      "lastSeen": "dernière activité le {date}",
+      "revoke": "Déconnecter",
+      "revokeLabel": "Déconnecter {device}",
+      "revokeOthers": "Déconnecter tous les autres appareils"
+    }
   }
 }

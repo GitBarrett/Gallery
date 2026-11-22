@@ -8,6 +8,7 @@ import { PublicSettings } from '~~/shared/contracts/settings'
 import {
   MeResponse,
   type ResendVerificationBody,
+  SessionsResponse,
   type SigninBody,
   type SignupBody,
   type VerifyEmailBody,
@@ -74,4 +75,8 @@ export const api = {
   verifyEmail: (body: VerifyEmailBody) => call('/api/auth/verify-email', z.unknown(), { method: 'POST', body }),
   resendVerification: (body: ResendVerificationBody) =>
     call('/api/auth/resend-verification', z.unknown(), { method: 'POST', body }),
+  sessions: () => call('/api/me/sessions', SessionsResponse),
+  // 204 (US-03.8, US-03.9)
+  revokeSession: (id: string) => call(`/api/me/sessions/${id}`, z.unknown(), { method: 'DELETE' }),
+  revokeOtherSessions: () => call('/api/me/sessions/revoke-others', z.unknown(), { method: 'POST' }),
 }

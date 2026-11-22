@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { inMemoryIdentityRepository } from '../../../../tests/fakes/in-memory-identity-repository'
 import { hashToken } from './email-tokens'
-import { resolveSession, SESSION_TTL_MS, signout, startSession } from './sessions'
+import {
+  listSessions,
+  resolveSession,
+  revokeOtherSessions,
+  revokeSession,
+  SESSION_TTL_MS,
+  signout,
+  startSession,
+} from './sessions'
 
 async function setup() {
   const fake = inMemoryIdentityRepository()
@@ -20,6 +28,17 @@ async function setup() {
   const resolve = resolveSession({ repo: fake.repo, clock })
   return { ...fake, clock, travel, resolve }
 }
+
+const kael = {
+  id: 'kael',
+  email: 'kael@example.com',
+  username: 'Kaelys',
+  passwordHash: 'h',
+  locale: 'en' as const,
+  termsAcceptedAt: new Date('2026-11-01T00:00:00Z'),
+  termsVersion: 'v',
+}
+const notFound = { ok: false, error: { kind: 'not_found' } }
 
 const ash = { id: 'ash', username: 'Ash_Barrett', role: 'user', status: 'active', emailVerified: false }
 
@@ -81,5 +100,65 @@ describe('sessions', () => {
   it('refuses an unknown session id', async () => {
     const { resolve } = await setup()
     expect(await resolve({ sessionId: 'forged' })).toBeNull()
+  })
+
+  it('US-03.7 lists my active sessions with a readable device, the current one marked', async () => {
+    const { repo, clock, travel } = await setup()
+    const firefox = 'Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0'
+    const opened = clock.now()
+    const old = await startSession(repo, clock.now(), { userId: 'ash', userAgent: firefox })
+    await signout({ repo, clock })({ sessionId: await startSession(repo, clock.now(), { userId: 'ash' }) })
+    travel(60_000)
+    const current = await startSession(repo, clock.now(), { userId: 'ash' })
+    await repo.createUser(kael)
+    await startSession(repo, clock.now(), { userId: 'kael' })
+    const list = listSessions({ repo, clock })
+
+    expect(await list({ userId: 'ash', sessionId: current })).toEqual([
+      {
+        id: await hashToken(current),
+        device: { browser: null, os: null },
+        createdAt: clock.now(),
+        lastSeenAt: clock.now(),
+        current: true,
+      },
+      {
+        id: await hashToken(old),
+        device: { browser: 'Firefox', os: 'Linux' },
+        createdAt: opened,
+        lastSeenAt: opened,
+        current: false,
+      },
+    ])
+    travel(SESSION_TTL_MS)
+    expect(await list({ userId: 'ash', sessionId: current })).toEqual([])
+  })
+
+  it("US-03.8 revokes one of my sessions; another member's or an unknown one is not found", async () => {
+    const { repo, clock, resolve } = await setup()
+    const mine = await startSession(repo, clock.now(), { userId: 'ash' })
+    await repo.createUser(kael)
+    const theirs = await startSession(repo, clock.now(), { userId: 'kael' })
+    const revoke = revokeSession({ repo, clock })
+
+    expect(await revoke({ userId: 'ash', id: await hashToken(theirs) })).toEqual(notFound)
+    expect(await resolve({ sessionId: theirs })).not.toBeNull()
+    expect(await revoke({ userId: 'ash', id: 'unknown' })).toEqual(notFound)
+    expect(await revoke({ userId: 'ash', id: await hashToken(mine) })).toEqual({ ok: true, value: undefined })
+    expect(await resolve({ sessionId: mine })).toBeNull()
+    expect(await revoke({ userId: 'ash', id: await hashToken(mine) })).toEqual(notFound)
+  })
+
+  it('US-03.9 revokes all my other sessions and keeps the current one', async () => {
+    const { repo, clock, resolve } = await setup()
+    const current = await startSession(repo, clock.now(), { userId: 'ash' })
+    const phone = await startSession(repo, clock.now(), { userId: 'ash' })
+    await repo.createUser(kael)
+    const theirs = await startSession(repo, clock.now(), { userId: 'kael' })
+
+    await revokeOtherSessions({ repo, clock })({ userId: 'ash', sessionId: current })
+    expect(await resolve({ sessionId: current })).not.toBeNull()
+    expect(await resolve({ sessionId: phone })).toBeNull()
+    expect(await resolve({ sessionId: theirs })).not.toBeNull()
   })
 })

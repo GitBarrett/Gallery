@@ -1,5 +1,7 @@
 import type { Clock } from '../../../platform/clock'
-import { hashToken, newToken } from './email-tokens'
+import { err, ok } from '../../../../shared/domain/result'
+import { deviceOf, type Device } from '../domain/device'
+import { hashToken, newToken, type IdentityResult } from './email-tokens'
 import type { Actor, IdentityRepository } from './ports'
 
 /** 30 days, sliding (US-03.1); staff sessions (12 h) come with the MFA of T-18b. */
@@ -49,6 +51,46 @@ export const resolveSession =
     if (refreshed) await deps.repo.touchSession(idHash, now, new Date(now.getTime() + SESSION_TTL_MS))
     return { actor: session.account, refreshed }
   }
+
+/**
+ * Active sessions of the member (US-03.7), the one of this request marked. Their `id` is the stored hash: it
+ * cannot be used as a cookie (Q51). Last activity is exact to the hour (TOUCH_MS).
+ */
+export interface DeviceSession {
+  id: string
+  device: Device
+  createdAt: Date
+  lastSeenAt: Date
+  current: boolean
+}
+
+export const listSessions =
+  (deps: { repo: IdentityRepository; clock: Clock }) =>
+  async (cmd: { userId: string; sessionId: string }): Promise<DeviceSession[]> => {
+    const current = await hashToken(cmd.sessionId)
+    const rows = await deps.repo.listSessions(cmd.userId, deps.clock.now())
+    return rows.map((s) => ({
+      id: s.idHash,
+      device: deviceOf(s.userAgentSummary),
+      createdAt: s.createdAt,
+      lastSeenAt: s.lastSeenAt,
+      current: s.idHash === current,
+    }))
+  }
+
+/** Revokes one of the member's sessions (US-03.8); another member's is not found (404, never 403). */
+export const revokeSession =
+  (deps: { repo: IdentityRepository; clock: Clock }) =>
+  async (cmd: { userId: string; id: string }): Promise<IdentityResult> =>
+    (await deps.repo.revokeUserSession(cmd.userId, cmd.id, deps.clock.now()))
+      ? ok(undefined)
+      : err({ kind: 'not_found' })
+
+/** Revokes every session of the member but the one of this request (US-03.9). */
+export const revokeOtherSessions =
+  (deps: { repo: IdentityRepository; clock: Clock }) =>
+  async (cmd: { userId: string; sessionId: string }): Promise<void> =>
+    deps.repo.revokeOtherSessions(cmd.userId, await hashToken(cmd.sessionId), deps.clock.now())
 
 /** Sign-out (US-03.4): the session is revoked server side, a copy of the cookie is useless. */
 export const signout =

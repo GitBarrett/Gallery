@@ -139,6 +139,17 @@
     }
   },
   "settings": {
-    "title": "Settings"
+    "title": "Settings",
+    "sessions": {
+      "title": "Devices",
+      "device": "{browser} on {os}",
+      "unknown": "Unknown device",
+      "current": "This device",
+      "opened": "Signed in {date}",
+      "lastSeen": "last active {date}",
+      "revoke": "Sign out",
+      "revokeLabel": "Sign out {device}",
+      "revokeOthers": "Sign out all other devices"
+    }
   }
 }

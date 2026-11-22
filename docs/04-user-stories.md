@@ -55,6 +55,9 @@ En tant que membre, je veux me connecter et me déconnecter en sécurité.
 - US-03.4 Given que je me déconnecte, When l'action aboutit, Then la session est révoquée côté serveur, le cookie supprimé et les caches utilisateur du service worker vidés.
 - US-03.5 Given un compte banni ou supprimé, When une requête arrive avec une session existante, Then elle est refusée (401) et la session révoquée.
 - US-03.6 Given le paramètre `redirect` après connexion, When il pointe hors du site, Then il est ignoré (redirection vers `/`).
+- US-03.7 Given que je suis connecté, When j'ouvre mes réglages, Then je vois mes sessions actives (appareil lisible, ouverture, dernière activité), la session courante signalée.
+- US-03.8 Given une autre de mes sessions, When je la révoque, Then elle est refusée (401) à la requête suivante ; la session d'un autre membre ou inconnue répond 404.
+- US-03.9 Given plusieurs sessions, When je révoque toutes les autres, Then seule la session courante reste active.
 - Tests : U (politique de verrouillage), I (sessions, révocation), E (connexion, déconnexion).
 
 ### US-04 [MVP] Mot de passe oublié
