@@ -25,6 +25,7 @@ describe('migrations (T-05a)', () => {
   it('create every cross-cutting table on a blank database', async () => {
     const tables = ['outbox', 'processed_messages', 'site_settings', 'audit_log', 'rate_limit_counters', 'donations']
     tables.push('users', 'sessions', 'email_tokens') // T-11a
+    tables.push('beta_invites', 'waitlist_entries') // T-11d
     const found = await sql`select tablename from pg_tables where schemaname = 'public'`
     expect(found.map((t) => t.tablename).sort()).toEqual(tables.sort())
   })

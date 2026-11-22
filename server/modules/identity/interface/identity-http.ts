@@ -7,6 +7,9 @@ export function orThrow(result: IdentityResult): void {
   const error = result.error
   if (error.kind === 'rate_limited')
     throw new AppError('RATE_LIMITED', 'Too many requests', { retryAfterSeconds: error.retryAfterSeconds })
+  if (error.kind === 'invite_required')
+    throw new AppError('FORBIDDEN', 'An invitation is required', { reason: 'invite_required' })
+  if (error.kind === 'not_found') throw new AppError('NOT_FOUND', 'Not found')
   if (error.kind === 'taken') throw new AppError('CONFLICT', `${error.field} already taken`, { field: error.field })
   throw new AppError('VALIDATION_FAILED', `Invalid ${error.field}`, { field: error.field, reason: error.reason })
 }

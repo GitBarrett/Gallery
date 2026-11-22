@@ -126,6 +126,39 @@ export const emailTokens = pgTable(
   ],
 )
 
+/**
+ * Beta invitations (US-56.4): single-use sign-up link valid 14 days, only the SHA-256 of its token is stored.
+ * `email_hmac`: keyed fingerprint of the invited email, never the email itself (privacy policy).
+ */
+export const betaInvites = pgTable(
+  'beta_invites',
+  {
+    id: id(),
+    emailHmac: text('email_hmac').notNull(),
+    tokenHash: text('token_hash').notNull().unique(),
+    invitedBy: uuid('invited_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+    expiresAt: at('expires_at').notNull(),
+    usedAt: at('used_at'),
+  },
+  (t) => [index('beta_invites_invited_by_idx').on(t.invitedBy)],
+)
+
+/** Waiting list of the beta (US-56.4), one entry per email ignoring case. */
+export const waitlistEntries = pgTable(
+  'waitlist_entries',
+  {
+    id: id(),
+    email: text('email').notNull(),
+    locale: text('locale').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('waitlist_entries_email_unique').on(sql`lower(${t.email})`),
+    check('waitlist_entries_locale_check', sql`${t.locale} in ('en', 'fr')`),
+  ],
+)
+
 /** Settings editable from the admin (thresholds, `features.*` flags, hero…). */
 export const siteSettings = pgTable('site_settings', {
   key: text('key').primaryKey(),

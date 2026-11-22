@@ -59,5 +59,31 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect((await repo.findEmailToken(t.tokenHash, 'verify'))?.usedAt).toEqual(now)
       await repo.markEmailVerified(ash.id, now)
     })
+
+    it('US-56.4 finds an invitation only while it is unused and unexpired, and uses it once', async () => {
+      const repo = await make()
+      const invite = {
+        id: crypto.randomUUID(),
+        emailHmac: 'hmac',
+        tokenHash: crypto.randomUUID(),
+        invitedBy: null,
+        expiresAt: new Date('2026-12-06T12:00:00Z'),
+      }
+      await repo.createInvite(invite)
+      const before = new Date('2026-12-06T11:59:59Z')
+      expect(await repo.findUsableInvite(invite.tokenHash, before)).toBe(invite.id)
+      expect(await repo.findUsableInvite(invite.tokenHash, invite.expiresAt)).toBeNull()
+      expect(await repo.findUsableInvite(crypto.randomUUID(), before)).toBeNull()
+      expect(await repo.useInvite(invite.id, before)).toBe(true)
+      expect(await repo.useInvite(invite.id, before)).toBe(false)
+      expect(await repo.findUsableInvite(invite.tokenHash, before)).toBeNull()
+    })
+
+    it('US-56.4 accepts an email already on the waiting list in another case', async () => {
+      const repo = await make()
+      const email = `Ash.${crypto.randomUUID().slice(0, 8)}@Example.com`
+      await repo.joinWaitlist({ id: crypto.randomUUID(), email, locale: 'fr' })
+      await repo.joinWaitlist({ id: crypto.randomUUID(), email: email.toLowerCase(), locale: 'en' })
+    })
   })
 }

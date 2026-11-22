@@ -3,12 +3,13 @@ import { fixedClock } from '../../../../tests/fakes/fixed-clock'
 import { inMemoryIdentityRepository } from '../../../../tests/fakes/in-memory-identity-repository'
 import { inMemoryRateLimiter } from '../../../../tests/fakes/in-memory-rate-limiter'
 import { inMemoryUnitOfWork } from '../../../../tests/fakes/in-memory-unit-of-work'
+import { hashToken } from './email-tokens'
 import { signup, TERMS_VERSION } from './signup'
 
 const clock = fixedClock('2026-11-22T12:00:00Z')
 
-function setup() {
-  const { repo, users } = inMemoryIdentityRepository()
+function setup({ inviteOnly = false } = {}) {
+  const { repo, users, invites } = inMemoryIdentityRepository()
   const { uow, sent } = inMemoryUnitOfWork(repo)
   const hasher = { hash: vi.fn(async (p: string) => `hashed:${p}`), verify: vi.fn() }
   let n = 0
@@ -20,8 +21,9 @@ function setup() {
     limiter: inMemoryRateLimiter(clock),
     ids: { next: () => `user-${++n}` },
     clock,
+    inviteOnly: async () => inviteOnly,
   })
-  return { run, users, sent, hasher }
+  return { run, users, sent, hasher, invites, repo }
 }
 
 const body = {
@@ -108,5 +110,66 @@ describe('signup', () => {
       error: { kind: 'taken', field: 'username' },
     })
     expect(await run({ ...body, username: 'ash_barrett' })).toMatchObject({ error: { kind: 'taken' } })
+  })
+
+  describe('invite-only beta', () => {
+    const inviteRequired = { ok: false, error: { kind: 'invite_required' } }
+    const invite = async (repo: ReturnType<typeof setup>['repo'], token: string, expiresAt = '2026-12-06T12:00:00Z') =>
+      repo.createInvite({
+        id: `invite-${token}`,
+        emailHmac: 'hmac',
+        tokenHash: await hashToken(token),
+        invitedBy: null,
+        expiresAt: new Date(expiresAt),
+      })
+
+    it('US-56.4 refuses a sign-up without invitation with the same answer for a new or a used email', async () => {
+      const { run, users, repo } = setup({ inviteOnly: true })
+      await invite(repo, 'first')
+      await run({ ...body, inviteToken: 'first' })
+      expect(await run({ ...body, email: 'new@example.com', username: 'Newcomer' })).toEqual(inviteRequired)
+      expect(await run({ ...body, username: 'Newcomer' })).toEqual(inviteRequired)
+      expect(users).toHaveLength(1)
+    })
+
+    it('US-56.4 refuses an unknown, expired or used invitation', async () => {
+      const { run, repo } = setup({ inviteOnly: true })
+      await invite(repo, 'old', '2026-11-22T12:00:00Z')
+      await invite(repo, 'once')
+      expect(await run({ ...body, inviteToken: 'unknown' })).toEqual(inviteRequired)
+      expect(await run({ ...body, inviteToken: 'old' })).toEqual(inviteRequired)
+      expect(await run({ ...body, inviteToken: 'once' })).toEqual({ ok: true, value: undefined })
+      const other = { ...body, email: 'bee@example.com', username: 'Bee', inviteToken: 'once', ip: '198.51.100.1' }
+      expect(await run(other)).toEqual(inviteRequired)
+    })
+
+    it('US-56.4 signs up with a valid invitation and uses it', async () => {
+      const { run, users, invites, repo } = setup({ inviteOnly: true })
+      await invite(repo, 'welcome')
+      expect(await run({ ...body, inviteToken: 'welcome' })).toEqual({ ok: true, value: undefined })
+      expect(users).toHaveLength(1)
+      expect(invites[0]?.usedAt).toEqual(clock.now())
+    })
+
+    it('cancels the account when its invitation was used concurrently', async () => {
+      const { run, repo } = setup({ inviteOnly: true })
+      await invite(repo, 'race')
+      repo.useInvite = async () => false
+      expect(await run({ ...body, inviteToken: 'race' })).toEqual(inviteRequired)
+    })
+
+    it('keeps the invitation sent with a used email unused', async () => {
+      const { run, invites, repo } = setup({ inviteOnly: true })
+      await invite(repo, 'first')
+      await invite(repo, 'second')
+      await run({ ...body, inviteToken: 'first' })
+      expect(await run({ ...body, username: 'Other', inviteToken: 'second' })).toEqual({ ok: true, value: undefined })
+      expect(invites[1]?.usedAt).toBeNull()
+    })
+
+    it('ignores the invitation once the beta is over', async () => {
+      const { run } = setup()
+      expect(await run({ ...body, inviteToken: 'unknown' })).toEqual({ ok: true, value: undefined })
+    })
   })
 })
