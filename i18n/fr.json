@@ -73,5 +73,48 @@
   },
   "legal": {
     "table": "Tableau défilant"
+  },
+  "auth": {
+    "turnstileUnavailable": "La vérification anti-robot n'a pas pu se charger. Rechargez la page et réessayez.",
+    "signup": {
+      "title": "Créer un compte",
+      "username": "Pseudo",
+      "usernameHint": "3 à 24 caractères : lettres, chiffres, _ et -.",
+      "email": "Email",
+      "password": "Mot de passe",
+      "passwordHint": "Au moins 10 caractères.",
+      "terms": "J'ai au moins 15 ans et j'accepte les Conditions d'utilisation et la Politique de confidentialité.",
+      "termsLink": "Conditions d'utilisation",
+      "privacyLink": "Politique de confidentialité",
+      "submit": "Créer mon compte",
+      "note": "Nous vous enverrons un lien pour vérifier votre email. Vous pourrez publier une fois celui-ci vérifié.",
+      "inboxTitle": "Consultez votre boîte mail",
+      "inboxText": "Nous vous avons envoyé un email. Ouvrez le lien qu'il contient dans les 24 heures pour vérifier votre adresse et vous connecter."
+    },
+    "waitlist": {
+      "title": "Rejoindre la liste d'attente",
+      "text": "Pendant la bêta, les comptes sont créés sur invitation. Laissez votre email : nous vous préviendrons à l'ouverture de Legendary Shots.",
+      "consent": "J'accepte de recevoir un email à l'ouverture du site.",
+      "submit": "Rejoindre la liste d'attente",
+      "doneTitle": "Vous êtes sur la liste",
+      "doneText": "Nous vous écrirons à l'ouverture du site, et rien d'autre d'ici là."
+    },
+    "errors": {
+      "username": {
+        "length": "Votre pseudo doit compter de 3 à 24 caractères.",
+        "charset": "Utilisez seulement des lettres, des chiffres, _ et -.",
+        "reserved": "Ce pseudo est réservé. Choisissez-en un autre.",
+        "insult": "Ce pseudo n'est pas autorisé. Choisissez-en un autre.",
+        "taken": "Ce pseudo est déjà pris."
+      },
+      "password": {
+        "too_short": "Votre mot de passe doit compter au moins 10 caractères.",
+        "too_long": "Votre mot de passe doit compter au plus 128 caractères.",
+        "breached": "Ce mot de passe figure dans une fuite de données connue. Choisissez-en un autre."
+      },
+      "turnstileToken": {
+        "failed": "La vérification anti-robot a échoué. Réessayez."
+      }
+    }
   }
 }

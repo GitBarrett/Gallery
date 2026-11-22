@@ -73,5 +73,48 @@
   },
   "legal": {
     "table": "Scrollable table"
+  },
+  "auth": {
+    "turnstileUnavailable": "The anti-bot check could not load. Reload the page and try again.",
+    "signup": {
+      "title": "Create account",
+      "username": "Username",
+      "usernameHint": "3 to 24 characters: letters, digits, _ and -.",
+      "email": "Email",
+      "password": "Password",
+      "passwordHint": "At least 10 characters.",
+      "terms": "I am at least 15 and accept the Terms and Privacy policy.",
+      "termsLink": "Terms",
+      "privacyLink": "Privacy policy",
+      "submit": "Create my account",
+      "note": "We'll send a link to verify your email. You can publish once it's verified.",
+      "inboxTitle": "Check your inbox",
+      "inboxText": "We've sent you an email. Open the link inside within 24 hours to verify your address and sign in."
+    },
+    "waitlist": {
+      "title": "Join the waiting list",
+      "text": "During the beta, accounts are created by invitation. Leave your email and we'll let you know when Legendary Shots opens.",
+      "consent": "I agree to receive an email when the site opens.",
+      "submit": "Join the waiting list",
+      "doneTitle": "You're on the list",
+      "doneText": "We'll email you when the site opens. Nothing else until then."
+    },
+    "errors": {
+      "username": {
+        "length": "Your username must have 3 to 24 characters.",
+        "charset": "Use only letters, digits, _ and -.",
+        "reserved": "This username is reserved. Choose another one.",
+        "insult": "This username is not allowed. Choose another one.",
+        "taken": "This username is already taken."
+      },
+      "password": {
+        "too_short": "Your password must have at least 10 characters.",
+        "too_long": "Your password must have at most 128 characters.",
+        "breached": "This password appeared in a known data breach. Choose another one."
+      },
+      "turnstileToken": {
+        "failed": "The anti-bot check failed. Try again."
+      }
+    }
   }
 }

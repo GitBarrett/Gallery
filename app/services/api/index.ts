@@ -1,16 +1,19 @@
 // Typed API client (10-clean-architecture.md § Front): the only caller of /api. Responses are checked against
 // shared/contracts; errors become an ApiError carrying the stable code and the correlation id of the server.
 import type { FetchError } from 'ofetch'
-import type { z } from 'zod'
+import { z } from '~~/shared/contracts/zod'
 import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
 import { PublicSettings } from '~~/shared/contracts/settings'
+import type { SignupBody, WaitlistBody } from '~~/shared/contracts/auth'
 
 export class ApiError extends Error {
   constructor(
     readonly code: ErrorCode,
     readonly status: number,
     readonly correlationId?: string,
+    /** `{ field, reason }` of a VALIDATION_FAILED, `{ reason }` of a FORBIDDEN… (03-architecture.md § Conventions d'API) */
+    readonly details?: { field?: string; reason?: string },
   ) {
     super(code)
     this.name = 'ApiError'
@@ -29,7 +32,12 @@ export async function call<S extends z.ZodType>(path: string, schema: S, options
     const response = ErrorResponse.safeParse((error as FetchError).data)
     const status = (error as FetchError).statusCode ?? 0
     throw response.success
-      ? new ApiError(response.data.error.code, status, response.data.error.correlationId)
+      ? new ApiError(
+          response.data.error.code,
+          status,
+          response.data.error.correlationId,
+          response.data.error.details as ApiError['details'],
+        )
       : new ApiError('INTERNAL', status)
   }
   const parsed = schema.safeParse(body)
@@ -43,4 +51,7 @@ export const errorMessageKey = (error: unknown) => `errors.${error instanceof Ap
 export const api = {
   health: () => call('/api/health', HealthResponse),
   publicSettings: () => call('/api/settings/public', PublicSettings),
+  // 204 without body (US-01.2, US-56.4: the same answer whatever the email)
+  signup: (body: SignupBody) => call('/api/auth/signup', z.unknown(), { method: 'POST', body }),
+  waitlist: (body: WaitlistBody) => call('/api/waitlist', z.unknown(), { method: 'POST', body }),
 }
