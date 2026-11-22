@@ -20,8 +20,27 @@ describe('validateUsername', () => {
     expect(validateUsername(name)).toEqual({ ok: false, error: 'reserved' })
   })
 
-  it.each(['FuckThis', 'gros_connard'])('US-05.2 refuses %s, which contains an insult', (name) => {
-    expect(validateUsername(name)).toEqual({ ok: false, error: 'insult' })
+  it.each(['FuckThis', 'gros_connard', 'xX_Bitch_Xx', 'Putain42', 'HitlerFan', 'Le-Batard'])(
+    'US-05.2 refuses %s, which contains an insult',
+    (name) => {
+      expect(validateUsername(name)).toEqual({ ok: false, error: 'insult' })
+    },
+  )
+
+  it.each([
+    'Computer',
+    'Peacock',
+    'Grapefruit',
+    'Torpedo',
+    'Montenegro',
+    'Analyst',
+    'Document',
+    'Chatterbox',
+    'Unique',
+    'Dickens',
+    'Spicy',
+  ])('US-05.1 accepts %s, which only looks like an insult', (name) => {
+    expect(validateUsername(name)).toEqual({ ok: true, value: name })
   })
 })
 
