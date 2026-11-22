@@ -68,7 +68,7 @@ describe('googleOAuthProvider', () => {
 
 describe('fakeOAuthProvider', () => {
   it('sends to the test consent page and takes the typed email as the identity', async () => {
-    const fake = fakeOAuthProvider('https://ls-pr-1.example.dev', 'google')
+    const fake = fakeOAuthProvider('https://ls-pr-1.example.dev/__test/oauth', 'google')
     expect(fake.authorizationUrl({ state: 'st', codeChallenge: 'ch', redirectUri })).toBe(
       'https://ls-pr-1.example.dev/__test/oauth/google?state=st&code_challenge=ch',
     )

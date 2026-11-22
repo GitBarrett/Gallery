@@ -14,6 +14,7 @@ describe('previewConfig (ADR-013)', () => {
   it('switches to preview mode with fake providers and its own R2 prefix', () => {
     expect(preview.toml).toContain('NUXT_DEPLOY_ENV = "preview"')
     expect(preview.toml).toContain('NUXT_FAKE_PROVIDERS = "true"')
+    expect(preview.toml).toContain('NUXT_FAKE_OAUTH_CONSENT_URL = "https://ls-pr-42.aleygues.workers.dev/__test/oauth"')
     expect(preview.toml).toContain('NUXT_R2_PREFIX = "pr-42/"')
   })
 

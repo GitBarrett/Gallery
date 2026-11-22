@@ -104,7 +104,7 @@ export function createContainer({
   const inviteOnly = async () => (await readSettings(logger))['features.inviteOnly']
   const oauthProvider = (provider: OAuthProviderName) =>
     config.fakeProviders
-      ? fakeOAuthProvider(config.siteUrl, provider)
+      ? fakeOAuthProvider(required(config.fakeOAuthConsentUrl, 'NUXT_FAKE_OAUTH_CONSENT_URL'), provider)
       : googleOAuthProvider({
           clientId: required(config.googleClientId, 'NUXT_OAUTH_GOOGLE_CLIENT_ID'),
           clientSecret: required(config.googleClientSecret, 'NUXT_OAUTH_GOOGLE_CLIENT_SECRET'),

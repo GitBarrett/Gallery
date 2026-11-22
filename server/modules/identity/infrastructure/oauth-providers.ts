@@ -61,12 +61,13 @@ export const googleOAuthProvider = ({
 })
 
 /**
- * Provider of local runs and previews: its consent page (/__test/oauth/<provider>) sends back the email typed as
- * the code (a code without "@": no email; "invalid": refused by the exchange).
+ * Provider of local runs and previews. Its consent page, `<consentUrl>/<provider>`, is a test route of the previews
+ * whose address comes from NUXT_FAKE_OAUTH_CONSENT_URL, unknown to the production build. It sends back the email
+ * typed as the code (a code without "@": no email; "invalid": refused by the exchange).
  */
-export const fakeOAuthProvider = (siteUrl: string, provider: OAuthProviderName): OAuthProvider => ({
+export const fakeOAuthProvider = (consentUrl: string, provider: OAuthProviderName): OAuthProvider => ({
   authorizationUrl: ({ state, codeChallenge }) =>
-    `${siteUrl}/__test/oauth/${provider}?${new URLSearchParams({ state, code_challenge: codeChallenge })}`,
+    `${consentUrl}/${provider}?${new URLSearchParams({ state, code_challenge: codeChallenge })}`,
   async identity({ code }) {
     if (code === 'invalid') throw new Error('invalid_grant')
     return { subject: `fake-${code}`, email: code.includes('@') ? code : null }

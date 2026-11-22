@@ -10,6 +10,7 @@ import { ErrorResponse } from '../../shared/contracts/errors'
 
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
 process.env.NUXT_FAKE_PROVIDERS = 'true' // fakeOAuthProvider: the code is the email typed on the consent page
+process.env.NUXT_FAKE_OAUTH_CONSENT_URL = 'http://localhost:3000/__test/oauth'
 process.env.NUXT_APP_SECRET = 'test-only-app-secret-of-32-characters-or-more' // seals the cookies
 await startTestServer()
 
