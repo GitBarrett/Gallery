@@ -8,7 +8,7 @@ Site communautaire de galeries de captures d'écran World of Warcraft (focus WoW
 2. Lire les stories et critères référencés (`docs/04-user-stories.md`), puis les sections concernées de `docs/03-architecture.md`, `docs/08-securite.md` et `docs/10-clean-architecture.md`.
 3. **TDD** : écrire d'abord les tests des critères d'acceptation, nommés avec leur identifiant (`US-30.2 …`), selon `docs/11-strategie-de-tests.md` ; les voir échouer, puis coder.
 4. Une tâche = une branche `feat/T-xx-slug` = une pull request (≈ 400 lignes applicatives max). Ne jamais mélanger plusieurs tâches.
-5. Avant d'ouvrir la PR : `pnpm check` vert (lint, typecheck, architecture, tests unitaires et d'intégration, couverture, traçabilité), checklist sécurité (`08-securite.md` § 10) cochée dans la description, tâche cochée dans le plan.
+5. Avant d'ouvrir la PR : en local, `pnpm lint`, `pnpm typecheck` et les tests touchés seulement (fichiers ciblés ou `vitest related`) ; le job `checks` de la CI (`pnpm check` complet : architecture, couverture, traçabilité) fait foi et doit être vert avant la fusion. Checklist sécurité (`08-securite.md` § 10) cochée dans la description, tâche cochée dans le plan.
 6. Toute décision non couverte par les specs : ne pas improviser. Ajouter une question dans `docs/09-questions-ouvertes.md`, appliquer l'option la plus simple et réversible, et le signaler dans la PR.
 7. Toute décision d'architecture nouvelle : créer un ADR dans `docs/adr/`.
 8. Phase **T-00 (prototypes)** avant T-02 : scripts jetables dans `prototypes/`, aucun code applicatif, résultats consignés en ADR.
