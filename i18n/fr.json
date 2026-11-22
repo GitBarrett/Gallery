@@ -47,5 +47,16 @@
   },
   "surprises": {
     "console": "En recherche de guilde ? Signalez les bugs : {link}"
+  },
+  "pwa": {
+    "updateAvailable": "Une nouvelle version est disponible",
+    "reload": "Recharger",
+    "dismiss": "Fermer",
+    "installApp": "Installer l'application",
+    "installText": "Installez Legendary Shots sur votre appareil pour l'ouvrir d'un geste.",
+    "install": "Installer",
+    "notNow": "Plus tard",
+    "iosTitle": "Installer sur iPhone",
+    "iosSteps": "Dans Safari, touchez Partager, puis Sur l'écran d'accueil."
   }
 }

@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 // Service worker (ADR-008, injectManifest): precached shell and offline pages, then the rules of ./rules.ts.
-// No skipWaiting here: the new version waits for the user (update toast, T-09b).
+// A new version waits for the user: skipWaiting only on the update toast's Reload (US-65, SKIP_WAITING message).
 import { ExpirationPlugin } from 'workbox-expiration'
 import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching'
 import { registerRoute, setCatchHandler } from 'workbox-routing'
@@ -8,6 +8,10 @@ import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strateg
 import { cacheRule, offlinePage } from './rules'
 
 declare const self: ServiceWorkerGlobalScope
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') void self.skipWaiting()
+})
 
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()

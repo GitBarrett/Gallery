@@ -7,6 +7,7 @@ import NavIcon, { type NavIconName } from './NavIcon.vue'
 const props = defineProps<{ flags: FeatureFlags; username?: string }>()
 const { t } = useI18n()
 const localePath = useLocalePath()
+const online = useOnline()
 
 const items = computed(() =>
   (
@@ -66,7 +67,12 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
       <NuxtLink :to="localePath('/search')" class="icon-link mobile-only" :aria-label="t('layout.search')">
         <NavIcon name="search" />
       </NuxtLink>
-      <UiButton :to="localePath('/upload')" class="desktop-only"
+      <!-- Offline, uploading is impossible (US-64.3): disabled, with the reason -->
+      <UiButton
+        :to="localePath('/upload')"
+        :disabled="!online"
+        :title="online ? undefined : t('offline.banner')"
+        class="desktop-only"
         ><NavIcon name="upload" />{{ t('layout.upload') }}</UiButton
       >
       <template v-if="username">

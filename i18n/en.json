@@ -47,5 +47,16 @@
   },
   "surprises": {
     "console": "Looking for guild? Report bugs: {link}"
+  },
+  "pwa": {
+    "updateAvailable": "A new version is available",
+    "reload": "Reload",
+    "dismiss": "Close",
+    "installApp": "Install the app",
+    "installText": "Install Legendary Shots on your device to open it in one tap.",
+    "install": "Install",
+    "notNow": "Not now",
+    "iosTitle": "Install on iPhone",
+    "iosSteps": "In Safari, tap Share, then Add to Home Screen."
   }
 }

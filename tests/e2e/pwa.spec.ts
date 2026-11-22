@@ -65,3 +65,26 @@ test('US-64.3 offline, a banner says so', async ({ page, context }) => {
   await context.setOffline(false)
   await expect(page.getByRole('status').filter({ hasText: "You're offline" })).toBeHidden()
 })
+
+test('US-65.1 US-65.3 a new version shows "A new version is available · Reload", which activates it', async ({
+  page,
+  context,
+}) => {
+  await controlledHome(page)
+  const before = await page.evaluate(() => navigator.serviceWorker.controller!.scriptURL)
+  // A new deployment: same service worker with one more byte (the update check bypasses the HTTP cache)
+  await context.route('**/sw.js', async (route) => {
+    const response = await route.fetch()
+    await route.fulfill({ response, body: `${await response.text()}\n// next version` })
+  })
+  await page.evaluate(async () => (await navigator.serviceWorker.getRegistration())!.update())
+  const toast = page.getByRole('status').filter({ hasText: 'A new version is available' })
+  await expect(toast).toBeVisible({ timeout: 15_000 })
+  await toast.getByRole('button', { name: 'Reload' }).click()
+  await page.waitForLoadState('load')
+  await expect
+    .poll(() => page.evaluate(async () => !(await navigator.serviceWorker.getRegistration())!.waiting))
+    .toBe(true)
+  expect(await page.evaluate(() => navigator.serviceWorker.controller!.scriptURL)).toBe(before)
+  await expect(toast).toBeHidden()
+})
