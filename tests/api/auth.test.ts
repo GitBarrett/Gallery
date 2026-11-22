@@ -143,15 +143,20 @@ describe('sessions', () => {
     await post('/api/auth/signup', body)
     return { email: body.email, password: body.password, username: body.username }
   }
-  const signin = ({ email, password }: { email: string; password: string }, cookie?: string) =>
+  const signin = (
+    { email, password, turnstileToken }: { email: string; password: string; turnstileToken?: string },
+    cookie?: string,
+    ip: string = crypto.randomUUID(),
+  ) =>
     fetch('/api/auth/signin', {
       method: 'POST',
       headers: {
         'sec-fetch-site': 'same-origin',
         'content-type': 'application/json',
+        'cf-connecting-ip': ip,
         ...(cookie ? { cookie } : {}),
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, turnstileToken }),
     })
 
   it('US-03.1 signs in with a secure, HttpOnly, Lax session cookie of 30 days, then knows the member', async () => {
@@ -187,6 +192,15 @@ describe('sessions', () => {
     expect(unknown.status).toBe(401)
     expect((await errorOf(unknown)).details).toEqual(wrongError.details)
     expect(wrong.headers.get('set-cookie')).toBeNull()
+  })
+
+  it('US-03.3 asks for Turnstile after 5 failures on an account, then lets a solved check through', async () => {
+    const { email, password } = await account()
+    for (let i = 0; i < 5; i++) await signin({ email, password: 'not the password' })
+    const required = await signin({ email, password })
+    expect(required.status).toBe(400)
+    expect((await errorOf(required)).details).toEqual({ field: 'turnstileToken', reason: 'required' })
+    expect((await signin({ email, password, turnstileToken: TURNSTILE_DUMMY_TOKEN })).status).toBe(204)
   })
 
   it('US-03.4 revokes the session on sign-out and deletes the cookie', async () => {

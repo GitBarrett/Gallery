@@ -1,6 +1,6 @@
 import { inArray, sql } from 'drizzle-orm'
 import { afterAll, describe, expect, it } from 'vitest'
-import { rateLimiterContract } from '../../tests/contracts/rate-limiter.contract'
+import { attemptCounterContract, rateLimiterContract } from '../../tests/contracts/rate-limiter.contract'
 import { fixedClock } from '../../tests/fakes/fixed-clock'
 import { createDb } from './client'
 import { dbRateLimiter, purgeRateLimitCounters } from './rate-limiter'
@@ -17,6 +17,7 @@ afterAll(async () => {
 })
 
 rateLimiterContract('database counters', async () => dbRateLimiter(db, key, noon), { ...hourly, limit: 3 })
+attemptCounterContract('database counters', async () => dbRateLimiter(db, key, noon), { ...hourly, limit: 3 })
 
 describe('database counters (T-05c)', () => {
   it('count exactly over a one-hour window, even under concurrent attempts', async () => {

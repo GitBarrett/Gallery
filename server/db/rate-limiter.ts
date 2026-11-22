@@ -1,6 +1,6 @@
-import { lt, sql } from 'drizzle-orm'
+import { and, eq, lt, sql } from 'drizzle-orm'
 import type { Clock } from '../platform/clock'
-import { fixedWindow, type RateLimiter } from '../platform/rate-limiter'
+import { fixedWindow, type AttemptCounter } from '../platform/rate-limiter'
 import type { Db } from './client'
 import { rateLimitCounters } from './schema'
 
@@ -18,7 +18,7 @@ async function hmacHex(secret: string, message: string): Promise<string> {
  * Exact database counters (`rate_limit_counters`, 08-securite.md § 8) for long windows and strict limits:
  * atomic increment per fixed window; the key is an HMAC of the rule and the subject (no IP in clear).
  */
-export function dbRateLimiter(db: Db, hmacKey: string, clock: Clock): RateLimiter {
+export function dbRateLimiter(db: Db, hmacKey: string, clock: Clock): AttemptCounter {
   return {
     async consume(rule, subject) {
       const window = fixedWindow(clock.now(), rule.windowSeconds)
@@ -31,6 +31,17 @@ export function dbRateLimiter(db: Db, hmacKey: string, clock: Clock): RateLimite
         })
         .returning({ count: rateLimitCounters.count })
       return row!.count <= rule.limit
+        ? { allowed: true }
+        : { allowed: false, retryAfterSeconds: window.retryAfterSeconds }
+    },
+    async peek(rule, subject) {
+      const window = fixedWindow(clock.now(), rule.windowSeconds)
+      const keyHmac = await hmacHex(hmacKey, `${rule.name}\n${subject}`)
+      const [row] = await db
+        .select({ count: rateLimitCounters.count })
+        .from(rateLimitCounters)
+        .where(and(eq(rateLimitCounters.keyHmac, keyHmac), eq(rateLimitCounters.windowStart, window.start)))
+      return (row?.count ?? 0) < rule.limit
         ? { allowed: true }
         : { allowed: false, retryAfterSeconds: window.retryAfterSeconds }
     },

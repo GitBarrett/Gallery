@@ -21,3 +21,8 @@ export function fixedWindow(now: Date, windowSeconds: number): { start: Date; re
   const start = Math.floor(now.getTime() / size) * size
   return { start: new Date(start), retryAfterSeconds: Math.max(1, Math.ceil((start + size - now.getTime()) / 1000)) }
 }
+
+/** Failure counter (sign-in lockout, US-03.3): `peek` tells whether one more attempt would be allowed, without counting. */
+export interface AttemptCounter extends RateLimiter {
+  peek(rule: RateLimitRule, subject: string): Promise<RateLimitDecision>
+}

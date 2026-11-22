@@ -3,7 +3,7 @@ import type { IdGenerator } from '../../../platform/ids'
 import { hashToken, newToken, VERIFY_TTL_MS } from './email-tokens'
 import type { IdentityRepository, Locale, Mailer } from './ports'
 
-export type AccountEmail = { template: 'verify' | 'account_exists'; userId: string }
+export type AccountEmail = { template: 'verify' | 'account_exists' | 'signin_locked'; userId: string }
 
 type Texts = { subject: string; text: (username: string, link: string) => string }
 
@@ -23,6 +23,13 @@ const TEMPLATES: Record<Locale, Record<AccountEmail['template'], Texts>> = {
         `but you already have one. Sign in here, or reset your password from that page:\n${link}\n\n` +
         `If it was not you, you can ignore this email.`,
     },
+    signin_locked: {
+      subject: 'Sign-in to your account is paused',
+      text: (name, link) =>
+        `Hello ${name},\n\nThere were 20 failed sign-in attempts on your Legendary Shots account within an hour, ` +
+        `so signing in with your password is paused for up to an hour.\n\nIf it was you, wait a little and try ` +
+        `again. If it was not, your password is still safe; you can change it from the sign-in page:\n${link}`,
+    },
   },
   fr: {
     verify: {
@@ -37,6 +44,14 @@ const TEMPLATES: Record<Locale, Record<AccountEmail['template'], Texts>> = {
         `Bonjour ${name},\n\nQuelqu'un a essayé de créer un compte Legendary Shots avec cette adresse, ` +
         `mais vous en avez déjà un. Connectez-vous ici, ou réinitialisez votre mot de passe depuis cette page :\n` +
         `${link}\n\nSi ce n'était pas vous, ignorez cet email.`,
+    },
+    signin_locked: {
+      subject: 'La connexion à votre compte est suspendue',
+      text: (name, link) =>
+        `Bonjour ${name},\n\n20 tentatives de connexion ont échoué sur votre compte Legendary Shots en une heure : ` +
+        `la connexion par mot de passe est suspendue pendant une heure au plus.\n\nSi c'était vous, patientez un ` +
+        `peu avant de réessayer. Sinon, votre mot de passe reste protégé ; vous pouvez le changer depuis la page ` +
+        `de connexion :\n${link}`,
     },
   },
 }

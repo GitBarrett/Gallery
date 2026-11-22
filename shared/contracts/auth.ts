@@ -26,10 +26,11 @@ export type WaitlistBody = z.infer<typeof WaitlistBody>
 export const VerifyEmailBody = z.strictObject({ token: z.string().min(1).max(128) })
 export type VerifyEmailBody = z.infer<typeof VerifyEmailBody>
 
-/** POST /api/auth/signin. The Turnstile token required after failures comes with the lockout (T-12c). */
+/** POST /api/auth/signin. `turnstileToken` is required after repeated failures (400 `turnstileToken: required`). */
 export const SigninBody = z.strictObject({
   email: z.email().max(254),
   password: z.string().min(1).max(512),
+  turnstileToken: z.string().min(1).max(2048).optional(), // required after 5 failures (US-03.3)
 })
 export type SigninBody = z.infer<typeof SigninBody>
 

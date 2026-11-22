@@ -9,7 +9,10 @@ import type { Mailer } from '../application/ports'
 import { sendAccountEmail } from '../application/send-account-email'
 import { drizzleIdentityRepository } from '../infrastructure/drizzle-identity-repository'
 
-const AccountEmail = z.strictObject({ template: z.enum(['verify', 'account_exists']), userId: z.uuid() })
+const AccountEmail = z.strictObject({
+  template: z.enum(['verify', 'account_exists', 'signin_locked']),
+  userId: z.uuid(),
+})
 
 /** Consumer of the `emails` queue: one email per event, even when Queues delivers it twice. */
 export const emailsConsumer =
