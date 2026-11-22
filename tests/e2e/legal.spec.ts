@@ -7,8 +7,6 @@ const PAGES = [
   { link: 'Privacy', path: '/privacy', title: 'Privacy policy' },
 ]
 
-// From page to page through the footer: on Chromium, the service worker precache of /fr/offline currently sets the
-// language cookie to fr, so going back to / would land on /fr (fixed separately)
 test('US-74.1 each footer link opens its legal page with its update date', async ({ page }) => {
   await page.goto('/')
   for (const { link, path, title } of PAGES) {

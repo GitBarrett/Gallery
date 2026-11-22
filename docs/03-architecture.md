@@ -284,7 +284,7 @@ Deux dernières versions de Chrome, Edge, Firefox et Safari ; Safari iOS ≥ 16.
 - **Objectifs** : RPO 24 h (images) / quelques minutes (base) ; RTO 4 h. Procédure de restauration testée une fois par trimestre (`docs/runbooks/restore.md`, à écrire en tâche dédiée).
 
 ## Emails transactionnels
-Domaine d'envoi `mail.legendaryshots.{tld}` avec SPF, DKIM et DMARC (`p=quarantine`). Modèles bilingues EN/FR : vérification, reset, changement d'email (ancienne et nouvelle adresse), alerte de verrouillage, suppression programmée et annulation, décision de modération, récap hebdo (v1.x). Liens signés à usage unique, jamais de mot de passe ni de jeton en clair dans les logs.
+Domaine d'envoi `mail.legendaryshots.gg` avec SPF, DKIM et DMARC (`p=quarantine`). Modèles bilingues EN/FR : vérification, reset, changement d'email (ancienne et nouvelle adresse), alerte de verrouillage, suppression programmée et annulation, décision de modération, récap hebdo (v1.x). Liens signés à usage unique, jamais de mot de passe ni de jeton en clair dans les logs.
 
 ## SEO
 Rendu serveur de toutes les pages publiques ; `<title>` et `description` par page ; Open Graph et Twitter Card (`/img/{id}/og.jpg`, JPEG 1200 px : les robots des réseaux sociaux ne lisent pas tous le WebP) ; URL canonique ; `hreflang` en/fr + `x-default` ; données structurées `ImageObject` (auteur, date, licence = lien vers les Terms) sur la PDP ; `sitemap.xml` (index par lots) ; `robots.txt` ; previews en `noindex`.
