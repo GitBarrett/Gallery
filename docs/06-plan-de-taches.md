@@ -207,6 +207,10 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Lien « Forgot password? » de la connexion, formulaire de demande conforme à `SignIn.dc.html`, page `/reset#<jeton>` (nouveau mot de passe, lien expiré ou utilisé avec lien pour recommencer).
   Stories : US-04 (parcours). Tests : composants, E (US-04.1–3 : oubli → reset → anciennes sessions invalides).
 
+- [x] **T-13c Mot de passe oublié : suites de Q52** (dép. T-13a) — ajoutée le 22/11/2026
+  Après un reset réussi : autres liens de reset annulés, email marqué vérifié, email « mot de passe modifié » EN/FR.
+  Stories : US-04.5–6. Tests : U, I.
+
 - [ ] **T-14 OAuth Google** (dép. T-12b) — **action humaine** : client OAuth Google.
   State + PKCE, règles de liaison, bouton conforme à la charte Google.
   Stories : US-02.1–5. Tests : U, I (fournisseur factice), E.

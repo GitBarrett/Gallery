@@ -53,6 +53,9 @@ export function inMemoryIdentityRepository() {
       if (token) token.usedAt = at
       return Boolean(token)
     },
+    async useEmailTokens(userId, type, at) {
+      for (const t of tokens) if (t.userId === userId && t.type === type && !t.usedAt) t.usedAt = at
+    },
     async markEmailVerified(userId, at) {
       const user = users.find((u) => u.id === userId)
       if (user) user.emailVerifiedAt = at

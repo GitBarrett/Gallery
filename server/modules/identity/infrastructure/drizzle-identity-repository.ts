@@ -59,6 +59,12 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .returning({ id: emailTokens.id })
     return updated.length > 0
   },
+  async useEmailTokens(userId, type, at) {
+    await db
+      .update(emailTokens)
+      .set({ usedAt: at })
+      .where(and(eq(emailTokens.userId, userId), eq(emailTokens.type, type), isNull(emailTokens.usedAt)))
+  },
   async markEmailVerified(userId, at) {
     await db.update(users).set({ emailVerifiedAt: at }).where(eq(users.id, userId))
   },

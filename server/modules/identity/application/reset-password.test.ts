@@ -26,14 +26,15 @@ async function setup({ expiresAt = '2026-11-22T12:30:00Z', type = 'reset' as con
     tokenHash: await hashToken('secret'),
     expiresAt: new Date(expiresAt),
   })
+  const { uow, sent } = inMemoryUnitOfWork(fake.repo)
   const reset = resetPassword({
-    uow: inMemoryUnitOfWork(fake.repo).uow,
+    uow,
     hasher: { hash: async (p) => `hashed:${p}`, verify: async () => ({ valid: false, needsRehash: false }) },
     breaches: { isBreached: async (p) => p === 'password123' },
     clock: fixedClock(now),
   })
   const passwordHash = () => fake.users[0]!.passwordHash
-  return { reset, passwordHash, fake }
+  return { reset, passwordHash, fake, sent }
 }
 
 const cmd = { token: 'secret', password: 'a new long passphrase' }
@@ -50,6 +51,32 @@ describe('resetPassword', () => {
     expect(active).toHaveLength(1)
     expect(result.ok && (await hashToken(result.value.sessionId))).toBe(active[0]!.idHash)
     for (const old of [laptop, current]) expect(active[0]!.idHash).not.toBe(await hashToken(old))
+  })
+
+  it('US-04.5 cancels the other reset links of the account and marks its email verified', async () => {
+    const { reset, fake } = await setup()
+    await fake.repo.createEmailToken({
+      id: 'token-ash-2',
+      userId: 'ash',
+      type: 'reset',
+      tokenHash: await hashToken('other'),
+      expiresAt: new Date('2026-11-22T12:45:00Z'),
+    })
+    expect(await reset(cmd)).toMatchObject({ ok: true })
+    expect(await reset({ ...cmd, token: 'other' })).toEqual(refused('invalid'))
+    expect(fake.users[0]!.emailVerifiedAt).toEqual(new Date(now))
+  })
+
+  it('US-04.6 tells the owner by email that the password changed', async () => {
+    const { reset, sent } = await setup()
+    await reset(cmd)
+    expect(sent()).toEqual([{ topic: 'emails', payload: { template: 'password_changed', userId: 'ash' } }])
+  })
+
+  it('sends nothing when the link is refused', async () => {
+    const { reset, sent } = await setup({ expiresAt: now })
+    await reset(cmd)
+    expect(sent()).toEqual([])
   })
 
   it('US-04.2 refuses a link already used', async () => {

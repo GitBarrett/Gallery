@@ -68,6 +68,22 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect((await repo.findCredentials(ash.email))?.passwordHash).toBe('$argon2id$new')
     })
 
+    it('US-04.5 uses every unused token of a kind of an account, and only those', async () => {
+      const repo = await make()
+      const [ash, thrall] = [user(), user()]
+      await repo.createUser(ash)
+      await repo.createUser(thrall)
+      const now = new Date('2026-11-22T12:00:00Z')
+      const reset = { ...token(ash.id), type: 'reset' as const }
+      const verify = token(ash.id)
+      const other = { ...token(thrall.id), type: 'reset' as const }
+      for (const t of [reset, verify, other]) await repo.createEmailToken(t)
+      await repo.useEmailTokens(ash.id, 'reset', now)
+      expect((await repo.findEmailToken(reset.tokenHash, 'reset'))?.usedAt).toEqual(now)
+      expect((await repo.findEmailToken(verify.tokenHash, 'verify'))?.usedAt).toBeNull()
+      expect((await repo.findEmailToken(other.tokenHash, 'reset'))?.usedAt).toBeNull()
+    })
+
     it('US-03.1 finds the credentials of an email in any case', async () => {
       const repo = await make()
       const ash = user()

@@ -63,6 +63,14 @@ describe('sendAccountEmail', () => {
     ])
   })
 
+  it('US-04.6 tells the owner that the password changed, with a link to start again', async () => {
+    const { send, sent, tokens } = await setup()
+    await send({ template: 'password_changed', userId: 'ash' })
+    expect(sent[0]).toMatchObject({ to: 'ash@example.com', subject: 'Your password was changed' })
+    expect(sent[0]!.text).toContain('https://legendaryshots.gg/reset')
+    expect(tokens).toEqual([])
+  })
+
   it('US-01.2 tells the owner of a used email that an account already exists', async () => {
     const { send, sent, tokens } = await setup()
     await send({ template: 'account_exists', userId: 'ash' })

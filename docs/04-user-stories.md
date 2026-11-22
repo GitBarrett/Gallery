@@ -65,6 +65,8 @@ En tant que membre, je veux me connecter et me déconnecter en sécurité.
 - US-04.2 Given un lien expiré ou déjà utilisé, When je l'ouvre, Then il est refusé avec un lien pour recommencer.
 - US-04.3 Given un reset réussi, When il se termine, Then toutes les sessions du compte sont révoquées (y compris la courante), puis je suis reconnecté.
 - US-04.4 Given plus de 3 demandes par heure pour un email ou 10 par IP, When j'en fais une de plus, Then elle est ignorée silencieusement (même message).
+- US-04.5 Given un reset réussi, When il se termine, Then les autres liens de reset du compte encore valables sont annulés et l'email du compte est marqué vérifié (le lien prouve la maîtrise de la boîte, Q52).
+- US-04.6 Given un reset réussi, When il se termine, Then le titulaire reçoit un email « mot de passe modifié » avec un lien pour recommencer si ce n'était pas lui (Q52).
 - Tests : U, I, E.
 
 ### US-05 [MVP] Pseudo et profil public
