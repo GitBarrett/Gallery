@@ -58,7 +58,11 @@ describe('POST /api/auth/signup', () => {
   it('US-01.2 answers the same for an email already used', async () => {
     const body = await signupBody()
     await post('/api/auth/signup', body)
-    const again = await post('/api/auth/signup', { ...body, username: `${body.username}x` })
+    const again = await post('/api/auth/signup', {
+      ...body,
+      username: `${body.username}x`,
+      inviteToken: await invite(),
+    })
     expect(again.status).toBe(204)
   })
 
