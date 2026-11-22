@@ -58,5 +58,17 @@
     "notNow": "Plus tard",
     "iosTitle": "Installer sur iPhone",
     "iosSteps": "Dans Safari, touchez Partager, puis Sur l'écran d'accueil."
+  },
+  "consent": {
+    "title": "Vos choix de cookies",
+    "text": "Nous utilisons des cookies essentiels au fonctionnement du site. Avec votre accord, nous aimerions aussi mesurer l'usage des fonctionnalités et afficher des publicités personnalisées qui gardent Legendary Shots gratuit.",
+    "acceptAll": "Tout accepter",
+    "rejectAll": "Tout refuser",
+    "customise": "Personnaliser",
+    "save": "Enregistrer mes choix",
+    "close": "Fermer",
+    "analytics": "Mesure d'usage",
+    "analyticsDescription": "PostHog (UE) : pages visitées et actions comme publier, aimer ou partager. Conservé 12 mois.",
+    "policy": "Lire la politique de cookies"
   }
 }

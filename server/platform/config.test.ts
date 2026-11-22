@@ -37,15 +37,17 @@ describe('loadConfig', () => {
     expect(() => loadConfig({ ...valid, NUXT_R2_PREFIX: '../originals/' })).toThrow(/NUXT_R2_PREFIX/)
   })
 
-  it('accepts an absent or valid Sentry DSN and Web Analytics token, and rejects anything else', () => {
+  it('accepts an absent or valid Sentry DSN, Web Analytics token and PostHog key, and rejects anything else', () => {
     const ok = {
       ...valid,
       NUXT_PUBLIC_SENTRY_DSN: 'https://abc@o1.ingest.de.sentry.io/2',
       NUXT_PUBLIC_CF_BEACON_TOKEN: 'f'.repeat(32),
+      NUXT_PUBLIC_POSTHOG_KEY: 'phc_abc123',
     }
     expect(() => loadConfig(ok)).not.toThrow()
     expect(() => loadConfig({ ...valid, NUXT_PUBLIC_SENTRY_DSN: '', NUXT_PUBLIC_CF_BEACON_TOKEN: '' })).not.toThrow()
     expect(() => loadConfig({ ...ok, NUXT_PUBLIC_SENTRY_DSN: 'not a url' })).toThrow(/NUXT_PUBLIC_SENTRY_DSN/)
     expect(() => loadConfig({ ...ok, NUXT_PUBLIC_CF_BEACON_TOKEN: '<script>' })).toThrow(/NUXT_PUBLIC_CF_BEACON_TOKEN/)
+    expect(() => loadConfig({ ...ok, NUXT_PUBLIC_POSTHOG_KEY: '"><x' })).toThrow(/NUXT_PUBLIC_POSTHOG_KEY/)
   })
 })

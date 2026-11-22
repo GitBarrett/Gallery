@@ -1,5 +1,6 @@
 <script setup lang="ts">
-// Shared layout: skip link first (US-75.1), header, content, footer and, below 768 px, the tab bar (US-67.1).
+// Shared layout: skip link first (US-75.1), the cookie panel (US-61.1), header, content, footer and, below 768 px, the tab bar (US-67.1).
+import ConsentPanel from '~/features/consent/ConsentPanel.vue'
 import AppFooter from '~/features/layout/AppFooter.vue'
 import AppHeader from '~/features/layout/AppHeader.vue'
 import AppTabBar from '~/features/layout/AppTabBar.vue'
@@ -15,6 +16,7 @@ const username = undefined
 <template>
   <div class="layout">
     <a href="#content" class="skip-link">{{ $t('layout.skipToContent') }}</a>
+    <ConsentPanel />
     <AppHeader :flags="flags" :username="username" />
     <OfflineBanner />
     <main id="content" tabindex="-1" class="content"><slot /></main>

@@ -145,7 +145,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Bandeau hors ligne et actions désactivées, toast de mise à jour (`skipWaiting` à la demande), invitation discrète à l'installation.
   Stories : US-63.2–5, US-65. Tests : E.
 
-- [ ] **T-10a Consentement et analytics** (dép. T-07b)
+- [x] **T-10a Consentement et analytics** (dép. T-07b)
   Panneau cookies conforme à `docs/legal/cookies.md`, chargement conditionnel de PostHog EU, Cloudflare Web Analytics.
   Stories : US-61, US-72 (mécanique). Tests : E (aucun appel PostHog ni cookie avant consentement, retrait).
 

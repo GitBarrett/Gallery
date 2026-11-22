@@ -79,6 +79,6 @@ test('US-75.1 skip link first, every element reachable by keyboard with a visibl
 test('US-75.4 transitions are neutralised with prefers-reduced-motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
-  const duration = await page.locator('header').evaluate((e) => parseFloat(getComputedStyle(e).transitionDuration))
+  const duration = await page.getByRole('banner').evaluate((e) => parseFloat(getComputedStyle(e).transitionDuration))
   expect(duration).toBeLessThan(0.001)
 })
