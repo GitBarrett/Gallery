@@ -108,6 +108,8 @@
   --content-max: 1280px;
   --tab-bar-height: 64px;
   --dialog-width: 560px;
+  --auth-card-max: 440px; /* sign-in and sign-up card (SignIn mockup) */
+  --turnstile-height: 65px; /* Turnstile widget, normal size */
 
   /* Visible focus (US-75) and shadows */
   --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent);
