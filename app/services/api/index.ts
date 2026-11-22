@@ -4,6 +4,7 @@ import type { FetchError } from 'ofetch'
 import type { z } from 'zod'
 import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
+import { PublicSettings } from '~~/shared/contracts/settings'
 
 export class ApiError extends Error {
   constructor(
@@ -41,4 +42,5 @@ export const errorMessageKey = (error: unknown) => `errors.${error instanceof Ap
 
 export const api = {
   health: () => call('/api/health', HealthResponse),
+  publicSettings: () => call('/api/settings/public', PublicSettings),
 }

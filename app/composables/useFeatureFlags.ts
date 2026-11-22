@@ -1,3 +1,5 @@
+import { api } from '~/services/api'
+
 /** Flags `features.*` of site_settings that show or hide navigation entries (07-design.md § Header). */
 export interface FeatureFlags {
   leaderboard: boolean
@@ -5,7 +7,10 @@ export interface FeatureFlags {
   collections: boolean
 }
 
-// shortcut: launch values hard-coded (every v1.x entry hidden), read from GET /api/settings/public in T-08
-export function useFeatureFlags(): FeatureFlags {
-  return { leaderboard: false, contests: false, collections: false }
+const HIDDEN: FeatureFlags = { leaderboard: false, contests: false, collections: false }
+
+/** Public flags of GET /api/settings/public, shared by the page; entries stay hidden while unknown or on error. */
+export function useFeatureFlags() {
+  const { data } = useAsyncData('settings-public', api.publicSettings)
+  return computed<FeatureFlags>(() => data.value?.features ?? HIDDEN)
 }

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from './zod'
 
 /** Single list of the API error codes (03-architecture.md § Conventions d'API), translated on the client. */
 export const ERROR_CODES = [
