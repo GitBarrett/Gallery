@@ -133,7 +133,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Page 404 « uncharted zone » avec le bouton « Use Hearthstone » (identifiant de corrélation conservé), message console (logo ASCII et lien vers `/feedback`, une fois par session).
   Stories : US-79. Tests : U (message console émis une fois), E (US-79.1).
 
-- [ ] **T-08 Réglages du site et flags** (dép. T-05a)
+- [x] **T-08 Réglages du site et flags** (dép. T-05a)
   Module `settings` : lecture typée de `site_settings` (seuils de qualité, de modération, d'affichage, hero, editor's pick, flags), cache 60 s, valeurs par défaut de lancement (seuils 3/15/50/150, `moderation.reportsToHide` = 3, `features.inviteOnly` = true jusqu'à l'ouverture), exposition publique en lecture des valeurs non sensibles (`GET /api/settings/public`).
   Stories : US-56 (lecture), US-71.5. Tests : U (validation des réglages US-56.2), I.
 

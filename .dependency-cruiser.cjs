@@ -7,7 +7,7 @@ module.exports = {
       name: 'domain-pure',
       comment: 'The domain imports only its own domain, shared/domain and the standard library.',
       severity: 'error',
-      from: { path: '^server/modules/([^/]+)/domain/' },
+      from: { path: '^server/modules/([^/]+)/domain/', pathNot: '\\.test\\.ts$' }, // tests sit next to the code
       to: { pathNot: ['^server/modules/$1/domain/', '^shared/domain/'], dependencyTypesNot: ['core'] },
     },
     {
