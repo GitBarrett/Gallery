@@ -12,8 +12,12 @@ const RESERVED = new Set(
   ),
 )
 
-// shortcut: small local EN/FR list (Q8, Q41), matched as substrings; switch to a maintained list when Q8 is decided.
-const INSULTS = ['fuck', 'shit', 'cunt', 'nigger', 'faggot', 'whore', 'connard', 'connasse', 'salope', 'encule']
+// shortcut: local EN/FR list (Q8, Q41), matched as substrings, no leetspeak; switch to a maintained list when Q8
+// is decided. Words hidden in common ones are left out: cock (peacock), nique (unique), pedo (torpedo), cum (document).
+const INSULTS =
+  'fuck shit cunt bitch bastard asshole dickhead wanker twat whore slut pussy retard nigger nigga faggot tranny kike rapist porn dildo jizz penis vagina nazi hitler connard connasse salope salaud encule batard putain merde couille branleur trouduc niquer tapette gouine bougnoule youpin pedophile'.split(
+    ' ',
+  )
 
 export function validateUsername(name: string): Result<string, UsernameProblem> {
   if (name.length < 3 || name.length > 24) return err('length')
