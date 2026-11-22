@@ -7,6 +7,7 @@ import NavIcon, { type NavIconName } from './NavIcon.vue'
 const props = defineProps<{ flags: FeatureFlags; username?: string }>()
 const { t } = useI18n()
 const localePath = useLocalePath()
+const online = useOnline()
 
 const tabs = computed((): { to: string; label: string; icon: NavIconName }[] =>
   [
@@ -25,10 +26,23 @@ const tabs = computed((): { to: string; label: string; icon: NavIconName }[] =>
 
 <template>
   <nav :aria-label="t('layout.mainNav')" class="tab-bar">
-    <NuxtLink v-for="tab in tabs" :key="tab.icon" :to="tab.to" class="tab" :class="{ upload: tab.icon === 'upload' }">
-      <span class="glyph"><NavIcon :name="tab.icon" /></span>
-      <span class="label">{{ tab.label }}</span>
-    </NuxtLink>
+    <template v-for="tab in tabs" :key="tab.icon">
+      <!-- Offline, uploading is impossible (US-64.3): the tab stays in place, disabled, with the reason -->
+      <span
+        v-if="tab.icon === 'upload' && !online"
+        class="tab upload disabled"
+        role="link"
+        aria-disabled="true"
+        :title="t('offline.banner')"
+      >
+        <span class="glyph"><NavIcon :name="tab.icon" /></span>
+        <span class="label">{{ tab.label }}</span>
+      </span>
+      <NuxtLink v-else :to="tab.to" class="tab" :class="{ upload: tab.icon === 'upload' }">
+        <span class="glyph"><NavIcon :name="tab.icon" /></span>
+        <span class="label">{{ tab.label }}</span>
+      </NuxtLink>
+    </template>
   </nav>
 </template>
 
@@ -55,6 +69,11 @@ const tabs = computed((): { to: string; label: string; icon: NavIconName }[] =>
   color: var(--color-text-muted);
   font-size: var(--text-xs);
   text-decoration: none;
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .tab[aria-current='page'] {

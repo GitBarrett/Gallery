@@ -1,22 +1,11 @@
 <script setup lang="ts">
-// "You're offline" banner (US-64.3), driven by the browser's online and offline events.
+// "You're offline" banner (US-64.3).
 const { t } = useI18n()
-const offline = ref(false)
-const update = () => (offline.value = !navigator.onLine)
-
-onMounted(() => {
-  update()
-  window.addEventListener('online', update)
-  window.addEventListener('offline', update)
-})
-onBeforeUnmount(() => {
-  window.removeEventListener('online', update)
-  window.removeEventListener('offline', update)
-})
+const online = useOnline()
 </script>
 
 <template>
-  <p v-if="offline" role="status" class="banner">{{ t('offline.banner') }}</p>
+  <p v-if="!online" role="status" class="banner">{{ t('offline.banner') }}</p>
 </template>
 
 <style scoped>

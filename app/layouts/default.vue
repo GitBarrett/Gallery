@@ -4,6 +4,8 @@ import AppFooter from '~/features/layout/AppFooter.vue'
 import AppHeader from '~/features/layout/AppHeader.vue'
 import AppTabBar from '~/features/layout/AppTabBar.vue'
 import OfflineBanner from '~/features/layout/OfflineBanner.vue'
+import InstallBanner from '~/features/pwa/InstallBanner.vue'
+import UpdateToast from '~/features/pwa/UpdateToast.vue'
 
 const flags = useFeatureFlags()
 // shortcut: always signed out, the username comes from the session in T-12a
@@ -16,7 +18,9 @@ const username = undefined
     <AppHeader :flags="flags" :username="username" />
     <OfflineBanner />
     <main id="content" tabindex="-1" class="content"><slot /></main>
+    <InstallBanner />
     <AppFooter />
+    <UpdateToast />
     <AppTabBar :flags="flags" :username="username" />
   </div>
 </template>
