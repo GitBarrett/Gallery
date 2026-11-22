@@ -156,3 +156,15 @@ Chaque emplacement a une hauteur réservée (CLS). Le libellé « Advertisement 
 6. **Badge « Supporter »** sur le profil, seulement si le donateur l'accepte. Aucune contrepartie dans le classement, les concours ou la modération.
 7. **Historique des dons** dans `/settings`, sans montant public.
 8. **Reçu** par email, avec la mention « don à un service en ligne, non déductible » tant que Q20 n'est pas tranché.
+
+## Réseaux sociaux du profil (US-82)
+
+Icônes maison monochromes (pas les logos officiels en couleur), alignées sous la bio ; une cible ≥ 44 px par réseau ; site web affiché par son domaine seul ; Discord sans lien, avec un bouton de copie de l'identifiant.
+
+## Secrets et easter eggs (US-79 à US-81)
+
+- **Page 404** : carte au trésor stylisée maison, titre « You have wandered into an uncharted zone », bouton principal « Use Hearthstone » (US-79.1).
+- **Fenêtre de butin** « Need / Greed / Pass » : cadre d'infobulle existant (ItemTooltip), bordure Legendary (v1.x, US-80.1).
+- **Bulle « Stop poking me! »** : ItemTooltip réduit, près du logo (v1.x, US-80.4).
+- **Bandeau d'anniversaire** « Happy birthday, Azeroth » : bandeau de quête avec le QuestMarker « ! » jaune (v1.x, US-80.6).
+- Toutes les animations ont une version statique (`prefers-reduced-motion`) ; aucun visuel ni texte de Blizzard.

@@ -39,6 +39,7 @@ Chaque module suit la structure en couches de `10-clean-architecture.md` (domain
 | settings | `site_settings` (seuils, hero, flags) avec cache 60 s | — |
 | admin | Back-office : orchestration des autres modules, journal d'audit | tous (ports publics) |
 | feedback | Bug reports → GitHub, anti-spam | identity |
+| secrets | (v1.x, T-73) Quêtes secrètes : étapes, essais vérifiés par HMAC, progression, badge et titre, Hall of Seekers (US-81) | identity |
 
 Règle : un module n'importe que l'`index.ts` public d'un autre module (ses use cases et ses types). Imports profonds interdits, vérifiés en CI (`10-clean-architecture.md` § Contrôles).
 
@@ -87,7 +88,11 @@ Pas de bibliothèque de décodage d'image dans le Worker (limite mémoire), à l
 | collections / collection_items | collections(id, user_id, name, is_public) ; items(collection_id, photo_id) |
 | contests | id, slug, title_en, title_fr, description_en, description_fr, theme, banner_photo_id, starts_at, ends_at, extended (bool), status (`draft`/`scheduled`/`open`/`judging`/`closed`/`cancelled`), criteria jsonb (game_version_id, zone_ids, required_tag), min_entries (déf. 10), blind_voting (bool), rewards_text, created_by, created_at |
 | contest_entries | id, contest_id, photo_id (unique parmi les participations actives), user_id, submitted_at, status (`active`/`withdrawn`/`disqualified`), disqualify_reason, score, final_rank ; unique(contest_id, user_id) where status = 'active' |
-| user_badges | id, user_id, type (`contest_champion`/`contest_silver`/`contest_bronze`/`contest_participant`), contest_id, awarded_at |
+| user_badges | id, user_id, type (`contest_champion`/`contest_silver`/`contest_bronze`/`contest_participant`/`ninja_looter` (US-80.2)/`secret_quest` (US-81.4)), contest_id (nullable), quest_id (nullable), visible (bool, défaut vrai : l'utilisateur choisit de l'afficher sur son profil), awarded_at ; unique (user_id, type) pour `ninja_looter`, unique (user_id, quest_id) pour `secret_quest` |
+| user_social_links | user_id, platform (`twitch`, `youtube`, `x`, `bluesky`, `instagram`, `tiktok`, `reddit`, `discord`, `website`), handle, updated_at ; PK (user_id, platform) ; supprimés avec le compte (US-82) |
+| secret_quests | (v1.x, T-73) id, slug (unique), title_en, title_fr, season, starts_at, ends_at, status (`draft`/`active`/`closed`), badge_code, title_code, created_by, created_at |
+| secret_steps | (v1.x, T-73) id, quest_id, ordinal, trigger (`console`/`not_found`/`tooltip`/`search`/`konami`/`upload`/`other`), context_kind (`none`/`photo`/`tag`/`zone`), context_ref (nullable), answer_hmac (HMAC-SHA256 avec `SECRETS_HMAC_KEY`, la réponse en clair n'est jamais stockée), clue_en, clue_fr ; unique (quest_id, ordinal) |
+| secret_progress | (v1.x, T-73) user_id, quest_id, current_ordinal, started_at, completed_at (nullable), hall_opt_out (bool) ; PK (user_id, quest_id) ; supprimée avec le compte (purge J+30) |
 | notifications | id, user_id, type, payload jsonb, read_at, created_at |
 | reports | id, reporter_id, target_type (`photo`/`comment`/`profile`), target_id, reason (`nudity`/`violence`/`hate`/`spam`/`copyright`/`personal_info`/`other`), comment, created_at, unique(reporter_id, target_type, target_id) |
 | moderation_decisions | id, target_type, target_id, decision, source (`auto`/`manual`), moderator_id, reason, scores jsonb, created_at |
@@ -188,8 +193,8 @@ Source de la matrice d'autorisation (08, annexe B) : toute route ajoutée ici y 
 | Domaine | Routes |
 |---|---|
 | Auth | `POST /api/auth/signup`, `POST /api/auth/signin`, `POST /api/auth/signout`, `POST /api/auth/verify-email`, `POST /api/auth/resend-verification`, `POST /api/auth/password/forgot`, `POST /api/auth/password/reset`, `POST /api/auth/email/confirm` (changement d'email), `POST /api/auth/deletion/cancel` (jeton reçu par email), `GET /auth/{google,battlenet}` + callbacks, `POST /api/auth/oauth/complete` (pseudo + Terms au premier login), `POST /api/auth/mfa/setup`, `POST /api/auth/mfa/verify`, `POST /api/auth/mfa/challenge` (TOTP ou code de secours après connexion staff), `POST /api/auth/reauth`, `POST /api/waitlist` (mode invitation) |
-| Compte | `GET/PATCH /api/me`, `GET /api/me/photos` (« My captures », tous statuts), `GET /api/me/sessions`, `DELETE /api/me/sessions/{id}`, `POST /api/me/sessions/revoke-others`, `POST /api/me/avatar-upload-url`, `POST /api/me/avatar/complete`, `POST /api/me/email`, `POST /api/me/password`, `DELETE /api/me/oauth/{provider}`, `POST /api/me/deletion`, `GET /api/usernames/{name}/availability` |
-| Profils | `GET /api/users/{username}`, `GET /api/users/{username}/photos` |
+| Compte | `GET/PATCH /api/me`, `GET /api/me/photos` (« My captures », tous statuts), `GET /api/me/sessions`, `DELETE /api/me/sessions/{id}`, `POST /api/me/sessions/revoke-others`, `POST /api/me/avatar-upload-url`, `POST /api/me/avatar/complete`, `POST /api/me/email`, `POST /api/me/password`, `DELETE /api/me/oauth/{provider}`, `POST /api/me/deletion`, `GET /api/usernames/{name}/availability`, `PUT /api/me/social-links` (liste complète, validée par Zod ; US-82) |
+| Profils | `GET /api/users/{username}` (réseaux sociaux inclus, liens construits par le serveur à partir des gabarits de `shared/domain/social-links.ts`, règles pures partagées client et serveur et testées ; US-82.4–5), `GET /api/users/{username}/photos` |
 | Captures | `POST /api/photos/upload-url`, `POST /api/photos/{id}/complete`, `GET /api/photos` (filtres, curseur), `GET /api/photos/{id}`, `GET /api/photos/{id}/related` (US-70), `PATCH /api/photos/{id}`, `DELETE /api/photos/{id}`, `POST /api/photos/{id}/download` |
 | Médias | `GET /img/{photoId}/{400,800,1200,2400}`, `GET /img/{photoId}/og.jpg`, `GET /img/{photoId}/{w}?preview=1` (auteur, modérateurs), `GET /avatar/{userId}/{version}/{64,128,256}` |
 | Catalogue | `GET /api/game-versions`, `GET /api/zones/suggest?q=`, `GET /api/tags/suggest?q=`, `GET /api/search?q=` |
@@ -200,7 +205,7 @@ Source de la matrice d'autorisation (08, annexe B) : toute route ajoutée ici y 
 | Admin (MFA) | `/api/admin/moderation/*` (file, décisions), `/api/admin/reports/*`, `/api/admin/sanctions/*`, `/api/admin/users` (recherche) et `/api/admin/users/{id}/role`, `/api/admin/game-versions/*`, `/api/admin/zones/*`, `/api/admin/settings`, `/api/admin/invites/*` et `/api/admin/waitlist`, `/api/admin/audit`, `/api/admin/bug-reports/*` |
 | Divers | `POST /api/bug-reports` (multipart, capture ≤ 5 Mo facultative), `GET /sitemap.xml` (+ lots `sitemap-{n}.xml`), `GET /robots.txt`, `GET /api/health` |
 | Preview uniquement | `/__test/*` (reset de base, boîte mail factice, horloge) — absent des builds de production |
-| v1.x | follows (`PUT/DELETE /api/users/{username}/follow`, `GET /api/feed`), collections (`/api/collections/*`), classement (`GET /api/leaderboard`), concours (`/api/contests/*`, `/api/admin/contests/*`), export (`POST /api/me/export`), versions des Terms (`/api/admin/legal`, `POST /api/me/terms/accept`, T-70), recours (`POST /api/appeals`, `/api/admin/appeals/*`, T-71), `POST /share-target`, désinscription du récap (`GET /api/email/unsubscribe?token=`) |
+| v1.x | follows (`PUT/DELETE /api/users/{username}/follow`, `GET /api/feed`), collections (`/api/collections/*`), classement (`GET /api/leaderboard`), concours (`/api/contests/*`, `/api/admin/contests/*`), export (`POST /api/me/export`), versions des Terms (`/api/admin/legal`, `POST /api/me/terms/accept`, T-70), recours (`POST /api/appeals`, `/api/admin/appeals/*`, T-71), `POST /share-target`, désinscription du récap (`GET /api/email/unsubscribe?token=`), quêtes secrètes (`POST /api/secrets/{slug}/attempt` : corps `answer`, `context?`, réponse `{ ok, clue?, completed? }` ; `GET /api/secrets/{slug}/hall` ; `GET/POST/PATCH /api/admin/secrets/*`, T-73, T-74), badge cosmétique « Ninja Looter » (US-80.2, T-72) |
 
 ## Files d'attente et tâches planifiées
 | Queue | Producteur | Consommateur | Retries | DLQ |
@@ -237,6 +242,7 @@ Tous les consommateurs sont **idempotents** (`processed_messages` + opérations 
 | `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_FEEDBACK_REPO` | secrets | bug reports |
 | `IP_HASH_KEY_CURRENT/PREVIOUS` | secrets (rotation 30 j) | HMAC des IP |
 | `CONTEST_IP_KEY` | secret (v1.x, T-64c ; changée seulement entre deux concours) | clé dérivée par concours pour `contest_like_signals` |
+| `SECRETS_HMAC_KEY` | secret (v1.x, T-73 ; distinct des autres clés, jamais changé pendant une quête active) | HMAC des réponses des quêtes secrètes (`secret_steps.answer_hmac`) |
 | `MFA_ENCRYPTION_KEY` | secret | chiffrement des secrets TOTP |
 | `NUXT_PUBLIC_SENTRY_DSN` | public (le DSN est servi au navigateur ; un seul DSN pour le Worker et le client, Q25) | suivi d'erreurs serveur et client |
 | `NUXT_PUBLIC_CF_BEACON_TOKEN` | public | beacon Cloudflare Web Analytics (ajouté par Nuxt avec nonce) |

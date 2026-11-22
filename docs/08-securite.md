@@ -66,6 +66,8 @@ Analyse STRIDE par flux à mettre à jour à chaque nouvelle fonctionnalité exp
 - **Rétention** : appliquée par les tâches planifiées (`03-architecture.md` § Files et tâches) et décrite dans `docs/legal/privacy.md`.
 - **Suppression** : cascade complète testée (US-09.2) : base, R2, PostHog, sessions.
 - **Secrets** : uniquement dans les secrets Cloudflare et GitHub Actions ; validation au démarrage ; rotation documentée (session, clés IP, clés fournisseurs) ; **gitleaks** en pre-commit et en CI ; aucun secret dans `wrangler.toml`.
+- **Réponses des quêtes secrètes** (v1.x, US-81) : jamais journalisées, jamais stockées en clair (HMAC-SHA256 avec `SECRETS_HMAC_KEY`, clé dédiée), jamais renvoyées par l'API admin après leur création ; aucun indice ni réponse dans le bundle JavaScript.
+- **Réseaux sociaux du profil** (US-82) : aucune URL libre hors site web (`https://`, sans IP ni raccourcisseur connu) ; liens construits par le serveur à partir de gabarits fixes, rendus avec `rel="nofollow ugc noopener noreferrer"` ; jamais de `v-html`.
 - **Accès humains** : comptes Cloudflare, Neon, GitHub, Resend, Sentry protégés par 2FA ; principe du moindre privilège (token CI limité au déploiement du Worker, token de purge limité au cache de la zone).
 - **Environnements non productifs** : previews derrière Cloudflare Access ; routes `/__test/*` et fournisseurs factices absents des builds de production (contrôle au démarrage et test de CI sur l'artefact de production).
 
@@ -82,6 +84,8 @@ Analyse STRIDE par flux à mettre à jour à chaque nouvelle fonctionnalité exp
 | Téléchargement HD | 100 / h / compte |
 | Bug report | cf. `02-specs-fonctionnelles.md` § 7 |
 | Changement de pseudo | 1 / 30 jours |
+| Réseaux sociaux du profil (`PUT /api/me/social-links`) | 20 / h / compte |
+| Essai de quête secrète (v1.x) | `secrets_attempt_user` : 10 / min et 100 / jour / compte et par quête (`rate_limit_counters`) ; `secrets_attempt_ip` : 30 / min / IP (binding) |
 | Liste d'attente (mode invitation) | 3 / h / IP, Turnstile |
 | Codes TOTP et codes de secours | 5 échecs / 15 min → blocage 15 min du compte staff + alerte aux admins |
 
@@ -134,6 +138,9 @@ Une ligne par groupe de routes de `03-architecture.md` § Inventaire ; le test d
 | `POST /api/auth/mfa/*` | 401 | 403 | 403 | — | 403 | ✓ | ✓ |
 | Compte : `GET/PATCH /api/me`, `/api/me/sessions*`, `email`, `password`, `oauth/*`, `terms/accept` (v1.x, T-70), `decisions`, `GET /api/me/photos`, `POST /api/me/deletion` | 401 | ✓ | ✓ | — | ✓ (PATCH bio : 403) | ✓ | ✓ (dernier admin : suppression 409) |
 | `POST /api/me/avatar-upload-url`, `avatar/complete` | 401 | 403 | ✓ | — | 403 | ✓ | ✓ |
+| `PUT /api/me/social-links` (sa propre ressource ; liens masqués sur le profil d'un compte sanctionné ou de moins de 7 jours, US-82.5) | 401 | ✓ | ✓ | — | ✓ | ✓ | ✓ |
+| `POST /api/secrets/{slug}/attempt` (v1.x, T-73 ; flag désactivé ou aucune quête active → 404) | ✓ (indice affiché, progression non enregistrée, US-81.5) | ✓ | ✓ | — | ✓ | ✓ | ✓ |
+| `GET /api/secrets/{slug}/hall` (v1.x, T-73) | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ |
 | Capture non publiée : `GET /api/photos/{id}`, `/img/{id}/{w}?preview=1` | 404 | 404 | 404 | ✓ | ✓ | ✓ (MFA) | ✓ (MFA) |
 | `POST /api/photos/upload-url`, `/complete` | 401 | 403 | ✓ | — | 403 | ✓ | ✓ |
 | `PATCH /api/photos/{id}` | 401 | 403 | 403 (404 si non publiée) | ✓ | 403 | 403 (passer par `/api/admin/moderation`) | 403 (idem) |
@@ -150,5 +157,6 @@ Une ligne par groupe de routes de `03-architecture.md` § Inventaire ; le test d
 | `/api/admin/moderation/*`, `/appeals/*` (v1.x, T-71), `/reports/*`, `/users` (recherche), `/sanctions/*` (avertissement, suspension) | 401 | 403 | 403 | 403 | 403 | ✓ (MFA ; recours : jamais l'auteur de la décision) | ✓ (MFA) |
 | `/api/admin/sanctions/*` (bannissement, levée) | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA + réauth) |
 | `/api/admin/users/{id}/role`, `/settings`, `/legal` (v1.x, T-70) | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA + réauth) |
+| `/api/admin/secrets/*` (v1.x, T-74 ; actions auditées) | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA ; réauth < 5 min pour créer ou modifier une réponse) |
 | `/api/admin/game-versions/*`, `/zones/*`, `/invites/*`, `/waitlist`, `/audit`, `/bug-reports/*` | 401 | 403 | 403 | 403 | 403 | 403 | ✓ (MFA) |
 | `/__test/*` | 404 en production pour tous ; preview uniquement (derrière Access) | | | | | | |
