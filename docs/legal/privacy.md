@@ -1,8 +1,8 @@
 # Privacy policy
 
-_Last updated: [DATE]_
+_Last updated: 22/11/2026_
 
-Controller: [PUBLISHER NAME], [ADDRESS] — privacy contact: [PRIVACY EMAIL].
+Controller: Adrien Leygues (Bootleygues), individual publisher — privacy contact: aleygues@yahoo.fr.
 
 ## What we collect and why
 
@@ -29,15 +29,15 @@ Controller: [PUBLISHER NAME], [ADDRESS] — privacy contact: [PRIVACY EMAIL].
 Image metadata (EXIF, which may contain location) is removed at upload. We never sell your data.
 
 ## Who processes it (subprocessors)
-Cloudflare (hosting, images, security — USA/global), Neon (database — [REGION]), Sightengine (automated image moderation — France/EU), Resend (emails — USA), PostHog (analytics — EU), Sentry (error tracking, no personal data sent — EU region), GitHub (bug report tracking, no email or name sent — USA), Google and Blizzard (only if you sign in with them), [AD NETWORK].
+Cloudflare (hosting, images, security — USA/global), Neon (database — AWS Europe Central, Frankfurt), Sightengine (automated image moderation — France/EU), Resend (emails — USA), PostHog (analytics — EU), Sentry (error tracking, no personal data sent — EU region), GitHub (bug report tracking, no email or name sent — USA), Google and Blizzard (only if you sign in with them), and the advertising network once one is chosen (this policy will name it).
 When you choose a password, we check it against known breaches with Have I Been Pwned using only the first 5 characters of a hash of your password: your password never leaves our servers.
 Transfers outside the EU rely on the EU–US Data Privacy Framework or the European Commission's standard contractual clauses.
 
 ## Your rights
-Access, rectification, erasure, restriction, objection, portability, and withdrawal of consent at any time. Delete your account from your settings (effective after 30 days, cancellable). To export your data, write to [PRIVACY EMAIL] (self-service export coming later). We answer within one month. You can complain to the CNIL (cnil.fr).
+Access, rectification, erasure, restriction, objection, portability, and withdrawal of consent at any time. Delete your account from your settings (effective after 30 days, cancellable). To export your data, write to aleygues@yahoo.fr (self-service export coming later). We answer within one month. You can complain to the CNIL (cnil.fr).
 
 ## Minors
-The service is not intended for children under [15].
+The service is not intended for children under 15.
 
 ## Security
 Passwords are hashed, traffic is encrypted, access to data is limited to what each service needs.

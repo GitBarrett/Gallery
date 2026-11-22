@@ -1,8 +1,8 @@
 # Politique de confidentialité
 
-_Dernière mise à jour : [DATE]_
+_Dernière mise à jour : 22/11/2026_
 
-Responsable du traitement : [NOM DE L'ÉDITEUR], [ADRESSE] — contact vie privée : [EMAIL VIE PRIVÉE].
+Responsable du traitement : Adrien Leygues (Bootleygues), éditeur particulier — contact vie privée : aleygues@yahoo.fr.
 
 ## Ce que nous collectons et pourquoi
 
@@ -29,15 +29,15 @@ Responsable du traitement : [NOM DE L'ÉDITEUR], [ADRESSE] — contact vie priv�
 Les métadonnées des images (EXIF, qui peuvent contenir une localisation) sont supprimées à l'envoi. Nous ne vendons jamais vos données.
 
 ## Qui les traite (sous-traitants)
-Cloudflare (hébergement, images, sécurité — États-Unis/monde), Neon (base de données — [RÉGION]), Sightengine (modération automatique des images — France/UE), Resend (emails — États-Unis), PostHog (mesure d'usage — UE), Sentry (suivi des erreurs, sans donnée personnelle — région UE), GitHub (suivi des rapports de bug, sans email ni nom — États-Unis), Google et Blizzard (uniquement si vous vous connectez avec eux), [RÉGIE PUBLICITAIRE].
+Cloudflare (hébergement, images, sécurité — États-Unis/monde), Neon (base de données — AWS Europe Central, Francfort), Sightengine (modération automatique des images — France/UE), Resend (emails — États-Unis), PostHog (mesure d'usage — UE), Sentry (suivi des erreurs, sans donnée personnelle — région UE), GitHub (suivi des rapports de bug, sans email ni nom — États-Unis), Google et Blizzard (uniquement si vous vous connectez avec eux), et la régie publicitaire une fois choisie (cette politique la nommera).
 Quand vous choisissez un mot de passe, nous le vérifions auprès de Have I Been Pwned à partir des 5 premiers caractères d'une empreinte de votre mot de passe seulement : votre mot de passe ne quitte jamais nos serveurs.
 Les transferts hors de l'UE reposent sur le Data Privacy Framework UE–États-Unis ou sur les clauses contractuelles types de la Commission européenne.
 
 ## Vos droits
-Accès, rectification, effacement, limitation, opposition, portabilité, et retrait de votre consentement à tout moment. Supprimez votre compte depuis vos paramètres (effectif après 30 jours, annulable). Pour exporter vos données, écrivez à [EMAIL VIE PRIVÉE] (export en libre-service prévu plus tard). Nous répondons sous un mois. Vous pouvez déposer une réclamation auprès de la CNIL (cnil.fr).
+Accès, rectification, effacement, limitation, opposition, portabilité, et retrait de votre consentement à tout moment. Supprimez votre compte depuis vos paramètres (effectif après 30 jours, annulable). Pour exporter vos données, écrivez à aleygues@yahoo.fr (export en libre-service prévu plus tard). Nous répondons sous un mois. Vous pouvez déposer une réclamation auprès de la CNIL (cnil.fr).
 
 ## Mineurs
-Le service ne s'adresse pas aux enfants de moins de [15] ans.
+Le service ne s'adresse pas aux enfants de moins de 15 ans.
 
 ## Sécurité
 Les mots de passe sont hachés, les échanges sont chiffrés, l'accès aux données est limité à ce dont chaque service a besoin.
