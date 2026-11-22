@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
 
 // Shared layout (T-07a). shortcut: extend PAGES as pages are added; the privacy page holds the widest table.
+// networkidle: leave a page once hydrated; WebKit takes its history.replaceState for a navigation otherwise
 const PAGES = ['/', '/privacy', '/terms', '/signup', '/signin', '/verify-email', '/reset']
 const INTERACTIVE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
 const axePath = createRequire(import.meta.url).resolve('axe-core')
@@ -26,7 +27,7 @@ test('US-67.1 below 768 px, the main navigation is a bottom tab bar with Upload 
 
 test('US-67.5 every interactive element has a touch target of at least 44 × 44 px', async ({ page }) => {
   for (const path of PAGES) {
-    await page.goto(path)
+    await page.goto(path, { waitUntil: 'networkidle' })
     const small = await page.locator(INTERACTIVE).evaluateAll((elements) =>
       elements
         // A checkbox is touched through its whole label
@@ -47,7 +48,7 @@ test('US-67.5 every interactive element has a touch target of at least 44 × 44 
 test('US-67.6 no horizontal scroll at 360 px', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 780 })
   for (const path of PAGES) {
-    await page.goto(path)
+    await page.goto(path, { waitUntil: 'networkidle' })
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
     expect(overflow, path).toBeLessThanOrEqual(0)
   }
@@ -59,13 +60,13 @@ test('US-75.1 skip link first, every element reachable by keyboard with a visibl
 }) => {
   test.skip(isMobile, 'keyboard navigation is checked on desktop')
   for (const path of PAGES) {
-    await page.goto(path)
+    await page.goto(path, { waitUntil: 'networkidle' })
     await page.keyboard.press('Tab')
     await expect(page.locator(':focus')).toHaveText('Skip to content')
     await page.keyboard.press('Enter')
     await expect(page.locator(':focus')).toHaveAttribute('id', 'content')
 
-    await page.goto(path)
+    await page.goto(path, { waitUntil: 'networkidle' })
     await page.keyboard.press('Tab')
     const reachable = await page
       .locator(INTERACTIVE)
