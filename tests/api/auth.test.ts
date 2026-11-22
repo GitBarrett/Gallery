@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { eq, like } from 'drizzle-orm'
 import { afterAll, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/db/client'
-import { betaInvites, users, waitlistEntries } from '../../server/db/schema'
+import { betaInvites, emailTokens, users, waitlistEntries } from '../../server/db/schema'
 import { TURNSTILE_DUMMY_TOKEN } from '../../server/modules/identity'
 import { SessionsResponse } from '../../shared/contracts/auth'
 import { ErrorResponse } from '../../shared/contracts/errors'
@@ -312,6 +312,69 @@ describe('sessions', () => {
     expect((await me(laptop)).status).toBe(401)
     expect((await me(current)).status).toBe(200)
     expect((await me(other)).status).toBe(200)
+  })
+
+  // Reset link of the account, as the `emails` consumer would mail it (the screens and E2E come with T-13b)
+  const resetToken = async (email: string, expiresAt = new Date(Date.now() + 3600_000)) => {
+    const [user] = await db.select({ id: users.id }).from(users).where(eq(users.email, email))
+    const token = crypto.randomUUID()
+    const tokenHash = createHash('sha256').update(token).digest('hex')
+    await db.insert(emailTokens).values({ userId: user!.id, type: 'reset', tokenHash, expiresAt })
+    return token
+  }
+  const reset = (body: { token: string; password: string }, cookie?: string) =>
+    fetch('/api/auth/password/reset', {
+      method: 'POST',
+      headers: { 'sec-fetch-site': 'same-origin', 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+      body: JSON.stringify(body),
+    })
+
+  it('US-04.1 answers 204 to a reset request, the same for an unknown email; 400 without Turnstile', async () => {
+    const { email } = await account()
+    const forgot = (body: object) => post('/api/auth/password/forgot', body)
+    expect((await forgot({ email, turnstileToken: TURNSTILE_DUMMY_TOKEN })).status).toBe(204)
+    expect((await forgot({ email: 'api.nobody@example.com', turnstileToken: TURNSTILE_DUMMY_TOKEN })).status).toBe(204)
+    expect((await errorOf(await forgot({ email, turnstileToken: 'bot' }))).details).toEqual({
+      field: 'turnstileToken',
+      reason: 'failed',
+    })
+  })
+
+  it('US-04.4 answers 204 to requests over the limits of an email and an IP', async () => {
+    const { email } = await account()
+    const ip = crypto.randomUUID()
+    for (let i = 0; i < 12; i++) {
+      const response = await post('/api/auth/password/forgot', { email, turnstileToken: TURNSTILE_DUMMY_TOKEN }, ip)
+      expect(response.status).toBe(204)
+    }
+  })
+
+  it('US-04.3 sets the new password, ends every session of the account, then signs it in', async () => {
+    const credentials = await account()
+    const laptop = sessionCookie(await signin(credentials)).value
+    const current = sessionCookie(await signin(credentials)).value
+    const password = 'a brand new passphrase'
+    const response = await reset({ token: await resetToken(credentials.email), password }, current)
+    expect(response.status).toBe(204)
+    const signedIn = sessionCookie(response).value
+    expect((await me(laptop)).status).toBe(401)
+    expect((await me(current)).status).toBe(401)
+    expect((await me(signedIn)).status).toBe(200)
+    expect((await signin(credentials)).status).toBe(401)
+    expect((await signin({ email: credentials.email, password })).status).toBe(204)
+  })
+
+  it('US-04.2 refuses a reset link already used or expired, with 400 and its reason', async () => {
+    const { email } = await account()
+    const token = await resetToken(email)
+    expect((await reset({ token, password: 'a brand new passphrase' })).status).toBe(204)
+    const used = await reset({ token, password: 'another new passphrase' })
+    expect((await errorOf(used)).details).toEqual({ field: 'token', reason: 'invalid' })
+    const expired = await reset({
+      token: await resetToken(email, new Date(Date.now() - 1000)),
+      password: 'another new passphrase',
+    })
+    expect((await errorOf(expired)).details).toEqual({ field: 'token', reason: 'expired' })
   })
 
   it('answers 401 without session and sets no cookie for a visitor', async () => {

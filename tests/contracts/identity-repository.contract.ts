@@ -60,6 +60,14 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       await repo.markEmailVerified(ash.id, now)
     })
 
+    it('US-04.3 replaces the password hash of an account', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      await repo.setPasswordHash(ash.id, '$argon2id$new')
+      expect((await repo.findCredentials(ash.email))?.passwordHash).toBe('$argon2id$new')
+    })
+
     it('US-03.1 finds the credentials of an email in any case', async () => {
       const repo = await make()
       const ash = user()

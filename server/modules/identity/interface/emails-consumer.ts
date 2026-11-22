@@ -10,7 +10,7 @@ import { sendAccountEmail } from '../application/send-account-email'
 import { drizzleIdentityRepository } from '../infrastructure/drizzle-identity-repository'
 
 const AccountEmail = z.strictObject({
-  template: z.enum(['verify', 'account_exists', 'signin_locked']),
+  template: z.enum(['verify', 'reset', 'account_exists', 'signin_locked']),
   userId: z.uuid(),
 })
 

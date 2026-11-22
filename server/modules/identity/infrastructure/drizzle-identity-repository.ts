@@ -62,6 +62,9 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
   async markEmailVerified(userId, at) {
     await db.update(users).set({ emailVerifiedAt: at }).where(eq(users.id, userId))
   },
+  async setPasswordHash(userId, passwordHash) {
+    await db.update(users).set({ passwordHash }).where(eq(users.id, userId))
+  },
   async findCredentials(email) {
     const [row] = await db
       .select({ userId: users.id, passwordHash: users.passwordHash, status: users.status })

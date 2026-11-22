@@ -2,6 +2,8 @@ import type { Result } from '../../../../shared/domain/result'
 
 /** Validity of a verification link (US-01.1). */
 export const VERIFY_TTL_MS = 24 * 3600_000
+/** Validity of a password reset link (US-04.1). */
+export const RESET_TTL_MS = 3600_000
 
 /** Error of an identity use case, mapped to HTTP by the interface layer. */
 export type IdentityError =

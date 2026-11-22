@@ -1,0 +1,38 @@
+import { validatePassword } from '../../../../shared/domain/account-rules'
+import { err, ok, type Result } from '../../../../shared/domain/result'
+import type { Clock } from '../../../platform/clock'
+import type { UnitOfWork } from '../../../platform/unit-of-work'
+import { hashToken, invalid, type IdentityError } from './email-tokens'
+import type { BreachChecker, IdentityRepository, PasswordHasher } from './ports'
+import { startSession } from './sessions'
+
+/**
+ * New password from a reset link (US-04.2–3), open to visitors: the token alone designates the account, once. The
+ * password is checked before the token is used, so a refused password leaves the link usable. Every session of the
+ * account ends, the current one included, then its owner is signed in again.
+ */
+export const resetPassword =
+  (deps: { uow: UnitOfWork<IdentityRepository>; hasher: PasswordHasher; breaches: BreachChecker; clock: Clock }) =>
+  async (cmd: {
+    token: string
+    password: string
+    userAgent?: string
+    previousSessionId?: string
+  }): Promise<Result<{ sessionId: string }, IdentityError>> => {
+    const password = validatePassword(cmd.password)
+    if (!password.ok) return err(invalid('password', password.error))
+    if (await deps.breaches.isBreached(cmd.password)) return err(invalid('password', 'breached'))
+    const passwordHash = await deps.hasher.hash(cmd.password)
+    const tokenHash = await hashToken(cmd.token)
+    const now = deps.clock.now()
+    return deps.uow.run(async (repo) => {
+      const token = await repo.findEmailToken(tokenHash, 'reset')
+      if (!token || token.usedAt) return err(invalid('token', 'invalid'))
+      if (token.expiresAt <= now) return err(invalid('token', 'expired'))
+      if (!(await repo.useEmailToken(token.id, now))) return err(invalid('token', 'invalid'))
+      await repo.setPasswordHash(token.userId, passwordHash)
+      const sessionId = await startSession(repo, now, { ...cmd, userId: token.userId })
+      await repo.revokeOtherSessions(token.userId, await hashToken(sessionId), now)
+      return ok({ sessionId })
+    })
+  }

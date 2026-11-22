@@ -63,3 +63,17 @@ export type SessionsResponse = z.infer<typeof SessionsResponse>
 
 /** DELETE /api/me/sessions/{id}: the id of a listed session (SHA-256, hex). */
 export const SessionParams = z.strictObject({ id: z.string().regex(/^[0-9a-f]{64}$/) })
+
+/** POST /api/auth/password/forgot (US-04.1): always 204, the email is only sent if the account exists. */
+export const ForgotPasswordBody = z.strictObject({
+  email: z.email().max(254),
+  turnstileToken: z.string().min(1).max(2048),
+})
+export type ForgotPasswordBody = z.infer<typeof ForgotPasswordBody>
+
+/** POST /api/auth/password/reset (US-04.2–3): the token of the link (URL fragment) and the new password; signs in. */
+export const ResetPasswordBody = z.strictObject({
+  token: z.string().min(1).max(128),
+  password: z.string().max(512),
+})
+export type ResetPasswordBody = z.infer<typeof ResetPasswordBody>

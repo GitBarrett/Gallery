@@ -1,9 +1,15 @@
 import type { Clock } from '../../../platform/clock'
 import type { IdGenerator } from '../../../platform/ids'
-import { hashToken, newToken, VERIFY_TTL_MS } from './email-tokens'
+import { hashToken, newToken, RESET_TTL_MS, VERIFY_TTL_MS } from './email-tokens'
 import type { IdentityRepository, Locale, Mailer } from './ports'
 
-export type AccountEmail = { template: 'verify' | 'account_exists' | 'signin_locked'; userId: string }
+export type AccountEmail = { template: 'verify' | 'reset' | 'account_exists' | 'signin_locked'; userId: string }
+
+// Templates that carry a single-use link: token type, validity and page that reads it from the fragment
+const LINKS = {
+  verify: { type: 'verify', ttlMs: VERIFY_TTL_MS, page: '/verify-email' },
+  reset: { type: 'reset', ttlMs: RESET_TTL_MS, page: '/reset' },
+} as const
 
 type Texts = { subject: string; text: (username: string, link: string) => string }
 
@@ -15,6 +21,13 @@ const TEMPLATES: Record<Locale, Record<AccountEmail['template'], Texts>> = {
       text: (name, link) =>
         `Hello ${name},\n\nConfirm your email address to publish your captures on Legendary Shots:\n${link}\n\n` +
         `This link is valid for 24 hours. If you did not create this account, ignore this email.`,
+    },
+    reset: {
+      subject: 'Reset your password',
+      text: (name, link) =>
+        `Hello ${name},\n\nChoose a new password for your Legendary Shots account:\n${link}\n\n` +
+        `This link is valid for 1 hour and signs you out everywhere. If you did not ask for it, ignore this email: ` +
+        `your password stays the same.`,
     },
     account_exists: {
       subject: 'You already have an account',
@@ -37,6 +50,13 @@ const TEMPLATES: Record<Locale, Record<AccountEmail['template'], Texts>> = {
       text: (name, link) =>
         `Bonjour ${name},\n\nConfirmez votre adresse email pour publier vos captures sur Legendary Shots :\n` +
         `${link}\n\nCe lien est valable 24 heures. Si vous n'avez pas créé ce compte, ignorez cet email.`,
+    },
+    reset: {
+      subject: 'Réinitialisez votre mot de passe',
+      text: (name, link) =>
+        `Bonjour ${name},\n\nChoisissez un nouveau mot de passe pour votre compte Legendary Shots :\n${link}\n\n` +
+        `Ce lien est valable 1 heure et vous déconnecte partout. Si vous ne l'avez pas demandé, ignorez cet email : ` +
+        `votre mot de passe reste inchangé.`,
     },
     account_exists: {
       subject: 'Vous avez déjà un compte',
@@ -67,16 +87,17 @@ export const sendAccountEmail =
     if (!recipient) return // account deleted in the meantime
     const base = `${deps.siteUrl}${recipient.locale === 'fr' ? '/fr' : ''}`
     let link = `${base}/signin`
-    if (template === 'verify') {
+    if (template === 'verify' || template === 'reset') {
+      const { type, ttlMs, page } = LINKS[template]
       const token = newToken()
       await deps.repo.createEmailToken({
         id: deps.ids.next(),
         userId,
-        type: 'verify',
+        type,
         tokenHash: await hashToken(token),
-        expiresAt: new Date(deps.clock.now().getTime() + VERIFY_TTL_MS),
+        expiresAt: new Date(deps.clock.now().getTime() + ttlMs),
       })
-      link = `${base}/verify-email#${token}` // fragment: the token never reaches a server log
+      link = `${base}${page}#${token}` // fragment: the token never reaches a server log
     }
     const texts = TEMPLATES[recipient.locale][template]
     await deps.mailer.send({ to: recipient.email, subject: texts.subject, text: texts.text(recipient.username, link) })

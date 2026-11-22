@@ -57,6 +57,10 @@ export function inMemoryIdentityRepository() {
       const user = users.find((u) => u.id === userId)
       if (user) user.emailVerifiedAt = at
     },
+    async setPasswordHash(userId, passwordHash) {
+      const user = users.find((u) => u.id === userId)
+      if (user) user.passwordHash = passwordHash
+    },
     async findCredentials(email) {
       const user = users.find((u) => same(u.email, email))
       return user ? { userId: user.id, passwordHash: user.passwordHash, status: user.status } : null

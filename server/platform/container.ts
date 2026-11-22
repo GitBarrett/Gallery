@@ -6,10 +6,12 @@ import {
   argon2idHasher,
   drizzleIdentityRepository,
   fakeHumanVerifier,
+  forgotPassword,
   hibpBreachChecker,
   joinWaitlist,
   listSessions,
   resendVerification,
+  resetPassword,
   resolveSession,
   revokeOtherSessions,
   revokeSession,
@@ -46,6 +48,8 @@ export interface Container {
     revokeSession: UseCase<typeof revokeSession>
     revokeOtherSessions: UseCase<typeof revokeOtherSessions>
     resendVerification: UseCase<typeof resendVerification>
+    forgotPassword: UseCase<typeof forgotPassword>
+    resetPassword: UseCase<typeof resetPassword>
   }
 }
 
@@ -136,6 +140,20 @@ export function createContainer({
         resendVerification({ uow: identityUow(), human: human(), limiter: dbRateLimiter(db(), ipHashKey(), clock) })(
           cmd,
         ),
+      forgotPassword: (cmd) =>
+        forgotPassword({
+          repo: drizzleIdentityRepository(db()),
+          uow: identityUow(),
+          human: human(),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
+        })(cmd),
+      resetPassword: (cmd) =>
+        resetPassword({
+          uow: identityUow(),
+          hasher: argon2idHasher(),
+          breaches: hibpBreachChecker({ fetch: fetcher, logger }),
+          clock,
+        })(cmd),
     },
   }
 }

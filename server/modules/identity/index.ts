@@ -21,6 +21,8 @@ export { listSessions, resolveSession, revokeOtherSessions, revokeSession, signo
 export type { DeviceSession } from './application/sessions'
 export { joinWaitlist } from './application/join-waitlist'
 export { resendVerification } from './application/resend-verification'
+export { forgotPassword } from './application/forgot-password'
+export { resetPassword } from './application/reset-password'
 export { requireVerified, type PolicyDenial } from './domain/policies'
 export { argon2idHasher } from './infrastructure/argon2id-hasher'
 export { drizzleIdentityRepository, purgeExpiredTokens } from './infrastructure/drizzle-identity-repository'

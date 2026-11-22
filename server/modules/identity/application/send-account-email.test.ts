@@ -49,6 +49,20 @@ describe('sendAccountEmail', () => {
     ])
   })
 
+  it('US-04.1 sends a reset link valid 1 h, whose token is only stored hashed', async () => {
+    const { send, sent, tokens } = await setup('fr')
+    await send({ template: 'reset', userId: 'ash' })
+    expect(sent[0]).toMatchObject({ to: 'ash@example.com', subject: 'Réinitialisez votre mot de passe' })
+    const token = sent[0]!.text.match(/https:\/\/legendaryshots\.gg\/fr\/reset#([\w-]{43})/)![1]!
+    expect(tokens).toEqual([
+      expect.objectContaining({
+        type: 'reset',
+        tokenHash: await hashToken(token),
+        expiresAt: new Date('2026-11-22T13:00:00Z'),
+      }),
+    ])
+  })
+
   it('US-01.2 tells the owner of a used email that an account already exists', async () => {
     const { send, sent, tokens } = await setup()
     await send({ template: 'account_exists', userId: 'ash' })
