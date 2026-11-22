@@ -3,7 +3,10 @@ import type { IdGenerator } from '../../../platform/ids'
 import { hashToken, newToken, RESET_TTL_MS, VERIFY_TTL_MS } from './email-tokens'
 import type { IdentityRepository, Locale, Mailer } from './ports'
 
-export type AccountEmail = { template: 'verify' | 'reset' | 'account_exists' | 'signin_locked'; userId: string }
+export type AccountEmail = {
+  template: 'verify' | 'reset' | 'password_changed' | 'account_exists' | 'signin_locked'
+  userId: string
+}
 
 // Templates that carry a single-use link: token type, validity and page that reads it from the fragment
 const LINKS = {
@@ -36,6 +39,13 @@ const TEMPLATES: Record<Locale, Record<AccountEmail['template'], Texts>> = {
         `but you already have one. Sign in here, or reset your password from that page:\n${link}\n\n` +
         `If it was not you, you can ignore this email.`,
     },
+    password_changed: {
+      subject: 'Your password was changed',
+      text: (name, link) =>
+        `Hello ${name},\n\nThe password of your Legendary Shots account was just changed with a reset link, ` +
+        `and every device was signed out.\n\nIf it was you, there is nothing to do. If it was not, someone can ` +
+        `read your emails: secure your mailbox, then reset your password again:\n${link}`,
+    },
     signin_locked: {
       subject: 'Sign-in to your account is paused',
       text: (name, link) =>
@@ -65,6 +75,14 @@ const TEMPLATES: Record<Locale, Record<AccountEmail['template'], Texts>> = {
         `mais vous en avez déjà un. Connectez-vous ici, ou réinitialisez votre mot de passe depuis cette page :\n` +
         `${link}\n\nSi ce n'était pas vous, ignorez cet email.`,
     },
+    password_changed: {
+      subject: 'Votre mot de passe a été modifié',
+      text: (name, link) =>
+        `Bonjour ${name},\n\nLe mot de passe de votre compte Legendary Shots vient d'être modifié avec un lien de ` +
+        `réinitialisation, et tous vos appareils ont été déconnectés.\n\nSi c'était vous, il n'y a rien à faire. ` +
+        `Sinon, quelqu'un peut lire vos emails : sécurisez votre boîte mail, puis réinitialisez de nouveau votre ` +
+        `mot de passe :\n${link}`,
+    },
     signin_locked: {
       subject: 'La connexion à votre compte est suspendue',
       text: (name, link) =>
@@ -86,7 +104,7 @@ export const sendAccountEmail =
     const recipient = await deps.repo.findRecipient(userId)
     if (!recipient) return // account deleted in the meantime
     const base = `${deps.siteUrl}${recipient.locale === 'fr' ? '/fr' : ''}`
-    let link = `${base}/signin`
+    let link = `${base}${template === 'password_changed' ? '/reset' : '/signin'}`
     if (template === 'verify' || template === 'reset') {
       const { type, ttlMs, page } = LINKS[template]
       const token = newToken()

@@ -365,6 +365,15 @@ describe('sessions', () => {
     expect((await signin({ email: credentials.email, password })).status).toBe(204)
   })
 
+  it('US-04.5 cancels the other reset links of the account and marks its email verified', async () => {
+    const { email } = await account()
+    const [first, second] = [await resetToken(email), await resetToken(email)]
+    const response = await reset({ token: first, password: 'a brand new passphrase' })
+    expect((await me(sessionCookie(response).value).then((r) => r.json())).emailVerified).toBe(true)
+    const other = await reset({ token: second, password: 'another new passphrase' })
+    expect((await errorOf(other)).details).toEqual({ field: 'token', reason: 'invalid' })
+  })
+
   it('US-04.2 refuses a reset link already used or expired, with 400 and its reason', async () => {
     const { email } = await account()
     const token = await resetToken(email)

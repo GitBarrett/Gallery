@@ -95,6 +95,8 @@ export interface IdentityRepository {
   findEmailToken(tokenHash: string, type: EmailTokenType): Promise<EmailToken | null>
   /** Marks the token used; `false` if it already was (concurrent use). */
   useEmailToken(id: string, at: Date): Promise<boolean>
+  /** Marks every unused token of this type of `userId` used (US-04.5: the other reset links after a reset). */
+  useEmailTokens(userId: string, type: EmailTokenType, at: Date): Promise<void>
   markEmailVerified(userId: string, at: Date): Promise<void>
   setPasswordHash(userId: string, passwordHash: string): Promise<void>
   findCredentials(email: string): Promise<{ userId: string; passwordHash: string | null; status: string } | null>
