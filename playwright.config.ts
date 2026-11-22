@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// Chromium: context.route also applies to service worker requests, so that they carry the Cloudflare Access service
+// token of the previews (tests/e2e/fixtures.ts); otherwise the service worker would precache the Access login page
+process.env.PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS = '1'
+
 // Projects of 11-strategie-de-tests.md: desktop, iPhone 14, Pixel 7. BASE_URL targets a preview in CI (T-04b).
 export default defineConfig({
   testDir: 'tests/e2e',
