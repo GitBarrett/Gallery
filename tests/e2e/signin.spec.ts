@@ -13,8 +13,11 @@ const testRoute = (page: Page, path: string, method: 'POST' | 'DELETE') =>
     [path, method],
   )
 
-// An invited sign-up through the screen (an unverified account may sign in: Q46)
+// An invited sign-up through the screen (an unverified account may sign in: Q46), made once per worker: the CI
+// address has 3 sign-ups per hour, shared with signup.spec.ts running in parallel
+let created: { username: string; email: string; password: string } | undefined
 async function member(page: Page) {
+  if (created) return created
   const run = crypto.randomUUID().slice(0, 8)
   const ash = { username: `e2e_${run}`, email: `e2e.${run}@example.com`, password: `a long passphrase ${run}` }
   const { body } = await testRoute(page, '/__test/invite', 'POST')
@@ -26,7 +29,9 @@ async function member(page: Page) {
   await page.getByLabel('Password').fill(ash.password)
   await page.getByRole('checkbox', { name: /at least 15/ }).check()
   await submit.click()
-  await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible()
+  // Argon2id and the breached-password check take a few seconds on the preview
+  await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible({ timeout: 15_000 })
+  created = ash
   return ash
 }
 
