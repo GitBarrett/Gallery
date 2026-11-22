@@ -9,6 +9,9 @@ export default defineConfig({
   testDir: 'tests/e2e',
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
+  // The 2-core runner would get 1 worker; the tests mostly wait for the remote preview. Not more than 2: E2E sign-ups
+  // share 3 per hour from the CI address (counters emptied before each test, at most 2 sign-ups per test)
+  workers: process.env.CI ? 2 : undefined,
   // In CI, HTML report attached to the run on failure (preview-deploy)
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: { baseURL: process.env.BASE_URL ?? 'http://localhost:3000', trace: 'on-first-retry' },

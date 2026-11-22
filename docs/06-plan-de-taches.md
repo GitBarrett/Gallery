@@ -93,6 +93,10 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Playwright smoke sur la preview (jeton Access), Lighthouse CI, smoke de production après déploiement et retour arrière.
   Tests : la CI elle-même.
 
+- [x] **T-04c CI plus rapide** (dép. T-04b) — ajoutée le 22/11/2026
+  Un seul build Nuxt par type de serveur (normal et preview) pour tous les tests `tests/api` au lieu d'un build par fichier ; E2E sur 2 workers en CI au lieu d'un.
+  Tests : la CI elle-même (durées comparées dans la PR).
+
 - [x] **T-05a Base de données : socle** (dép. T-03a)
   Drizzle, conventions (UUID v7, `timestamptz`, `created_at`/`updated_at`, index), runner de migrations, tables transverses `outbox`, `processed_messages`, `site_settings`, `audit_log` (rôle base sans UPDATE/DELETE), `rate_limit_counters`, `donations` (flag désactivé), seed de base, transaction de test annulée.
   Tests : I (migration sur base vierge, rôle d'audit sans UPDATE/DELETE). Étape `ci` des migrations (`11-strategie-de-tests.md` § 7 : base vierge et copie du schéma de production).

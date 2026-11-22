@@ -1,8 +1,9 @@
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { fetch } from '@nuxt/test-utils/e2e'
+import { startTestServer } from './server'
 import { describe, expect, it } from 'vitest'
 
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
-await setup({ server: true, browser: false })
+await startTestServer()
 
 const localeCookie = async (path: string) =>
   (await fetch(path, { headers: { accept: 'text/html' } })).headers
