@@ -48,6 +48,15 @@ test('US-63.1 the app is installable: manifest with name, colours, maskable icon
   expect(manifest.shortcuts.map((s: { url: string }) => s.url)).toEqual(['/upload', '/search', '/notifications'])
 })
 
+test('US-62.1 once the service worker has precached the offline pages, an English visitor stays in English', async ({
+  page,
+}) => {
+  await controlledHome(page) // active service worker: its install, which precaches /offline and /fr/offline, is done
+  await page.goto('/')
+  await expect(page).toHaveURL('/')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+})
+
 test('US-64.2 offline, a page never visited shows /offline with the pages available', async ({ page, context }) => {
   await controlledHome(page)
   await context.setOffline(true)

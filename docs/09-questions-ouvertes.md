@@ -4,7 +4,7 @@
 |---|---|---|---|
 | Q1 | Direction de design | A — Nuit d'Azeroth + kit d'identité WoW | Tranché — Adrien, 16/11/2026 |
 | Q2 | Régie publicitaire | Google AdSense au lancement ; attention : Google exige une plateforme de consentement certifiée IAB TCF v2.2 pour diffuser dans l'EEE (à vérifier au moment du choix), ce qui remplacerait le panneau maison (US-73.4) | Ouvert (v1.x) |
-| Q3 | Nom du site et domaine | **Legendary Shots** (tranché 17/11/2026, Adrien). Domaine à réserver : legendaryshots.com / .gg / .app (disponibilité non vérifiée) | Tranché — domaine à acheter |
+| Q3 | Nom du site et domaine | **Legendary Shots** (tranché 17/11/2026, Adrien). Domaine : **legendaryshots.gg** (legendaryshots.com est déjà pris ; choix d'Adrien le 22/11/2026, disponibilité à confirmer à l'achat) | Tranché — domaine à acheter |
 | Q4 | Convertir les PNG en WebP sans perte ? | Non : originaux conservés sans réencodage (ADR-011) | Tranché par ADR-011 |
 | Q5 | Argon2id disponible sur Workers ? | Sinon scrypt via `@noble/hashes` | Tranché par T-00d (20/11/2026) : Argon2id via `@noble/hashes`, ADR-015 |
 | Q6 | Liste des versions du jeu au lancement (champ unique, administrable) | WoW Forever, Retail, Classic Era, Classic progression, Other | À valider |
