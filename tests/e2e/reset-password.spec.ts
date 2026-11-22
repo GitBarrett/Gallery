@@ -83,7 +83,7 @@ test('US-04.1 US-04.2 US-04.3 the mailed link sets a new password, ends the othe
   const password = `a brand new passphrase ${run}`
   await page.goto('/') // a new document: from /reset, changing the fragment alone would not reload
   await page.goto(`/reset#${token}`)
-  await page.getByLabel('New password').fill(password)
+  await page.getByLabel('New password', { exact: true }).fill(password)
   await page.getByRole('button', { name: 'Change my password' }).click()
   await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible()
   await expect(page).toHaveURL('/') // the token left the address bar
@@ -97,7 +97,7 @@ test('US-04.1 US-04.2 US-04.3 the mailed link sets a new password, ends the othe
 
   // US-04.2: the link is then refused, with a way to ask for a new one
   await page.goto(`/reset#${token}`)
-  await page.getByLabel('New password').fill(`yet another passphrase ${run}`)
+  await page.getByLabel('New password', { exact: true }).fill(`yet another passphrase ${run}`)
   await page.getByRole('button', { name: 'Change my password' }).click()
   await expect(page.getByRole('alert').filter({ hasText: 'already used' })).toBeVisible()
   await page.getByRole('button', { name: 'Get a new link' }).click()

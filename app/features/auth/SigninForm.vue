@@ -66,7 +66,7 @@ async function submit() {
       maxlength="512"
     >
       <template #action>
-        <NuxtLink :to="localePath('/reset')">{{ t('auth.signin.forgot') }}</NuxtLink>
+        <NuxtLink :to="localePath('/reset')" class="forgot">{{ t('auth.signin.forgot') }}</NuxtLink>
       </template>
     </UiInput>
     <TurnstileCheck v-if="needsTurnstile" ref="turnstile" v-model="turnstileToken" action="signin" />
@@ -82,6 +82,13 @@ async function submit() {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+/* touch target of 44 px (US-67.5) without growing the text */
+.forgot {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-md);
 }
 
 .error {
