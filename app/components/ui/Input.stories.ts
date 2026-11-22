@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook-vue/nuxt'
+import { h } from 'vue'
 import Input from './Input.vue'
 
 const meta: Meta<typeof Input> = {
@@ -13,6 +14,8 @@ const meta: Meta<typeof Input> = {
 
 **When to use it**: any text field of a form, with \`v-model\`. Give the right \`type\` and \`autocomplete\` (email,
 username, current-password, new-password): the mobile keyboard and the password manager depend on them.
+
+**Action slot**: \`#action\` puts one short link beside the label, outside it ("Forgot password?" on sign-in).
 
 **Avoid**: a field without a visible label; a placeholder instead of the label; an error shown only by the colour of
 the border.
@@ -29,6 +32,10 @@ type Story = StoryObj<typeof Input>
 export const Default: Story = {}
 export const WithHint: Story = { args: { label: 'Password', type: 'password', hint: '12 characters minimum' } }
 export const Required: Story = { args: { label: 'Username', type: 'text', required: true } }
+export const WithAction: Story = {
+  args: { label: 'Password', type: 'password' },
+  render: (args) => () => h(Input, args, { action: () => h('a', { href: '#' }, 'Forgot password?') }),
+}
 export const WithError: Story = {
   args: { label: 'Password', type: 'password', hint: '12 characters minimum', error: 'Too short' },
 }

@@ -6,8 +6,10 @@ import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
 import { PublicSettings } from '~~/shared/contracts/settings'
 import {
+  type ForgotPasswordBody,
   MeResponse,
   type ResendVerificationBody,
+  type ResetPasswordBody,
   SessionsResponse,
   type SigninBody,
   type SignupBody,
@@ -75,6 +77,11 @@ export const api = {
   verifyEmail: (body: VerifyEmailBody) => call('/api/auth/verify-email', z.unknown(), { method: 'POST', body }),
   resendVerification: (body: ResendVerificationBody) =>
     call('/api/auth/resend-verification', z.unknown(), { method: 'POST', body }),
+  // 204 whatever the email (US-04.1, US-04.4)
+  forgotPassword: (body: ForgotPasswordBody) =>
+    call('/api/auth/password/forgot', z.unknown(), { method: 'POST', body }),
+  // 204: password changed, every session ended, a new one opened (US-04.3)
+  resetPassword: (body: ResetPasswordBody) => call('/api/auth/password/reset', z.unknown(), { method: 'POST', body }),
   sessions: () => call('/api/me/sessions', SessionsResponse),
   // 204 (US-03.8, US-03.9)
   revokeSession: (id: string) => call(`/api/me/sessions/${id}`, z.unknown(), { method: 'DELETE' }),

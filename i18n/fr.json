@@ -125,7 +125,24 @@
       "title": "Se connecter",
       "submit": "Se connecter",
       "invalid": "Email ou mot de passe incorrect.",
-      "turnstileRequired": "Plusieurs tentatives ont échoué. Confirmez que vous n'êtes pas un robot, puis reconnectez-vous."
+      "turnstileRequired": "Plusieurs tentatives ont échoué. Confirmez que vous n'êtes pas un robot, puis reconnectez-vous.",
+      "forgot": "Mot de passe oublié ?"
+    },
+    "forgot": {
+      "title": "Réinitialiser votre mot de passe",
+      "text": "Saisissez votre email. Si un compte existe, nous vous enverrons un lien de réinitialisation valable 1 heure.",
+      "submit": "Envoyer le lien",
+      "sent": "Consultez votre boîte de réception : si cet email est enregistré, le lien est en route.",
+      "back": "Retour à la connexion"
+    },
+    "reset": {
+      "title": "Choisissez un nouveau mot de passe",
+      "text": "Votre nouveau mot de passe vous déconnecte de tous vos appareils, puis vous connecte ici.",
+      "password": "Nouveau mot de passe",
+      "submit": "Changer mon mot de passe",
+      "expired": "Ce lien a expiré. Les liens sont valables 1 heure.",
+      "invalid": "Ce lien n'est pas valide : il a déjà été utilisé ou il est incomplet.",
+      "again": "Recevoir un nouveau lien"
     },
     "signout": "Se déconnecter",
     "verify": {

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 // Sign-in by password (US-03, SignIn mockup "Sign in"). One message for any wrong credentials (US-03.2); the
-// anti-bot check appears only once the server requires it (US-03.3, Q48). Social buttons come with T-14/T-15,
-// "Forgot password?" with T-13.
+// anti-bot check appears only once the server requires it (US-03.3, Q48). Social buttons come with T-14/T-15.
 import { api, ApiError, errorMessageKey } from '~/services/api'
 import { safeRedirect } from './safe-redirect'
 import TurnstileCheck from './TurnstileCheck.vue'
@@ -65,7 +64,11 @@ async function submit() {
       required
       autocomplete="current-password"
       maxlength="512"
-    />
+    >
+      <template #action>
+        <NuxtLink :to="localePath('/reset')">{{ t('auth.signin.forgot') }}</NuxtLink>
+      </template>
+    </UiInput>
     <TurnstileCheck v-if="needsTurnstile" ref="turnstile" v-model="turnstileToken" action="signin" />
     <p v-if="error" class="error" role="alert">{{ t(error) }}</p>
     <UiButton type="submit" size="lg" block :disabled="sending || (needsTurnstile && !turnstileToken)">

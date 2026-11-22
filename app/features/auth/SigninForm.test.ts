@@ -37,6 +37,11 @@ describe('SigninForm', () => {
     signin = refuse(401, 'UNAUTHENTICATED', { reason: 'invalid_credentials' })
   })
 
+  it('US-04.1 links to the reset request next to the password label', async () => {
+    const wrapper = await mountSuspended(SigninForm, { global: { stubs: { TurnstileCheck } } })
+    expect(wrapper.get('a[href="/reset"]').text()).toBe('Forgot password?')
+  })
+
   it('US-03.2 shows one message for wrong credentials, without the anti-bot check', async () => {
     const wrapper = await submitted()
     expect(wrapper.text()).toContain('Wrong email or password.')
