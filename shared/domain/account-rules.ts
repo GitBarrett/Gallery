@@ -1,0 +1,32 @@
+import { err, ok, type Result } from './result'
+
+// Account rules shared by the forms and the server (08-securite.md § 3, 04-user-stories.md US-01, US-05).
+
+export type UsernameProblem = 'length' | 'charset' | 'reserved' | 'insult'
+export type PasswordProblem = 'too_short' | 'too_long'
+
+// Staff names and every top-level route of the site (03-architecture.md, 02-specs-fonctionnelles.md)
+const RESERVED = new Set(
+  'admin administrator moderator mod staff support help root system api img avatar u v fr en settings upload search notifications following leaderboard contests legal terms privacy cookies offline manifest robots sitemap sw share-target storybook signin signup login logout'.split(
+    ' ',
+  ),
+)
+
+// shortcut: small local EN/FR list (Q8, Q41), matched as substrings; switch to a maintained list when Q8 is decided.
+const INSULTS = ['fuck', 'shit', 'cunt', 'nigger', 'faggot', 'whore', 'connard', 'connasse', 'salope', 'encule']
+
+export function validateUsername(name: string): Result<string, UsernameProblem> {
+  if (name.length < 3 || name.length > 24) return err('length')
+  if (!/^[a-zA-Z0-9_-]+$/.test(name)) return err('charset')
+  const lower = name.toLowerCase()
+  if (RESERVED.has(lower)) return err('reserved')
+  if (INSULTS.some((word) => lower.includes(word))) return err('insult')
+  return ok(name)
+}
+
+export function validatePassword(password: string): Result<string, PasswordProblem> {
+  const length = [...password].length // code points: an emoji counts as one character
+  if (length < 10) return err('too_short')
+  if (length > 128) return err('too_long')
+  return ok(password)
+}

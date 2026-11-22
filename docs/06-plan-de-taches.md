@@ -155,7 +155,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
 
 ## Phase 1 — Identité
 
-- [ ] **T-11a Identité : domaine et comptes** (dép. T-05b, T-08)
+- [x] **T-11a Identité : domaine et comptes** (dép. T-05b, T-08)
   Module `identity` (domain, application, infrastructure) : tables `users`, `sessions`, `email_tokens` ; règles de pseudo et de mot de passe ; hachage Argon2id `@noble/hashes` au format PHC (ADR-015) ; vérification HIBP ; port `Mailer` (Resend + fake).
   Tests : U (règles, hachage et vérification), I (contrat `Mailer`).
 
