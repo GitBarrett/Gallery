@@ -11,7 +11,14 @@ import {
   type MessageHandler,
   type QueueMessage,
 } from '../platform/jobs'
-import { emailsConsumer, fakeMailer, purgeExpiredTokens, resendMailer, type Mailer } from '../modules/identity'
+import {
+  emailsConsumer,
+  fakeMailer,
+  mailboxMailer,
+  purgeExpiredTokens,
+  resendMailer,
+  type Mailer,
+} from '../modules/identity'
 import { loadConfig } from '../platform/config'
 import { uuidV7Generator } from '../platform/ids'
 import { createLogger, type Logger } from '../platform/logger'
@@ -25,12 +32,14 @@ const required = (value: string | undefined, name: string) => {
 }
 
 // Consumers per queue (name without preview suffix): each module adds its own with its task.
-function consumers(db: Db, logger: Logger): Record<string, MessageHandler> {
+function consumers(db: Db, logger: Logger, env: Bindings): Record<string, MessageHandler> {
   const config = loadConfig(process.env)
   const fetcher = (url: string, init?: RequestInit) => fetch(url, init)
   // Key checked at sending time: a missing one fails the email messages only (DLQ), not the other queues
   const mailer: Mailer = config.fakeProviders
-    ? fakeMailer(logger)
+    ? env.R2
+      ? mailboxMailer({ bucket: env.R2, prefix: config.r2Prefix }) // previews: read by /__test/mailbox
+      : fakeMailer(logger)
     : {
         send: (message) =>
           resendMailer({
@@ -79,7 +88,7 @@ export default defineNitroPlugin((nitroApp) => {
     if (!connection) return dispatchBatch({ queue: batch.queue, messages }, {}, logger)
     const db = createDb(connection) // one connection per batch
     try {
-      await dispatchBatch({ queue: batch.queue, messages }, consumers(db, logger), logger)
+      await dispatchBatch({ queue: batch.queue, messages }, consumers(db, logger, env as Bindings), logger)
     } finally {
       await db.$client.end()
     }

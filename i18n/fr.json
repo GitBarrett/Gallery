@@ -127,7 +127,16 @@
       "invalid": "Email ou mot de passe incorrect.",
       "turnstileRequired": "Plusieurs tentatives ont échoué. Confirmez que vous n'êtes pas un robot, puis reconnectez-vous."
     },
-    "signout": "Se déconnecter"
+    "signout": "Se déconnecter",
+    "verify": {
+      "title": "Vérifiez votre adresse email",
+      "checking": "Vérification du lien…",
+      "expired": "Ce lien a expiré. Les liens sont valables 24 heures.",
+      "invalid": "Ce lien n'est pas valable : il a déjà servi ou il est incomplet.",
+      "resend": "Renvoyer",
+      "sent": "Nouveau lien envoyé. Consultez votre boîte mail.",
+      "signIn": "Se connecter pour recevoir un nouveau lien"
+    }
   },
   "settings": {
     "title": "Réglages"

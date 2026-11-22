@@ -171,7 +171,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Page d'inscription conforme à `SignIn.dc.html` (widget Turnstile, erreurs par champ, message « Check your inbox ») ; en mode invitation, lien `?invite=` et refus de l'inscription avec le formulaire de liste d'attente (test E de T-11d, Q43). Découpée le 22/11/2026 : page de vérification en T-11f (Q47).
   Stories : US-01 (parcours), US-56.4. Tests : composants (US-01.3, US-01.6), E (US-01.1–2, US-01.7, US-56.4).
 
-- [ ] **T-11f Vérification d'email : écran** (dép. T-11c, T-12b)
+- [x] **T-11f Vérification d'email : écran** (dép. T-11c, T-12b)
   Page `/verify-email#<jeton>` (vérification, connexion, redirection), lien expiré ou invalide, boîte mail simulée des previews (`/__test/mailbox`) pour le parcours complet inscription → lien → connecté.
   Stories : US-01 (parcours). Tests : E (US-01.1, US-01.4–5).
 
