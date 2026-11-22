@@ -103,8 +103,9 @@ export default defineNuxtConfig({
     },
     devOptions: { enabled: false },
   },
-  // Public values read at startup (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN), empty locally (T-03f)
-  runtimeConfig: { public: { sentryDsn: '', cfBeaconToken: '' } },
+  // Public values read at startup (NUXT_PUBLIC_SENTRY_DSN, NUXT_PUBLIC_CF_BEACON_TOKEN, NUXT_PUBLIC_POSTHOG_KEY),
+  // empty locally (T-03f, T-10a)
+  runtimeConfig: { public: { sentryDsn: '', cfBeaconToken: '', posthogKey: '' } },
   // No source map upload (organisation token not needed for the MVP) and no build plugin telemetry
   sentry: { sourcemaps: { disable: true }, telemetry: false },
   // /__test routes (reset, fake mailbox, queue…): only in preview builds (ADR-013)
@@ -125,7 +126,6 @@ export default defineNuxtConfig({
           "'wasm-unsafe-eval'",
           'https://challenges.cloudflare.com',
           'https://static.cloudflareinsights.com',
-          'https://eu-assets.i.posthog.com',
         ],
         'style-src': ["'self'", "'unsafe-inline'"],
         'img-src': ["'self'", 'data:', 'blob:'],

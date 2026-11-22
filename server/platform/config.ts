@@ -17,6 +17,10 @@ const schema = z
       .string()
       .regex(/^([0-9a-f]{32})?$/)
       .optional(),
+    NUXT_PUBLIC_POSTHOG_KEY: z
+      .string()
+      .regex(/^(phc_\w+)?$/)
+      .optional(),
   })
   .refine((env) => !(env.NUXT_DEPLOY_ENV === 'production' && env.NUXT_FAKE_PROVIDERS === 'true'), {
     path: ['NUXT_FAKE_PROVIDERS'],

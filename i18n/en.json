@@ -58,5 +58,17 @@
     "notNow": "Not now",
     "iosTitle": "Install on iPhone",
     "iosSteps": "In Safari, tap Share, then Add to Home Screen."
+  },
+  "consent": {
+    "title": "Your cookie choices",
+    "text": "We use essential cookies to run the site. With your permission, we'd also like to measure how features are used and show personalised ads that keep Legendary Shots free.",
+    "acceptAll": "Accept all",
+    "rejectAll": "Reject all",
+    "customise": "Customise",
+    "save": "Save choices",
+    "close": "Close",
+    "analytics": "Product analytics",
+    "analyticsDescription": "PostHog (EU): pages visited and actions such as upload, like or share. Kept 12 months.",
+    "policy": "Read the cookie policy"
   }
 }
