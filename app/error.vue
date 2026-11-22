@@ -1,6 +1,7 @@
 <script setup lang="ts">
-// Error page (US-69, no mockup: composed with the design system). 404: search and a way home; any other status:
-// a generic message and the correlation id (cf-ray) to quote, never a technical detail. Nuxt sets the HTTP status.
+// Error page (US-69, no mockup: composed with the design system). 404: the "uncharted zone" (US-79.1) with search,
+// the Hearthstone back home and the reference; any other status: a generic message and the correlation id (cf-ray)
+// to quote, never a technical detail. Nuxt sets the HTTP status.
 import type { NuxtError } from '#app'
 
 const props = defineProps<{ error: NuxtError<{ correlationId?: string }> }>()
@@ -25,12 +26,18 @@ useHead({ title: () => t(notFound.value ? 'errorPage.notFoundTitle' : 'errorPage
       :title="t('errorPage.notFoundTitle')"
       :description="t('errorPage.notFoundText')"
     >
+      <template #icon>
+        <img src="/brand/uncharted-map.svg" alt="" width="160" height="120" />
+      </template>
       <template #action>
         <form role="search" :action="localePath('/search')" method="get" class="search">
           <UiInput v-model="query" :label="t('errorPage.searchLabel')" type="search" name="q" />
-          <UiButton type="submit">{{ t('layout.search') }}</UiButton>
+          <UiButton type="submit" variant="secondary">{{ t('layout.search') }}</UiButton>
         </form>
-        <UiButton :to="localePath('/')" variant="ghost">{{ t('errorPage.home') }}</UiButton>
+        <p v-if="correlationId" class="reference">
+          {{ t('errorPage.reference') }} <code data-testid="correlation-id">{{ correlationId }}</code>
+        </p>
+        <UiButton :to="localePath('/')">{{ t('errorPage.hearthstone') }}</UiButton>
       </template>
     </UiEmptyState>
     <UiEmptyState
