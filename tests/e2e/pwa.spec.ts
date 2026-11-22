@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test'
-import { expect, test } from './fixtures'
+import { expect, test, withAccess } from './fixtures'
 
 // PWA (T-09a): Chromium only (WebKit in Playwright runs no service worker); the service worker only exists in
 // production builds (previews), so these tests are skipped against `pnpm dev`.
@@ -74,7 +74,7 @@ test('US-65.1 US-65.3 a new version shows "A new version is available · Reload"
   const before = await page.evaluate(() => navigator.serviceWorker.controller!.scriptURL)
   // A new deployment: same service worker with one more byte (the update check bypasses the HTTP cache)
   await context.route('**/sw.js', async (route) => {
-    const response = await route.fetch()
+    const response = await route.fetch({ headers: withAccess(route) }) // a later route replaces the fixture's
     await route.fulfill({ response, body: `${await response.text()}\n// next version` })
   })
   await page.evaluate(async () => (await navigator.serviceWorker.getRegistration())!.update())
