@@ -1,10 +1,13 @@
 // Typed API client (10-clean-architecture.md § Front): the only caller of /api. Responses are checked against
 // shared/contracts; errors become an ApiError carrying the stable code and the correlation id of the server.
 import type { FetchError } from 'ofetch'
-import type { z } from 'zod'
+import { z } from 'zod'
 import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
 import { PublicSettings } from '~~/shared/contracts/settings'
+
+// Zod probes `new Function` for its JIT: our strict CSP reports it as a violation (console error, Sentry event)
+z.config({ jitless: true })
 
 export class ApiError extends Error {
   constructor(
