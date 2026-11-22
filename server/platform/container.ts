@@ -7,6 +7,7 @@ import {
   drizzleIdentityRepository,
   fakeHumanVerifier,
   hibpBreachChecker,
+  joinWaitlist,
   signup,
   turnstileVerifier,
   verifyEmail,
@@ -27,7 +28,11 @@ export interface Container {
   logger: Logger
   /** Site settings, cached 60 s per isolate (settings module). */
   settings: () => Promise<SiteSettings>
-  identity: { signup: UseCase<typeof signup>; verifyEmail: UseCase<typeof verifyEmail> }
+  identity: {
+    signup: UseCase<typeof signup>
+    verifyEmail: UseCase<typeof verifyEmail>
+    joinWaitlist: UseCase<typeof joinWaitlist>
+  }
 }
 
 // Rate limiting key of local runs and previews without the secret: their counters are throwaway
@@ -61,6 +66,15 @@ export function createContainer({
   const identityUow = () => drizzleUnitOfWork(db(), drizzleIdentityRepository, outboxRelay(db(), queues, clock), logger)
   const ipHashKey = () =>
     config.ipHashKey ?? (config.fakeProviders ? FAKE_IP_HASH_KEY : required(undefined, 'IP_HASH_KEY_CURRENT'))
+  const human = () =>
+    config.fakeProviders
+      ? fakeHumanVerifier
+      : turnstileVerifier({
+          secret: required(config.turnstileSecret, 'TURNSTILE_SECRET_KEY'),
+          hostname: new URL(config.siteUrl).hostname,
+          fetch: fetcher,
+        })
+  const inviteOnly = async () => (await readSettings(logger))['features.inviteOnly']
 
   return {
     config,
@@ -74,18 +88,21 @@ export function createContainer({
           uow: identityUow(),
           hasher: argon2idHasher(),
           breaches: hibpBreachChecker({ fetch: fetcher, logger }),
-          human: config.fakeProviders
-            ? fakeHumanVerifier
-            : turnstileVerifier({
-                secret: required(config.turnstileSecret, 'TURNSTILE_SECRET_KEY'),
-                hostname: new URL(config.siteUrl).hostname,
-                fetch: fetcher,
-              }),
+          human: human(),
           limiter: dbRateLimiter(db(), ipHashKey(), clock),
           ids,
           clock,
+          inviteOnly,
         })(cmd),
       verifyEmail: (cmd) => verifyEmail({ uow: identityUow(), clock })(cmd),
+      joinWaitlist: (cmd) =>
+        joinWaitlist({
+          repo: drizzleIdentityRepository(db()),
+          human: human(),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
+          ids,
+          inviteOnly,
+        })(cmd),
     },
   }
 }

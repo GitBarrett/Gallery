@@ -1,7 +1,7 @@
-import { and, eq, isNull, lt, sql } from 'drizzle-orm'
+import { and, eq, gt, isNull, lt, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import type { Clock } from '../../../platform/clock'
-import { emailTokens, users } from '../../../db/schema'
+import { betaInvites, emailTokens, users, waitlistEntries } from '../../../db/schema'
 import type { EmailTokenType, IdentityRepository, Locale } from '../application/ports'
 
 const sameEmail = (email: string) => sql`lower(${users.email}) = lower(${email})`
@@ -59,6 +59,27 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
   },
   async markEmailVerified(userId, at) {
     await db.update(users).set({ emailVerifiedAt: at }).where(eq(users.id, userId))
+  },
+  async createInvite(invite) {
+    await db.insert(betaInvites).values(invite)
+  },
+  async findUsableInvite(tokenHash, at) {
+    const [row] = await db
+      .select({ id: betaInvites.id })
+      .from(betaInvites)
+      .where(and(eq(betaInvites.tokenHash, tokenHash), isNull(betaInvites.usedAt), gt(betaInvites.expiresAt, at)))
+    return row?.id ?? null
+  },
+  async useInvite(id, at) {
+    const updated = await db
+      .update(betaInvites)
+      .set({ usedAt: at })
+      .where(and(eq(betaInvites.id, id), isNull(betaInvites.usedAt)))
+      .returning({ id: betaInvites.id })
+    return updated.length > 0
+  },
+  async joinWaitlist(entry) {
+    await db.insert(waitlistEntries).values(entry).onConflictDoNothing() // lower(email) unique index
   },
 })
 

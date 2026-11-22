@@ -9,8 +9,18 @@ export const SignupBody = z.strictObject({
   termsAccepted: z.literal(true),
   turnstileToken: z.string().min(1).max(2048),
   locale: z.enum(['en', 'fr']).default('en'),
+  // token of the invitation link, required during the beta (features.inviteOnly, US-56.4)
+  inviteToken: z.string().min(1).max(128).optional(),
 })
 export type SignupBody = z.infer<typeof SignupBody>
+
+/** POST /api/waitlist (US-56.4), only while features.inviteOnly is on. */
+export const WaitlistBody = z.strictObject({
+  email: z.email().max(254),
+  turnstileToken: z.string().min(1).max(2048),
+  locale: z.enum(['en', 'fr']).default('en'),
+})
+export type WaitlistBody = z.infer<typeof WaitlistBody>
 
 /** POST /api/auth/verify-email: the token of the link (fragment of the URL, never sent to the server logs). */
 export const VerifyEmailBody = z.strictObject({ token: z.string().min(1).max(128) })

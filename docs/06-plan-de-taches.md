@@ -167,13 +167,13 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   `POST /api/auth/resend-verification` (Turnstile, 3/h par compte, 10/h par IP), politique `requireVerified`.
   Stories : US-01.5, US-08. Tests : U, I (US-01.5, US-08.1–2).
 
-- [ ] **T-11c Inscription : écrans** (dép. T-11e, T-07c)
-  Pages d'inscription et de vérification conformes à `SignIn.dc.html`.
-  Stories : US-01 (parcours). Tests : E (US-01).
+- [ ] **T-11c Inscription : écrans** (dép. T-11e, T-11d, T-07c)
+  Pages d'inscription et de vérification conformes à `SignIn.dc.html` ; en mode invitation, refus de l'inscription avec le formulaire de liste d'attente (test E de T-11d, Q43).
+  Stories : US-01 (parcours). Tests : E (US-01, US-56.4).
 
-- [ ] **T-11d Mode bêta sur invitation** (dép. T-11b)
+- [x] **T-11d Mode bêta sur invitation** (dép. T-11b)
   Tables `beta_invites`, `waitlist_entries`, inscription refusée sans invitation, liste d'attente (`POST /api/waitlist`).
-  Stories : US-56.4. Tests : I, E.
+  Stories : US-56.4. Tests : U, I ; E avec l'écran d'inscription en T-11c (Q43).
 
 - [ ] **T-12a Sessions : API** (dép. T-11b)
   Sessions en base vérifiées à chaque requête via Hyperdrive sans cache (ADR-010, ADR-016), rotation d'identifiant, `signin` / `signout`, verrouillage progressif, `requireContext`, session ouverte par `signup` (US-01.1, « je suis connecté »).

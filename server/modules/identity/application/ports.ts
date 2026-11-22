@@ -50,7 +50,16 @@ export interface EmailToken {
   usedAt: Date | null
 }
 
-/** Port: accounts and email tokens. Email and username comparisons ignore case. */
+/** Beta invitation (US-56.4): only the hash of its token and a keyed fingerprint of the email are stored. */
+export interface BetaInvite {
+  id: string
+  emailHmac: string
+  tokenHash: string
+  invitedBy: string | null
+  expiresAt: Date
+}
+
+/** Port: accounts, email tokens, beta invitations and waiting list. Email and username comparisons ignore case. */
 export interface IdentityRepository {
   findUserIdByEmail(email: string): Promise<string | null>
   usernameTaken(username: string): Promise<boolean>
@@ -62,4 +71,11 @@ export interface IdentityRepository {
   /** Marks the token used; `false` if it already was (concurrent use). */
   useEmailToken(id: string, at: Date): Promise<boolean>
   markEmailVerified(userId: string, at: Date): Promise<void>
+  createInvite(invite: BetaInvite): Promise<void>
+  /** Id of the invitation of this token if it is unused and not expired at `at`. */
+  findUsableInvite(tokenHash: string, at: Date): Promise<string | null>
+  /** Marks the invitation used; `false` if it already was (concurrent use). */
+  useInvite(id: string, at: Date): Promise<boolean>
+  /** Does nothing for an email already on the list. */
+  joinWaitlist(entry: { id: string; email: string; locale: Locale }): Promise<void>
 }

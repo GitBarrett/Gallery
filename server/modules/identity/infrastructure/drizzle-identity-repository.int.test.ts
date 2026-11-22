@@ -3,13 +3,15 @@ import { afterAll, describe, expect, it } from 'vitest'
 import { identityRepositoryContract } from '../../../../tests/contracts/identity-repository.contract'
 import { withRollback } from '../../../../tests/db'
 import { createDb } from '../../../db/client'
-import { users } from '../../../db/schema'
+import { betaInvites, users, waitlistEntries } from '../../../db/schema'
 import { drizzleIdentityRepository } from './drizzle-identity-repository'
 
 const db = createDb(process.env.DATABASE_URL!)
 
 afterAll(async () => {
   await db.delete(users).where(like(users.email, 'Ash.%@Example.com')) // contract accounts, tokens cascade
+  await db.delete(betaInvites).where(eq(betaInvites.emailHmac, 'hmac'))
+  await db.delete(waitlistEntries).where(like(waitlistEntries.email, 'Ash.%@Example.com'))
   await db.$client.end()
 })
 

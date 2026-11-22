@@ -1,9 +1,11 @@
-import type { EmailToken, IdentityRepository, NewUser } from '../../server/modules/identity'
+import type { BetaInvite, EmailToken, IdentityRepository, Locale, NewUser } from '../../server/modules/identity'
 
 /** In-memory IdentityRepository with the same case-insensitive uniqueness as the database indexes. */
 export function inMemoryIdentityRepository() {
   const users: (NewUser & { emailVerifiedAt: Date | null })[] = []
   const tokens: EmailToken[] = []
+  const invites: (BetaInvite & { usedAt: Date | null })[] = []
+  const waitlist: { id: string; email: string; locale: Locale }[] = []
   const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase()
   const repo: IdentityRepository = {
     async findUserIdByEmail(email) {
@@ -38,6 +40,20 @@ export function inMemoryIdentityRepository() {
       const user = users.find((u) => u.id === userId)
       if (user) user.emailVerifiedAt = at
     },
+    async createInvite(invite) {
+      invites.push({ ...invite, usedAt: null })
+    },
+    async findUsableInvite(tokenHash, at) {
+      return invites.find((i) => i.tokenHash === tokenHash && !i.usedAt && i.expiresAt > at)?.id ?? null
+    },
+    async useInvite(id, at) {
+      const invite = invites.find((i) => i.id === id && !i.usedAt)
+      if (invite) invite.usedAt = at
+      return Boolean(invite)
+    },
+    async joinWaitlist(entry) {
+      if (!waitlist.some((e) => same(e.email, entry.email))) waitlist.push(entry)
+    },
   }
-  return { repo, users, tokens }
+  return { repo, users, tokens, invites, waitlist }
 }
