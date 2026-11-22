@@ -21,6 +21,11 @@ const schema = z
       .string()
       .regex(/^(phc_\w+)?$/)
       .optional(),
+    // Secrets of the real providers, unused with fake providers. Optional at startup so that a missing one only
+    // breaks its feature (Q42): the code that needs it fails without it.
+    TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
+    RESEND_API_KEY: z.string().min(1).optional(),
+    IP_HASH_KEY_CURRENT: z.string().min(32).optional(),
   })
   .refine((env) => !(env.NUXT_DEPLOY_ENV === 'production' && env.NUXT_FAKE_PROVIDERS === 'true'), {
     path: ['NUXT_FAKE_PROVIDERS'],
@@ -32,6 +37,9 @@ export interface Config {
   fakeProviders: boolean
   deployEnv: 'local' | 'preview' | 'production'
   r2Prefix: string
+  turnstileSecret?: string
+  resendApiKey?: string
+  ipHashKey?: string
 }
 
 /** Validates the environment; a missing or invalid variable fails the startup, without printing its value. */
@@ -46,5 +54,8 @@ export function loadConfig(env: Record<string, string | undefined>): Config {
     fakeProviders: parsed.data.NUXT_FAKE_PROVIDERS === 'true',
     deployEnv: parsed.data.NUXT_DEPLOY_ENV,
     r2Prefix: parsed.data.NUXT_R2_PREFIX,
+    turnstileSecret: parsed.data.TURNSTILE_SECRET_KEY,
+    resendApiKey: parsed.data.RESEND_API_KEY,
+    ipHashKey: parsed.data.IP_HASH_KEY_CURRENT,
   }
 }

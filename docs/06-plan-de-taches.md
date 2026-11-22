@@ -159,11 +159,15 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Module `identity` (domain, application, infrastructure) : tables `users`, `sessions`, `email_tokens` ; règles de pseudo et de mot de passe ; hachage Argon2id `@noble/hashes` au format PHC (ADR-015) ; vérification HIBP ; port `Mailer` (Resend + fake).
   Tests : U (règles, hachage et vérification), I (contrat `Mailer`).
 
-- [ ] **T-11b Inscription et vérification d'email : API** (dép. T-11a, T-05c, T-10b)
-  `POST /api/auth/signup`, `verify-email`, `resend-verification` : Turnstile, âge 15 ans et Terms (version acceptée enregistrée), limites de débit, politique « email vérifié requis ».
-  Stories : US-01 (API), US-08. Tests : U, I (US-01.1–7, US-08.1–2).
+- [x] **T-11b Inscription et vérification d'email : API** (dép. T-11a, T-05c, T-10b)
+  `POST /api/auth/signup`, `verify-email` : Turnstile, âge 15 ans et Terms (version acceptée enregistrée), limite de débit, consommateur `emails` (vérification, « compte existant ») et modèles EN/FR. Découpée le 22/11/2026 : renvoi et politique « email vérifié requis » en T-11e (il leur faut la session de T-12a), session ouverte à l'inscription en T-12a.
+  Stories : US-01 (API). Tests : U, I (US-01.1–4, US-01.6–7).
 
-- [ ] **T-11c Inscription : écrans** (dép. T-11b, T-07c)
+- [ ] **T-11e Renvoi de vérification et email vérifié requis** (dép. T-11b, T-12a)
+  `POST /api/auth/resend-verification` (Turnstile, 3/h par compte, 10/h par IP), politique `requireVerified`.
+  Stories : US-01.5, US-08. Tests : U, I (US-01.5, US-08.1–2).
+
+- [ ] **T-11c Inscription : écrans** (dép. T-11e, T-07c)
   Pages d'inscription et de vérification conformes à `SignIn.dc.html`.
   Stories : US-01 (parcours). Tests : E (US-01).
 
@@ -172,7 +176,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Stories : US-56.4. Tests : I, E.
 
 - [ ] **T-12a Sessions : API** (dép. T-11b)
-  Sessions en base vérifiées à chaque requête via Hyperdrive sans cache (ADR-010, ADR-016), rotation d'identifiant, `signin` / `signout`, verrouillage progressif, `requireContext`.
+  Sessions en base vérifiées à chaque requête via Hyperdrive sans cache (ADR-010, ADR-016), rotation d'identifiant, `signin` / `signout`, verrouillage progressif, `requireContext`, session ouverte par `signup` (US-01.1, « je suis connecté »).
   Stories : US-03.1–5. Tests : U, I.
 
 - [ ] **T-12b Sessions : écrans et appareils** (dép. T-12a, T-11c)

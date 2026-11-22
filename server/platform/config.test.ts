@@ -13,6 +13,16 @@ describe('loadConfig', () => {
     })
   })
 
+  it('reads the provider secrets, optional at startup', () => {
+    const secrets = { TURNSTILE_SECRET_KEY: 't', RESEND_API_KEY: 'r', IP_HASH_KEY_CURRENT: 'k'.repeat(32) }
+    expect(loadConfig({ ...valid, ...secrets })).toMatchObject({
+      turnstileSecret: 't',
+      resendApiKey: 'r',
+      ipHashKey: 'k'.repeat(32),
+    })
+    expect(() => loadConfig({ ...valid, IP_HASH_KEY_CURRENT: 'short' })).toThrow(/IP_HASH_KEY_CURRENT/)
+  })
+
   it('fails at startup when a required variable is missing, naming it', () => {
     expect(() => loadConfig({ NUXT_FAKE_PROVIDERS: 'true' })).toThrow(/NUXT_PUBLIC_SITE_URL/)
   })
