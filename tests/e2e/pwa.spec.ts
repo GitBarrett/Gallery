@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test'
-import { expect, test, withAccess } from './fixtures'
+import { expect, test } from './fixtures'
 
 // PWA (T-09a): Chromium only (WebKit in Playwright runs no service worker); the service worker only exists in
 // production builds (previews), so these tests are skipped against `pnpm dev`.
@@ -72,11 +72,12 @@ test('US-65.1 US-65.3 a new version shows "A new version is available · Reload"
 }) => {
   await controlledHome(page)
   const before = await page.evaluate(() => navigator.serviceWorker.controller!.scriptURL)
-  // A new deployment: same service worker with one more byte (the update check bypasses the HTTP cache)
-  await context.route('**/sw.js', async (route) => {
-    const response = await route.fetch({ headers: withAccess(route) }) // a later route replaces the fixture's
-    await route.fulfill({ response, body: `${await response.text()}\n// next version` })
-  })
+  // A new deployment: the same service worker with one more line. Read by the page itself (its requests carry the
+  // Access token), then served by the test: a fetch made from the route is redirected by Cloudflare Access
+  const script = (await fetchInPage(page, '/sw.js')).body
+  await context.route('**/sw.js', (route) =>
+    route.fulfill({ status: 200, contentType: 'text/javascript', body: `${script}\n// next version` }),
+  )
   await page.evaluate(async () => (await navigator.serviceWorker.getRegistration())!.update())
   const toast = page.getByRole('status').filter({ hasText: 'A new version is available' })
   await expect(toast).toBeVisible({ timeout: 15_000 })
