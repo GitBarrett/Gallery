@@ -18,7 +18,9 @@ type StoredUser = Omit<NewUser, 'passwordHash'> & {
 export function inMemoryIdentityRepository() {
   const users: StoredUser[] = []
   const tokens: EmailToken[] = []
-  const sessions: (NewSession & { revokedAt: Date | null })[] = []
+  const sessions: (NewSession & { createdAt: Date; revokedAt: Date | null })[] = []
+  const active = (userId: string, at: Date) =>
+    sessions.filter((s) => s.userId === userId && !s.revokedAt && s.expiresAt > at)
   const invites: (BetaInvite & { usedAt: Date | null })[] = []
   const waitlist: { id: string; email: string; locale: Locale }[] = []
   const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase()
@@ -60,7 +62,7 @@ export function inMemoryIdentityRepository() {
       return user ? { userId: user.id, passwordHash: user.passwordHash, status: user.status } : null
     },
     async createSession(session) {
-      sessions.push({ ...session, revokedAt: null })
+      sessions.push({ ...session, createdAt: session.lastSeenAt, revokedAt: null })
     },
     async findSession(idHash) {
       const session = sessions.find((s) => s.idHash === idHash)
@@ -81,6 +83,24 @@ export function inMemoryIdentityRepository() {
     async revokeSession(idHash, at) {
       const session = sessions.find((s) => s.idHash === idHash && !s.revokedAt)
       if (session) session.revokedAt = at
+    },
+    async listSessions(userId, at) {
+      return active(userId, at)
+        .toSorted((a, b) => b.lastSeenAt.getTime() - a.lastSeenAt.getTime())
+        .map(({ idHash, createdAt, lastSeenAt, userAgentSummary }) => ({
+          idHash,
+          createdAt,
+          lastSeenAt,
+          userAgentSummary,
+        }))
+    },
+    async revokeUserSession(userId, idHash, at) {
+      const session = active(userId, at).find((s) => s.idHash === idHash)
+      if (session) session.revokedAt = at
+      return Boolean(session)
+    },
+    async revokeOtherSessions(userId, keptIdHash, at) {
+      for (const s of active(userId, at)) if (s.idHash !== keptIdHash) s.revokedAt = at
     },
     async createInvite(invite) {
       invites.push({ ...invite, usedAt: null })

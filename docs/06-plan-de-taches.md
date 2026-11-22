@@ -191,7 +191,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Page de connexion, redirection sûre, membre connecté dans l'en-tête, déconnexion avec vidage des caches du service worker (`CLEAR_USER_CACHES`). Découpée le 22/11/2026 : liste et révocation des sessions en T-12d.
   Stories : US-03.6, US-03.4 (client), US-64.4. Tests : U, E.
 
-- [ ] **T-12d Sessions : appareils** (dép. T-12b)
+- [x] **T-12d Sessions : appareils** (dép. T-12b)
   Liste et révocation des sessions (`/api/me/sessions*`), résumé lisible de l'appareil, écran dans `/settings`.
   Stories : US-03 (sessions). Tests : I, E.
 

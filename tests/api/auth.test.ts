@@ -5,6 +5,7 @@ import { afterAll, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/db/client'
 import { betaInvites, users, waitlistEntries } from '../../server/db/schema'
 import { TURNSTILE_DUMMY_TOKEN } from '../../server/modules/identity'
+import { SessionsResponse } from '../../shared/contracts/auth'
 import { ErrorResponse } from '../../shared/contracts/errors'
 
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
@@ -239,6 +240,78 @@ describe('sessions', () => {
     expect((await resend()).status).toBe(401)
     for (let i = 0; i < 3; i++) expect((await resend(session)).status).toBe(204)
     expect((await resend(session)).status).toBe(429)
+  })
+
+  const devices = (cookie?: string) => fetch('/api/me/sessions', { headers: cookie ? { cookie } : {} })
+  const revoke = (id: string, cookie?: string) =>
+    fetch(`/api/me/sessions/${id}`, {
+      method: 'DELETE',
+      headers: { 'sec-fetch-site': 'same-origin', ...(cookie ? { cookie } : {}) },
+    })
+  const firefox = 'Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0'
+  const signinFrom = async (credentials: { email: string; password: string }, userAgent: string) =>
+    sessionCookie(
+      await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: {
+          'sec-fetch-site': 'same-origin',
+          'content-type': 'application/json',
+          'cf-connecting-ip': crypto.randomUUID(),
+          'user-agent': userAgent,
+        },
+        body: JSON.stringify({ email: credentials.email, password: credentials.password }),
+      }),
+    ).value
+
+  it('US-03.7 lists the active sessions of the member with a readable device, the current one marked', async () => {
+    const credentials = await account()
+    const laptop = await signinFrom(credentials, firefox)
+    const phone = sessionCookie(await signin(credentials)).value
+    await fetch('/api/auth/signout', { method: 'POST', headers: { 'sec-fetch-site': 'same-origin', cookie: phone } })
+    const current = sessionCookie(await signin(credentials)).value
+    const response = await devices(current)
+    expect(response.status).toBe(200)
+    const { sessions } = SessionsResponse.parse(await response.json())
+    expect(sessions).toHaveLength(2)
+    expect(sessions.filter((s) => s.current)).toHaveLength(1)
+    expect(sessions.find((s) => !s.current)?.device).toEqual({ browser: 'Firefox', os: 'Linux' })
+    expect((await devices(laptop)).status).toBe(200)
+    expect((await devices()).status).toBe(401)
+  })
+
+  it("US-03.8 revokes one of the member's sessions; another member's or an unknown one answers 404", async () => {
+    const credentials = await account()
+    const laptop = await signinFrom(credentials, firefox)
+    const current = sessionCookie(await signin(credentials)).value
+    const other = sessionCookie(await signin(await account())).value
+    const idOf = async (cookie: string) =>
+      SessionsResponse.parse(await (await devices(cookie)).json()).sessions.find((s) => s.current)!.id
+
+    expect((await revoke(await idOf(other), current)).status).toBe(404)
+    expect((await me(other)).status).toBe(200)
+    expect((await revoke('0'.repeat(64), current)).status).toBe(404)
+    expect((await revoke('not-an-id', current)).status).toBe(400)
+    expect((await revoke(await idOf(laptop))).status).toBe(401)
+    expect((await revoke(await idOf(laptop), current)).status).toBe(204)
+    expect((await me(laptop)).status).toBe(401)
+    expect((await me(current)).status).toBe(200)
+  })
+
+  it('US-03.9 revokes every other session of the member and keeps the current one', async () => {
+    const credentials = await account()
+    const laptop = sessionCookie(await signin(credentials)).value
+    const current = sessionCookie(await signin(credentials)).value
+    const other = sessionCookie(await signin(await account())).value
+    const revokeOthers = (cookie?: string) =>
+      fetch('/api/me/sessions/revoke-others', {
+        method: 'POST',
+        headers: { 'sec-fetch-site': 'same-origin', ...(cookie ? { cookie } : {}) },
+      })
+    expect((await revokeOthers()).status).toBe(401)
+    expect((await revokeOthers(current)).status).toBe(204)
+    expect((await me(laptop)).status).toBe(401)
+    expect((await me(current)).status).toBe(200)
+    expect((await me(other)).status).toBe(200)
   })
 
   it('answers 401 without session and sets no cookie for a visitor', async () => {

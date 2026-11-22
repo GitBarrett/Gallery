@@ -46,3 +46,20 @@ export type MeResponse = z.infer<typeof MeResponse>
 /** POST /api/auth/resend-verification (signed-in member, US-01.5). */
 export const ResendVerificationBody = z.strictObject({ turnstileToken: z.string().min(1).max(2048) })
 export type ResendVerificationBody = z.infer<typeof ResendVerificationBody>
+
+/** GET /api/me/sessions (US-03.7): the member's active sessions, latest activity first. `id`: path of DELETE. */
+export const SessionsResponse = z.strictObject({
+  sessions: z.array(
+    z.strictObject({
+      id: z.string(),
+      device: z.strictObject({ browser: z.string().nullable(), os: z.string().nullable() }),
+      createdAt: z.iso.datetime(),
+      lastSeenAt: z.iso.datetime(),
+      current: z.boolean(),
+    }),
+  ),
+})
+export type SessionsResponse = z.infer<typeof SessionsResponse>
+
+/** DELETE /api/me/sessions/{id}: the id of a listed session (SHA-256, hex). */
+export const SessionParams = z.strictObject({ id: z.string().regex(/^[0-9a-f]{64}$/) })

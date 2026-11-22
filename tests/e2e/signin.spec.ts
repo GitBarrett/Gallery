@@ -85,10 +85,46 @@ test('US-03.4 US-64.4 sign-out ends the session and empties the pages and api-pu
 
   await page.goto('/settings')
   await page.waitForLoadState('networkidle')
-  await page.getByRole('button', { name: 'Sign out' }).click()
+  await page.getByRole('button', { name: 'Sign out', exact: true }).click()
   await expect(page).toHaveURL('/')
   await expect(page.getByRole('banner').getByRole('link', { name: 'Sign in' })).toBeVisible()
   const legalCached = () => page.evaluate(async () => Boolean(await (await caches.open('pages')).match('/legal')))
   await expect.poll(legalCached).toBe(false)
   expect(await page.evaluate(async () => (await fetch('/api/me')).status)).toBe(401)
+})
+
+test('US-03.7 US-03.8 US-03.9 lists the devices and signs out the other ones', async ({ page }) => {
+  const ash = await member(page)
+  await page.goto('/signin?redirect=/settings')
+  await signIn(page, ash)
+  await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
+  // Another device: a sign-in whose cookie this browser does not keep
+  const other = () =>
+    page.evaluate(
+      async (body) =>
+        (
+          await fetch('/api/auth/signin', {
+            method: 'POST',
+            credentials: 'omit',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(body),
+          })
+        ).status,
+      { email: ash.email, password: ash.password },
+    )
+  expect(await other()).toBe(204)
+  expect(await other()).toBe(204)
+  await page.reload()
+
+  const devices = page.getByRole('region', { name: 'Devices' })
+  const items = devices.getByRole('listitem')
+  await expect(items.filter({ hasText: 'This device' })).toHaveCount(1)
+  const count = await items.count()
+  expect(count).toBeGreaterThanOrEqual(3)
+  await items.filter({ hasNotText: 'This device' }).first().getByRole('button').click()
+  await expect(items).toHaveCount(count - 1)
+  await devices.getByRole('button', { name: 'Sign out all other devices' }).click()
+  await expect(items).toHaveCount(1)
+  await expect(items).toContainText('This device')
+  expect(await page.evaluate(async () => (await fetch('/api/me')).status)).toBe(200)
 })

@@ -77,6 +77,13 @@ export interface NewSession {
   userAgentSummary: string | null
 }
 
+export interface SessionSummary {
+  idHash: string
+  createdAt: Date
+  lastSeenAt: Date
+  userAgentSummary: string | null
+}
+
 /** Port: accounts, email tokens, sessions, beta invitations and waiting list. Email and username comparisons ignore case. */
 export interface IdentityRepository {
   findUserIdByEmail(email: string): Promise<string | null>
@@ -96,6 +103,11 @@ export interface IdentityRepository {
   ): Promise<{ lastSeenAt: Date; expiresAt: Date; revokedAt: Date | null; account: Actor } | null>
   touchSession(idHash: string, lastSeenAt: Date, expiresAt: Date): Promise<void>
   revokeSession(idHash: string, at: Date): Promise<void>
+  /** Sessions of `userId` neither revoked nor expired at `at`, latest activity first (US-03.7). */
+  listSessions(userId: string, at: Date): Promise<SessionSummary[]>
+  /** Revokes an active session of `userId`; `false` when none matches (another member's, unknown or ended). */
+  revokeUserSession(userId: string, idHash: string, at: Date): Promise<boolean>
+  revokeOtherSessions(userId: string, keptIdHash: string, at: Date): Promise<void>
   createInvite(invite: BetaInvite): Promise<void>
   /** Id of the invitation of this token if it is unused and not expired at `at`. */
   findUsableInvite(tokenHash: string, at: Date): Promise<string | null>
