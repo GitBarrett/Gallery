@@ -36,6 +36,13 @@
       "when": 1795382225112,
       "tag": "0004_oauth_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795458321239,
+      "tag": "0005_username_redirects",
+      "breakpoints": true
     }
   ]
 }

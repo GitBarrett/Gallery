@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { inMemoryIdentityRepository } from '../../../../tests/fakes/in-memory-identity-repository'
+import { fixedClock } from '../../../../tests/fakes/fixed-clock'
 import { getProfile } from './profiles'
 
 async function setup(status = 'active') {
@@ -14,7 +15,7 @@ async function setup(status = 'active') {
     termsVersion: 'v',
   })
   Object.assign(fake.users[0]!, { status, bio: 'Night elf hunter.', createdAt: new Date('2026-11-01T10:00:00Z') })
-  return getProfile({ repo: fake.repo })
+  return getProfile({ repo: fake.repo, clock: fixedClock('2026-11-23T12:00:00Z') })
 }
 
 describe('getProfile', () => {

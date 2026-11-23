@@ -178,5 +178,25 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       await repo.joinWaitlist({ id: crypto.randomUUID(), email, locale: 'fr' })
       await repo.joinWaitlist({ id: crypto.randomUUID(), email: email.toLowerCase(), locale: 'en' })
     })
+
+    it('US-05.4 renames and keeps the former name to its owner until the redirect ends', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      const at = new Date('2026-11-23T12:00:00Z')
+      const until = new Date('2027-02-21T12:00:00Z')
+      const renamed = `${ash.username}_New`
+      expect(await repo.findUsername(ash.id)).toEqual({ username: ash.username, changedAt: null })
+      await repo.renameUser({ userId: ash.id, previous: ash.username, username: renamed, at, redirectUntil: until })
+      expect(await repo.findUsername(ash.id)).toEqual({ username: renamed, changedAt: at })
+      expect(await repo.usernameOwner(renamed.toUpperCase(), at)).toBe(ash.id)
+      expect(await repo.usernameOwner(ash.username.toUpperCase(), at)).toBe(ash.id)
+      expect(await repo.usernameOwner(ash.username, until)).toBeNull()
+      // taking it back: no redirect left on the current name
+      await repo.renameUser({ userId: ash.id, previous: renamed, username: ash.username, at, redirectUntil: until })
+      expect(await repo.findProfile(ash.username)).toMatchObject({ username: ash.username })
+      expect(await repo.usernameOwner(renamed, at)).toBe(ash.id)
+      expect(await repo.usernameOwner(`${ash.username}_none`, at)).toBeNull()
+    })
   })
 }

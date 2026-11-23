@@ -14,11 +14,13 @@ import {
   drizzleIdentityRepository,
   fakeHumanVerifier,
   forgotPassword,
+  changeUsername,
   getProfile,
   hibpBreachChecker,
   joinWaitlist,
   listSessions,
   resendVerification,
+  usernameAvailability,
   resetPassword,
   resolveSession,
   revokeOtherSessions,
@@ -59,6 +61,8 @@ export interface Container {
     forgotPassword: UseCase<typeof forgotPassword>
     resetPassword: UseCase<typeof resetPassword>
     getProfile: UseCase<typeof getProfile>
+    changeUsername: UseCase<typeof changeUsername>
+    usernameAvailability: UseCase<typeof usernameAvailability>
     startOAuth: (provider: OAuthProviderName) => ReturnType<typeof startOAuth>
     oauthCallback: UseCase<typeof oauthCallback>
     completeOAuthSignup: UseCase<typeof completeOAuthSignup>
@@ -165,7 +169,9 @@ export function createContainer({
       listSessions: (cmd) => listSessions({ repo: drizzleIdentityRepository(db()), clock })(cmd),
       revokeSession: (cmd) => revokeSession({ repo: drizzleIdentityRepository(db()), clock })(cmd),
       revokeOtherSessions: (cmd) => revokeOtherSessions({ repo: drizzleIdentityRepository(db()), clock })(cmd),
-      getProfile: (cmd) => getProfile({ repo: drizzleIdentityRepository(db()) })(cmd),
+      getProfile: (cmd) => getProfile({ repo: drizzleIdentityRepository(db()), clock })(cmd),
+      changeUsername: (cmd) => changeUsername({ uow: identityUow(), clock })(cmd),
+      usernameAvailability: (cmd) => usernameAvailability({ repo: drizzleIdentityRepository(db()), clock })(cmd),
       resendVerification: (cmd) =>
         resendVerification({ uow: identityUow(), human: human(), limiter: dbRateLimiter(db(), ipHashKey(), clock) })(
           cmd,
