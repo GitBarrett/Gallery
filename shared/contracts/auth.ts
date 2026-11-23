@@ -1,3 +1,4 @@
+import { SOCIAL_PLATFORMS } from '../domain/social-links'
 import { z } from './zod'
 
 /** POST /api/auth/signup. Username and password rules are checked by the server (shared/domain/account-rules). */
@@ -133,5 +134,13 @@ export const ProfileResponse = z.strictObject({
   username: z.string(),
   bio: z.string().nullable(),
   memberSince: z.iso.datetime(),
+  // US-82.4: built by the server, Discord has no link (copied); empty when hidden (US-82.5)
+  socialLinks: z.array(
+    z.strictObject({
+      platform: z.enum(SOCIAL_PLATFORMS),
+      label: z.string(),
+      url: z.url({ protocol: /^https$/ }).nullable(),
+    }),
+  ),
 })
 export type ProfileResponse = z.infer<typeof ProfileResponse>

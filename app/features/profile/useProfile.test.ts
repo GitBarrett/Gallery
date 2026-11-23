@@ -7,6 +7,7 @@ registerEndpoint('/api/users/Ash_Barrett', () => ({
   username: 'Ash_Barrett',
   bio: null,
   memberSince: '2026-11-01T10:00:00.000Z',
+  socialLinks: [],
 }))
 registerEndpoint('/api/users/nobody', (event) => {
   setResponseStatus(event, 404)
@@ -16,7 +17,12 @@ registerEndpoint('/api/users/nobody', (event) => {
 describe('useProfile', () => {
   it('US-05.3 loads the public profile of a username', async () => {
     const { profile } = await useProfile(ref('Ash_Barrett'))
-    expect(profile.value).toEqual({ username: 'Ash_Barrett', bio: null, memberSince: '2026-11-01T10:00:00.000Z' })
+    expect(profile.value).toEqual({
+      username: 'Ash_Barrett',
+      bio: null,
+      memberSince: '2026-11-01T10:00:00.000Z',
+      socialLinks: [],
+    })
   })
 
   it('US-05.3 gives null for an unknown, banned or deleted account (the page answers 404)', async () => {

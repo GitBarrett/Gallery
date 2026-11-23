@@ -24,9 +24,12 @@ export function validateUsername(name: string): Result<string, UsernameProblem> 
   if (!/^[a-zA-Z0-9_-]+$/.test(name)) return err('charset')
   const lower = name.toLowerCase()
   if (RESERVED.has(lower)) return err('reserved')
-  if (INSULTS.some((word) => lower.includes(word))) return err('insult')
+  if (hasInsult(lower)) return err('insult')
   return ok(name)
 }
+
+/** Insult filter of usernames, also applied to the identifiers of social networks (US-82.2). */
+export const hasInsult = (text: string) => INSULTS.some((word) => text.toLowerCase().includes(word))
 
 export function validatePassword(password: string): Result<string, PasswordProblem> {
   const length = [...password].length // code points: an emoji counts as one character

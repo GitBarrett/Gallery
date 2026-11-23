@@ -15,6 +15,7 @@ export type {
   OAuthProvider,
   OAuthProviderName,
   PasswordHasher,
+  SocialLink,
 } from './application/ports'
 export { signup, SIGNUP_PER_IP, TERMS_VERSION } from './application/signup'
 export { verifyEmail } from './application/verify-email'

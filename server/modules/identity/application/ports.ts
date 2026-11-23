@@ -1,3 +1,11 @@
+import type { SocialPlatform } from '../../../../shared/domain/social-links'
+
+/** A stored social network identifier (US-82); the website is its https URL. */
+export interface SocialLink {
+  platform: SocialPlatform
+  handle: string
+}
+
 /** Port: password hashing (ADR-015). `needsRehash`: stored with older parameters, rehash at sign-in. */
 export interface PasswordHasher {
   hash(password: string): Promise<string>
@@ -120,9 +128,15 @@ export interface IdentityRepository {
   setPasswordHash(userId: string, passwordHash: string): Promise<void>
   findCredentials(email: string): Promise<{ userId: string; passwordHash: string | null; status: string } | null>
   /** Public fields of the account of `username`, ignoring case; `username` in its display case. */
-  findProfile(
-    username: string,
-  ): Promise<{ username: string; bio: string | null; createdAt: Date; status: string } | null>
+  findProfile(username: string): Promise<{
+    username: string
+    bio: string | null
+    createdAt: Date
+    status: string
+    socialLinks: SocialLink[] // in the order of SOCIAL_PLATFORMS
+  } | null>
+  /** Replaces all the social links of the account (US-82). */
+  setSocialLinks(userId: string, links: SocialLink[]): Promise<void>
   /** Current username of the account and date of its last change (US-05.4). */
   findUsername(userId: string): Promise<{ username: string; changedAt: Date | null } | null>
   /** Account holding `username` ignoring case: as its current name, or as a former one redirected after `at`. */

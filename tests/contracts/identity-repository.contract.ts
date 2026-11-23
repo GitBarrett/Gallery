@@ -108,9 +108,27 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       const ash = user()
       await repo.createUser(ash)
       const profile = await repo.findProfile(ash.username.toUpperCase())
-      expect(profile).toMatchObject({ username: ash.username, bio: null, status: 'active' })
+      expect(profile).toMatchObject({ username: ash.username, bio: null, status: 'active', socialLinks: [] })
       expect(profile?.createdAt).toBeInstanceOf(Date)
       expect(await repo.findProfile(`${ash.username}x`)).toBeNull()
+    })
+
+    it('US-82.4 stores the social links of an account, replaced as a whole, read in network order', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      await repo.setSocialLinks(ash.id, [
+        { platform: 'website', handle: 'https://ash.example.com' },
+        { platform: 'twitch', handle: 'Ash_Barrett' },
+      ])
+      expect((await repo.findProfile(ash.username))?.socialLinks).toEqual([
+        { platform: 'twitch', handle: 'Ash_Barrett' },
+        { platform: 'website', handle: 'https://ash.example.com' },
+      ])
+      await repo.setSocialLinks(ash.id, [{ platform: 'discord', handle: 'ash.barrett' }])
+      expect((await repo.findProfile(ash.username))?.socialLinks).toEqual([
+        { platform: 'discord', handle: 'ash.barrett' },
+      ])
     })
 
     it('US-03.1 finds the credentials of an email in any case', async () => {

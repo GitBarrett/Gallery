@@ -7,10 +7,15 @@ import {
   oauthAccounts,
   sessions,
   usernameRedirects,
+  userSocialLinks,
   users,
   waitlistEntries,
 } from '../../../db/schema'
-import type { Actor, EmailTokenType, IdentityRepository, Locale } from '../application/ports'
+import { SOCIAL_PLATFORMS } from '../../../../shared/domain/social-links'
+import type { Actor, EmailTokenType, IdentityRepository, Locale, SocialLink } from '../application/ports'
+
+const inPlatformOrder = (links: SocialLink[]) =>
+  links.sort((a, b) => SOCIAL_PLATFORMS.indexOf(a.platform) - SOCIAL_PLATFORMS.indexOf(b.platform))
 
 const sameEmail = (email: string) => sql`lower(${users.email}) = lower(${email})`
 const activeOf = (userId: string, at: Date) =>
@@ -81,10 +86,26 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
   },
   async findProfile(username) {
     const [row] = await db
-      .select({ username: users.username, bio: users.bio, createdAt: users.createdAt, status: users.status })
+      .select({
+        id: users.id,
+        username: users.username,
+        bio: users.bio,
+        createdAt: users.createdAt,
+        status: users.status,
+      })
       .from(users)
       .where(sql`lower(${users.username}) = lower(${username})`)
-    return row ?? null
+    if (!row) return null
+    const { id, ...profile } = row
+    const links = await db
+      .select({ platform: userSocialLinks.platform, handle: userSocialLinks.handle })
+      .from(userSocialLinks)
+      .where(eq(userSocialLinks.userId, id))
+    return { ...profile, socialLinks: inPlatformOrder(links as SocialLink[]) }
+  },
+  async setSocialLinks(userId, links) {
+    await db.delete(userSocialLinks).where(eq(userSocialLinks.userId, userId))
+    if (links.length) await db.insert(userSocialLinks).values(links.map((link) => ({ userId, ...link })))
   },
   async findUsername(userId) {
     const [row] = await db
