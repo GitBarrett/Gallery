@@ -165,6 +165,6 @@ test('US-05.1 US-05.2 US-05.4 the username changes in the settings, the former p
 
   const response = await page.goto(`/u/${former}`)
   await expect(page).toHaveURL(`/u/${renamed}`)
-  expect(response?.request().redirectedFrom()?.url()).toMatch(new RegExp(`/u/${former}$`))
+  expect(response?.request().redirectedFrom()?.url().endsWith(`/u/${former}`)).toBe(true)
   await expect(page.getByRole('heading', { level: 1, name: renamed })).toBeVisible()
 })
