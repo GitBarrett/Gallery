@@ -163,8 +163,7 @@ test('US-05.1 US-05.2 US-05.4 the username changes in the settings, the former p
   const former = ash.username
   created = { ...ash, username: renamed } // the next tests of this worker sign in as the renamed member
 
-  const response = await page.goto(`/u/${former}`)
+  await page.goto(`/u/${former}`) // the 301 itself: tests/api/usernames.test.ts (the service worker hides it here)
   await expect(page).toHaveURL(`/u/${renamed}`)
-  expect(response?.request().redirectedFrom()?.url().endsWith(`/u/${former}`)).toBe(true)
   await expect(page.getByRole('heading', { level: 1, name: renamed })).toBeVisible()
 })
