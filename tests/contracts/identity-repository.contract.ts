@@ -103,6 +103,16 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect(await repo.createUser({ ...user(), email: null })).toBe('created')
     })
 
+    it('US-05.3 finds the public profile of a username in any case, with its display case', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      const profile = await repo.findProfile(ash.username.toUpperCase())
+      expect(profile).toMatchObject({ username: ash.username, bio: null, status: 'active' })
+      expect(profile?.createdAt).toBeInstanceOf(Date)
+      expect(await repo.findProfile(`${ash.username}x`)).toBeNull()
+    })
+
     it('US-03.1 finds the credentials of an email in any case', async () => {
       const repo = await make()
       const ash = user()

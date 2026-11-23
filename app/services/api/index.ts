@@ -10,6 +10,7 @@ import {
   MeResponse,
   type OAuthCompleteBody,
   OAuthPendingResponse,
+  ProfileResponse,
   type ResendVerificationBody,
   type ResetPasswordBody,
   SessionsResponse,
@@ -84,6 +85,9 @@ export const api = {
     call('/api/auth/password/forgot', z.unknown(), { method: 'POST', body }),
   // 204: password changed, every session ended, a new one opened (US-04.3)
   resetPassword: (body: ResetPasswordBody) => call('/api/auth/password/reset', z.unknown(), { method: 'POST', body }),
+  // public profile (US-05.3); 404 NOT_FOUND for an unknown, banned or deleted account
+  profile: (username: string, fetch?: typeof $fetch) =>
+    call(`/api/users/${encodeURIComponent(username)}`, ProfileResponse, {}, fetch),
   sessions: () => call('/api/me/sessions', SessionsResponse),
   // 204 (US-03.8, US-03.9)
   revokeSession: (id: string) => call(`/api/me/sessions/${id}`, z.unknown(), { method: 'DELETE' }),

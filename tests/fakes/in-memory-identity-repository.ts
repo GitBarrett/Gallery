@@ -12,6 +12,9 @@ type StoredUser = Omit<NewUser, 'passwordHash' | 'emailVerifiedAt'> & {
   emailVerifiedAt: Date | null
   role: 'user' | 'moderator' | 'admin'
   status: string
+  // set by the tests that need them (not written by createUser, so that its rows compare simply)
+  bio?: string | null
+  createdAt?: Date
 }
 
 /** In-memory IdentityRepository with the same case-insensitive uniqueness as the database indexes. */
@@ -65,6 +68,17 @@ export function inMemoryIdentityRepository() {
     async setPasswordHash(userId, passwordHash) {
       const user = users.find((u) => u.id === userId)
       if (user) user.passwordHash = passwordHash
+    },
+    async findProfile(username) {
+      const user = users.find((u) => same(u.username, username))
+      return user
+        ? {
+            username: user.username,
+            bio: user.bio ?? null,
+            createdAt: user.createdAt ?? new Date(0),
+            status: user.status,
+          }
+        : null
     },
     async findCredentials(email) {
       const user = users.find((u) => same(u.email, email))

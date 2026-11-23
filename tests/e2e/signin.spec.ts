@@ -65,6 +65,23 @@ test('US-03.6 a visitor sent to sign in comes back to the page of the site', asy
   await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
 })
 
+test('US-05.3 the profile icon opens the public profile, which visitors see too', async ({ page, context }) => {
+  const ash = await member(page)
+  await page.goto('/signin')
+  await signIn(page, ash)
+  await page.getByRole('link', { name: 'My profile' }).click()
+  await expect(page).toHaveURL(`/u/${ash.username}`)
+  await expect(page.getByRole('heading', { level: 1, name: ash.username })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Settings' })).toBeVisible()
+
+  await context.clearCookies() // a visitor, keeping the Access token routing of the fixture
+  await page.goto(`/u/${ash.username.toUpperCase()}`)
+  await expect(page.getByRole('heading', { level: 1, name: ash.username })).toBeVisible()
+  await expect(page.getByText('No captures yet')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Settings' })).toHaveCount(0)
+  expect((await page.goto('/u/nobody-here-at-all'))?.status()).toBe(404)
+})
+
 test('US-03.2 wrong credentials get one message', async ({ page }) => {
   await signIn(page, { email: 'nobody@example.com', password: 'not the password' })
   await expect(page.getByRole('alert')).toHaveText('Wrong email or password.')

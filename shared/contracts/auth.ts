@@ -109,3 +109,14 @@ export const OAuthCompleteBody = z.strictObject({
   locale: z.enum(['en', 'fr']).default('en'),
 })
 export type OAuthCompleteBody = z.infer<typeof OAuthCompleteBody>
+
+/** GET /api/users/{username}: any case; 404 for an unknown, banned or deleted account. */
+export const ProfileParams = z.strictObject({ username: z.string().min(1).max(64) })
+
+/** GET /api/users/{username} (US-05.3): public profile, the username in its display case. */
+export const ProfileResponse = z.strictObject({
+  username: z.string(),
+  bio: z.string().nullable(),
+  memberSince: z.iso.datetime(),
+})
+export type ProfileResponse = z.infer<typeof ProfileResponse>
