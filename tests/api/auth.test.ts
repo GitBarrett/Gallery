@@ -387,6 +387,27 @@ describe('sessions', () => {
     expect((await errorOf(expired)).details).toEqual({ field: 'token', reason: 'expired' })
   })
 
+  it('US-07.3 changes the password with the old one and revokes the other sessions only', async () => {
+    const credentials = await account()
+    const laptop = sessionCookie(await signin(credentials)).value
+    const current = sessionCookie(await signin(credentials)).value
+    const change = (body: { currentPassword: string; password: string }, cookie?: string) =>
+      fetch('/api/me/password', {
+        method: 'POST',
+        headers: { 'sec-fetch-site': 'same-origin', 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+        body: JSON.stringify(body),
+      })
+    const password = 'a brand new passphrase'
+    expect((await change({ currentPassword: credentials.password, password })).status).toBe(401)
+    const wrong = await change({ currentPassword: 'not the password', password }, current)
+    expect((await errorOf(wrong)).details).toEqual({ field: 'currentPassword', reason: 'wrong' })
+    expect((await me(laptop)).status).toBe(200)
+    expect((await change({ currentPassword: credentials.password, password }, current)).status).toBe(204)
+    expect((await me(laptop)).status).toBe(401)
+    expect((await me(current)).status).toBe(200)
+    expect((await signin({ email: credentials.email, password })).status).toBe(204)
+  })
+
   it('answers 401 without session and sets no cookie for a visitor', async () => {
     const response = await me()
     expect(response.status).toBe(401)

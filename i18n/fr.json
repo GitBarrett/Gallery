@@ -200,6 +200,15 @@
       "language": "Langue du site et des emails",
       "submit": "Enregistrer mon profil",
       "saved": "Profil enregistré."
+    },
+    "password": {
+      "title": "Mot de passe",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "submit": "Changer mon mot de passe",
+      "saved": "Mot de passe modifié. Vos autres appareils sont déconnectés.",
+      "wrong": "Ce n'est pas votre mot de passe actuel.",
+      "none": "Votre compte n'a pas encore de mot de passe : créez-en un avec « Mot de passe oublié ? » sur la page de connexion."
     }
   },
   "profile": {

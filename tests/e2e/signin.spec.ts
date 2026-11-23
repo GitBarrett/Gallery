@@ -171,6 +171,40 @@ test('US-05.1 US-05.2 US-05.4 the username changes in the settings, the former p
   await expect(page.getByRole('heading', { level: 1, name: renamed })).toBeVisible()
 })
 
+test('US-07.3 the password changes in the settings with the old one, the other devices are signed out', async ({
+  page,
+}) => {
+  const ash = await member(page)
+  await page.goto('/signin?redirect=/settings')
+  await signIn(page, ash)
+  const elsewhere = await page.evaluate(
+    async (body) =>
+      (
+        await fetch('/api/auth/signin', {
+          method: 'POST',
+          credentials: 'omit',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+      ).status,
+    { email: ash.email, password: ash.password },
+  )
+  expect(elsewhere).toBe(204)
+  await page.reload()
+  const devices = page.getByRole('region', { name: 'Devices' }).getByRole('listitem')
+  await expect.poll(() => devices.count()).toBeGreaterThan(1)
+
+  const password = `${ash.password} renewed`
+  await page.getByLabel('Current password').fill(ash.password)
+  await page.getByLabel('New password').fill(password)
+  await page.getByRole('button', { name: 'Change my password' }).click()
+  // Argon2id twice (old, new) on a preview Worker
+  await expect(page.getByText('Password changed. Your other devices are signed out.')).toBeVisible({ timeout: 15_000 })
+  created = { ...ash, password } // the next tests of this worker sign in with the new password
+  await expect(devices).toHaveCount(1)
+  await expect(devices).toContainText('This device')
+})
+
 test('US-07.1 the bio and the language are saved in the settings and shown at once', async ({ page }) => {
   const ash = await member(page)
   await page.goto('/signin?redirect=/settings')
