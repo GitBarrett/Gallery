@@ -97,6 +97,10 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Un seul build Nuxt par type de serveur (normal et preview) pour tous les tests `tests/api` au lieu d'un build par fichier ; E2E sur 2 workers en CI au lieu d'un.
   Tests : la CI elle-même (durées comparées dans la PR).
 
+- [x] **T-04d Déploiement de production à la demande** (dép. T-04c) — ajoutée le 23/11/2026
+  Production déployée à la demande (`workflow_dispatch`), plus à chaque fusion dans `main` (choix d'Adrien du 23/11/2026) ; smoke test réduit à son périmètre (`11-strategie-de-tests.md` § 7 : santé, accueil, cookie de session) au lieu de toute la suite E2E, que les previews exécutent déjà ; navigateurs Playwright mis en cache par version (`actions/cache`).
+  Tests : la CI elle-même, puis un déploiement de production manuel.
+
 - [x] **T-05a Base de données : socle** (dép. T-03a)
   Drizzle, conventions (UUID v7, `timestamptz`, `created_at`/`updated_at`, index), runner de migrations, tables transverses `outbox`, `processed_messages`, `site_settings`, `audit_log` (rôle base sans UPDATE/DELETE), `rate_limit_counters`, `donations` (flag désactivé), seed de base, transaction de test annulée.
   Tests : I (migration sur base vierge, rôle d'audit sans UPDATE/DELETE). Étape `ci` des migrations (`11-strategie-de-tests.md` § 7 : base vierge et copie du schéma de production).
