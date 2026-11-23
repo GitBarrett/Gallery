@@ -16,6 +16,7 @@ import {
   type ResetPasswordBody,
   type ChangePasswordBody,
   SessionsResponse,
+  SocialLinksBody,
   type SigninBody,
   type SignupBody,
   UsernameAvailabilityResponse,
@@ -90,6 +91,9 @@ export const api = {
   resetPassword: (body: ResetPasswordBody) => call('/api/auth/password/reset', z.unknown(), { method: 'POST', body }),
   // US-07.3: 400 VALIDATION_FAILED field currentPassword (wrong, none) or password, 429 after 5 wrong old passwords
   changePassword: (body: ChangePasswordBody) => call('/api/me/password', z.unknown(), { method: 'POST', body }),
+  // US-82: identifiers as stored; PUT replaces the list, 400 VALIDATION_FAILED field = the network, 429 after 20 / h
+  socialLinks: () => call('/api/me/social-links', SocialLinksBody),
+  setSocialLinks: (body: SocialLinksBody) => call('/api/me/social-links', z.unknown(), { method: 'PUT', body }),
   // public profile (US-05.3); 404 NOT_FOUND for an unknown, banned or deleted account
   profile: (username: string, fetch?: typeof $fetch) =>
     call(`/api/users/${encodeURIComponent(username)}`, ProfileResponse, {}, fetch),

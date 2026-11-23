@@ -86,6 +86,15 @@ export const ChangePasswordBody = z.strictObject({
 })
 export type ChangePasswordBody = z.infer<typeof ChangePasswordBody>
 
+/** PUT and GET /api/me/social-links (US-82.1–3): the whole list of identifiers, one per network at most. */
+export const SocialLinksBody = z.strictObject({
+  links: z
+    .array(z.strictObject({ platform: z.enum(SOCIAL_PLATFORMS), handle: z.string().max(200) }))
+    .max(SOCIAL_PLATFORMS.length)
+    .refine((links) => new Set(links.map((l) => l.platform)).size === links.length, 'One identifier per network'),
+})
+export type SocialLinksBody = z.infer<typeof SocialLinksBody>
+
 /** /auth/{provider} and its callback (US-02); Battle.net comes with T-15. */
 export const OAuthProviderParams = z.strictObject({ provider: z.enum(['google', 'battlenet']) })
 

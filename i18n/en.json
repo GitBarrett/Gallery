@@ -209,6 +209,15 @@
       "saved": "Password changed. Your other devices are signed out.",
       "wrong": "This is not your current password.",
       "none": "Your account has no password yet: set one with “Forgot password?” on the sign-in page."
+    },
+    "social": {
+      "title": "Social networks",
+      "text": "Your username only, for example luneblade for Twitch or {'@'}luneblade for YouTube; the full https:// address for your website. Leave a field empty to remove it.",
+      "format": "This is not a valid {network} username.",
+      "website": "Enter an https:// address, without an IP address or a link shortener, 200 characters at most.",
+      "insult": "This contains a word that is not allowed.",
+      "submit": "Save my social networks",
+      "saved": "Social networks saved."
     }
   },
   "profile": {

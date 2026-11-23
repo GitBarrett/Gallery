@@ -2,26 +2,17 @@
 // Social networks of a profile (US-82.4, 07-design.md § Réseaux sociaux): house monochrome icons under the bio, links
 // built by the server, opened apart without passing trust; Discord has no link, its username is copied.
 import type { ProfileResponse } from '~~/shared/contracts/auth'
+import type { SocialPlatform } from '~~/shared/domain/social-links'
+import { SOCIAL_NAMES } from './social-names'
 
 defineProps<{ links: ProfileResponse['socialLinks'] }>()
 const { t } = useI18n()
 const copied = ref(false)
 
-const NAMES = {
-  twitch: 'Twitch',
-  youtube: 'YouTube',
-  x: 'X',
-  bluesky: 'Bluesky',
-  instagram: 'Instagram',
-  tiktok: 'TikTok',
-  reddit: 'Reddit',
-  discord: 'Discord',
-  website: '',
-} as const
-const name = (platform: keyof typeof NAMES) => NAMES[platform] || t('profile.website')
+const name = (platform: SocialPlatform) => (platform === 'website' ? t('profile.website') : SOCIAL_NAMES[platform])
 
 // House glyphs on a 24 px grid, drawn with the stroke of the text (not the networks' official logos)
-const ICONS: Record<keyof typeof NAMES, string> = {
+const ICONS: Record<SocialPlatform, string> = {
   twitch: 'M5 3h15v11l-4 4h-4l-3 3v-3H5Z M11 8v4 M15 8v4',
   youtube: 'M3 7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3Z M10 9v6l5-3Z',
   x: 'M5 4l14 16 M19 4L5 20',

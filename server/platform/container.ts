@@ -24,6 +24,8 @@ import {
   usernameAvailability,
   resetPassword,
   changePassword,
+  getSocialLinks,
+  setSocialLinks,
   resolveSession,
   revokeOtherSessions,
   revokeSession,
@@ -63,6 +65,8 @@ export interface Container {
     forgotPassword: UseCase<typeof forgotPassword>
     resetPassword: UseCase<typeof resetPassword>
     changePassword: UseCase<typeof changePassword>
+    getSocialLinks: UseCase<typeof getSocialLinks>
+    setSocialLinks: UseCase<typeof setSocialLinks>
     getProfile: UseCase<typeof getProfile>
     updateProfile: UseCase<typeof updateProfile>
     changeUsername: UseCase<typeof changeUsername>
@@ -204,6 +208,9 @@ export function createContainer({
           limiter: dbRateLimiter(db(), ipHashKey(), clock),
           clock,
         })(cmd),
+      getSocialLinks: (cmd) => getSocialLinks({ repo: drizzleIdentityRepository(db()) })(cmd),
+      setSocialLinks: (cmd) =>
+        setSocialLinks({ uow: identityUow(), limiter: dbRateLimiter(db(), ipHashKey(), clock) })(cmd),
       startOAuth: (provider) => startOAuth(oauthProvider(provider), redirectUri(provider)),
       oauthCallback: (cmd) =>
         oauthCallback({

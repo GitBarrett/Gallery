@@ -138,7 +138,7 @@ Une ligne par groupe de routes de `03-architecture.md` § Inventaire ; le test d
 | `POST /api/auth/mfa/*` | 401 | 403 | 403 | — | 403 | ✓ | ✓ |
 | Compte : `GET/PATCH /api/me`, `/api/me/sessions*`, `email`, `password`, `oauth/*`, `terms/accept` (v1.x, T-70), `decisions`, `GET /api/me/photos`, `POST /api/me/deletion` | 401 | ✓ | ✓ | — | ✓ (PATCH bio : 403) | ✓ | ✓ (dernier admin : suppression 409) |
 | `POST /api/me/avatar-upload-url`, `avatar/complete` | 401 | 403 | ✓ | — | 403 | ✓ | ✓ |
-| `PUT /api/me/social-links` (sa propre ressource ; liens masqués sur le profil d'un compte sanctionné ou de moins de 7 jours, US-82.5) | 401 | ✓ | ✓ | — | ✓ | ✓ | ✓ |
+| `GET/PUT /api/me/social-links` (sa propre ressource ; liens masqués sur le profil d'un compte sanctionné ou de moins de 7 jours, US-82.5) | 401 | ✓ | ✓ | — | ✓ | ✓ | ✓ |
 | `POST /api/secrets/{slug}/attempt` (v1.x, T-73 ; flag désactivé ou aucune quête active → 404) | ✓ (indice affiché, progression non enregistrée, US-81.5) | ✓ | ✓ | — | ✓ | ✓ | ✓ |
 | `GET /api/secrets/{slug}/hall` (v1.x, T-73) | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ |
 | Capture non publiée : `GET /api/photos/{id}`, `/img/{id}/{w}?preview=1` | 404 | 404 | 404 | ✓ | ✓ | ✓ (MFA) | ✓ (MFA) |

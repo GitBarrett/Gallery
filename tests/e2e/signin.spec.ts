@@ -171,6 +171,26 @@ test('US-05.1 US-05.2 US-05.4 the username changes in the settings, the former p
   await expect(page.getByRole('heading', { level: 1, name: renamed })).toBeVisible()
 })
 
+test('US-82.1 US-82.2 US-82.5 the social networks are entered in the settings and kept there', async ({ page }) => {
+  const ash = await member(page)
+  await page.goto('/signin?redirect=/settings')
+  await signIn(page, ash)
+  const networks = page.getByRole('region', { name: 'Social networks' })
+  await networks.getByLabel('Twitch').fill('twitch.tv/luneblade')
+  await expect(networks.getByText('This is not a valid Twitch username.')).toBeVisible()
+  await networks.getByLabel('Twitch').fill('luneblade')
+  await networks.getByLabel('Website').fill('https://ash.example.com')
+  await networks.getByRole('button', { name: 'Save my social networks' }).click()
+  await expect(networks.getByText('Social networks saved.')).toBeVisible()
+  await page.reload()
+  await expect(networks.getByLabel('Twitch')).toHaveValue('luneblade')
+  await expect(networks.getByLabel('Website')).toHaveValue('https://ash.example.com')
+  // An account under 7 days old: no links on its profile yet (the display itself: tests/api/auth.test.ts)
+  await page.goto(`/u/${created!.username}`)
+  await expect(page.getByRole('heading', { level: 1, name: created!.username })).toBeVisible()
+  await expect(page.getByRole('link', { name: /^Twitch/ })).toHaveCount(0)
+})
+
 test('US-07.3 the password changes in the settings with the old one, the other devices are signed out', async ({
   page,
 }) => {
