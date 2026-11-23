@@ -26,6 +26,9 @@ import {
   changePassword,
   getSocialLinks,
   setSocialLinks,
+  getAccount,
+  requestEmailChange,
+  confirmEmailChange,
   resolveSession,
   revokeOtherSessions,
   revokeSession,
@@ -67,6 +70,9 @@ export interface Container {
     changePassword: UseCase<typeof changePassword>
     getSocialLinks: UseCase<typeof getSocialLinks>
     setSocialLinks: UseCase<typeof setSocialLinks>
+    getAccount: UseCase<typeof getAccount>
+    requestEmailChange: UseCase<typeof requestEmailChange>
+    confirmEmailChange: UseCase<typeof confirmEmailChange>
     getProfile: UseCase<typeof getProfile>
     updateProfile: UseCase<typeof updateProfile>
     changeUsername: UseCase<typeof changeUsername>
@@ -211,6 +217,15 @@ export function createContainer({
       getSocialLinks: (cmd) => getSocialLinks({ repo: drizzleIdentityRepository(db()) })(cmd),
       setSocialLinks: (cmd) =>
         setSocialLinks({ uow: identityUow(), limiter: dbRateLimiter(db(), ipHashKey(), clock) })(cmd),
+      getAccount: (cmd) => getAccount({ repo: drizzleIdentityRepository(db()) })(cmd),
+      requestEmailChange: (cmd) =>
+        requestEmailChange({
+          repo: drizzleIdentityRepository(db()),
+          uow: identityUow(),
+          hasher: argon2idHasher(),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
+        })(cmd),
+      confirmEmailChange: (cmd) => confirmEmailChange({ uow: identityUow(), clock })(cmd),
       startOAuth: (provider) => startOAuth(oauthProvider(provider), redirectUri(provider)),
       oauthCallback: (cmd) =>
         oauthCallback({

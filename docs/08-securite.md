@@ -85,6 +85,7 @@ Analyse STRIDE par flux à mettre à jour à chaque nouvelle fonctionnalité exp
 | Bug report | cf. `02-specs-fonctionnelles.md` § 7 |
 | Changement de pseudo | 1 / 30 jours |
 | Réseaux sociaux du profil (`PUT /api/me/social-links`) | 20 / h / compte |
+| Changement d'email (`POST /api/me/email`, mot de passe faux compris) | 3 / h / compte |
 | Essai de quête secrète (v1.x) | `secrets_attempt_user` : 10 / min et 100 / jour / compte et par quête (`rate_limit_counters`) ; `secrets_attempt_ip` : 30 / min / IP (binding) |
 | Liste d'attente (mode invitation) | 3 / h / IP, Turnstile |
 | Codes TOTP et codes de secours | 5 échecs / 15 min → blocage 15 min du compte staff + alerte aux admins |
@@ -136,7 +137,7 @@ Une ligne par groupe de routes de `03-architecture.md` § Inventaire ; le test d
 | Auth sans session : `signup`, `signin`, `password/*`, `verify-email`, `email/confirm`, `deletion/cancel`, `GET /auth/*`, `oauth/pending`, `oauth/complete`, `POST /api/waitlist` | ✓ (Turnstile, § 8) | ✓ | ✓ | — | ✓ (banni : refusé) | ✓ | ✓ |
 | `signout`, `resend-verification`, `reauth` | 401 | ✓ | ✓ | — | ✓ | ✓ | ✓ |
 | `POST /api/auth/mfa/*` | 401 | 403 | 403 | — | 403 | ✓ | ✓ |
-| Compte : `GET/PATCH /api/me`, `/api/me/sessions*`, `email`, `password`, `oauth/*`, `terms/accept` (v1.x, T-70), `decisions`, `GET /api/me/photos`, `POST /api/me/deletion` | 401 | ✓ | ✓ | — | ✓ (PATCH bio : 403) | ✓ | ✓ (dernier admin : suppression 409) |
+| Compte : `GET/PATCH /api/me`, `GET /api/me/account`, `/api/me/sessions*`, `email`, `password`, `oauth/*`, `terms/accept` (v1.x, T-70), `decisions`, `GET /api/me/photos`, `POST /api/me/deletion` | 401 | ✓ | ✓ | — | ✓ (PATCH bio : 403) | ✓ | ✓ (dernier admin : suppression 409) |
 | `POST /api/me/avatar-upload-url`, `avatar/complete` | 401 | 403 | ✓ | — | 403 | ✓ | ✓ |
 | `GET/PUT /api/me/social-links` (sa propre ressource ; liens masqués sur le profil d'un compte sanctionné ou de moins de 7 jours, US-82.5) | 401 | ✓ | ✓ | — | ✓ | ✓ | ✓ |
 | `POST /api/secrets/{slug}/attempt` (v1.x, T-73 ; flag désactivé ou aucune quête active → 404) | ✓ (indice affiché, progression non enregistrée, US-81.5) | ✓ | ✓ | — | ✓ | ✓ | ✓ |

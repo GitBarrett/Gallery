@@ -44,6 +44,7 @@ describe('sendAccountEmail', () => {
         type: 'verify',
         tokenHash: await hashToken(token),
         expiresAt: new Date('2026-11-23T12:00:00Z'),
+        newEmail: null,
         usedAt: null,
       },
     ])
@@ -90,5 +91,22 @@ describe('sendAccountEmail', () => {
     const { send, sent } = await setup()
     await send({ template: 'verify', userId: 'gone' })
     expect(sent).toEqual([])
+  })
+
+  it('US-07.2 mails the change link to the new address, the token holding it, and the alert to the old one', async () => {
+    const { send, sent, tokens } = await setup('fr')
+    await send({ template: 'email_change', userId: 'ash', newEmail: 'ash.new@example.com' })
+    await send({ template: 'email_change_alert', userId: 'ash' })
+    expect(sent.map((m) => [m.to, m.subject])).toEqual([
+      ['ash.new@example.com', 'Confirmez votre nouvelle adresse email'],
+      ['ash@example.com', "Un changement d'email a été demandé"],
+    ])
+    const token = sent[0]!.text.match(/https:\/\/legendaryshots\.gg\/fr\/confirm-email#([\w-]{43})/)![1]!
+    expect(tokens[0]).toMatchObject({
+      type: 'email_change',
+      tokenHash: await hashToken(token),
+      newEmail: 'ash.new@example.com',
+      expiresAt: new Date('2026-11-23T12:00:00Z'),
+    })
   })
 })

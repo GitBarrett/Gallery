@@ -49,10 +49,10 @@ export function inMemoryIdentityRepository() {
     },
     async findRecipient(userId) {
       const user = users.find((u) => u.id === userId)
-      return user?.email ? { email: user.email, username: user.username, locale: user.locale } : null
+      return user ? { email: user.email, username: user.username, locale: user.locale } : null
     },
     async createEmailToken(token) {
-      tokens.push({ ...token, usedAt: null })
+      tokens.push({ ...token, newEmail: token.newEmail ?? null, usedAt: null })
     },
     async findEmailToken(tokenHash, type) {
       const token = tokens.find((t) => t.tokenHash === tokenHash && t.type === type)
@@ -69,6 +69,10 @@ export function inMemoryIdentityRepository() {
     async markEmailVerified(userId, at) {
       const user = users.find((u) => u.id === userId)
       if (user) user.emailVerifiedAt = at
+    },
+    async setEmail(userId, email, verifiedAt) {
+      const user = users.find((u) => u.id === userId)
+      if (user) Object.assign(user, { email, emailVerifiedAt: verifiedAt })
     },
     async setPasswordHash(userId, passwordHash) {
       const user = users.find((u) => u.id === userId)

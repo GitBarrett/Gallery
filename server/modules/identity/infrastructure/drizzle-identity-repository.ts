@@ -45,7 +45,7 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .select({ email: users.email, username: users.username, locale: users.locale })
       .from(users)
       .where(eq(users.id, userId))
-    return row?.email ? { email: row.email, username: row.username, locale: row.locale as Locale } : null
+    return row ? { ...row, locale: row.locale as Locale } : null
   },
   async createEmailToken(token) {
     await db.insert(emailTokens).values(token)
@@ -59,6 +59,7 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
         tokenHash: emailTokens.tokenHash,
         expiresAt: emailTokens.expiresAt,
         usedAt: emailTokens.usedAt,
+        newEmail: emailTokens.newEmail,
       })
       .from(emailTokens)
       .where(and(eq(emailTokens.tokenHash, tokenHash), eq(emailTokens.type, type)))
@@ -80,6 +81,9 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
   },
   async markEmailVerified(userId, at) {
     await db.update(users).set({ emailVerifiedAt: at }).where(eq(users.id, userId))
+  },
+  async setEmail(userId, email, verifiedAt) {
+    await db.update(users).set({ email, emailVerifiedAt: verifiedAt }).where(eq(users.id, userId))
   },
   async setPasswordHash(userId, passwordHash) {
     await db.update(users).set({ passwordHash }).where(eq(users.id, userId))

@@ -154,6 +154,16 @@
       "sent": "Nouveau lien envoyé. Consultez votre boîte mail.",
       "signIn": "Se connecter pour recevoir un nouveau lien"
     },
+    "confirmEmail": {
+      "title": "Confirmez votre nouvelle adresse",
+      "checking": "Vérification du lien…",
+      "done": "Votre nouvelle adresse est confirmée. Utilisez-la désormais pour vous connecter.",
+      "expired": "Ce lien a expiré. Les liens sont valables 24 heures : demandez-en un nouveau dans vos réglages.",
+      "invalid": "Ce lien n'est pas valable : il a déjà servi, a été remplacé par un plus récent ou est incomplet.",
+      "taken": "Cette adresse est désormais utilisée par un autre compte. Choisissez-en une autre dans vos réglages.",
+      "settings": "Aller à mes réglages",
+      "signIn": "Se connecter"
+    },
     "oauth": {
       "battlenet": "Continuer avec Battle.net",
       "google": "Continuer avec Google",
@@ -209,6 +219,15 @@
       "saved": "Mot de passe modifié. Vos autres appareils sont déconnectés.",
       "wrong": "Ce n'est pas votre mot de passe actuel.",
       "none": "Votre compte n'a pas encore de mot de passe : créez-en un avec « Mot de passe oublié ? » sur la page de connexion."
+    },
+    "email": {
+      "title": "Email",
+      "current": "Votre email : {email}",
+      "none": "Votre compte n'a pas encore d'email : ajoutez-en un pour vous connecter avec un mot de passe et recevoir nos emails.",
+      "new": "Nouvel email",
+      "submit": "Changer mon email",
+      "sent": "Lien envoyé à {email} : ouvrez-le sous 24 heures. D'ici là, votre email reste inchangé.",
+      "same": "C'est déjà votre email."
     },
     "social": {
       "title": "Réseaux sociaux",

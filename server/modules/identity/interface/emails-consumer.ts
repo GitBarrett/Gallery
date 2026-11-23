@@ -10,8 +10,17 @@ import { sendAccountEmail } from '../application/send-account-email'
 import { drizzleIdentityRepository } from '../infrastructure/drizzle-identity-repository'
 
 const AccountEmail = z.strictObject({
-  template: z.enum(['verify', 'reset', 'password_changed', 'account_exists', 'signin_locked']),
+  template: z.enum([
+    'verify',
+    'reset',
+    'password_changed',
+    'account_exists',
+    'signin_locked',
+    'email_change',
+    'email_change_alert',
+  ]),
   userId: z.uuid(),
+  newEmail: z.email().max(254).optional(),
 })
 
 /** Consumer of the `emails` queue: one email per event, even when Queues delivers it twice. */

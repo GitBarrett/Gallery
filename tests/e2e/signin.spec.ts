@@ -4,7 +4,7 @@ import { expect, test } from './fixtures'
 // Sign-in and sign-out screens (T-12b). They need the preview's test routes (invitation, counters: ADR-013) and run
 // on desktop Chromium only: the sign-up and sign-in limits are shared by the CI address, and WebKit in Playwright
 // runs no service worker.
-const testRoute = (page: Page, path: string, method: 'POST' | 'DELETE') =>
+const testRoute = (page: Page, path: string, method: 'GET' | 'POST' | 'DELETE') =>
   page.evaluate(
     async ([url, verb]) => {
       const r = await fetch(url!, { method: verb })
@@ -191,6 +191,36 @@ test('US-82.1 US-82.2 US-82.5 the social networks are entered in the settings an
   await expect(page.getByRole('link', { name: /^Twitch/ })).toHaveCount(0)
 })
 
+test('US-07.2 the email changes in the settings once the link sent to the new address is opened', async ({ page }) => {
+  const ash = await member(page)
+  await page.goto('/signin?redirect=/settings')
+  await signIn(page, ash)
+  const section = page.getByRole('region', { name: 'Email', exact: true })
+  await expect(section.getByText(`Your email: ${ash.email}`)).toBeVisible()
+  const email = `new.${ash.email}`
+  await section.getByLabel('New email').fill(email)
+  await section.getByLabel('Current password').fill(ash.password)
+  await section.getByRole('button', { name: 'Change my email' }).click()
+  await expect(section.getByText(`Link sent to ${email}`)).toBeVisible({ timeout: 15_000 }) // Argon2id on a preview
+  // The link of the preview's fake mailbox (Q50), sent by the `emails` queue
+  let token: string | undefined
+  await expect
+    .poll(
+      async () => {
+        const { body } = await testRoute(page, `/__test/mailbox?to=${encodeURIComponent(email)}`, 'GET')
+        token = body?.text.match(/\/confirm-email#([\w-]+)/)?.[1]
+        return token !== undefined
+      },
+      { timeout: 60_000 },
+    )
+    .toBe(true)
+  await page.goto(`/confirm-email#${token}`)
+  await expect(page.getByText('Your new email is confirmed.')).toBeVisible()
+  created = { ...ash, email } // the next tests of this worker sign in with the new email
+  await page.getByRole('link', { name: 'Go to my settings' }).click()
+  await expect(section.getByText(`Your email: ${email}`)).toBeVisible()
+})
+
 test('US-07.3 the password changes in the settings with the old one, the other devices are signed out', async ({
   page,
 }) => {
@@ -215,9 +245,10 @@ test('US-07.3 the password changes in the settings with the old one, the other d
   await expect.poll(() => devices.count()).toBeGreaterThan(1)
 
   const password = `${ash.password} renewed`
-  await page.getByLabel('Current password').fill(ash.password)
-  await page.getByLabel('New password').fill(password)
-  await page.getByRole('button', { name: 'Change my password' }).click()
+  const form = page.getByRole('region', { name: 'Password', exact: true })
+  await form.getByLabel('Current password').fill(ash.password)
+  await form.getByLabel('New password').fill(password)
+  await form.getByRole('button', { name: 'Change my password' }).click()
   // Argon2id twice (old, new) on a preview Worker
   await expect(page.getByText('Password changed. Your other devices are signed out.')).toBeVisible({ timeout: 15_000 })
   created = { ...ash, password } // the next tests of this worker sign in with the new password

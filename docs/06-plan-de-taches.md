@@ -255,9 +255,13 @@ T-17a (réglages du compte : bio, langue, mot de passe, réseaux sociaux) est d�
   `/settings` : réseaux sociaux (`PUT /api/me/social-links`, liste complète, validation par réseau, site web en `https://` seul, 20/h par compte).
   Stories : US-82.1–3. Tests : U, I, E (saisie puis affichage).
 
-- [ ] **T-17b Réglages du compte : email et comptes liés** (dép. T-17a, T-14)
-  Changement d'email avec confirmation (ancienne et nouvelle adresse), comptes liés (refus si plus aucun moyen de connexion).
-  Stories : US-07.2, US-07.4. Tests : U, I, E.
+- [x] **T-17b Réglages du compte : email** (dép. T-17a, T-14)
+  Changement d'email avec confirmation : lien à la nouvelle adresse, alerte à l'ancienne, mot de passe actuel exigé s'il existe ; ajout d'un premier email pour un compte Battle.net (Q55).
+  Stories : US-07.2. Tests : U, I, E.
+
+- [ ] **T-17e Réglages du compte : comptes liés** (dép. T-17a, T-14)
+  Comptes Google et Battle.net liés dans `/settings`, déliaison (`DELETE /api/me/oauth/{provider}`) refusée s'il ne resterait aucun moyen de connexion.
+  Stories : US-07.4. Tests : U, I, E.
 
 - [ ] **T-18a Autorisation déclarative** (dép. T-12a)
   Politiques d'autorisation déclarées par use case (refus par défaut), harnais de **matrice d'autorisation** généré depuis l'inventaire des routes (`08-securite.md` annexe B).
