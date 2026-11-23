@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { validatePassword, validateUsername } from './account-rules'
+import { validateBio, validatePassword, validateUsername } from './account-rules'
 
 describe('validateUsername', () => {
   it.each(['Ash', 'Ash_Barrett', 'night-elf-42', 'a'.repeat(24)])('US-05.1 accepts %s', (name) => {
@@ -58,5 +58,18 @@ describe('validatePassword', () => {
     [129, 'too_long'],
   ])('US-01.1 refuses %i characters', (length, problem) => {
     expect(validatePassword('p'.repeat(length))).toEqual({ ok: false, error: problem })
+  })
+})
+
+describe('validateBio', () => {
+  it('US-07.1 keeps a bio of up to 300 characters, trimmed, and gives null for an empty one', () => {
+    expect(validateBio('  Night elf hunter.  ')).toEqual({ ok: true, value: 'Night elf hunter.' })
+    expect(validateBio('🌙'.repeat(300))).toEqual({ ok: true, value: '🌙'.repeat(300) })
+    expect(validateBio('   ')).toEqual({ ok: true, value: null })
+  })
+
+  it('US-07.1 refuses a bio over 300 characters or with an insult', () => {
+    expect(validateBio('b'.repeat(301))).toEqual({ ok: false, error: 'too_long' })
+    expect(validateBio('Ask the bastard of Stormwind')).toEqual({ ok: false, error: 'insult' })
   })
 })

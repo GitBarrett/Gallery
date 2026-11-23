@@ -1,8 +1,9 @@
+import { validateBio } from '../../../../shared/domain/account-rules'
 import { err, ok, type Result } from '../../../../shared/domain/result'
 import { socialLink, type SocialPlatform } from '../../../../shared/domain/social-links'
 import type { Clock } from '../../../platform/clock'
-import type { IdentityError } from './email-tokens'
-import type { IdentityRepository } from './ports'
+import { invalid, type IdentityError, type IdentityResult } from './email-tokens'
+import type { IdentityRepository, Locale } from './ports'
 import { isEnded } from './sessions'
 
 export interface PublicProfile {
@@ -41,3 +42,22 @@ async function formerProfile(deps: { repo: IdentityRepository; clock: Clock }, u
   const current = owner ? await deps.repo.findUsername(owner) : null
   return current ? deps.repo.findProfile(current.username) : null
 }
+
+/**
+ * Bio and language of the signed-in member (US-07.1), saved at once; a field left out keeps its value. A suspended
+ * member may not change their bio (08-securite.md annexe B), only their language.
+ */
+export const updateProfile =
+  (deps: { repo: IdentityRepository }) =>
+  async (cmd: { actor: { id: string; status: string }; bio?: string; locale?: Locale }): Promise<IdentityResult> => {
+    if (cmd.bio !== undefined && cmd.actor.status !== 'active') return err({ kind: 'forbidden', reason: 'suspended' })
+    const fields: { bio?: string | null; locale?: Locale } = {}
+    if (cmd.locale) fields.locale = cmd.locale
+    if (cmd.bio !== undefined) {
+      const bio = validateBio(cmd.bio)
+      if (!bio.ok) return err(invalid('bio', bio.error))
+      fields.bio = bio.value
+    }
+    await deps.repo.updateProfile(cmd.actor.id, fields)
+    return ok(undefined)
+  }

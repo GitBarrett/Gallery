@@ -188,6 +188,18 @@
       "revoke": "Déconnecter",
       "revokeLabel": "Déconnecter {device}",
       "revokeOthers": "Déconnecter tous les autres appareils"
+    },
+    "profile": {
+      "title": "Profil",
+      "bio": {
+        "label": "Bio",
+        "hint": "{count} / 300 caractères, affichée sur votre profil.",
+        "too_long": "Votre bio doit faire 300 caractères au plus.",
+        "insult": "Votre bio contient un mot interdit."
+      },
+      "language": "Langue du site et des emails",
+      "submit": "Enregistrer mon profil",
+      "saved": "Profil enregistré."
     }
   },
   "profile": {

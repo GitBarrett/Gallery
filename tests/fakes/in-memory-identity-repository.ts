@@ -89,6 +89,10 @@ export function inMemoryIdentityRepository() {
           }
         : null
     },
+    async updateProfile(userId, fields) {
+      const user = users.find((u) => u.id === userId)
+      if (user) Object.assign(user, fields)
+    },
     async setSocialLinks(userId, links) {
       socials = [...socials.filter((l) => l.userId !== userId), ...links.map((link) => ({ userId, ...link }))]
     },

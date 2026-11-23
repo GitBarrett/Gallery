@@ -31,6 +31,16 @@ export function validateUsername(name: string): Result<string, UsernameProblem> 
 /** Insult filter of usernames, also applied to the identifiers of social networks (US-82.2). */
 export const hasInsult = (text: string) => INSULTS.some((word) => text.toLowerCase().includes(word))
 
+export type BioProblem = 'too_long' | 'insult'
+
+/** Bio of the profile (US-07.1): plain text, trimmed, up to 300 characters; empty means no bio. */
+export function validateBio(bio: string): Result<string | null, BioProblem> {
+  const trimmed = bio.trim()
+  if ([...trimmed].length > 300) return err('too_long') // code points, like the password
+  if (hasInsult(trimmed)) return err('insult')
+  return ok(trimmed || null)
+}
+
 export function validatePassword(password: string): Result<string, PasswordProblem> {
   const length = [...password].length // code points: an emoji counts as one character
   if (length < 10) return err('too_short')

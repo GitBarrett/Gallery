@@ -167,3 +167,16 @@ test('US-05.1 US-05.2 US-05.4 the username changes in the settings, the former p
   await expect(page).toHaveURL(`/u/${renamed}`)
   await expect(page.getByRole('heading', { level: 1, name: renamed })).toBeVisible()
 })
+
+test('US-07.1 the bio and the language are saved in the settings and shown at once', async ({ page }) => {
+  const ash = await member(page)
+  await page.goto('/signin?redirect=/settings')
+  await signIn(page, ash)
+  await page.getByRole('textbox', { name: 'Bio' }).fill('Moonwell watcher, Night elf hunter.')
+  await page.getByRole('radio', { name: 'Français' }).check()
+  await page.getByRole('button', { name: 'Save my profile' }).click()
+  await expect(page).toHaveURL('/fr/settings') // the site switches to the chosen language
+  await expect(page.getByRole('heading', { level: 1, name: 'Réglages' })).toBeVisible()
+  await page.goto(`/fr/u/${created!.username}`)
+  await expect(page.getByText('Moonwell watcher, Night elf hunter.')).toBeVisible()
+})

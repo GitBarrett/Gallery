@@ -103,3 +103,33 @@ describe('GET /api/usernames/{name}/availability', () => {
     expect(await availability(name())).toEqual({ available: true })
   })
 })
+
+describe('PATCH /api/me (bio and language)', () => {
+  const update = (cookie: string, body: object) =>
+    fetch('/api/me', { method: 'PATCH', headers: headers(cookie), body: JSON.stringify(body) })
+
+  it('US-07.1 saves the bio and the language, the profile shows the bio at once', async () => {
+    const { cookie, username } = await member()
+    expect((await update(cookie, { bio: ' Moonwell watcher. ', locale: 'fr' })).status).toBe(200)
+    expect((await (await fetch(`/api/users/${username}`)).json()).bio).toBe('Moonwell watcher.')
+    const [row] = await db.select({ locale: users.locale }).from(users).where(eq(users.username, username))
+    expect(row?.locale).toBe('fr')
+  })
+
+  it('US-07.1 refuses a bio over 300 characters or with an insult, an empty body, and a visitor', async () => {
+    const { cookie } = await member()
+    const long = await update(cookie, { bio: 'b'.repeat(301) })
+    expect(long.status).toBe(400)
+    expect((await errorOf(long)).details).toMatchObject({ field: 'bio', reason: 'too_long' })
+    expect((await errorOf(await update(cookie, { bio: 'the bastard' }))).details).toMatchObject({ reason: 'insult' })
+    expect((await update(cookie, {})).status).toBe(400)
+    expect((await update('', { bio: 'Hello' })).status).toBe(401)
+  })
+
+  it('US-07.1 answers 403 to the bio of a suspended member, who may still change their language', async () => {
+    const { cookie, username } = await member()
+    await db.update(users).set({ status: 'suspended' }).where(eq(users.username, username))
+    expect((await update(cookie, { bio: 'Hello' })).status).toBe(403)
+    expect((await update(cookie, { locale: 'fr' })).status).toBe(200)
+  })
+})

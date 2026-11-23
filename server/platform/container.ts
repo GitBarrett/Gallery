@@ -16,6 +16,7 @@ import {
   forgotPassword,
   changeUsername,
   getProfile,
+  updateProfile,
   hibpBreachChecker,
   joinWaitlist,
   listSessions,
@@ -61,6 +62,7 @@ export interface Container {
     forgotPassword: UseCase<typeof forgotPassword>
     resetPassword: UseCase<typeof resetPassword>
     getProfile: UseCase<typeof getProfile>
+    updateProfile: UseCase<typeof updateProfile>
     changeUsername: UseCase<typeof changeUsername>
     usernameAvailability: UseCase<typeof usernameAvailability>
     startOAuth: (provider: OAuthProviderName) => ReturnType<typeof startOAuth>
@@ -170,6 +172,7 @@ export function createContainer({
       revokeSession: (cmd) => revokeSession({ repo: drizzleIdentityRepository(db()), clock })(cmd),
       revokeOtherSessions: (cmd) => revokeOtherSessions({ repo: drizzleIdentityRepository(db()), clock })(cmd),
       getProfile: (cmd) => getProfile({ repo: drizzleIdentityRepository(db()), clock })(cmd),
+      updateProfile: (cmd) => updateProfile({ repo: drizzleIdentityRepository(db()) })(cmd),
       changeUsername: (cmd) => changeUsername({ uow: identityUow(), clock })(cmd),
       usernameAvailability: (cmd) => usernameAvailability({ repo: drizzleIdentityRepository(db()), clock })(cmd),
       resendVerification: (cmd) =>
