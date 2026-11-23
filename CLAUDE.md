@@ -9,7 +9,7 @@ Site communautaire de galeries de captures d'écran World of Warcraft (focus WoW
 3. **TDD** : écrire d'abord les tests des critères d'acceptation, nommés avec leur identifiant (`US-30.2 …`), selon `docs/11-strategie-de-tests.md` ; les voir échouer, puis coder.
 4. Une tâche = une branche `feat/T-xx-slug` = une pull request (≈ 400 lignes applicatives max). Ne jamais mélanger plusieurs tâches.
 5. Avant d'ouvrir la PR : en local, `pnpm lint`, `pnpm typecheck` et les tests touchés seulement (fichiers ciblés ou `vitest related`) ; le job `checks` de la CI (`pnpm check` complet : architecture, couverture, traçabilité) fait foi et doit être vert avant la fusion. Checklist sécurité (`08-securite.md` § 10) cochée dans la description, tâche cochée dans le plan.
-6. Toute décision non couverte par les specs : ne pas improviser. Ajouter une question dans `docs/09-questions-ouvertes.md`, appliquer l'option la plus simple et réversible, et le signaler dans la PR.
+6. Toute décision non couverte par les specs : ne pas improviser. Ajouter une question dans `docs/questions/Qnn-slug.md` (une par fichier ; Q1 à Q61 dans `docs/09-questions-ouvertes.md`), appliquer l'option la plus simple et réversible, et le signaler dans la PR.
 7. Toute décision d'architecture nouvelle : créer un ADR dans `docs/adr/`.
 8. Phase **T-00 (prototypes)** avant T-02 : scripts jetables dans `prototypes/`, aucun code applicatif, résultats consignés en ADR.
 9. Tâche marquée **action humaine** : préparer tout ce qui est possible, documenter les étapes pour Adrien dans la PR, et s'arrêter.
@@ -72,7 +72,7 @@ docs/             specs (ce dossier fait foi)
 - `pnpm check` — lint + typecheck + `arch` + `test:coverage` (unitaires, composants et intégration, base dans `.env.test` en local) + `test:trace`
 - `pnpm test` — Vitest unitaires et composants
 - `pnpm test:int` — Vitest intégration (Postgres local)
-- `pnpm test:e2e` — Playwright (desktop, iPhone 14, Pixel 7)
+- `pnpm test:e2e` — Playwright (desktop, iPhone 14, Pixel 7 ; sur les previews : desktop seul, mobiles avec l'étiquette `e2e-mobile`)
 - `pnpm test:trace` — vérifie que chaque AC [MVP] a un test
 - `pnpm arch` — dependency-cruiser
 - `pnpm storybook` — design system et playbook (ADR-019) ; publiés sous `/storybook/` en production et sur les previews
@@ -91,7 +91,7 @@ docs/             specs (ce dossier fait foi)
 | docs/06-plan-de-taches.md | Plan de tâches ordonné, DoR, DoD (à exécuter) |
 | docs/07-design.md | Design, identité visuelle, responsive, contraste ; maquettes dans `docs/design/` ; composants et playbook dans Storybook (`/storybook/`, ADR-019) |
 | docs/08-securite.md | Sécurité de bout en bout, matrice d'autorisation (fait foi pour la sécurité) |
-| docs/09-questions-ouvertes.md | Points à trancher |
+| docs/09-questions-ouvertes.md | Points à trancher Q1 à Q61 ; à partir de Q62 : `docs/questions/` (un fichier par question) |
 | docs/10-clean-architecture.md | Couches, règles de dépendance, front et back, contrôles |
 | docs/11-strategie-de-tests.md | Pyramide, couverture, fakes, E2E, CI |
 | docs/adr/ | Décisions d'architecture |

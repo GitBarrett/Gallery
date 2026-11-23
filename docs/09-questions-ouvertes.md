@@ -1,5 +1,7 @@
 # 09 — Questions ouvertes
 
+Q1 à Q61 ci-dessous ; à partir de Q62, une question par fichier dans [`questions/`](questions/README.md).
+
 | # | Question | Option par défaut (simple, réversible) | Statut |
 |---|---|---|---|
 | Q1 | Direction de design | A — Nuit d'Azeroth + kit d'identité WoW | Tranché — Adrien, 16/11/2026 |
