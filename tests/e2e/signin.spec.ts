@@ -159,7 +159,7 @@ test('US-05.1 US-05.2 US-05.4 the username changes in the settings, the former p
   await field.fill(renamed)
   await expect(page.getByText(`“${renamed}” is available`)).toBeVisible()
   await page.getByRole('button', { name: 'Change my username' }).click()
-  await expect(page.getByRole('status')).toHaveText(/Username changed/)
+  await expect(page.getByText(/^Username changed/)).toBeVisible() // the toast region is a status too
   const former = ash.username
   created = { ...ash, username: renamed } // the next tests of this worker sign in as the renamed member
 
