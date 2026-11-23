@@ -4,6 +4,8 @@ name: preview-deploy
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    # Docs-only pull requests change nothing a preview would test (the cleanup tolerates a missing preview)
+    paths-ignore: ['docs/**', '**/*.md']
 
 concurrency:
   group: preview-${{ github.event.pull_request.number }}
