@@ -256,7 +256,7 @@ Validation au démarrage par un schéma Zod (`server/config.ts`) : variable manq
 ## Environnements
 | Env | Hébergement | Base | Données |
 |---|---|---|---|
-| local | `wrangler dev` (Miniflare : R2, Queues, API Cache locaux) | branche Neon `dev-{prénom}` ou Postgres Docker | seed de démo (`pnpm db:seed`) |
+| local | `pnpm dev` (`nuxt dev`, fournisseurs factices et routes de test ; ni Queues ni R2 : les emails ne partent pas) | PostgreSQL 18 dans WSL (`scripts/local-postgres.sh`) : base `ls_dev`, et `ls_test` pour les tests d'intégration (T-04e) | compte de test et invitation (`pnpm db:seed`) |
 | preview | Worker `ls-pr-{n}` par pull request (ADR-013) | branche Neon `pr-{n}` créée par la CI depuis la branche modèle `preview-template`, sans données (ADR-018), via sa propre configuration Hyperdrive (ADR-016) | seed de démo + fixtures E2E |
 | production | Worker `main` | branche Neon principale | réelles |
 

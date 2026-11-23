@@ -7,6 +7,7 @@
     "node": ">=22.21"
   },
   "scripts": {
+    "predev": "node scripts/local-postgres-up.mjs",
     "dev": "nuxt dev",
     "build": "nuxt build",
     "postinstall": "nuxt prepare",
@@ -16,13 +17,17 @@
     "typecheck": "nuxt typecheck",
     "test": "vitest run --project unit --project component",
     "test:coverage": "vitest run --coverage",
+    "pretest:int": "node scripts/local-postgres-up.mjs",
     "test:int": "vitest run --project integration",
     "test:e2e": "playwright test",
     "test:trace": "node scripts/test-trace.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm arch && pnpm test:coverage && pnpm test:trace",
     "arch": "depcruise app server shared --config .dependency-cruiser.cjs",
     "db:generate": "drizzle-kit generate",
+    "predb:migrate": "node scripts/local-postgres-up.mjs",
     "db:migrate": "node scripts/database.mjs migrate",
+    "predb:seed": "node scripts/local-postgres-up.mjs",
+    "db:seed": "node scripts/seed.mjs",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build --quiet"
   },

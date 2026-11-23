@@ -2,7 +2,7 @@ import { createDb } from '../../db/client'
 import { betaInvites } from '../../db/schema'
 import type { Bindings } from '../../platform/bindings'
 
-// Preview only (excluded from other builds, nuxt.config.ts): a 14-day beta invitation for the E2E sign-ups,
+// Previews and `nuxt dev` only (excluded from other builds, nuxt.config.ts): a 14-day beta invitation for the E2E sign-ups,
 // until the admin sends them (T-53c). Returns the token of the link /signup?invite=<token>.
 export default defineEventHandler(async (event) => {
   const env = (event.context.cloudflare?.env ?? {}) as Bindings

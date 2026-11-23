@@ -22,7 +22,7 @@ export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook('request', (event) => {
     const env: Bindings = event.context.cloudflare?.env ?? {}
     readSettings ??= settingsReader({
-      repository: drizzleSettingsRepository(env.HYPERDRIVE?.connectionString),
+      repository: drizzleSettingsRepository(env.HYPERDRIVE?.connectionString ?? process.env.DATABASE_URL),
       clock: systemClock,
     })
     // Node test server and local runs without Hyperdrive: the database of DATABASE_URL
