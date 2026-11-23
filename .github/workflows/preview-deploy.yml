@@ -3,7 +3,8 @@ name: preview-deploy
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    # labeled: adding `e2e-mobile` reruns the preview with the iPhone 14 and Pixel 7 projects
+    types: [opened, synchronize, reopened, labeled]
     # Docs-only pull requests change nothing a preview would test (the cleanup tolerates a missing preview)
     paths-ignore: ['docs/**', '**/*.md']
 
@@ -17,9 +18,16 @@ permissions:
 
 jobs:
   deploy:
-    # No preview for Dependabot: GitHub does not pass it the secrets; the pull request CI still applies
-    if: github.actor != 'dependabot[bot]'
+    # No preview for Dependabot: GitHub does not pass it the secrets; the pull request CI still applies. Another
+    # label than `e2e-mobile` changes nothing to test.
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (github.event.action != 'labeled' || github.event.label.name == 'e2e-mobile')
     runs-on: ubuntu-latest
+    env:
+      # Desktop only by default (23/11/2026, a preview spent 13 min installing the system packages of WebKit);
+      # the `e2e-mobile` label adds iPhone 14 (WebKit) and Pixel 7, for the tasks that change the mobile layout
+      MOBILE: ${{ contains(github.event.pull_request.labels.*.name, 'e2e-mobile') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
@@ -47,7 +55,8 @@ jobs:
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
       # Preview tests (T-04b): the Access token is only sent to the preview's domain (Playwright fixture,
       # scripts/lighthouse.mjs), never to third parties
-      # Browsers downloaded once per Playwright version (T-04d); their system packages still install at each run
+      # Browsers downloaded once per Playwright version (T-04d); their system packages still install at each run.
+      # Chromium alone shares the key of deploy-production, saved on main, which every pull request can read.
       - name: Playwright version
         id: playwright
         run: echo "version=$(pnpm exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
@@ -55,11 +64,11 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium-webkit
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ env.MOBILE == 'true' && 'chromium-webkit' || 'chromium' }}
       - name: Install the browsers
-        run: pnpm exec playwright install --with-deps chromium webkit
-      - name: End-to-end tests (desktop, iPhone 14, Pixel 7)
-        run: pnpm test:e2e
+        run: pnpm exec playwright install --with-deps chromium ${{ env.MOBILE == 'true' && 'webkit' || '' }}
+      - name: End-to-end tests (desktop; iPhone 14 and Pixel 7 with the e2e-mobile label)
+        run: pnpm test:e2e ${{ env.MOBILE != 'true' && '--project=desktop' || '' }}
         env:
           CI: true
           BASE_URL: ${{ steps.preview.outputs.url }}

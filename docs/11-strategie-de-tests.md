@@ -90,7 +90,7 @@ Chaque parcours vérifie aussi l'accessibilité de chaque page visitée avec `@a
 | Vitest intégration (Postgres de CI, Miniflare) | chaque PR | oui |
 | Migrations : application sur base vierge **et** sur copie du schéma de production, puis rollback du code précédent compatible (expand/contract) | chaque PR | oui |
 | Déploiement preview (ADR-013 : Worker, Queues, branche Neon, préfixe R2, seed) ; suppression de toutes ces ressources à la fermeture de la PR, balayage hebdomadaire des orphelins | chaque PR | oui |
-| Playwright E2E (desktop, iPhone 14, Pixel 7) sur la preview, authentifié auprès de Cloudflare Access par jeton de service | chaque PR | oui |
+| Playwright E2E sur la preview, authentifié auprès de Cloudflare Access par jeton de service : desktop seul par défaut ; iPhone 14 et Pixel 7 en plus avec l'étiquette `e2e-mobile`, à poser sur toute PR qui touche la mise en page mobile, la PWA ou les gestes (23/11/2026 : les paquets système de WebKit pouvaient prendre 13 min à s'installer) | chaque PR | oui |
 | Vérification de l'artefact de production : aucune route `/__test`, aucun fournisseur factice | chaque PR | oui |
 | Lighthouse CI (home, PLP, PDP) | chaque PR | oui (seuils US-68) |
 | Semgrep CE (à la place de CodeQL, Q26), `pnpm audit --prod` | chaque PR | oui (Semgrep : toute alerte ; audit : haute/critique) |

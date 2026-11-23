@@ -11,7 +11,7 @@ Read: its entry and dependencies in docs/06-plan-de-taches.md (plus the DoR/DoD 
 rules), the stories and acceptance criteria it cites in docs/04-user-stories.md, and only the
 relevant sections of docs/03-architecture.md, 07-design.md (UI tasks), 08-securite.md,
 10-clean-architecture.md, 11-strategie-de-tests.md, the ADRs in docs/adr/ it touches, and open
-questions in docs/09-questions-ouvertes.md that concern it.
+questions that concern it (Q1–Q61 in docs/09-questions-ouvertes.md, then one file per question in docs/questions/).
 
 Reply in English, at most 60 lines:
 1. Goal (2 lines) and whether its dependencies are checked in the plan.
