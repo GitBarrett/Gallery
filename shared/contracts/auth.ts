@@ -79,7 +79,7 @@ export const ResetPasswordBody = z.strictObject({
 export type ResetPasswordBody = z.infer<typeof ResetPasswordBody>
 
 /** /auth/{provider} and its callback (US-02); Battle.net comes with T-15. */
-export const OAuthProviderParams = z.strictObject({ provider: z.enum(['google']) })
+export const OAuthProviderParams = z.strictObject({ provider: z.enum(['google', 'battlenet']) })
 
 /** GET /auth/{provider}: language of the pages to come back to, invitation of the beta (US-56.4). */
 export const OAuthStartQuery = z.strictObject({
@@ -96,7 +96,7 @@ export const OAuthCallbackQuery = z.object({
 
 /** GET /api/auth/oauth/pending: the identity waiting for its account (US-02.1) or for the link (US-02.3). */
 export const OAuthPendingResponse = z.strictObject({
-  provider: z.enum(['google']),
+  provider: z.enum(['google', 'battlenet']),
   email: z.string().nullable(),
   emailTaken: z.boolean(),
 })

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fakeOAuthProvider, googleOAuthProvider } from './oauth-providers'
+import { battlenetOAuthProvider, fakeOAuthProvider, googleOAuthProvider } from './oauth-providers'
 
 const redirectUri = 'https://legendaryshots.gg/auth/google/callback'
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status })
@@ -63,6 +63,57 @@ describe('googleOAuthProvider', () => {
     await expect(
       google({ email: 'x' }).provider.identity({ code: 'c', codeVerifier: 'v', redirectUri }),
     ).rejects.toThrow()
+  })
+})
+
+describe('battlenetOAuthProvider', () => {
+  const bnetRedirect = 'https://legendaryshots.gg/auth/battlenet/callback'
+  function battlenet(userinfo: unknown, tokenStatus = 200) {
+    const fetch = vi.fn(async (url: string, _init?: RequestInit) =>
+      url.endsWith('/token') ? json(tokenStatus, { access_token: 'at', token_type: 'bearer' }) : json(200, userinfo),
+    )
+    return { fetch, provider: battlenetOAuthProvider({ clientId: 'cid', clientSecret: 'csecret', fetch }) }
+  }
+
+  it('US-02.6 authorizes on the global host oauth.battle.net with the state only', () => {
+    const url = new URL(
+      battlenet({}).provider.authorizationUrl({ state: 'st', codeChallenge: 'ch', redirectUri: bnetRedirect }),
+    )
+    expect(url.origin + url.pathname).toBe('https://oauth.battle.net/authorize')
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      client_id: 'cid',
+      redirect_uri: bnetRedirect,
+      response_type: 'code',
+      scope: 'openid',
+      state: 'st',
+    })
+  })
+
+  it('US-02.6 exchanges the code on the global host and returns no email', async () => {
+    const { fetch, provider } = battlenet({ sub: '98765', id: 98765, battletag: 'Ash#1234' })
+    expect(await provider.identity({ code: 'c', codeVerifier: 'v', redirectUri: bnetRedirect })).toEqual({
+      subject: '98765',
+      email: null,
+    })
+    const [tokenUrl, init] = fetch.mock.calls[0]!
+    expect(tokenUrl).toBe('https://oauth.battle.net/token')
+    expect(Object.fromEntries(init!.body as URLSearchParams)).toEqual({
+      grant_type: 'authorization_code',
+      code: 'c',
+      redirect_uri: bnetRedirect,
+      client_id: 'cid',
+      client_secret: 'csecret',
+    })
+    expect(fetch.mock.calls[1]).toEqual([
+      'https://oauth.battle.net/userinfo',
+      expect.objectContaining({ headers: { Authorization: 'Bearer at' } }),
+    ])
+  })
+
+  it('US-02.5 rejects a refused code or an answer out of contract', async () => {
+    const args = { code: 'c', codeVerifier: 'v', redirectUri: bnetRedirect }
+    await expect(battlenet({}, 400).provider.identity(args)).rejects.toThrow('400')
+    await expect(battlenet({ battletag: 'Ash#1234' }).provider.identity(args)).rejects.toThrow()
   })
 })
 

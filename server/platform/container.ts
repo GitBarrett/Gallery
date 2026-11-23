@@ -4,6 +4,7 @@ import { dbRateLimiter } from '../db/rate-limiter'
 import { drizzleUnitOfWork } from '../db/unit-of-work'
 import {
   argon2idHasher,
+  battlenetOAuthProvider,
   completeOAuthSignup,
   fakeOAuthProvider,
   googleOAuthProvider,
@@ -107,11 +108,17 @@ export function createContainer({
   const oauthProvider = (provider: OAuthProviderName) =>
     config.fakeProviders
       ? fakeOAuthProvider(required(config.fakeOAuthConsentUrl, 'NUXT_FAKE_OAUTH_CONSENT_URL'), provider)
-      : googleOAuthProvider({
-          clientId: required(config.googleClientId, 'NUXT_OAUTH_GOOGLE_CLIENT_ID'),
-          clientSecret: required(config.googleClientSecret, 'NUXT_OAUTH_GOOGLE_CLIENT_SECRET'),
-          fetch: fetcher,
-        })
+      : provider === 'battlenet'
+        ? battlenetOAuthProvider({
+            clientId: required(config.battlenetClientId, 'NUXT_OAUTH_BATTLEDOTNET_CLIENT_ID'),
+            clientSecret: required(config.battlenetClientSecret, 'NUXT_OAUTH_BATTLEDOTNET_CLIENT_SECRET'),
+            fetch: fetcher,
+          })
+        : googleOAuthProvider({
+            clientId: required(config.googleClientId, 'NUXT_OAUTH_GOOGLE_CLIENT_ID'),
+            clientSecret: required(config.googleClientSecret, 'NUXT_OAUTH_GOOGLE_CLIENT_SECRET'),
+            fetch: fetcher,
+          })
   // Registered as is with the provider (08-securite.md § 3)
   const redirectUri = (provider: OAuthProviderName) => `${config.siteUrl}/auth/${provider}/callback`
 

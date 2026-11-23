@@ -61,8 +61,10 @@
   --color-logo-legendary: #ff8c1a;
   --shadow-logo: 0 2px 0 #2a1200, 0 0 18px rgb(255 128 0 / 35%);
 
-  /* Provider buttons: colors imposed by their brand guidelines (Google: white, text #1f1f1f) */
+  /* Provider buttons: colors of their brands (Google: white, text #1f1f1f; Battle.net: SignIn mockup) */
   --color-google-text: #1f1f1f;
+  --color-battlenet-bg: #0e2a4e;
+  --color-battlenet-border: #148eff;
 
   /* Typography: fonts self-hosted by @nuxt/fonts */
   --font-body: 'Inter', system-ui, sans-serif;

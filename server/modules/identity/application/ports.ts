@@ -45,7 +45,7 @@ export interface NewUser {
   termsVersion: string
 }
 
-export type OAuthProviderName = 'google'
+export type OAuthProviderName = 'google' | 'battlenet'
 
 /** Identity given by an OAuth provider; `email` only when the provider verified it (08-securite.md § 3). */
 export interface OAuthIdentity {

@@ -18,6 +18,7 @@ const db = createDb(process.env.DATABASE_URL!)
 
 afterAll(async () => {
   await db.delete(users).where(like(users.email, 'api.oauth.%@example.com'))
+  await db.delete(users).where(like(users.username, 'bn_%'))
   await db.delete(betaInvites).where(eq(betaInvites.emailHmac, 'api-oauth-test'))
   await db.$client.end()
 })
@@ -40,9 +41,9 @@ const errorOf = async (response: Response) => ErrorResponse.parse(await response
 
 const get = (path: string, cookie = '') => fetch(path, { redirect: 'manual', headers: cookie ? { cookie } : {} })
 
-/** /auth/google: state and cookie of a new flow. */
-async function start(query = '') {
-  const response = await get(`/auth/google${query}`)
+/** /auth/{provider}: state and cookie of a new flow. */
+async function start(query = '', provider = 'google') {
+  const response = await get(`/auth/${provider}${query}`)
   const location = new URL(response.headers.get('location') ?? '')
   return {
     response,
@@ -53,10 +54,10 @@ async function start(query = '') {
 }
 
 /** Start, consent with `email`, callback: the response of the callback and the flow cookie it leaves. */
-async function consent(email: string, query?: string) {
-  const flow = await start(query ?? `?invite=${await invite()}`)
+async function consent(email: string, query?: string, provider = 'google') {
+  const flow = await start(query ?? `?invite=${await invite()}`, provider)
   const response = await get(
-    `/auth/google/callback?${new URLSearchParams({ state: flow.state, code: email })}`,
+    `/auth/${provider}/callback?${new URLSearchParams({ state: flow.state, code: email })}`,
     flow.cookie,
   )
   return { response, flow, cookie: pair(cookieOf(response, '__Host-ls-oauth')) }
@@ -186,5 +187,25 @@ describe('OAuth Google (fake provider)', () => {
   it('answers 404 to the account step without an OAuth sign-in in progress', async () => {
     expect((await complete('', username())).status).toBe(404)
     expect((await get('/api/auth/oauth/pending')).status).toBe(404)
+  })
+})
+
+describe('OAuth Battle.net (fake provider)', () => {
+  it('US-02.6 creates an account without email, left unverified until an email is verified', async () => {
+    const code = `bnet-${crypto.randomUUID().slice(0, 8)}` // no "@": Battle.net gives no email
+    const first = await consent(code, undefined, 'battlenet')
+    expect(first.flow.location.pathname).toBe('/__test/oauth/battlenet')
+    expect(first.response.headers.get('location')).toBe('/oauth/complete')
+    const pending = await get('/api/auth/oauth/pending', first.cookie)
+    expect(await pending.json()).toEqual({ provider: 'battlenet', email: null, emailTaken: false })
+
+    const name = `bn_${crypto.randomUUID().slice(0, 8)}`
+    const done = await complete(first.cookie, name)
+    expect(done.status).toBe(204)
+    const session = pair(cookieOf(done, '__Host-ls-session'))
+    expect(await (await get('/api/me', session)).json()).toMatchObject({ username: name, emailVerified: false })
+    const [created] = await db.select().from(users).where(eq(users.username, name))
+    expect(created).toMatchObject({ email: null, emailVerifiedAt: null, passwordHash: null })
+    expect((await consent(code, '', 'battlenet')).response.headers.get('location')).toBe('/')
   })
 })
