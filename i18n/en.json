@@ -153,6 +153,18 @@
       "resend": "Resend",
       "sent": "New link sent. Check your inbox.",
       "signIn": "Sign in to get a new link"
+    },
+    "oauth": {
+      "google": "Continue with Google",
+      "or": "or with email",
+      "failed": "Signing in with Google did not work. Try again, or use your email.",
+      "linkNotice": "Sign in with your password to link Google to your account.",
+      "completeTitle": "Choose your username",
+      "completeText": "One last step to create your account. Your username is public.",
+      "expired": "This sign-in has expired or was already used. Start again.",
+      "linkTitle": "You already have an account",
+      "emailTaken": "An account already uses {email}. Sign in to it with your password to link Google: no new account is created.",
+      "signinToLink": "Sign in to link Google"
     }
   },
   "settings": {

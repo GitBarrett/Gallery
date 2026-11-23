@@ -1,7 +1,7 @@
 import { and, desc, eq, gt, isNull, lt, ne, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import type { Clock } from '../../../platform/clock'
-import { betaInvites, emailTokens, sessions, users, waitlistEntries } from '../../../db/schema'
+import { betaInvites, emailTokens, oauthAccounts, sessions, users, waitlistEntries } from '../../../db/schema'
 import type { Actor, EmailTokenType, IdentityRepository, Locale } from '../application/ports'
 
 const sameEmail = (email: string) => sql`lower(${users.email}) = lower(${email})`
@@ -25,7 +25,7 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
     // Do nothing on conflict: a unique violation would abort the caller's transaction
     const inserted = await db.insert(users).values(user).onConflictDoNothing().returning({ id: users.id })
     if (inserted.length) return 'created'
-    return (await this.findUserIdByEmail(user.email)) ? 'email_taken' : 'username_taken'
+    return user.email && (await this.findUserIdByEmail(user.email)) ? 'email_taken' : 'username_taken'
   },
   async findRecipient(userId) {
     const [row] = await db
@@ -77,6 +77,22 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .from(users)
       .where(sameEmail(email))
     return row ?? null
+  },
+  async findOAuthAccount(provider, subject) {
+    const [row] = await db
+      .select({ userId: users.id, status: users.status })
+      .from(oauthAccounts)
+      .innerJoin(users, eq(users.id, oauthAccounts.userId))
+      .where(and(eq(oauthAccounts.provider, provider), eq(oauthAccounts.providerUserId, subject)))
+    return row ?? null
+  },
+  async linkOAuthAccount({ id, userId, provider, subject }) {
+    const inserted = await db
+      .insert(oauthAccounts)
+      .values({ id, userId, provider, providerUserId: subject })
+      .onConflictDoNothing()
+      .returning({ id: oauthAccounts.id })
+    return inserted.length > 0
   },
   async createSession(session) {
     await db.insert(sessions).values(session)

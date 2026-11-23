@@ -1,5 +1,6 @@
+import { defineEventHandler as definePortableHandler, useSession } from 'nuxt/server'
 import type { H3Event } from 'h3'
-import type { Actor } from '../modules/identity'
+import type { Actor, PendingOAuth } from '../modules/identity'
 import { AppError } from './http-errors'
 
 declare module '#auth-utils' {
@@ -43,4 +44,34 @@ export async function requireContext(
   const ctx = await getContext(event)
   if (!ctx.actor) throw new AppError('UNAUTHENTICATED', 'Sign in required')
   return { ...ctx, actor: ctx.actor }
+}
+
+const OAUTH_COOKIE = '__Host-ls-oauth'
+// The H3 event as the event of nuxt/server, as nuxt-auth-utils does for the session cookie
+const portable = definePortableHandler((event) => event) as unknown as (
+  event: H3Event,
+) => Parameters<typeof useSession>[0]
+
+type OAuthFlow = {
+  state?: string
+  verifier?: string
+  locale?: 'en' | 'fr'
+  invite?: string
+  pending?: PendingOAuth
+}
+
+/**
+ * Sealed cookie of an OAuth sign-in in progress, 30 min (Q53): state and PKCE verifier until the callback, then
+ * the identity waiting for its account or its link. Lax: sent back on the provider's top-level redirect.
+ */
+export const oauthFlow = (event: H3Event) =>
+  useSession<OAuthFlow>(portable(event), {
+    name: OAUTH_COOKIE,
+    maxAge: 1800,
+    cookie: { httpOnly: true, secure: true, sameSite: 'lax', path: '/' },
+  })
+
+/** Data of the OAuth sign-in in progress, read without creating the cookie for a visitor. */
+export async function oauthFlowOf(event: H3Event): Promise<OAuthFlow> {
+  return getCookie(event, OAUTH_COOKIE) ? (await oauthFlow(event)).data : {}
 }

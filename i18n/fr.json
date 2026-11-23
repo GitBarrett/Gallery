@@ -153,6 +153,18 @@
       "resend": "Renvoyer",
       "sent": "Nouveau lien envoyé. Consultez votre boîte mail.",
       "signIn": "Se connecter pour recevoir un nouveau lien"
+    },
+    "oauth": {
+      "google": "Continuer avec Google",
+      "or": "ou avec un email",
+      "failed": "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre email.",
+      "linkNotice": "Connectez-vous avec votre mot de passe pour lier Google à votre compte.",
+      "completeTitle": "Choisissez votre pseudo",
+      "completeText": "Dernière étape pour créer votre compte. Votre pseudo est public.",
+      "expired": "Cette connexion a expiré ou a déjà servi. Recommencez.",
+      "linkTitle": "Vous avez déjà un compte",
+      "emailTaken": "Un compte utilise déjà {email}. Connectez-vous-y avec votre mot de passe pour lier Google : aucun nouveau compte n'est créé.",
+      "signinToLink": "Se connecter pour lier Google"
     }
   },
   "settings": {

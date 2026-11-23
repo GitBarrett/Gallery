@@ -4,6 +4,12 @@ import { dbRateLimiter } from '../db/rate-limiter'
 import { drizzleUnitOfWork } from '../db/unit-of-work'
 import {
   argon2idHasher,
+  completeOAuthSignup,
+  fakeOAuthProvider,
+  googleOAuthProvider,
+  oauthCallback,
+  type OAuthProviderName,
+  startOAuth,
   drizzleIdentityRepository,
   fakeHumanVerifier,
   forgotPassword,
@@ -50,6 +56,9 @@ export interface Container {
     resendVerification: UseCase<typeof resendVerification>
     forgotPassword: UseCase<typeof forgotPassword>
     resetPassword: UseCase<typeof resetPassword>
+    startOAuth: (provider: OAuthProviderName) => ReturnType<typeof startOAuth>
+    oauthCallback: UseCase<typeof oauthCallback>
+    completeOAuthSignup: UseCase<typeof completeOAuthSignup>
   }
 }
 
@@ -93,6 +102,16 @@ export function createContainer({
           fetch: fetcher,
         })
   const inviteOnly = async () => (await readSettings(logger))['features.inviteOnly']
+  const oauthProvider = (provider: OAuthProviderName) =>
+    config.fakeProviders
+      ? fakeOAuthProvider(required(config.fakeOAuthConsentUrl, 'NUXT_FAKE_OAUTH_CONSENT_URL'), provider)
+      : googleOAuthProvider({
+          clientId: required(config.googleClientId, 'NUXT_OAUTH_GOOGLE_CLIENT_ID'),
+          clientSecret: required(config.googleClientSecret, 'NUXT_OAUTH_GOOGLE_CLIENT_SECRET'),
+          fetch: fetcher,
+        })
+  // Registered as is with the provider (08-securite.md § 3)
+  const redirectUri = (provider: OAuthProviderName) => `${config.siteUrl}/auth/${provider}/callback`
 
   return {
     config,
@@ -129,6 +148,7 @@ export function createContainer({
           human: human(),
           limiter: dbRateLimiter(db(), ipHashKey(), clock),
           clock,
+          ids,
         })(cmd),
       signout: (cmd) => signout({ repo: drizzleIdentityRepository(db()), clock })(cmd),
       // Read through Hyperdrive without cache (ADR-016): a revoked session is refused at once
@@ -153,6 +173,23 @@ export function createContainer({
           hasher: argon2idHasher(),
           breaches: hibpBreachChecker({ fetch: fetcher, logger }),
           clock,
+        })(cmd),
+      startOAuth: (provider) => startOAuth(oauthProvider(provider), redirectUri(provider)),
+      oauthCallback: (cmd) =>
+        oauthCallback({
+          repo: drizzleIdentityRepository(db()),
+          provider: oauthProvider(cmd.provider),
+          clock,
+          logger,
+          redirectUri: redirectUri(cmd.provider),
+        })(cmd),
+      completeOAuthSignup: (cmd) =>
+        completeOAuthSignup({
+          uow: identityUow(),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
+          ids,
+          clock,
+          inviteOnly,
         })(cmd),
     },
   }

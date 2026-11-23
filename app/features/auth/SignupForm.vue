@@ -1,15 +1,16 @@
 <script setup lang="ts">
 // Sign-up (US-01, SignIn mockup "Create account"). Every accepted request ends on the same "Check your inbox",
 // a used email included (US-01.2); during the beta, a refusal without invitation opens the waiting list
-// (US-56.4). Social buttons come with T-14/T-15, the sign-in tab is in AuthCard.
+// (US-56.4). Provider buttons above the form (US-02; Battle.net: T-15), the sign-in tab is in AuthCard.
 import { api } from '~/services/api'
 import { localSignupError, signupError, type FormError } from './signup-errors'
 import TurnstileCheck from './TurnstileCheck.vue'
 import WaitlistForm from './WaitlistForm.vue'
 import AuthCard from './AuthCard.vue'
+import OAuthButtons from './OAuthButtons.vue'
+import TermsConsent from './TermsConsent.vue'
 
 const { t, locale } = useI18n()
-const localePath = useLocalePath()
 const route = useRoute()
 const username = ref('')
 const email = ref('')
@@ -56,6 +57,7 @@ async function submit() {
   <AuthCard :tab="step === 'form' ? 'signup' : undefined" aria-labelledby="signup-title">
     <template v-if="step === 'form'">
       <h1 id="signup-title" class="title">{{ t('auth.signup.title') }}</h1>
+      <OAuthButtons />
       <form class="form" @submit.prevent="submit">
         <UiInput
           v-model="username"
@@ -85,14 +87,7 @@ async function submit() {
           autocomplete="new-password"
           maxlength="128"
         />
-        <label class="terms">
-          <input v-model="terms" type="checkbox" required class="checkbox" />
-          <span>{{ t('auth.signup.terms') }}</span>
-        </label>
-        <p class="policies">
-          <NuxtLink :to="localePath('/terms')" class="link">{{ t('auth.signup.termsLink') }}</NuxtLink>
-          <NuxtLink :to="localePath('/privacy')" class="link">{{ t('auth.signup.privacyLink') }}</NuxtLink>
-        </p>
+        <TermsConsent v-model="terms" />
         <TurnstileCheck ref="turnstile" v-model="turnstileToken" action="signup" />
         <p v-if="fieldError('turnstileToken')" class="error" role="alert">{{ fieldError('turnstileToken') }}</p>
         <p v-if="error && !error.field" class="error" role="alert">{{ t(error.key) }}</p>
@@ -121,40 +116,6 @@ async function submit() {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-}
-
-.terms {
-  display: flex;
-  gap: var(--space-3);
-  align-items: flex-start;
-  min-height: var(--control-md);
-  font-size: var(--text-sm);
-  cursor: pointer;
-}
-
-.checkbox {
-  flex: none;
-  width: var(--space-5);
-  height: var(--space-5);
-  margin: 0;
-  accent-color: var(--color-accent);
-}
-
-.policies {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 var(--space-4);
-  margin: 0;
-  font-size: var(--text-sm);
-}
-
-.link {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--control-md);
-  min-width: var(--control-md);
-  justify-content: center;
-  color: var(--color-accent);
 }
 
 .error {

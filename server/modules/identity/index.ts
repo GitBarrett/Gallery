@@ -12,11 +12,15 @@ export type {
   NewSession,
   SessionSummary,
   NewUser,
+  OAuthProvider,
+  OAuthProviderName,
   PasswordHasher,
 } from './application/ports'
 export { signup, SIGNUP_PER_IP, TERMS_VERSION } from './application/signup'
 export { verifyEmail } from './application/verify-email'
 export { signin } from './application/signin'
+export { completeOAuthSignup, oauthCallback, startOAuth, type PendingOAuth } from './application/oauth'
+export { fakeOAuthProvider, googleOAuthProvider } from './infrastructure/oauth-providers'
 export { listSessions, resolveSession, revokeOtherSessions, revokeSession, signout } from './application/sessions'
 export type { DeviceSession } from './application/sessions'
 export { joinWaitlist } from './application/join-waitlist'

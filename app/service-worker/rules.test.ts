@@ -9,7 +9,7 @@ const rule = (path: string, request: { method?: string; mode?: string; sameOrigi
   })
 
 describe('service worker rules (03-architecture.md § PWA)', () => {
-  it('US-64.2 public navigations go network first into the pages cache, private ones network only', () => {
+  it('US-64.2 public navigations go network first into the pages cache, private and OAuth ones network only', () => {
     for (const path of ['/', '/fr', '/explore', '/fr/explore', '/u/jaina'])
       expect(rule(path, { mode: 'navigate' }), path).toBe('pages')
     for (const path of [
@@ -19,6 +19,9 @@ describe('service worker rules (03-architecture.md § PWA)', () => {
       '/notifications',
       '/upload',
       '/fr/upload',
+      '/auth/google',
+      '/auth/google/callback',
+      '/fr/oauth/complete',
     ])
       expect(rule(path, { mode: 'navigate' }), path).toBe('network')
   })

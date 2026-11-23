@@ -1,7 +1,9 @@
 <script setup lang="ts">
 // Sign-in by password (US-03, SignIn mockup "Sign in"). One message for any wrong credentials (US-03.2); the
-// anti-bot check appears only once the server requires it (US-03.3, Q48). Social buttons come with T-14/T-15.
+// anti-bot check appears only once the server requires it (US-03.3, Q48). Provider buttons above (US-02); back from
+// a failed OAuth sign-in, or to link an identity to the account of its email, a message says why (US-02.5, US-02.3).
 import { api, ApiError, errorMessageKey } from '~/services/api'
+import OAuthButtons from './OAuthButtons.vue'
 import { safeRedirect } from './safe-redirect'
 import TurnstileCheck from './TurnstileCheck.vue'
 
@@ -13,7 +15,8 @@ const password = ref('')
 const needsTurnstile = ref(false)
 const turnstileToken = ref('')
 const turnstile = ref<InstanceType<typeof TurnstileCheck>>()
-const error = ref<string>()
+const error = ref<string | undefined>(route.query.oauth === 'failed' ? 'auth.oauth.failed' : undefined)
+const linking = route.query.link === 'google'
 const sending = ref(false)
 
 function messageOf(thrown: unknown): string {
@@ -48,6 +51,8 @@ async function submit() {
 </script>
 
 <template>
+  <OAuthButtons v-if="!linking" />
+  <p v-else class="notice" role="status">{{ t('auth.oauth.linkNotice') }}</p>
   <form class="form" :aria-label="t('auth.signin.title')" @submit.prevent="submit">
     <UiInput
       v-model="email"
@@ -89,6 +94,11 @@ async function submit() {
   display: inline-flex;
   align-items: center;
   min-height: var(--control-md);
+}
+
+.notice {
+  margin: 0;
+  color: var(--color-text-soft);
 }
 
 .error {

@@ -33,12 +33,31 @@ export type EmailTokenType = 'verify' | 'reset' | 'email_change' | 'deletion_can
 
 export interface NewUser {
   id: string
-  email: string
+  /** null: OAuth account whose provider gave no verified email */
+  email: string | null
   username: string
-  passwordHash: string
+  /** null: OAuth account (a password can be set by reset, Q52) */
+  passwordHash: string | null
+  /** Set for an email verified by the OAuth provider (US-02.1). */
+  emailVerifiedAt?: Date
   locale: Locale
   termsAcceptedAt: Date
   termsVersion: string
+}
+
+export type OAuthProviderName = 'google'
+
+/** Identity given by an OAuth provider; `email` only when the provider verified it (08-securite.md § 3). */
+export interface OAuthIdentity {
+  subject: string
+  email: string | null
+}
+
+/** Port: OAuth provider, authorization code flow with PKCE S256 (08-securite.md § 3). */
+export interface OAuthProvider {
+  authorizationUrl(params: { state: string; codeChallenge: string; redirectUri: string }): string
+  /** Exchanges the code; rejects when the provider refuses it or answers out of contract. */
+  identity(params: { code: string; codeVerifier: string; redirectUri: string }): Promise<OAuthIdentity>
 }
 
 export interface EmailToken {
@@ -100,6 +119,9 @@ export interface IdentityRepository {
   markEmailVerified(userId: string, at: Date): Promise<void>
   setPasswordHash(userId: string, passwordHash: string): Promise<void>
   findCredentials(email: string): Promise<{ userId: string; passwordHash: string | null; status: string } | null>
+  findOAuthAccount(provider: OAuthProviderName, subject: string): Promise<{ userId: string; status: string } | null>
+  /** `false` (nothing written) when this identity is already linked. */
+  linkOAuthAccount(link: { id: string; userId: string; provider: OAuthProviderName; subject: string }): Promise<boolean>
   createSession(session: NewSession): Promise<void>
   findSession(
     idHash: string,

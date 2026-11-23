@@ -29,6 +29,13 @@
       "when": 1795356894488,
       "tag": "0003_beta_invites_and_waitlist",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795382225112,
+      "tag": "0004_oauth_accounts",
+      "breakpoints": true
     }
   ]
 }

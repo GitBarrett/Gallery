@@ -20,7 +20,12 @@ export function previewConfig(productionToml, { pr, hyperdriveId }) {
     'NUXT_PUBLIC_SITE_URL',
   )
   replace(/^NUXT_DEPLOY_ENV = "production"$/m, 'NUXT_DEPLOY_ENV = "preview"', 'NUXT_DEPLOY_ENV')
-  replace(/^NUXT_FAKE_PROVIDERS = "false"$/m, 'NUXT_FAKE_PROVIDERS = "true"', 'NUXT_FAKE_PROVIDERS')
+  // Fake providers, with the consent page of the fake OAuth providers (a test route of the preview build)
+  replace(
+    /^NUXT_FAKE_PROVIDERS = "false"$/m,
+    `NUXT_FAKE_PROVIDERS = "true"\nNUXT_FAKE_OAUTH_CONSENT_URL = "https://ls-pr-${pr}.${SUBDOMAIN}/__test/oauth"`,
+    'NUXT_FAKE_PROVIDERS',
+  )
   replace(/^NUXT_R2_PREFIX = ""$/m, `NUXT_R2_PREFIX = "pr-${pr}/"`, 'NUXT_R2_PREFIX')
   // Turnstile test key (always passes, dummy token): the production widget only accepts the site's domain
   replace(

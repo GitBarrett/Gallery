@@ -60,4 +60,24 @@ describe('SigninForm', () => {
     const wrapper = await submitted()
     expect(wrapper.text()).toContain('Too many attempts')
   })
+
+  it('US-02.5 offers Google again with a message after a refused or failed OAuth sign-in', async () => {
+    const wrapper = await mountSuspended(SigninForm, {
+      route: '/signin?oauth=failed',
+      global: { stubs: { TurnstileCheck } },
+    })
+    expect(wrapper.get('[role="alert"]').text()).toBe(
+      'Signing in with Google did not work. Try again, or use your email.',
+    )
+    expect(wrapper.get('a[href^="/auth/google"]').attributes('href')).toBe('/auth/google?locale=en')
+  })
+
+  it('US-02.3 asks for the password of the account to link, without the provider buttons', async () => {
+    const wrapper = await mountSuspended(SigninForm, {
+      route: '/signin?link=google',
+      global: { stubs: { TurnstileCheck } },
+    })
+    expect(wrapper.get('[role="status"]').text()).toContain('link Google to your account')
+    expect(wrapper.find('a[href^="/auth/google"]').exists()).toBe(false)
+  })
 })
