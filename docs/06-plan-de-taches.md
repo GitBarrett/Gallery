@@ -263,7 +263,7 @@ T-17a (réglages du compte : bio, langue, mot de passe, réseaux sociaux) est d�
   Comptes Google et Battle.net liés dans `/settings`, déliaison (`DELETE /api/me/oauth/{provider}`) refusée s'il ne resterait aucun moyen de connexion.
   Stories : US-07.4. Tests : U, I, E.
 
-- [ ] **T-18a Autorisation déclarative** (dép. T-12a)
+- [x] **T-18a Autorisation déclarative** (dép. T-12a)
   Politiques d'autorisation déclarées par use case (refus par défaut), harnais de **matrice d'autorisation** généré depuis l'inventaire des routes (`08-securite.md` annexe B).
   Stories : US-55 (règles). Tests : U, I (matrice).
 

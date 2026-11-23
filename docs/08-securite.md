@@ -35,7 +35,7 @@ Analyse STRIDE par flux à mettre à jour à chaque nouvelle fonctionnalité exp
 - **Redirections** : paramètre `redirect` accepté uniquement s'il s'agit d'un chemin relatif du site (`/^\/(?!\/)/`).
 
 ## 4. Autorisation
-- **Refus par défaut** : chaque use case déclare sa politique (`requireMember`, `requireVerified`, `requireOwner`, `requireRole('moderator')`, `notSanctioned`) ; une route sans politique déclarée fait échouer un test d'architecture.
+- **Refus par défaut** : chaque use case déclare sa politique (`requireMember`, `requireVerified`, `requireOwner`, `requireRole('moderator')`, `notSanctioned`) ; une route sans politique déclarée fait échouer un test d'architecture. Mise en œuvre (T-18a) : `requireMember` est le `requireContext(event)` de la route (401), les autres politiques sont dans `server/modules/identity/domain/policies.ts` ; l'inventaire des routes avec leur accès et leur ligne de l'annexe B est `tests/authorization-matrix.ts`, contrôlé par `tests/architecture.test.ts` et rejoué en visiteur et en membre par `tests/api/authorization-matrix.test.ts`.
 - **Contrôle de propriété** dans la couche application, jamais seulement dans l'interface ; les ressources privées d'autrui répondent 404 (pas d'information sur leur existence).
 - **Statut du compte** relu à chaque requête via la session (suspension, bannissement, suppression en cours).
 - **Matrice d'autorisation** (annexe B) testée automatiquement : chaque route × chaque rôle (visiteur, membre non vérifié, membre, propriétaire, suspendu, modérateur, admin).

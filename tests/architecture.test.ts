@@ -1,7 +1,9 @@
+import { readdirSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import { cruise } from 'dependency-cruiser'
 import { describe, expect, it } from 'vitest'
+import { ROUTES, routeOf } from './authorization-matrix'
 
 // Rules of 10-clean-architecture.md § 7, checked on a demo tree:
 // one violation per rule, plus allowed imports that must trigger nothing.
@@ -31,5 +33,28 @@ describe('architecture rules', () => {
       'ui-pure: app/components/ui/button.ts -> app/features/upload/use-upload.ts',
       'ui-pure: app/components/ui/button.ts -> app/services/api/client.ts',
     ])
+  })
+})
+
+// Deny by default (08-securite.md § 4, T-18a): a route file must be in the inventory of the matrix, with an access its
+// code follows and a row of annexe B
+describe('authorization matrix', () => {
+  const files = ['server/api', 'server/routes/auth'].flatMap((dir) =>
+    readdirSync(dir, { recursive: true, encoding: 'utf8' })
+      .filter((f) => f.endsWith('.ts') && !f.endsWith('.test.ts'))
+      .map((f) => `${dir}/${f.replaceAll('\\', '/')}`),
+  )
+  const annexB = readFileSync('docs/08-securite.md', 'utf8')
+
+  it('US-55 lists every route and only existing ones', () => {
+    expect(files.map(routeOf).sort()).toEqual(Object.keys(ROUTES).sort())
+  })
+
+  it('US-55 asks for a session in exactly the member routes, each one tied to a row of annexe B', () => {
+    for (const file of files) {
+      const { access, row } = ROUTES[routeOf(file)]!
+      expect(readFileSync(file, 'utf8').includes('requireContext(event)'), file).toBe(access === 'member')
+      expect(annexB.includes(`| ${row}`), `${file}: row "${row}"`).toBe(true)
+    }
   })
 })

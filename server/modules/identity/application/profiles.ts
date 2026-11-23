@@ -5,6 +5,7 @@ import type { Clock } from '../../../platform/clock'
 import { invalid, type IdentityError, type IdentityResult } from './email-tokens'
 import type { IdentityRepository, Locale } from './ports'
 import { isEnded } from './sessions'
+import { notSanctioned } from '../domain/policies'
 
 export interface PublicProfile {
   username: string
@@ -50,7 +51,10 @@ async function formerProfile(deps: { repo: IdentityRepository; clock: Clock }, u
 export const updateProfile =
   (deps: { repo: IdentityRepository }) =>
   async (cmd: { actor: { id: string; status: string }; bio?: string; locale?: Locale }): Promise<IdentityResult> => {
-    if (cmd.bio !== undefined && cmd.actor.status !== 'active') return err({ kind: 'forbidden', reason: 'suspended' })
+    if (cmd.bio !== undefined) {
+      const allowed = notSanctioned(cmd.actor)
+      if (!allowed.ok) return allowed
+    }
     const fields: { bio?: string | null; locale?: Locale } = {}
     if (cmd.locale) fields.locale = cmd.locale
     if (cmd.bio !== undefined) {

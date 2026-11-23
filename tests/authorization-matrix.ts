@@ -1,0 +1,47 @@
+// Route inventory of the authorization matrix (08-securite.md § 4 and annexe B, T-18a): every route file of
+// server/api and server/routes/auth, its access and its row of annexe B. Deny by default: a route missing here fails
+// tests/architecture.test.ts, and tests/api/authorization-matrix.test.ts calls each one as a visitor and as a member.
+// `member`: a session is required (`requireContext`, 401 without); the use case then declares the rest (own
+// resources, `notSanctioned`, `requireVerified`, `requireRole`…). `public`: open to visitors.
+// Moderator, admin and MFA columns join with T-18b and T-18c; the owner column with the first shared resources (T-21).
+
+export type Access = 'public' | 'member'
+
+export const ROUTES: Record<string, { access: Access; row: string }> = {
+  'GET /api/health': { access: 'public', row: 'Lectures publiques' },
+  'GET /api/settings/public': { access: 'public', row: 'Lectures publiques' },
+  'POST /api/waitlist': { access: 'public', row: 'Auth sans session' },
+  'GET /api/usernames/[name]/availability': { access: 'public', row: 'Lectures publiques' },
+  'GET /api/users/[username]': { access: 'public', row: 'Lectures publiques' },
+  'POST /api/auth/signup': { access: 'public', row: 'Auth sans session' },
+  'POST /api/auth/signin': { access: 'public', row: 'Auth sans session' },
+  'POST /api/auth/signout': { access: 'public', row: 'Auth sans session' },
+  'POST /api/auth/verify-email': { access: 'public', row: 'Auth sans session' },
+  'POST /api/auth/email/confirm': { access: 'public', row: 'Auth sans session' },
+  'POST /api/auth/password/forgot': { access: 'public', row: 'Auth sans session' },
+  'POST /api/auth/password/reset': { access: 'public', row: 'Auth sans session' },
+  'GET /api/auth/oauth/pending': { access: 'public', row: 'Auth sans session' },
+  'POST /api/auth/oauth/complete': { access: 'public', row: 'Auth sans session' },
+  'GET /auth/[provider]': { access: 'public', row: 'Auth sans session' },
+  'GET /auth/[provider]/callback': { access: 'public', row: 'Auth sans session' },
+  'POST /api/auth/resend-verification': { access: 'member', row: 'Compte' },
+  'GET /api/me': { access: 'member', row: 'Compte' },
+  'PATCH /api/me': { access: 'member', row: 'Compte' },
+  'GET /api/me/account': { access: 'member', row: 'Compte' },
+  'POST /api/me/email': { access: 'member', row: 'Compte' },
+  'POST /api/me/password': { access: 'member', row: 'Compte' },
+  'DELETE /api/me/oauth/[provider]': { access: 'member', row: 'Compte' },
+  'GET /api/me/sessions': { access: 'member', row: 'Compte' },
+  'DELETE /api/me/sessions/[id]': { access: 'member', row: 'Compte' },
+  'POST /api/me/sessions/revoke-others': { access: 'member', row: 'Compte' },
+  'GET /api/me/social-links': { access: 'member', row: '`GET/PUT /api/me/social-links`' },
+  'PUT /api/me/social-links': { access: 'member', row: '`GET/PUT /api/me/social-links`' },
+}
+
+/** `server/api/me/sessions/[id].delete.ts` → `DELETE /api/me/sessions/[id]` (Nitro file routing). */
+export function routeOf(file: string): string {
+  const [, dir, rest] = file.replace(/\\/g, '/').match(/server\/(api|routes)\/(.+)\.ts$/)!
+  const [path, method] = rest!.split(/\.(?=[a-z]+$)/)
+  const url = `${dir === 'api' ? '/api' : ''}/${path!.replace(/\/?index$/, '')}`
+  return `${method!.toUpperCase()} ${url}`
+}
