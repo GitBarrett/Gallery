@@ -165,6 +165,21 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .returning({ id: oauthAccounts.id })
     return inserted.length > 0
   },
+  async listOAuthProviders(userId) {
+    const rows = await db
+      .select({ provider: oauthAccounts.provider })
+      .from(oauthAccounts)
+      .where(eq(oauthAccounts.userId, userId))
+    const linked = new Set(rows.map((r) => r.provider))
+    return (['google', 'battlenet'] as const).filter((p) => linked.has(p))
+  },
+  async unlinkOAuthAccount(userId, provider) {
+    const deleted = await db
+      .delete(oauthAccounts)
+      .where(and(eq(oauthAccounts.userId, userId), eq(oauthAccounts.provider, provider)))
+      .returning({ id: oauthAccounts.id })
+    return deleted.length > 0
+  },
   async createSession(session) {
     await db.insert(sessions).values(session)
   },

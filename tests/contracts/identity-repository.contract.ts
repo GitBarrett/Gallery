@@ -117,6 +117,23 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect(await repo.findCredentials(ash.email)).toMatchObject({ passwordHash: null })
     })
 
+    it('US-07.4 lists the providers of an account and unlinks one, only its own', async () => {
+      const repo = await make()
+      const [ash, thrall] = [user(), user()]
+      await repo.createUser(ash)
+      await repo.createUser(thrall)
+      const link = (userId: string, provider: 'google' | 'battlenet') =>
+        repo.linkOAuthAccount({ id: crypto.randomUUID(), userId, provider, subject: `${provider}-${userId}` })
+      await link(ash.id, 'battlenet')
+      await link(ash.id, 'google')
+      await link(thrall.id, 'google')
+      expect(await repo.listOAuthProviders(ash.id)).toEqual(['google', 'battlenet'])
+      expect(await repo.unlinkOAuthAccount(ash.id, 'google')).toBe(true)
+      expect(await repo.unlinkOAuthAccount(ash.id, 'google')).toBe(false)
+      expect(await repo.listOAuthProviders(ash.id)).toEqual(['battlenet'])
+      expect(await repo.listOAuthProviders(thrall.id)).toEqual(['google'])
+    })
+
     it('US-02.1 creates accounts without email, any number of them', async () => {
       const repo = await make()
       expect(await repo.createUser({ ...user(), email: null })).toBe('created')

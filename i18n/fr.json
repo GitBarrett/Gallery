@@ -220,6 +220,16 @@
       "wrong": "Ce n'est pas votre mot de passe actuel.",
       "none": "Votre compte n'a pas encore de mot de passe : créez-en un avec « Mot de passe oublié ? » sur la page de connexion."
     },
+    "linked": {
+      "title": "Comptes liés",
+      "google": "Google",
+      "battlenet": "Battle.net",
+      "none": "Non lié",
+      "unlink": "Délier",
+      "unlinkLabel": "Délier {provider}",
+      "done": "{provider} n'est plus lié à votre compte.",
+      "last": "C'est votre seul moyen de connexion : ajoutez d'abord un mot de passe avec « Mot de passe oublié ? » sur la page de connexion, ou liez un autre compte."
+    },
     "email": {
       "title": "Email",
       "current": "Votre email : {email}",

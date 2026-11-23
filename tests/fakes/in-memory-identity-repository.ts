@@ -130,6 +130,16 @@ export function inMemoryIdentityRepository() {
       oauth.push(link)
       return true
     },
+    async listOAuthProviders(userId) {
+      return (['google', 'battlenet'] as const).filter((p) =>
+        oauth.some((o) => o.userId === userId && o.provider === p),
+      )
+    },
+    async unlinkOAuthAccount(userId, provider) {
+      const index = oauth.findIndex((o) => o.userId === userId && o.provider === provider)
+      if (index >= 0) oauth.splice(index, 1)
+      return index >= 0
+    },
     async createSession(session) {
       sessions.push({ ...session, createdAt: session.lastSeenAt, revokedAt: null })
     },

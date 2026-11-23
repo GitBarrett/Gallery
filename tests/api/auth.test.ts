@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto'
 import { eq, like } from 'drizzle-orm'
 import { afterAll, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/db/client'
-import { betaInvites, emailTokens, users, waitlistEntries } from '../../server/db/schema'
+import { betaInvites, emailTokens, oauthAccounts, users, waitlistEntries } from '../../server/db/schema'
 import { TURNSTILE_DUMMY_TOKEN } from '../../server/modules/identity'
 import { SessionsResponse } from '../../shared/contracts/auth'
 import { ErrorResponse } from '../../shared/contracts/errors'
@@ -443,7 +443,7 @@ describe('sessions', () => {
     expect((await errorOf(wrong)).details).toEqual({ field: 'currentPassword', reason: 'wrong' })
     expect((await change({ newEmail, currentPassword: credentials.password })).status).toBe(204)
     const own = await fetch('/api/me/account', { headers: { cookie } })
-    expect(await own.json()).toEqual({ email: credentials.email, hasPassword: true }) // unchanged until confirmed
+    expect(await own.json()).toEqual({ email: credentials.email, hasPassword: true, providers: [] }) // unchanged until confirmed
 
     // The link the `emails` consumer would mail to the new address
     const [user] = await db.select({ id: users.id }).from(users).where(eq(users.email, credentials.email))
@@ -456,6 +456,34 @@ describe('sessions', () => {
     expect((await errorOf(await confirm())).details).toEqual({ field: 'token', reason: 'invalid' })
     expect((await signin({ email: newEmail, password: credentials.password })).status).toBe(204)
     expect((await signin(credentials)).status).toBe(401)
+  })
+
+  it('US-07.4 lists and unlinks a provider, refused when it is the last way to sign in', async () => {
+    const credentials = await account()
+    const cookie = sessionCookie(await signin(credentials)).value
+    const [user] = await db.select({ id: users.id }).from(users).where(eq(users.email, credentials.email))
+    await db.insert(oauthAccounts).values([
+      { userId: user!.id, provider: 'google', providerUserId: `google-${user!.id}` },
+      { userId: user!.id, provider: 'battlenet', providerUserId: `battlenet-${user!.id}` },
+    ])
+    const unlink = (provider: string, withCookie = true) =>
+      fetch(`/api/me/oauth/${provider}`, {
+        method: 'DELETE',
+        headers: { 'sec-fetch-site': 'same-origin', ...(withCookie ? { cookie } : {}) },
+      })
+    expect((await unlink('google', false)).status).toBe(401)
+    expect((await unlink('github')).status).toBe(400)
+    expect((await (await fetch('/api/me/account', { headers: { cookie } })).json()).providers).toEqual([
+      'google',
+      'battlenet',
+    ])
+    expect((await unlink('google')).status).toBe(204)
+    expect((await unlink('google')).status).toBe(404)
+    // Without a password, Battle.net is now the only way to sign in
+    await db.update(users).set({ passwordHash: null }).where(eq(users.id, user!.id))
+    const refused = await unlink('battlenet')
+    expect(refused.status).toBe(403)
+    expect((await errorOf(refused)).details).toEqual({ reason: 'last_sign_in_method' })
   })
 
   it('US-07.3 changes the password with the old one and revokes the other sessions only', async () => {

@@ -121,6 +121,7 @@ describe('getAccount', () => {
     expect(await getAccount({ repo: fake.repo })({ userId: 'ash' })).toEqual({
       email: 'ash@example.com',
       hasPassword: true,
+      providers: [],
     })
   })
 })

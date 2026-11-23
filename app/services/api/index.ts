@@ -98,6 +98,9 @@ export const api = {
   // US-07.2: email of the account; the change sends a link (204 even for another account's address), 429 after 3 / h
   account: () => call('/api/me/account', AccountResponse),
   changeEmail: (body: EmailChangeBody) => call('/api/me/email', z.unknown(), { method: 'POST', body }),
+  // US-07.4: 403 FORBIDDEN reason last_sign_in_method, 404 when not linked
+  unlinkOAuth: (provider: 'google' | 'battlenet') =>
+    call(`/api/me/oauth/${provider}`, z.unknown(), { method: 'DELETE' }),
   confirmEmail: (body: VerifyEmailBody) => call('/api/auth/email/confirm', z.unknown(), { method: 'POST', body }),
   setSocialLinks: (body: SocialLinksBody) => call('/api/me/social-links', z.unknown(), { method: 'PUT', body }),
   // public profile (US-05.3); 404 NOT_FOUND for an unknown, banned or deleted account
