@@ -14,6 +14,7 @@ import {
   ProfileResponse,
   type ResendVerificationBody,
   type ResetPasswordBody,
+  type ChangePasswordBody,
   SessionsResponse,
   type SigninBody,
   type SignupBody,
@@ -87,6 +88,8 @@ export const api = {
     call('/api/auth/password/forgot', z.unknown(), { method: 'POST', body }),
   // 204: password changed, every session ended, a new one opened (US-04.3)
   resetPassword: (body: ResetPasswordBody) => call('/api/auth/password/reset', z.unknown(), { method: 'POST', body }),
+  // US-07.3: 400 VALIDATION_FAILED field currentPassword (wrong, none) or password, 429 after 5 wrong old passwords
+  changePassword: (body: ChangePasswordBody) => call('/api/me/password', z.unknown(), { method: 'POST', body }),
   // public profile (US-05.3); 404 NOT_FOUND for an unknown, banned or deleted account
   profile: (username: string, fetch?: typeof $fetch) =>
     call(`/api/users/${encodeURIComponent(username)}`, ProfileResponse, {}, fetch),

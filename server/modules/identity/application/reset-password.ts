@@ -6,6 +6,17 @@ import { hashToken, invalid, type IdentityError } from './email-tokens'
 import type { BreachChecker, IdentityRepository, PasswordHasher } from './ports'
 import { startSession } from './sessions'
 
+/** Sign-up rules, then the breach check (08-securite.md § 3), then the hash of a new password. */
+export async function newPasswordHash(
+  deps: { hasher: PasswordHasher; breaches: BreachChecker },
+  password: string,
+): Promise<Result<string, IdentityError>> {
+  const valid = validatePassword(password)
+  if (!valid.ok) return err(invalid('password', valid.error))
+  if (await deps.breaches.isBreached(password)) return err(invalid('password', 'breached'))
+  return ok(await deps.hasher.hash(password))
+}
+
 /**
  * New password from a reset link (US-04.2–3), open to visitors: the token alone designates the account, once. The
  * password is checked before the token is used, so a refused password leaves the link usable. Every session of the
@@ -19,10 +30,9 @@ export const resetPassword =
     userAgent?: string
     previousSessionId?: string
   }): Promise<Result<{ sessionId: string }, IdentityError>> => {
-    const password = validatePassword(cmd.password)
-    if (!password.ok) return err(invalid('password', password.error))
-    if (await deps.breaches.isBreached(cmd.password)) return err(invalid('password', 'breached'))
-    const passwordHash = await deps.hasher.hash(cmd.password)
+    const hashed = await newPasswordHash(deps, cmd.password)
+    if (!hashed.ok) return hashed
+    const passwordHash = hashed.value
     const tokenHash = await hashToken(cmd.token)
     const now = deps.clock.now()
     return deps.uow.run(async (repo, publish) => {

@@ -23,6 +23,7 @@ import {
   resendVerification,
   usernameAvailability,
   resetPassword,
+  changePassword,
   resolveSession,
   revokeOtherSessions,
   revokeSession,
@@ -61,6 +62,7 @@ export interface Container {
     resendVerification: UseCase<typeof resendVerification>
     forgotPassword: UseCase<typeof forgotPassword>
     resetPassword: UseCase<typeof resetPassword>
+    changePassword: UseCase<typeof changePassword>
     getProfile: UseCase<typeof getProfile>
     updateProfile: UseCase<typeof updateProfile>
     changeUsername: UseCase<typeof changeUsername>
@@ -191,6 +193,15 @@ export function createContainer({
           uow: identityUow(),
           hasher: argon2idHasher(),
           breaches: hibpBreachChecker({ fetch: fetcher, logger }),
+          clock,
+        })(cmd),
+      changePassword: (cmd) =>
+        changePassword({
+          repo: drizzleIdentityRepository(db()),
+          uow: identityUow(),
+          hasher: argon2idHasher(),
+          breaches: hibpBreachChecker({ fetch: fetcher, logger }),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
           clock,
         })(cmd),
       startOAuth: (provider) => startOAuth(oauthProvider(provider), redirectUri(provider)),

@@ -79,6 +79,13 @@ export const ResetPasswordBody = z.strictObject({
 })
 export type ResetPasswordBody = z.infer<typeof ResetPasswordBody>
 
+/** POST /api/me/password (US-07.3): the old password proves the owner. */
+export const ChangePasswordBody = z.strictObject({
+  currentPassword: z.string().max(512),
+  password: z.string().max(512),
+})
+export type ChangePasswordBody = z.infer<typeof ChangePasswordBody>
+
 /** /auth/{provider} and its callback (US-02); Battle.net comes with T-15. */
 export const OAuthProviderParams = z.strictObject({ provider: z.enum(['google', 'battlenet']) })
 

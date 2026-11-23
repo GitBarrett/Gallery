@@ -200,6 +200,15 @@
       "language": "Language of the site and the emails",
       "submit": "Save my profile",
       "saved": "Profile saved."
+    },
+    "password": {
+      "title": "Password",
+      "current": "Current password",
+      "new": "New password",
+      "submit": "Change my password",
+      "saved": "Password changed. Your other devices are signed out.",
+      "wrong": "This is not your current password.",
+      "none": "Your account has no password yet: set one with “Forgot password?” on the sign-in page."
     }
   },
   "profile": {

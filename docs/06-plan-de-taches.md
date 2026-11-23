@@ -247,7 +247,7 @@ T-17a (réglages du compte : bio, langue, mot de passe, réseaux sociaux) est d�
   `/settings` : bio (≤ 300 caractères, filtre d'insultes) et langue, par `PATCH /api/me`, enregistrées et visibles immédiatement.
   Stories : US-07.1. Tests : U, I, E.
 
-- [ ] **T-17c Changement de mot de passe** (dép. T-17a)
+- [x] **T-17c Changement de mot de passe** (dép. T-17a)
   `POST /api/me/password` avec l'ancien mot de passe (réauthentification), règles et HIBP de l'inscription, autres sessions révoquées.
   Stories : US-07.3. Tests : U, I, E.
 
