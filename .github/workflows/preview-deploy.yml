@@ -45,6 +45,15 @@ jobs:
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
       # Preview tests (T-04b): the Access token is only sent to the preview's domain (Playwright fixture,
       # scripts/lighthouse.mjs), never to third parties
+      # Browsers downloaded once per Playwright version (T-04d); their system packages still install at each run
+      - name: Playwright version
+        id: playwright
+        run: echo "version=$(pnpm exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+      - name: Cache the browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium-webkit
       - name: Install the browsers
         run: pnpm exec playwright install --with-deps chromium webkit
       - name: End-to-end tests (desktop, iPhone 14, Pixel 7)

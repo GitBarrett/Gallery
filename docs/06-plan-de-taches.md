@@ -97,6 +97,10 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Un seul build Nuxt par type de serveur (normal et preview) pour tous les tests `tests/api` au lieu d'un build par fichier ; E2E sur 2 workers en CI au lieu d'un.
   Tests : la CI elle-même (durées comparées dans la PR).
 
+- [x] **T-04d Cache des navigateurs Playwright** (dép. T-04c) — ajoutée le 23/11/2026
+  Navigateurs Playwright mis en cache par version (`actions/cache`) dans la preview et le smoke test de production, au lieu d'un téléchargement à chaque run ; les paquets système restent installés à chaque run.
+  Tests : la CI elle-même (durée de l'installation des navigateurs avant et après, dans la PR).
+
 - [x] **T-05a Base de données : socle** (dép. T-03a)
   Drizzle, conventions (UUID v7, `timestamptz`, `created_at`/`updated_at`, index), runner de migrations, tables transverses `outbox`, `processed_messages`, `site_settings`, `audit_log` (rôle base sans UPDATE/DELETE), `rate_limit_counters`, `donations` (flag désactivé), seed de base, transaction de test annulée.
   Tests : I (migration sur base vierge, rôle d'audit sans UPDATE/DELETE). Étape `ci` des migrations (`11-strategie-de-tests.md` § 7 : base vierge et copie du schéma de production).
