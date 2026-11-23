@@ -103,6 +103,9 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .where(eq(userSocialLinks.userId, id))
     return { ...profile, socialLinks: inPlatformOrder(links as SocialLink[]) }
   },
+  async updateProfile(userId, fields) {
+    if (Object.keys(fields).length) await db.update(users).set(fields).where(eq(users.id, userId))
+  },
   async setSocialLinks(userId, links) {
     await db.delete(userSocialLinks).where(eq(userSocialLinks.userId, userId))
     if (links.length) await db.insert(userSocialLinks).values(links.map((link) => ({ userId, ...link })))

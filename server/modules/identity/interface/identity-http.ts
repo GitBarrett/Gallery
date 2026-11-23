@@ -12,6 +12,7 @@ export function orThrow<R extends Result<unknown, IdentityError>>(result: R): Ex
     throw new AppError('FORBIDDEN', 'An invitation is required', { reason: 'invite_required' })
   if (error.kind === 'invalid_credentials')
     throw new AppError('UNAUTHENTICATED', 'Invalid email or password', { reason: 'invalid_credentials' })
+  if (error.kind === 'forbidden') throw new AppError('FORBIDDEN', 'Forbidden', { reason: error.reason })
   if (error.kind === 'oauth_failed')
     throw new AppError('UNAUTHENTICATED', 'Sign-in with the provider failed', { reason: 'oauth_failed' })
   if (error.kind === 'not_found') throw new AppError('NOT_FOUND', 'Not found')

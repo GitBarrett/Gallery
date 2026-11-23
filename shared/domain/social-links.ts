@@ -2,7 +2,7 @@ import { hasInsult } from './account-rules'
 import { err, ok, type Result } from './result'
 
 // Social networks of a profile (US-82, 08-securite.md § 4): only an identifier is stored, never a free URL except
-// the website; links are built from these fixed templates. Shared by the settings form (T-17a) and the server.
+// the website; links are built from these fixed templates. Shared by the settings form (T-17d) and the server.
 
 export const SOCIAL_PLATFORMS = [
   'twitch',

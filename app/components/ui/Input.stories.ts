@@ -36,6 +36,7 @@ export const WithAction: Story = {
   args: { label: 'Password', type: 'password' },
   render: (args) => () => h(Input, args, { action: () => h('a', { href: '#' }, 'Forgot password?') }),
 }
+export const Multiline: Story = { args: { label: 'Bio', multiline: true, hint: '300 characters maximum' } }
 export const WithError: Story = {
   args: { label: 'Password', type: 'password', hint: '12 characters minimum', error: 'Too short' },
 }

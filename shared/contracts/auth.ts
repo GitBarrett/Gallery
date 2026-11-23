@@ -111,8 +111,17 @@ export const OAuthCompleteBody = z.strictObject({
 })
 export type OAuthCompleteBody = z.infer<typeof OAuthCompleteBody>
 
-/** PATCH /api/me (US-05.1, US-05.4): new username, once every 30 days. Answers MeResponse. */
-export const MeUpdateBody = z.strictObject({ username: z.string().max(64) })
+/**
+ * PATCH /api/me: new username, once every 30 days (US-05.1, US-05.4), bio and language (US-07.1); at least one
+ * field. The bio rules are checked by the server (shared/domain/account-rules). Answers MeResponse.
+ */
+export const MeUpdateBody = z
+  .strictObject({
+    username: z.string().max(64).optional(),
+    bio: z.string().max(2000).optional(),
+    locale: z.enum(['en', 'fr']).optional(),
+  })
+  .refine((body) => Object.keys(body).length > 0, 'Nothing to update')
 export type MeUpdateBody = z.infer<typeof MeUpdateBody>
 
 /** GET /api/usernames/{name}/availability (US-05.2), open to everyone. */

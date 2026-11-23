@@ -113,6 +113,19 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect(await repo.findProfile(`${ash.username}x`)).toBeNull()
     })
 
+    it('US-07.1 updates the bio and the language of an account, each one alone', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      await repo.updateProfile(ash.id, { bio: 'Moonwell watcher.' })
+      expect(await repo.findProfile(ash.username)).toMatchObject({ bio: 'Moonwell watcher.' })
+      expect((await repo.findRecipient(ash.id))?.locale).toBe('fr')
+      await repo.updateProfile(ash.id, { locale: 'en' })
+      expect((await repo.findRecipient(ash.id))?.locale).toBe('en')
+      await repo.updateProfile(ash.id, { bio: null })
+      expect(await repo.findProfile(ash.username)).toMatchObject({ bio: null })
+    })
+
     it('US-82.4 stores the social links of an account, replaced as a whole, read in network order', async () => {
       const repo = await make()
       const ash = user()

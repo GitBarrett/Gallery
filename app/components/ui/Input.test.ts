@@ -28,6 +28,14 @@ describe('UiInput', () => {
     expect(wrapper.emitted('update:modelValue')).toEqual([['Dawn on the Plains']])
   })
 
+  it('is a text area tied to its label when multiline', async () => {
+    const wrapper = await mountSuspended(Input, { props: { label: 'Bio', multiline: true, modelValue: '' } })
+    const area = wrapper.get('textarea')
+    expect(wrapper.get('label').attributes('for')).toBe(area.attributes('id'))
+    await area.setValue('Night elf hunter.')
+    expect(wrapper.emitted('update:modelValue')).toEqual([['Night elf hunter.']])
+  })
+
   it('announces the hint and the error to assistive technologies', async () => {
     const wrapper = await mountSuspended(Input, {
       props: { label: 'Password', hint: '12 characters minimum', error: 'Too short', required: true },

@@ -11,6 +11,7 @@ export type IdentityError =
   | { kind: 'taken'; field: string }
   | { kind: 'rate_limited'; retryAfterSeconds: number }
   | { kind: 'invite_required' }
+  | { kind: 'forbidden'; reason: string }
   | { kind: 'not_found' }
   | { kind: 'invalid_credentials' }
   | { kind: 'oauth_failed' }

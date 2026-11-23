@@ -135,6 +135,8 @@ export interface IdentityRepository {
     status: string
     socialLinks: SocialLink[] // in the order of SOCIAL_PLATFORMS
   } | null>
+  /** Bio and language of the account (US-07.1); a field left out keeps its value. */
+  updateProfile(userId: string, fields: { bio?: string | null; locale?: Locale }): Promise<void>
   /** Replaces all the social links of the account (US-82). */
   setSocialLinks(userId: string, links: SocialLink[]): Promise<void>
   /** Current username of the account and date of its last change (US-05.4). */

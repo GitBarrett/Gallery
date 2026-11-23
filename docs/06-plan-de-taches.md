@@ -241,9 +241,19 @@ T-16 (pseudo et profil public : pseudos réservés, changement limité, redirect
   Table `user_social_links`, gabarits `shared/domain/social-links.ts`, affichage sur le profil (icônes maison, liens construits par le serveur, Discord à copier), liens masqués pour un compte sanctionné ou de moins de 7 jours. La saisie arrive avec T-17a.
   Stories : US-82.4–5. Tests : U, I.
 
-- [ ] **T-17a Réglages du compte : profil et mot de passe** (dép. T-16)
-  `/settings` : bio, langue, mot de passe (réauthentification), réseaux sociaux (`PUT /api/me/social-links`, validation par réseau, site web en `https://` seul).
-  Stories : US-07.1, US-07.3, US-82.1–3. Tests : U, I, E.
+T-17a (réglages du compte : bio, langue, mot de passe, réseaux sociaux) est découpée le 23/11/2026 en T-17a, T-17c et T-17d ; T-17b garde son numéro.
+
+- [x] **T-17a Réglages du compte : bio et langue** (dép. T-16)
+  `/settings` : bio (≤ 300 caractères, filtre d'insultes) et langue, par `PATCH /api/me`, enregistrées et visibles immédiatement.
+  Stories : US-07.1. Tests : U, I, E.
+
+- [ ] **T-17c Changement de mot de passe** (dép. T-17a)
+  `POST /api/me/password` avec l'ancien mot de passe (réauthentification), règles et HIBP de l'inscription, autres sessions révoquées.
+  Stories : US-07.3. Tests : U, I, E.
+
+- [ ] **T-17d Saisie des réseaux sociaux** (dép. T-17a, T-16c)
+  `/settings` : réseaux sociaux (`PUT /api/me/social-links`, liste complète, validation par réseau, site web en `https://` seul, 20/h par compte).
+  Stories : US-82.1–3. Tests : U, I, E (saisie puis affichage).
 
 - [ ] **T-17b Réglages du compte : email et comptes liés** (dép. T-17a, T-14)
   Changement d'email avec confirmation (ancienne et nouvelle adresse), comptes liés (refus si plus aucun moyen de connexion).

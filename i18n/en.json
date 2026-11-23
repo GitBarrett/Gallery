@@ -188,6 +188,18 @@
       "revoke": "Sign out",
       "revokeLabel": "Sign out {device}",
       "revokeOthers": "Sign out all other devices"
+    },
+    "profile": {
+      "title": "Profile",
+      "bio": {
+        "label": "Bio",
+        "hint": "{count} / 300 characters, shown on your profile.",
+        "too_long": "Your bio must have 300 characters or fewer.",
+        "insult": "Your bio contains a word that is not allowed."
+      },
+      "language": "Language of the site and the emails",
+      "submit": "Save my profile",
+      "saved": "Profile saved."
     }
   },
   "profile": {

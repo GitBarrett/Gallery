@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { inMemoryIdentityRepository } from '../../../../tests/fakes/in-memory-identity-repository'
 import { fixedClock } from '../../../../tests/fakes/fixed-clock'
-import { getProfile } from './profiles'
+import { getProfile, updateProfile } from './profiles'
 
 async function setup(status = 'active', createdAt = new Date('2026-11-01T10:00:00Z')) {
   const fake = inMemoryIdentityRepository()
@@ -67,5 +67,55 @@ describe('getProfile', () => {
 
   it('answers not found for an unknown username', async () => {
     expect(await (await setup())({ username: 'nobody' })).toEqual({ ok: false, error: { kind: 'not_found' } })
+  })
+})
+
+describe('updateProfile', () => {
+  const actor = { id: 'ash', status: 'active' }
+  async function fresh() {
+    const fake = inMemoryIdentityRepository()
+    await fake.repo.createUser({
+      id: 'ash',
+      email: 'ash@example.com',
+      username: 'Ash_Barrett',
+      passwordHash: 'h',
+      locale: 'en',
+      termsAcceptedAt: new Date('2026-11-01T00:00:00Z'),
+      termsVersion: 'v',
+    })
+    return { fake, run: updateProfile({ repo: fake.repo }) }
+  }
+
+  it('US-07.1 saves the trimmed bio and the language of the member', async () => {
+    const { fake, run } = await fresh()
+    expect(await run({ actor, bio: '  Night elf hunter. ', locale: 'fr' })).toEqual({ ok: true, value: undefined })
+    expect(fake.users[0]).toMatchObject({ bio: 'Night elf hunter.', locale: 'fr' })
+    await run({ actor, bio: '' })
+    expect(fake.users[0]).toMatchObject({ bio: null, locale: 'fr' })
+  })
+
+  it('US-07.1 refuses a bio over 300 characters or with an insult, and saves nothing', async () => {
+    const { fake, run } = await fresh()
+    expect(await run({ actor, bio: 'b'.repeat(301), locale: 'fr' })).toEqual({
+      ok: false,
+      error: { kind: 'invalid', field: 'bio', reason: 'too_long' },
+    })
+    expect(await run({ actor, bio: 'the bastard' })).toEqual({
+      ok: false,
+      error: { kind: 'invalid', field: 'bio', reason: 'insult' },
+    })
+    expect(fake.users[0]).toMatchObject({ locale: 'en' })
+  })
+
+  it('US-07.1 lets a suspended member change their language, not their bio', async () => {
+    const { fake, run } = await fresh()
+    const suspended = { id: 'ash', status: 'suspended' }
+    expect(await run({ actor: suspended, bio: 'Hello' })).toEqual({
+      ok: false,
+      error: { kind: 'forbidden', reason: 'suspended' },
+    })
+    expect((await run({ actor: suspended, locale: 'fr' })).ok).toBe(true)
+    expect(fake.users[0]).toMatchObject({ locale: 'fr' })
+    expect(fake.users[0]?.bio).toBeUndefined()
   })
 })

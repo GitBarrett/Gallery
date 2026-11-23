@@ -1,8 +1,15 @@
 <script setup lang="ts">
 // Form field (SignIn and Upload mockups): visible label always tied to the field, hint and error announced.
-// Other attributes (autocomplete, maxlength, placeholder…) go to the field. Slot `action`: a link beside the label.
+// Other attributes (autocomplete, maxlength, placeholder, rows…) go to the field; `multiline`: a text area (bio). Slot `action`: a link beside the label.
 defineOptions({ inheritAttrs: false })
-const props = defineProps<{ label: string; hint?: string; error?: string; required?: boolean; type?: string }>()
+const props = defineProps<{
+  label: string
+  hint?: string
+  error?: string
+  required?: boolean
+  type?: string
+  multiline?: boolean
+}>()
 const model = defineModel<string>({ default: '' })
 const id = useId()
 const describedBy = computed(
@@ -18,7 +25,19 @@ const describedBy = computed(
       </label>
       <slot name="action" />
     </div>
+    <textarea
+      v-if="multiline"
+      :id="id"
+      v-model="model"
+      v-bind="$attrs"
+      :required="required"
+      :aria-invalid="error ? 'true' : undefined"
+      :aria-describedby="describedBy"
+      class="input multiline"
+      :class="{ invalid: error }"
+    ></textarea>
     <input
+      v-else
       :id="id"
       v-model="model"
       v-bind="$attrs"
@@ -66,6 +85,11 @@ const describedBy = computed(
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
   color: var(--color-text);
+}
+
+.multiline {
+  padding: var(--space-2) var(--space-3);
+  resize: vertical;
 }
 
 .input:focus-visible {
