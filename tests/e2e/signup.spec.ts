@@ -72,7 +72,12 @@ test.describe('submissions', () => {
     await fill(page, someone())
     await page.getByRole('button', { name: 'Create my account' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Join the waiting list' })).toBeVisible()
-    await page.getByRole('checkbox', { name: /receive an email/ }).check()
+    // the form renders again once Turnstile mounts: a tick before that is lost, so tick until it holds
+    const consent = page.getByRole('checkbox', { name: /receive an email/ })
+    await expect(async () => {
+      await consent.check()
+      await expect(consent).toBeChecked({ timeout: 1_000 })
+    }).toPass({ timeout: 15_000 })
     const join = page.getByRole('button', { name: 'Join the waiting list' })
     await expect(join).toBeEnabled({ timeout: 15_000 })
     await join.click()

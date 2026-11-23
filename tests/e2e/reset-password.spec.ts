@@ -64,7 +64,7 @@ test('US-04.1 US-04.2 US-04.3 the mailed link sets a new password, ends the othe
   await page.getByLabel('Email').fill(ash.email)
   await page.getByLabel('Password').fill(ash.password)
   await page.getByRole('main').getByRole('button', { name: 'Sign in' }).click()
-  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible({ timeout: 15_000 }) // Argon2id: seconds
   const otherDevice = await context.cookies()
 
   // US-04.1: "Forgot password?" on the sign-in page, the same answer whatever the email
@@ -85,7 +85,7 @@ test('US-04.1 US-04.2 US-04.3 the mailed link sets a new password, ends the othe
   await page.goto(`/reset#${token}`)
   await page.getByRole('textbox', { name: 'New password' }).fill(password)
   await page.getByRole('button', { name: 'Change my password' }).click()
-  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible({ timeout: 15_000 }) // Argon2id: seconds
   await expect(page).toHaveURL('/') // the token left the address bar
   const signedIn = await context.cookies()
   await context.clearCookies()

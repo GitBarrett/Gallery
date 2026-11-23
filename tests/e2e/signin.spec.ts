@@ -39,7 +39,10 @@ async function signIn(page: Page, { email, password }: { email: string; password
   await page.waitForLoadState('networkidle') // hydrated: typing before would be lost
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Password').fill(password)
+  // the password check (Argon2id) takes seconds on a preview: wait for its answer, not only the default 5 s
+  const answered = page.waitForResponse((r) => r.url().endsWith('/api/auth/signin'), { timeout: 15_000 })
   await page.getByRole('main').getByRole('button', { name: 'Sign in' }).click()
+  await answered
 }
 
 test.beforeEach(async ({ page, browserName }, testInfo) => {
