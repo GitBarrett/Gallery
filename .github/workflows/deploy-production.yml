@@ -1,9 +1,8 @@
-# Production deployment from main (T-03a), smoke test and automatic rollback (T-04b).
+# Production deployment of main, on demand (T-03a, T-04d: not at each merge), smoke test and automatic rollback
+# (T-04b). Run it with `gh workflow run deploy-production.yml --ref main` or from the Actions tab.
 name: deploy-production
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       rollback_drill:
@@ -63,13 +62,14 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
       # 11-strategie-de-tests.md § 7: health (database through Hyperdrive, R2) and home page without CSP violation;
-      # the reference photo page and image join with their tasks (T-31a, T-25a)
+      # the reference photo page and image join with their tasks (T-31a, T-25a). Only these specs and the session
+      # cookie check (NUXT_APP_SECRET present), not the whole suite: the previews run it (T-04d)
       - name: Smoke test
         id: smoke
         run: |
           curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors "$BASE_URL/api/health"
           pnpm exec playwright install --with-deps chromium
-          pnpm exec playwright test --project desktop
+          pnpm exec playwright test tests/e2e/smoke.spec.ts tests/e2e/session.spec.ts --project desktop
           if [ "$ROLLBACK_DRILL" = "true" ]; then echo "Drill: failing on purpose"; exit 1; fi
         env:
           BASE_URL: https://legendary-shots.aleygues.workers.dev
