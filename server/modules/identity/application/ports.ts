@@ -119,6 +119,10 @@ export interface IdentityRepository {
   markEmailVerified(userId: string, at: Date): Promise<void>
   setPasswordHash(userId: string, passwordHash: string): Promise<void>
   findCredentials(email: string): Promise<{ userId: string; passwordHash: string | null; status: string } | null>
+  /** Public fields of the account of `username`, ignoring case; `username` in its display case. */
+  findProfile(
+    username: string,
+  ): Promise<{ username: string; bio: string | null; createdAt: Date; status: string } | null>
   findOAuthAccount(provider: OAuthProviderName, subject: string): Promise<{ userId: string; status: string } | null>
   /** `false` (nothing written) when this identity is already linked. */
   linkOAuthAccount(link: { id: string; userId: string; provider: OAuthProviderName; subject: string }): Promise<boolean>

@@ -71,6 +71,13 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
   async setPasswordHash(userId, passwordHash) {
     await db.update(users).set({ passwordHash }).where(eq(users.id, userId))
   },
+  async findProfile(username) {
+    const [row] = await db
+      .select({ username: users.username, bio: users.bio, createdAt: users.createdAt, status: users.status })
+      .from(users)
+      .where(sql`lower(${users.username}) = lower(${username})`)
+    return row ?? null
+  },
   async findCredentials(email) {
     const [row] = await db
       .select({ userId: users.id, passwordHash: users.passwordHash, status: users.status })

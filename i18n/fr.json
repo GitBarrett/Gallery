@@ -180,5 +180,13 @@
       "revokeLabel": "Déconnecter {device}",
       "revokeOthers": "Déconnecter tous les autres appareils"
     }
+  },
+  "profile": {
+    "memberSince": "Membre depuis {date}",
+    "settings": "Réglages",
+    "captures": "Captures",
+    "empty": "Aucune capture pour le moment",
+    "emptyOwn": "Vous n'avez encore publié aucune capture",
+    "emptyOwnText": "Vos captures publiées apparaîtront ici, visibles de tous."
   }
 }

@@ -227,9 +227,19 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   Hôte global `oauth.battle.net`, `state` sans PKCE, absence d'email, logo officiel (Q7).
   Stories : US-02.6. Tests : I, E.
 
-- [ ] **T-16 Pseudo et profil public** (dép. T-12a, T-07c)
-  Pseudos réservés, changement limité, redirections, page `/u/{pseudo}` (état vide pour les captures), réseaux sociaux du profil (table `user_social_links`, gabarits `shared/domain/social-links.ts`, liens masqués pour un compte sanctionné ou de moins de 7 jours).
-  Stories : US-05, US-82.4–5. Tests : U, I, E.
+T-16 (pseudo et profil public : pseudos réservés, changement limité, redirections, page `/u/{pseudo}`, réseaux sociaux du profil) est découpée le 23/11/2026 en T-16a à T-16c.
+
+- [x] **T-16a Profil public** (dép. T-12a, T-07c)
+  `GET /api/users/{username}` et page `/u/{pseudo}` conforme à `Profile.dc.html` : avatar, bio, date d'inscription, statistiques (compteurs < 10 masqués), état vide des captures ; compte banni ou en suppression : 404 ; l'icône et l'onglet Profil mènent à `/u/{moi}` (Q49).
+  Stories : US-05.3. Tests : U, I, E.
+
+- [ ] **T-16b Changement de pseudo** (dép. T-16a)
+  `PATCH /api/me` (pseudo une fois tous les 30 jours), table `username_redirects` (301 de l'ancienne URL pendant 90 jours, purge au cron quotidien), `GET /api/usernames/{name}/availability` (contrôle en direct, moins de 500 ms).
+  Stories : US-05.1, US-05.2, US-05.4. Tests : U, I, E.
+
+- [ ] **T-16c Réseaux sociaux du profil** (dép. T-16a)
+  Table `user_social_links`, gabarits `shared/domain/social-links.ts`, affichage sur le profil (icônes maison, liens construits par le serveur, Discord à copier), liens masqués pour un compte sanctionné ou de moins de 7 jours. La saisie arrive avec T-17a.
+  Stories : US-82.4–5. Tests : U, I.
 
 - [ ] **T-17a Réglages du compte : profil et mot de passe** (dép. T-16)
   `/settings` : bio, langue, mot de passe (réauthentification), réseaux sociaux (`PUT /api/me/social-links`, validation par réseau, site web en `https://` seul).
