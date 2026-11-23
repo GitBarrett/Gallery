@@ -60,6 +60,55 @@ export const googleOAuthProvider = ({
   },
 })
 
+// Battle.net sends `sub` as a string of digits; the BattleTag (personal data) is neither kept nor logged
+const BattlenetUserInfo = z.object({ sub: z.coerce.string().min(1).max(255) })
+
+/**
+ * Battle.net, authorization code flow on the global host (every region but China, US-02.6), confidential client,
+ * `state` only: PKCE is not documented by Blizzard (08-securite.md § 3). Battle.net gives no email.
+ */
+export const battlenetOAuthProvider = ({
+  clientId,
+  clientSecret,
+  fetch,
+}: {
+  clientId: string
+  clientSecret: string
+  fetch: Fetch
+}): OAuthProvider => ({
+  authorizationUrl({ state, redirectUri }) {
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      scope: 'openid',
+      state,
+    })
+    return `https://oauth.battle.net/authorize?${params}`
+  },
+  async identity({ code, redirectUri }) {
+    const token = await fetch('https://oauth.battle.net/token', {
+      method: 'POST',
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        client_id: clientId,
+        client_secret: clientSecret,
+      }),
+      signal: AbortSignal.timeout(5_000),
+    })
+    if (!token.ok) throw new Error(`Battle.net token endpoint answered ${token.status}`)
+    const { access_token } = Token.parse(await token.json())
+    const info = await fetch('https://oauth.battle.net/userinfo', {
+      headers: { Authorization: `Bearer ${access_token}` },
+      signal: AbortSignal.timeout(5_000),
+    })
+    if (!info.ok) throw new Error(`Battle.net userinfo answered ${info.status}`)
+    return { subject: BattlenetUserInfo.parse(await info.json()).sub, email: null }
+  },
+})
+
 /**
  * Provider of local runs and previews. Its consent page, `<consentUrl>/<provider>`, is a test route of the previews
  * whose address comes from NUXT_FAKE_OAUTH_CONSENT_URL, unknown to the production build. It sends back the email

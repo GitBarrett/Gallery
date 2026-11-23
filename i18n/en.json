@@ -155,9 +155,10 @@
       "signIn": "Sign in to get a new link"
     },
     "oauth": {
+      "battlenet": "Continue with Battle.net",
       "google": "Continue with Google",
       "or": "or with email",
-      "failed": "Signing in with Google did not work. Try again, or use your email.",
+      "failed": "That sign-in did not work. Try again, or use your email.",
       "linkNotice": "Sign in with your password to link Google to your account.",
       "completeTitle": "Choose your username",
       "completeText": "One last step to create your account. Your username is public.",

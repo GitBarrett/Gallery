@@ -223,7 +223,7 @@ Scripts jetables dans `prototypes/` (conservés dans `main` pour mémoire, jamai
   State + PKCE, règles de liaison, bouton conforme à la charte Google.
   Stories : US-02.1–5. Tests : U, I (fournisseur factice), E.
 
-- [ ] **T-15 OAuth Battle.net** (dép. T-14) — **action humaine** : client Battle.net.
+- [x] **T-15 OAuth Battle.net** (dép. T-14) — **action humaine** : client Battle.net.
   Hôte global `oauth.battle.net`, `state` sans PKCE, absence d'email, logo officiel (Q7).
   Stories : US-02.6. Tests : I, E.
 

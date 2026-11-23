@@ -28,6 +28,8 @@ const schema = z
     IP_HASH_KEY_CURRENT: z.string().min(32).optional(),
     NUXT_OAUTH_GOOGLE_CLIENT_ID: z.string().min(1).optional(),
     NUXT_OAUTH_GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+    NUXT_OAUTH_BATTLEDOTNET_CLIENT_ID: z.string().min(1).optional(),
+    NUXT_OAUTH_BATTLEDOTNET_CLIENT_SECRET: z.string().min(1).optional(),
     // Consent page of the fake OAuth providers: a test route, only on previews and in tests (ADR-013)
     NUXT_FAKE_OAUTH_CONSENT_URL: z.url().optional(),
   })
@@ -46,6 +48,8 @@ export interface Config {
   ipHashKey?: string
   googleClientId?: string
   googleClientSecret?: string
+  battlenetClientId?: string
+  battlenetClientSecret?: string
   fakeOAuthConsentUrl?: string
 }
 
@@ -66,6 +70,8 @@ export function loadConfig(env: Record<string, string | undefined>): Config {
     ipHashKey: parsed.data.IP_HASH_KEY_CURRENT,
     googleClientId: parsed.data.NUXT_OAUTH_GOOGLE_CLIENT_ID,
     googleClientSecret: parsed.data.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
+    battlenetClientId: parsed.data.NUXT_OAUTH_BATTLEDOTNET_CLIENT_ID,
+    battlenetClientSecret: parsed.data.NUXT_OAUTH_BATTLEDOTNET_CLIENT_SECRET,
     fakeOAuthConsentUrl: parsed.data.NUXT_FAKE_OAUTH_CONSENT_URL,
   }
 }
