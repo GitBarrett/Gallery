@@ -170,6 +170,14 @@
   },
   "settings": {
     "title": "Réglages",
+    "username": {
+      "title": "Pseudo",
+      "hint": "3 à 24 caractères : lettres, chiffres, _ et -. Modifiable une fois tous les 30 jours.",
+      "free": "« {name} » est disponible",
+      "submit": "Changer mon pseudo",
+      "saved": "Pseudo modifié. L'ancien lien de votre profil redirige pendant 90 jours.",
+      "wait": "Vous pouvez changer de pseudo une fois tous les 30 jours : réessayez dans {days} jours."
+    },
     "sessions": {
       "title": "Appareils",
       "device": "{browser} sur {os}",

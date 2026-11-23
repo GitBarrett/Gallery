@@ -145,3 +145,25 @@ test('US-03.7 US-03.8 US-03.9 lists the devices and signs out the other ones', a
   await expect(items).toContainText('This device')
   expect(await page.evaluate(async () => (await fetch('/api/me')).status)).toBe(200)
 })
+
+test('US-05.1 US-05.2 US-05.4 the username changes in the settings, the former profile link redirects', async ({
+  page,
+}) => {
+  const ash = await member(page)
+  await page.goto('/signin?redirect=/settings')
+  await signIn(page, ash)
+  const field = page.getByRole('textbox', { name: 'Username' })
+  await field.fill('admin')
+  await expect(page.getByText('This username is reserved. Choose another one.')).toBeVisible()
+  const renamed = `e2e_n_${crypto.randomUUID().slice(0, 6)}`
+  await field.fill(renamed)
+  await expect(page.getByText(`“${renamed}” is available`)).toBeVisible()
+  await page.getByRole('button', { name: 'Change my username' }).click()
+  await expect(page.getByText(/^Username changed/)).toBeVisible() // the toast region is a status too
+  const former = ash.username
+  created = { ...ash, username: renamed } // the next tests of this worker sign in as the renamed member
+
+  await page.goto(`/u/${former}`) // the 301 itself: tests/api/usernames.test.ts (the service worker hides it here)
+  await expect(page).toHaveURL(`/u/${renamed}`)
+  await expect(page.getByRole('heading', { level: 1, name: renamed })).toBeVisible()
+})

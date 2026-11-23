@@ -233,7 +233,7 @@ T-16 (pseudo et profil public : pseudos réservés, changement limité, redirect
   `GET /api/users/{username}` et page `/u/{pseudo}` conforme à `Profile.dc.html` : avatar, bio, date d'inscription, statistiques (compteurs < 10 masqués), état vide des captures ; compte banni ou en suppression : 404 ; l'icône et l'onglet Profil mènent à `/u/{moi}` (Q49).
   Stories : US-05.3. Tests : U, I, E.
 
-- [ ] **T-16b Changement de pseudo** (dép. T-16a)
+- [x] **T-16b Changement de pseudo** (dép. T-16a)
   `PATCH /api/me` (pseudo une fois tous les 30 jours), table `username_redirects` (301 de l'ancienne URL pendant 90 jours, purge au cron quotidien), `GET /api/usernames/{name}/availability` (contrôle en direct, moins de 500 ms).
   Stories : US-05.1, US-05.2, US-05.4. Tests : U, I, E.
 

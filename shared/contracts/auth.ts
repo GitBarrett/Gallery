@@ -110,6 +110,21 @@ export const OAuthCompleteBody = z.strictObject({
 })
 export type OAuthCompleteBody = z.infer<typeof OAuthCompleteBody>
 
+/** PATCH /api/me (US-05.1, US-05.4): new username, once every 30 days. Answers MeResponse. */
+export const MeUpdateBody = z.strictObject({ username: z.string().max(64) })
+export type MeUpdateBody = z.infer<typeof MeUpdateBody>
+
+/** GET /api/usernames/{name}/availability (US-05.2), open to everyone. */
+export const UsernameParams = z.strictObject({ name: z.string().min(1).max(64) })
+export const UsernameAvailabilityResponse = z.discriminatedUnion('available', [
+  z.strictObject({ available: z.literal(true) }),
+  z.strictObject({
+    available: z.literal(false),
+    reason: z.enum(['length', 'charset', 'reserved', 'insult', 'taken']),
+  }),
+])
+export type UsernameAvailabilityResponse = z.infer<typeof UsernameAvailabilityResponse>
+
 /** GET /api/users/{username}: any case; 404 for an unknown, banned or deleted account. */
 export const ProfileParams = z.strictObject({ username: z.string().min(1).max(64) })
 

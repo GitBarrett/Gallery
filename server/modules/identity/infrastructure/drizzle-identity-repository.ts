@@ -1,7 +1,15 @@
 import { and, desc, eq, gt, isNull, lt, ne, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import type { Clock } from '../../../platform/clock'
-import { betaInvites, emailTokens, oauthAccounts, sessions, users, waitlistEntries } from '../../../db/schema'
+import {
+  betaInvites,
+  emailTokens,
+  oauthAccounts,
+  sessions,
+  usernameRedirects,
+  users,
+  waitlistEntries,
+} from '../../../db/schema'
 import type { Actor, EmailTokenType, IdentityRepository, Locale } from '../application/ports'
 
 const sameEmail = (email: string) => sql`lower(${users.email}) = lower(${email})`
@@ -77,6 +85,34 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .from(users)
       .where(sql`lower(${users.username}) = lower(${username})`)
     return row ?? null
+  },
+  async findUsername(userId) {
+    const [row] = await db
+      .select({ username: users.username, changedAt: users.usernameChangedAt })
+      .from(users)
+      .where(eq(users.id, userId))
+    return row ?? null
+  },
+  async usernameOwner(username, at) {
+    const [holder] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(sql`lower(${users.username}) = lower(${username})`)
+    if (holder) return holder.id
+    const [redirect] = await db
+      .select({ userId: usernameRedirects.userId })
+      .from(usernameRedirects)
+      .where(and(eq(usernameRedirects.oldUsername, username.toLowerCase()), gt(usernameRedirects.expiresAt, at)))
+    return redirect?.userId ?? null
+  },
+  async renameUser({ userId, previous, username, at, redirectUntil }) {
+    await db.update(users).set({ username, usernameChangedAt: at }).where(eq(users.id, userId))
+    await db.delete(usernameRedirects).where(eq(usernameRedirects.oldUsername, username.toLowerCase()))
+    if (previous.toLowerCase() === username.toLowerCase()) return
+    await db
+      .insert(usernameRedirects)
+      .values({ oldUsername: previous.toLowerCase(), userId, expiresAt: redirectUntil })
+      .onConflictDoUpdate({ target: usernameRedirects.oldUsername, set: { userId, expiresAt: redirectUntil } })
   },
   async findCredentials(email) {
     const [row] = await db
@@ -186,4 +222,9 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
 export async function purgeExpiredTokens(db: Db, clock: Clock): Promise<void> {
   await db.delete(emailTokens).where(lt(emailTokens.expiresAt, clock.now()))
   await db.delete(sessions).where(lt(sessions.expiresAt, clock.now()))
+}
+
+/** Daily cron (03-architecture.md § Cron): former usernames past their 90 days (US-05.4). Idempotent. */
+export async function purgeExpiredRedirects(db: Db, clock: Clock): Promise<void> {
+  await db.delete(usernameRedirects).where(lt(usernameRedirects.expiresAt, clock.now()))
 }

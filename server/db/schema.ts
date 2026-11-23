@@ -105,6 +105,19 @@ export const oauthAccounts = pgTable(
   ],
 )
 
+/** Former usernames: /u/{old} redirects (301) to the account for 90 days, then the daily cron purges (US-05.4). */
+export const usernameRedirects = pgTable(
+  'username_redirects',
+  {
+    oldUsername: text('old_username').primaryKey(), // lowercase
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    expiresAt: at('expires_at').notNull(),
+  },
+  (t) => [index('username_redirects_user_idx').on(t.userId)],
+)
+
 /** Server sessions: the sealed cookie carries a 256-bit id, only its SHA-256 is stored (ADR-010). */
 export const sessions = pgTable(
   'sessions',

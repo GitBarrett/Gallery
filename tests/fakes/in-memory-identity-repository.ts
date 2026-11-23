@@ -13,6 +13,7 @@ type StoredUser = Omit<NewUser, 'passwordHash' | 'emailVerifiedAt'> & {
   role: 'user' | 'moderator' | 'admin'
   status: string
   // set by the tests that need them (not written by createUser, so that its rows compare simply)
+  usernameChangedAt?: Date | null
   bio?: string | null
   createdAt?: Date
 }
@@ -28,6 +29,7 @@ export function inMemoryIdentityRepository() {
   const waitlist: { id: string; email: string; locale: Locale }[] = []
   const same = (a: string | null, b: string) => a?.toLowerCase() === b.toLowerCase()
   const oauth: { id: string; userId: string; provider: string; subject: string }[] = []
+  const redirects: { oldUsername: string; userId: string; expiresAt: Date }[] = []
   const repo: IdentityRepository = {
     async findUserIdByEmail(email) {
       return users.find((u) => same(u.email, email))?.id ?? null
@@ -79,6 +81,22 @@ export function inMemoryIdentityRepository() {
             status: user.status,
           }
         : null
+    },
+    async findUsername(userId) {
+      const user = users.find((u) => u.id === userId)
+      return user ? { username: user.username, changedAt: user.usernameChangedAt ?? null } : null
+    },
+    async usernameOwner(username, at) {
+      const holder = users.find((u) => same(u.username, username))
+      return holder?.id ?? redirects.find((r) => same(r.oldUsername, username) && r.expiresAt > at)?.userId ?? null
+    },
+    async renameUser({ userId, previous, username, at, redirectUntil }) {
+      const user = users.find((u) => u.id === userId)!
+      Object.assign(user, { username, usernameChangedAt: at })
+      const kept = redirects.filter((r) => !same(r.oldUsername, username) && !same(r.oldUsername, previous))
+      if (!same(previous, username))
+        kept.push({ oldUsername: previous.toLowerCase(), userId, expiresAt: redirectUntil })
+      redirects.splice(0, redirects.length, ...kept)
     },
     async findCredentials(email) {
       const user = users.find((u) => same(u.email, email))

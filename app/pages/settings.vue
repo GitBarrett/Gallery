@@ -1,8 +1,9 @@
 <script setup lang="ts">
-// Account settings (/settings, to be designed: 07-design.md). Sign-out and devices for now (Q51), the other
+// Account settings (/settings, to be designed: 07-design.md). Username (T-16b), sign-out and devices (Q51), the other
 // settings with US-07 and US-09. A visitor is sent to sign in and comes back here (Q49).
 import SessionList from '~/features/auth/SessionList.vue'
 import SignoutButton from '~/features/auth/SignoutButton.vue'
+import UsernameForm from '~/features/profile/UsernameForm.vue'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -15,6 +16,7 @@ if (!me.value) await navigateTo({ path: localePath('/signin'), query: { redirect
 <template>
   <section class="settings" aria-labelledby="settings-title">
     <h1 id="settings-title" class="title">{{ t('settings.title') }}</h1>
+    <UsernameForm v-if="me" :username="me.username" />
     <SignoutButton />
     <SessionList />
   </section>

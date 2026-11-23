@@ -123,6 +123,18 @@ export interface IdentityRepository {
   findProfile(
     username: string,
   ): Promise<{ username: string; bio: string | null; createdAt: Date; status: string } | null>
+  /** Current username of the account and date of its last change (US-05.4). */
+  findUsername(userId: string): Promise<{ username: string; changedAt: Date | null } | null>
+  /** Account holding `username` ignoring case: as its current name, or as a former one redirected after `at`. */
+  usernameOwner(username: string, at: Date): Promise<string | null>
+  /** Renames; the previous name redirects to the account until `redirectUntil`, the new one stops redirecting. */
+  renameUser(rename: {
+    userId: string
+    previous: string
+    username: string
+    at: Date
+    redirectUntil: Date
+  }): Promise<void>
   findOAuthAccount(provider: OAuthProviderName, subject: string): Promise<{ userId: string; status: string } | null>
   /** `false` (nothing written) when this identity is already linked. */
   linkOAuthAccount(link: { id: string; userId: string; provider: OAuthProviderName; subject: string }): Promise<boolean>

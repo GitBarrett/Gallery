@@ -8,6 +8,7 @@ import { PublicSettings } from '~~/shared/contracts/settings'
 import {
   type ForgotPasswordBody,
   MeResponse,
+  type MeUpdateBody,
   type OAuthCompleteBody,
   OAuthPendingResponse,
   ProfileResponse,
@@ -16,6 +17,7 @@ import {
   SessionsResponse,
   type SigninBody,
   type SignupBody,
+  UsernameAvailabilityResponse,
   type VerifyEmailBody,
   type WaitlistBody,
 } from '~~/shared/contracts/auth'
@@ -25,8 +27,8 @@ export class ApiError extends Error {
     readonly code: ErrorCode,
     readonly status: number,
     readonly correlationId?: string,
-    /** `{ field, reason }` of a VALIDATION_FAILED, `{ reason }` of a FORBIDDEN… (03-architecture.md § Conventions d'API) */
-    readonly details?: { field?: string; reason?: string },
+    /** `{ field, reason }` of a VALIDATION_FAILED, `{ reason }` of a FORBIDDEN, `{ retryAfterSeconds }` of a RATE_LIMITED… */
+    readonly details?: { field?: string; reason?: string; retryAfterSeconds?: number },
   ) {
     super(code)
     this.name = 'ApiError'
@@ -88,6 +90,11 @@ export const api = {
   // public profile (US-05.3); 404 NOT_FOUND for an unknown, banned or deleted account
   profile: (username: string, fetch?: typeof $fetch) =>
     call(`/api/users/${encodeURIComponent(username)}`, ProfileResponse, {}, fetch),
+  // US-05.1, US-05.4: 409 CONFLICT when taken, 429 RATE_LIMITED within 30 days of the last change
+  updateMe: (body: MeUpdateBody) => call('/api/me', MeResponse, { method: 'PATCH', body }),
+  // US-05.2: why a username cannot be used
+  usernameAvailability: (name: string) =>
+    call(`/api/usernames/${encodeURIComponent(name)}/availability`, UsernameAvailabilityResponse),
   sessions: () => call('/api/me/sessions', SessionsResponse),
   // 204 (US-03.8, US-03.9)
   revokeSession: (id: string) => call(`/api/me/sessions/${id}`, z.unknown(), { method: 'DELETE' }),

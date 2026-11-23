@@ -28,9 +28,14 @@ export { resendVerification } from './application/resend-verification'
 export { forgotPassword } from './application/forgot-password'
 export { resetPassword } from './application/reset-password'
 export { getProfile } from './application/profiles'
+export { changeUsername, usernameAvailability } from './application/usernames'
 export { requireVerified, type PolicyDenial } from './domain/policies'
 export { argon2idHasher } from './infrastructure/argon2id-hasher'
-export { drizzleIdentityRepository, purgeExpiredTokens } from './infrastructure/drizzle-identity-repository'
+export {
+  drizzleIdentityRepository,
+  purgeExpiredRedirects,
+  purgeExpiredTokens,
+} from './infrastructure/drizzle-identity-repository'
 export { hibpBreachChecker } from './infrastructure/hibp-breach-checker'
 export { fakeMailer, resendMailer } from './infrastructure/resend-mailer'
 export { mailboxKey, mailboxMailer } from './infrastructure/mailbox-mailer'

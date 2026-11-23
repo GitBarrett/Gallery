@@ -15,6 +15,7 @@ import {
   emailsConsumer,
   fakeMailer,
   mailboxMailer,
+  purgeExpiredRedirects,
   purgeExpiredTokens,
   resendMailer,
   type Mailer,
@@ -75,7 +76,10 @@ const crons = (env: Bindings): Record<string, CronHandler[]> => ({
     withDb(env, (db) => purgeRateLimitCounters(db, systemClock)), // ended windows (T-05c)
     withDb(env, (db) => purgeExpiredTokens(db, systemClock)),
   ],
-  '15 3 * * *': [withDb(env, (db) => relayOf(env, db).purge())],
+  '15 3 * * *': [
+    withDb(env, (db) => relayOf(env, db).purge()),
+    withDb(env, (db) => purgeExpiredRedirects(db, systemClock)), // former usernames (T-16b)
+  ],
 })
 
 // Nitro hooks validated by T-00f; acknowledgement happens message by message in dispatchBatch.

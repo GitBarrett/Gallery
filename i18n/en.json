@@ -170,6 +170,14 @@
   },
   "settings": {
     "title": "Settings",
+    "username": {
+      "title": "Username",
+      "hint": "3 to 24 characters: letters, digits, _ and -. You can change it once every 30 days.",
+      "free": "“{name}” is available",
+      "submit": "Change my username",
+      "saved": "Username changed. Your former profile link redirects for 90 days.",
+      "wait": "You can change your username once every 30 days: try again in {days} days."
+    },
     "sessions": {
       "title": "Devices",
       "device": "{browser} on {os}",
