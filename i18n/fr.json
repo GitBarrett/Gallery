@@ -196,6 +196,9 @@
     "captures": "Captures",
     "empty": "Aucune capture pour le moment",
     "emptyOwn": "Vous n'avez encore publié aucune capture",
-    "emptyOwnText": "Vos captures publiées apparaîtront ici, visibles de tous."
+    "emptyOwnText": "Vos captures publiées apparaîtront ici, visibles de tous.",
+    "website": "Site web",
+    "copyDiscord": "Copier le pseudo Discord {handle}",
+    "discordCopied": "Pseudo Discord copié"
   }
 }

@@ -118,6 +118,26 @@ export const usernameRedirects = pgTable(
   (t) => [index('username_redirects_user_idx').on(t.userId)],
 )
 
+/** Social networks of a profile (US-82): an identifier per network, the website its https URL; deleted with the account. */
+export const userSocialLinks = pgTable(
+  'user_social_links',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    platform: text('platform').notNull(),
+    handle: text('handle').notNull(),
+    updatedAt: at('updated_at').notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.platform] }),
+    check(
+      'user_social_links_platform_check',
+      sql`${t.platform} in ('twitch', 'youtube', 'x', 'bluesky', 'instagram', 'tiktok', 'reddit', 'discord', 'website')`,
+    ),
+  ],
+)
+
 /** Server sessions: the sealed cookie carries a 256-bit id, only its SHA-256 is stored (ADR-010). */
 export const sessions = pgTable(
   'sessions',

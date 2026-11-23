@@ -3,6 +3,7 @@
 // the initial until avatars come (T-17a); statistics and the Follow / Share buttons come with the photos and follows
 // (every counter is under 10 until then, hidden: US-70). The member's own profile leads to the settings (sign-out).
 import type { ProfileResponse } from '~~/shared/contracts/auth'
+import SocialLinks from './SocialLinks.vue'
 
 const props = defineProps<{ profile: ProfileResponse; own: boolean }>()
 const { t, locale } = useI18n()
@@ -23,6 +24,7 @@ const since = computed(() =>
         <h1 id="profile-name" class="name">{{ profile.username }}</h1>
         <p v-if="profile.bio" class="bio">{{ profile.bio }}</p>
         <p class="since">{{ t('profile.memberSince', { date: since }) }}</p>
+        <SocialLinks :links="profile.socialLinks" />
       </div>
       <UiButton v-if="own" :to="localePath('/settings')" variant="secondary">{{ t('profile.settings') }}</UiButton>
     </section>

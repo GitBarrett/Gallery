@@ -5,7 +5,9 @@ import type {
   Locale,
   NewSession,
   NewUser,
+  SocialLink,
 } from '../../server/modules/identity'
+import { SOCIAL_PLATFORMS } from '../../shared/domain/social-links'
 
 type StoredUser = Omit<NewUser, 'passwordHash' | 'emailVerifiedAt'> & {
   passwordHash: string | null
@@ -29,6 +31,7 @@ export function inMemoryIdentityRepository() {
   const waitlist: { id: string; email: string; locale: Locale }[] = []
   const same = (a: string | null, b: string) => a?.toLowerCase() === b.toLowerCase()
   const oauth: { id: string; userId: string; provider: string; subject: string }[] = []
+  let socials: (SocialLink & { userId: string })[] = []
   const redirects: { oldUsername: string; userId: string; expiresAt: Date }[] = []
   const repo: IdentityRepository = {
     async findUserIdByEmail(email) {
@@ -79,8 +82,15 @@ export function inMemoryIdentityRepository() {
             bio: user.bio ?? null,
             createdAt: user.createdAt ?? new Date(0),
             status: user.status,
+            socialLinks: socials
+              .filter((l) => l.userId === user.id)
+              .map(({ platform, handle }) => ({ platform, handle }))
+              .sort((a, b) => SOCIAL_PLATFORMS.indexOf(a.platform) - SOCIAL_PLATFORMS.indexOf(b.platform)),
           }
         : null
+    },
+    async setSocialLinks(userId, links) {
+      socials = [...socials.filter((l) => l.userId !== userId), ...links.map((link) => ({ userId, ...link }))]
     },
     async findUsername(userId) {
       const user = users.find((u) => u.id === userId)

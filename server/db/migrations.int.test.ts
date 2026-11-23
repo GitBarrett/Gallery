@@ -28,6 +28,7 @@ describe('migrations (T-05a)', () => {
     tables.push('beta_invites', 'waitlist_entries') // T-11d
     tables.push('oauth_accounts') // T-14
     tables.push('username_redirects') // T-16b
+    tables.push('user_social_links') // T-16c
     const found = await sql`select tablename from pg_tables where schemaname = 'public'`
     expect(found.map((t) => t.tablename).sort()).toEqual(tables.sort())
   })

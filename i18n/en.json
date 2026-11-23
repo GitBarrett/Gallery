@@ -196,6 +196,9 @@
     "captures": "Captures",
     "empty": "No captures yet",
     "emptyOwn": "You haven't published any capture yet",
-    "emptyOwnText": "Your published captures will show here, for everyone to see."
+    "emptyOwnText": "Your published captures will show here, for everyone to see.",
+    "website": "Website",
+    "copyDiscord": "Copy the Discord username {handle}",
+    "discordCopied": "Discord username copied"
   }
 }
