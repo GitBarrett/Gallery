@@ -209,6 +209,15 @@
       "saved": "Mot de passe modifié. Vos autres appareils sont déconnectés.",
       "wrong": "Ce n'est pas votre mot de passe actuel.",
       "none": "Votre compte n'a pas encore de mot de passe : créez-en un avec « Mot de passe oublié ? » sur la page de connexion."
+    },
+    "social": {
+      "title": "Réseaux sociaux",
+      "text": "Votre pseudo seulement, par exemple luneblade pour Twitch ou {'@'}luneblade pour YouTube ; l'adresse complète en https:// pour votre site web. Laissez un champ vide pour le retirer.",
+      "format": "Ce n'est pas un pseudo {network} valide.",
+      "website": "Saisissez une adresse en https://, sans adresse IP ni raccourcisseur de liens, de 200 caractères au plus.",
+      "insult": "Ce texte contient un mot interdit.",
+      "submit": "Enregistrer mes réseaux sociaux",
+      "saved": "Réseaux sociaux enregistrés."
     }
   },
   "profile": {

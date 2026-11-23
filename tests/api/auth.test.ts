@@ -387,6 +387,43 @@ describe('sessions', () => {
     expect((await errorOf(expired)).details).toEqual({ field: 'token', reason: 'expired' })
   })
 
+  it('US-82.1 US-82.2 US-82.3 saves the social networks, reads them back and shows them on the profile', async () => {
+    const credentials = await account()
+    const cookie = sessionCookie(await signin(credentials)).value
+    const put = (links: unknown, withCookie = true) =>
+      fetch('/api/me/social-links', {
+        method: 'PUT',
+        headers: {
+          'sec-fetch-site': 'same-origin',
+          'content-type': 'application/json',
+          ...(withCookie ? { cookie } : {}),
+        },
+        body: JSON.stringify({ links }),
+      })
+    const links = [
+      { platform: 'twitch', handle: 'luneblade' },
+      { platform: 'website', handle: 'https://ash.example.com/shots' },
+    ]
+    expect((await put(links, false)).status).toBe(401)
+    expect((await errorOf(await put([{ platform: 'twitch', handle: 'twitch.tv/x' }]))).details).toEqual({
+      field: 'twitch',
+      reason: 'format',
+    })
+    expect((await put([links[0], links[0]])).status).toBe(400) // one identifier per network
+    expect((await put(links)).status).toBe(204)
+    const own = await fetch('/api/me/social-links', { headers: { cookie } })
+    expect(await own.json()).toEqual({ links }) // kept in the settings while the profile hides them (US-82.5)
+    await db
+      .update(users)
+      .set({ createdAt: new Date('2026-11-01T10:00:00Z') })
+      .where(eq(users.email, credentials.email))
+    const profile = await (await fetch(`/api/users/${credentials.username}`)).json()
+    expect(profile.socialLinks).toEqual([
+      { platform: 'twitch', label: 'luneblade', url: 'https://twitch.tv/luneblade' },
+      { platform: 'website', label: 'ash.example.com', url: 'https://ash.example.com/shots' },
+    ])
+  })
+
   it('US-07.3 changes the password with the old one and revokes the other sessions only', async () => {
     const credentials = await account()
     const laptop = sessionCookie(await signin(credentials)).value

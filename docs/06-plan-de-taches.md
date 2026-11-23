@@ -251,7 +251,7 @@ T-17a (réglages du compte : bio, langue, mot de passe, réseaux sociaux) est d�
   `POST /api/me/password` avec l'ancien mot de passe (réauthentification), règles et HIBP de l'inscription, autres sessions révoquées.
   Stories : US-07.3. Tests : U, I, E.
 
-- [ ] **T-17d Saisie des réseaux sociaux** (dép. T-17a, T-16c)
+- [x] **T-17d Saisie des réseaux sociaux** (dép. T-17a, T-16c)
   `/settings` : réseaux sociaux (`PUT /api/me/social-links`, liste complète, validation par réseau, site web en `https://` seul, 20/h par compte).
   Stories : US-82.1–3. Tests : U, I, E (saisie puis affichage).
 
