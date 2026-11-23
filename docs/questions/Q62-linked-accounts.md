@@ -1,6 +1,6 @@
 # Q62 — Comptes liés (T-17e)
 
-- **Statut** : À valider — Adrien (23/11/2026)
+- **Statut** : Tranché — Adrien, 23/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - Section « Comptes liés » dans `/settings` (pas de maquette des réglages) : Google et Battle.net, chacun « Non lié » ou avec un bouton « Délier » ; pas de bouton « Lier » dans les réglages, la liaison reste celle de la connexion (US-02.3).
   - Fournisseurs liés lus par `GET /api/me/account` (champ `providers`), sans nouvelle route.

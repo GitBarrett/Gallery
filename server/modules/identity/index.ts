@@ -34,7 +34,7 @@ export { confirmEmailChange, getAccount, requestEmailChange } from './applicatio
 export { unlinkOAuth } from './application/linked-accounts'
 export { getProfile, updateProfile } from './application/profiles'
 export { changeUsername, usernameAvailability } from './application/usernames'
-export { requireVerified, type PolicyDenial } from './domain/policies'
+export { notSanctioned, requireOwner, requireRole, requireVerified, type PolicyDenial } from './domain/policies'
 export { argon2idHasher } from './infrastructure/argon2id-hasher'
 export {
   drizzleIdentityRepository,
