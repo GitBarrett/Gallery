@@ -29,6 +29,7 @@ import {
   getAccount,
   requestEmailChange,
   confirmEmailChange,
+  unlinkOAuth,
   resolveSession,
   revokeOtherSessions,
   revokeSession,
@@ -73,6 +74,7 @@ export interface Container {
     getAccount: UseCase<typeof getAccount>
     requestEmailChange: UseCase<typeof requestEmailChange>
     confirmEmailChange: UseCase<typeof confirmEmailChange>
+    unlinkOAuth: UseCase<typeof unlinkOAuth>
     getProfile: UseCase<typeof getProfile>
     updateProfile: UseCase<typeof updateProfile>
     changeUsername: UseCase<typeof changeUsername>
@@ -226,6 +228,7 @@ export function createContainer({
           limiter: dbRateLimiter(db(), ipHashKey(), clock),
         })(cmd),
       confirmEmailChange: (cmd) => confirmEmailChange({ uow: identityUow(), clock })(cmd),
+      unlinkOAuth: (cmd) => unlinkOAuth({ uow: identityUow() })(cmd),
       startOAuth: (provider) => startOAuth(oauthProvider(provider), redirectUri(provider)),
       oauthCallback: (cmd) =>
         oauthCallback({

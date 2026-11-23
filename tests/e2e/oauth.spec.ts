@@ -27,7 +27,7 @@ test.beforeEach(async ({ page, browserName }, testInfo) => {
   test.skip(reset.status === 404, 'test routes are only built for previews')
 })
 
-test('US-02.1 US-02.2 a first Google sign-in asks for a username and the Terms, the next one signs in at once', async ({
+test('US-02.1 US-02.2 US-07.4 a first Google sign-in asks for a username and the Terms, the next one signs in at once; Google cannot be unlinked as the only way in', async ({
   page,
   context,
 }) => {
@@ -55,6 +55,15 @@ test('US-02.1 US-02.2 a first Google sign-in asks for a username and the Terms, 
   await page.getByRole('button', { name: 'Allow' }).click()
   await expect(page).toHaveURL('/')
   await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible()
+
+  // US-07.4: an account made with Google alone, no password: unlinking Google would leave no way to sign in
+  await page.goto('/settings')
+  const linked = page.getByRole('region', { name: 'Linked accounts' })
+  await expect(linked.getByText('Not linked')).toBeVisible() // Battle.net
+  await linked.getByRole('button', { name: 'Unlink Google' }).click()
+  await expect(linked.getByRole('alert')).toContainText('This is your only way to sign in')
+  await page.reload()
+  await expect(linked.getByRole('button', { name: 'Unlink Google' })).toBeVisible()
 })
 
 test('US-02.5 a refusal on the consent screen comes back to the sign-in with a message, Google offered again', async ({

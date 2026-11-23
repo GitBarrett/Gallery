@@ -220,6 +220,16 @@
       "wrong": "This is not your current password.",
       "none": "Your account has no password yet: set one with “Forgot password?” on the sign-in page."
     },
+    "linked": {
+      "title": "Linked accounts",
+      "google": "Google",
+      "battlenet": "Battle.net",
+      "none": "Not linked",
+      "unlink": "Unlink",
+      "unlinkLabel": "Unlink {provider}",
+      "done": "{provider} is no longer linked to your account.",
+      "last": "This is your only way to sign in: add a password with “Forgot password?” on the sign-in page, or link another account first."
+    },
     "email": {
       "title": "Email",
       "current": "Your email: {email}",

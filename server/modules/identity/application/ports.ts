@@ -159,6 +159,10 @@ export interface IdentityRepository {
   findOAuthAccount(provider: OAuthProviderName, subject: string): Promise<{ userId: string; status: string } | null>
   /** `false` (nothing written) when this identity is already linked. */
   linkOAuthAccount(link: { id: string; userId: string; provider: OAuthProviderName; subject: string }): Promise<boolean>
+  /** Providers linked to the account (US-07.4), in a fixed order: google, battlenet. */
+  listOAuthProviders(userId: string): Promise<OAuthProviderName[]>
+  /** `false` (nothing deleted) when this provider is not linked to the account. */
+  unlinkOAuthAccount(userId: string, provider: OAuthProviderName): Promise<boolean>
   createSession(session: NewSession): Promise<void>
   findSession(
     idHash: string,

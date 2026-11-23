@@ -3,23 +3,29 @@ import type { Clock } from '../../../platform/clock'
 import type { RateLimiter, RateLimitRule } from '../../../platform/rate-limiter'
 import type { UnitOfWork } from '../../../platform/unit-of-work'
 import { hashToken, invalid, type IdentityResult } from './email-tokens'
-import type { IdentityRepository, PasswordHasher } from './ports'
+import type { IdentityRepository, OAuthProviderName, PasswordHasher } from './ports'
 
 // Every request counts, a wrong password included: it also stops guessing the password (same pace as US-01.5)
 export const EMAIL_CHANGE_REQUESTS: RateLimitRule = { name: 'email-change', limit: 3, windowSeconds: 3600 }
 
-async function accountOf(repo: IdentityRepository, userId: string) {
+/** Email and password hash of an account (both null: Battle.net without email, Q55). */
+export async function accountOf(repo: IdentityRepository, userId: string) {
   const recipient = await repo.findRecipient(userId)
   const passwordHash = recipient?.email ? (await repo.findCredentials(recipient.email))?.passwordHash : null
   return { email: recipient?.email ?? null, passwordHash: passwordHash ?? null }
 }
 
-/** Email of the signed-in member and whether a password guards its change (US-07.2), own account only. */
+/**
+ * Email of the signed-in member, whether a password guards its change (US-07.2) and its linked providers (US-07.4),
+ * own account only.
+ */
 export const getAccount =
   (deps: { repo: IdentityRepository }) =>
-  async (cmd: { userId: string }): Promise<{ email: string | null; hasPassword: boolean }> => {
+  async (cmd: {
+    userId: string
+  }): Promise<{ email: string | null; hasPassword: boolean; providers: OAuthProviderName[] }> => {
     const { email, passwordHash } = await accountOf(deps.repo, cmd.userId)
-    return { email, hasPassword: Boolean(passwordHash) }
+    return { email, hasPassword: Boolean(passwordHash), providers: await deps.repo.listOAuthProviders(cmd.userId) }
   }
 
 /**

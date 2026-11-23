@@ -86,8 +86,15 @@ export const ChangePasswordBody = z.strictObject({
 })
 export type ChangePasswordBody = z.infer<typeof ChangePasswordBody>
 
-/** GET /api/me/account (US-07.2): email of the account (null: Battle.net, Q55), whether a password guards it. */
-export const AccountResponse = z.strictObject({ email: z.email().nullable(), hasPassword: z.boolean() })
+/**
+ * GET /api/me/account: email of the account (null: Battle.net, Q55), whether a password guards it (US-07.2), linked
+ * providers (US-07.4).
+ */
+export const AccountResponse = z.strictObject({
+  email: z.email().nullable(),
+  hasPassword: z.boolean(),
+  providers: z.array(z.enum(['google', 'battlenet'])),
+})
 export type AccountResponse = z.infer<typeof AccountResponse>
 
 /** POST /api/me/email (US-07.2): `currentPassword` required when the account has one. */

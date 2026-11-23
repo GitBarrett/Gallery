@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { readBody, setResponseStatus } from 'h3'
 import ChangeEmailForm from './ChangeEmailForm.vue'
 
-let account = { email: 'ash@example.com' as string | null, hasPassword: true }
+let account = { email: 'ash@example.com' as string | null, hasPassword: true, providers: [] as string[] }
 const sent = vi.fn()
 registerEndpoint('/api/me/account', () => account)
 registerEndpoint('/api/me/email', {
@@ -44,7 +44,7 @@ describe('ChangeEmailForm', () => {
   })
 
   it('US-07.2 asks no password from an account without one, and adds a first email (Battle.net)', async () => {
-    account = { email: null, hasPassword: false }
+    account = { email: null, hasPassword: false, providers: ['battlenet'] }
     const wrapper = await submit('ash@example.com')
     expect(wrapper.findAll('input')).toHaveLength(1)
     expect(wrapper.text()).toContain('Your account has no email yet')

@@ -259,7 +259,7 @@ T-17a (réglages du compte : bio, langue, mot de passe, réseaux sociaux) est d�
   Changement d'email avec confirmation : lien à la nouvelle adresse, alerte à l'ancienne, mot de passe actuel exigé s'il existe ; ajout d'un premier email pour un compte Battle.net (Q55).
   Stories : US-07.2. Tests : U, I, E.
 
-- [ ] **T-17e Réglages du compte : comptes liés** (dép. T-17a, T-14)
+- [x] **T-17e Réglages du compte : comptes liés** (dép. T-17a, T-14)
   Comptes Google et Battle.net liés dans `/settings`, déliaison (`DELETE /api/me/oauth/{provider}`) refusée s'il ne resterait aucun moyen de connexion.
   Stories : US-07.4. Tests : U, I, E.
 
