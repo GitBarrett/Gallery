@@ -245,9 +245,10 @@ test('US-07.3 the password changes in the settings with the old one, the other d
   await expect.poll(() => devices.count()).toBeGreaterThan(1)
 
   const password = `${ash.password} renewed`
-  await page.getByLabel('Current password').fill(ash.password)
-  await page.getByLabel('New password').fill(password)
-  await page.getByRole('button', { name: 'Change my password' }).click()
+  const form = page.getByRole('region', { name: 'Password', exact: true })
+  await form.getByLabel('Current password').fill(ash.password)
+  await form.getByLabel('New password').fill(password)
+  await form.getByRole('button', { name: 'Change my password' }).click()
   // Argon2id twice (old, new) on a preview Worker
   await expect(page.getByText('Password changed. Your other devices are signed out.')).toBeVisible({ timeout: 15_000 })
   created = { ...ash, password } // the next tests of this worker sign in with the new password
