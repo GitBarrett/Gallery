@@ -119,8 +119,11 @@ export default defineNuxtConfig({
   },
   // No source map upload (organisation token not needed for the MVP) and no build plugin telemetry
   sentry: { sourcemaps: { disable: true }, telemetry: false },
-  // /__test routes (reset, fake mailbox, queue…): only in preview builds (ADR-013)
-  nitro: { ignore: process.env.NUXT_DEPLOY_ENV === 'preview' ? [] : ['routes/__test/**'] },
+  // /__test routes (reset, fake mailbox, queue…): only in preview builds (ADR-013) and `nuxt dev` (T-04e)
+  nitro: {
+    ignore:
+      process.env.NUXT_DEPLOY_ENV === 'preview' || process.env.NODE_ENV === 'development' ? [] : ['routes/__test/**'],
+  },
   // Security headers of 08-securite.md § 5
   security: {
     nonce: true,

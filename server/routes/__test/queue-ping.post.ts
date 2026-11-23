@@ -1,6 +1,6 @@
 import type { Bindings } from '../../platform/bindings'
 
-// Preview only (excluded from other builds, nuxt.config.ts): proves that a queue message is processed (T-03b)
+// Previews and `nuxt dev` only (excluded from other builds, nuxt.config.ts): proves that a queue message is processed (T-03b)
 export default defineEventHandler(async (event) => {
   const queue = (event.context.cloudflare?.env as Bindings | undefined)?.NOTIFICATIONS_QUEUE
   if (!queue) {

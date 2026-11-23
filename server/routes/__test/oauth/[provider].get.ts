@@ -3,7 +3,7 @@ import { OAuthProviderParams } from '../../../../shared/contracts/auth'
 
 const Query = z.object({ state: z.string().regex(/^[\w-]{1,256}$/) })
 
-// Preview only (excluded from other builds, nuxt.config.ts): consent page of the fake OAuth providers. "Allow"
+// Previews and `nuxt dev` only (excluded from other builds, nuxt.config.ts): consent page of the fake OAuth providers. "Allow"
 // sends the typed email back as the code (fakeOAuthProvider), "Deny" the provider's refusal (US-02.5).
 export default defineEventHandler(async (event) => {
   const { provider } = await getValidatedRouterParams(event, OAuthProviderParams.parse)
