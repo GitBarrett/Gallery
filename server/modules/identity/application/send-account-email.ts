@@ -4,14 +4,18 @@ import { hashToken, newToken, RESET_TTL_MS, VERIFY_TTL_MS } from './email-tokens
 import type { IdentityRepository, Locale, Mailer } from './ports'
 
 export type AccountEmail = {
-  template: 'verify' | 'reset' | 'password_changed' | 'account_exists' | 'signin_locked'
+  template:
+    'verify' | 'reset' | 'password_changed' | 'account_exists' | 'signin_locked' | 'email_change' | 'email_change_alert'
   userId: string
+  /** `email_change` only: the address to confirm, which receives the link (US-07.2). */
+  newEmail?: string
 }
 
 // Templates that carry a single-use link: token type, validity and page that reads it from the fragment
 const LINKS = {
   verify: { type: 'verify', ttlMs: VERIFY_TTL_MS, page: '/verify-email' },
   reset: { type: 'reset', ttlMs: RESET_TTL_MS, page: '/reset' },
+  email_change: { type: 'email_change', ttlMs: VERIFY_TTL_MS, page: '/confirm-email' },
 } as const
 
 type Texts = { subject: string; text: (username: string, link: string) => string }
@@ -53,6 +57,20 @@ const TEMPLATES: Record<Locale, Record<AccountEmail['template'], Texts>> = {
         `so signing in with your password is paused for up to an hour.\n\nIf it was you, wait a little and try ` +
         `again. If it was not, your password is still safe; you can change it from the sign-in page:\n${link}`,
     },
+    email_change: {
+      subject: 'Confirm your new email',
+      text: (name, link) =>
+        `Hello ${name},\n\nConfirm this address as the new email of your Legendary Shots account:\n${link}\n\n` +
+        `This link is valid for 24 hours. Until then, your email stays the same. If you did not ask for it, ` +
+        `ignore this email.`,
+    },
+    email_change_alert: {
+      subject: 'A change of email was asked',
+      text: (name, link) =>
+        `Hello ${name},\n\nSomeone asked to change the email of your Legendary Shots account. It changes only ` +
+        `once the new address is confirmed.\n\nIf it was you, there is nothing to do. If it was not, change your ` +
+        `password now from the sign-in page:\n${link}`,
+    },
   },
   fr: {
     verify: {
@@ -91,6 +109,20 @@ const TEMPLATES: Record<Locale, Record<AccountEmail['template'], Texts>> = {
         `peu avant de réessayer. Sinon, votre mot de passe reste protégé ; vous pouvez le changer depuis la page ` +
         `de connexion :\n${link}`,
     },
+    email_change: {
+      subject: 'Confirmez votre nouvelle adresse email',
+      text: (name, link) =>
+        `Bonjour ${name},\n\nConfirmez cette adresse comme nouvel email de votre compte Legendary Shots :\n` +
+        `${link}\n\nCe lien est valable 24 heures. D'ici là, votre email reste inchangé. Si vous ne l'avez pas ` +
+        `demandé, ignorez cet email.`,
+    },
+    email_change_alert: {
+      subject: "Un changement d'email a été demandé",
+      text: (name, link) =>
+        `Bonjour ${name},\n\nQuelqu'un a demandé à changer l'email de votre compte Legendary Shots. Il ne ` +
+        `change qu'une fois la nouvelle adresse confirmée.\n\nSi c'était vous, il n'y a rien à faire. Sinon, ` +
+        `changez tout de suite votre mot de passe depuis la page de connexion :\n${link}`,
+    },
   },
 }
 
@@ -100,13 +132,14 @@ const TEMPLATES: Record<Locale, Record<AccountEmail['template'], Texts>> = {
  */
 export const sendAccountEmail =
   (deps: { repo: IdentityRepository; mailer: Mailer; clock: Clock; ids: IdGenerator; siteUrl: string }) =>
-  async ({ template, userId }: AccountEmail): Promise<void> => {
+  async ({ template, userId, newEmail }: AccountEmail): Promise<void> => {
     const recipient = await deps.repo.findRecipient(userId)
-    if (!recipient) return // account deleted in the meantime
+    const to = template === 'email_change' ? newEmail : recipient?.email
+    if (!recipient || !to) return // account deleted in the meantime, or without email (Battle.net, Q55)
     const base = `${deps.siteUrl}${recipient.locale === 'fr' ? '/fr' : ''}`
     let link = `${base}${template === 'password_changed' ? '/reset' : '/signin'}`
-    if (template === 'verify' || template === 'reset') {
-      const { type, ttlMs, page } = LINKS[template]
+    if (template in LINKS) {
+      const { type, ttlMs, page } = LINKS[template as keyof typeof LINKS]
       const token = newToken()
       await deps.repo.createEmailToken({
         id: deps.ids.next(),
@@ -114,9 +147,10 @@ export const sendAccountEmail =
         type,
         tokenHash: await hashToken(token),
         expiresAt: new Date(deps.clock.now().getTime() + ttlMs),
+        ...(type === 'email_change' && { newEmail: to }),
       })
       link = `${base}${page}#${token}` // fragment: the token never reaches a server log
     }
     const texts = TEMPLATES[recipient.locale][template]
-    await deps.mailer.send({ to: recipient.email, subject: texts.subject, text: texts.text(recipient.username, link) })
+    await deps.mailer.send({ to, subject: texts.subject, text: texts.text(recipient.username, link) })
   }

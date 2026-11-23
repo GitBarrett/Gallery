@@ -75,6 +75,8 @@ export interface EmailToken {
   tokenHash: string
   expiresAt: Date
   usedAt: Date | null
+  /** Address to confirm (`email_change` only, US-07.2). */
+  newEmail: string | null
 }
 
 /** Beta invitation (US-56.4): only the hash of its token and a keyed fingerprint of the email are stored. */
@@ -117,14 +119,17 @@ export interface IdentityRepository {
   usernameTaken(username: string): Promise<boolean>
   /** `email_taken` / `username_taken`: a concurrent sign-up won the unique index. */
   createUser(user: NewUser): Promise<'created' | 'email_taken' | 'username_taken'>
-  findRecipient(userId: string): Promise<{ email: string; username: string; locale: Locale } | null>
-  createEmailToken(token: Omit<EmailToken, 'usedAt'>): Promise<void>
+  /** `email` null: account without email (Battle.net, Q55). */
+  findRecipient(userId: string): Promise<{ email: string | null; username: string; locale: Locale } | null>
+  createEmailToken(token: Omit<EmailToken, 'usedAt' | 'newEmail'> & { newEmail?: string }): Promise<void>
   findEmailToken(tokenHash: string, type: EmailTokenType): Promise<EmailToken | null>
   /** Marks the token used; `false` if it already was (concurrent use). */
   useEmailToken(id: string, at: Date): Promise<boolean>
   /** Marks every unused token of this type of `userId` used (US-04.5: the other reset links after a reset). */
   useEmailTokens(userId: string, type: EmailTokenType, at: Date): Promise<void>
   markEmailVerified(userId: string, at: Date): Promise<void>
+  /** New address of the account, verified at `verifiedAt` (US-07.2). */
+  setEmail(userId: string, email: string, verifiedAt: Date): Promise<void>
   setPasswordHash(userId: string, passwordHash: string): Promise<void>
   findCredentials(email: string): Promise<{ userId: string; passwordHash: string | null; status: string } | null>
   /** Public fields of the account of `username`, ignoring case; `username` in its display case. */

@@ -6,6 +6,8 @@ import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
 import { PublicSettings } from '~~/shared/contracts/settings'
 import {
+  AccountResponse,
+  type EmailChangeBody,
   type ForgotPasswordBody,
   MeResponse,
   type MeUpdateBody,
@@ -93,6 +95,10 @@ export const api = {
   changePassword: (body: ChangePasswordBody) => call('/api/me/password', z.unknown(), { method: 'POST', body }),
   // US-82: identifiers as stored; PUT replaces the list, 400 VALIDATION_FAILED field = the network, 429 after 20 / h
   socialLinks: () => call('/api/me/social-links', SocialLinksBody),
+  // US-07.2: email of the account; the change sends a link (204 even for another account's address), 429 after 3 / h
+  account: () => call('/api/me/account', AccountResponse),
+  changeEmail: (body: EmailChangeBody) => call('/api/me/email', z.unknown(), { method: 'POST', body }),
+  confirmEmail: (body: VerifyEmailBody) => call('/api/auth/email/confirm', z.unknown(), { method: 'POST', body }),
   setSocialLinks: (body: SocialLinksBody) => call('/api/me/social-links', z.unknown(), { method: 'PUT', body }),
   // public profile (US-05.3); 404 NOT_FOUND for an unknown, banned or deleted account
   profile: (username: string, fetch?: typeof $fetch) =>

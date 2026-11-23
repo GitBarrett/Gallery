@@ -52,12 +52,32 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       const t = token(ash.id)
       await repo.createEmailToken(t)
       expect(await repo.findEmailToken(t.tokenHash, 'reset')).toBeNull()
-      expect(await repo.findEmailToken(t.tokenHash, 'verify')).toEqual({ ...t, usedAt: null })
+      expect(await repo.findEmailToken(t.tokenHash, 'verify')).toEqual({ ...t, newEmail: null, usedAt: null })
       const now = new Date('2026-11-22T13:00:00Z')
       expect(await repo.useEmailToken(t.id, now)).toBe(true)
       expect(await repo.useEmailToken(t.id, now)).toBe(false)
       expect((await repo.findEmailToken(t.tokenHash, 'verify'))?.usedAt).toEqual(now)
       await repo.markEmailVerified(ash.id, now)
+    })
+
+    it('US-07.2 keeps the address of an email change token, then sets the new email verified', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      const t = { ...token(ash.id), type: 'email_change' as const, newEmail: `new.${ash.email}` }
+      await repo.createEmailToken(t)
+      expect((await repo.findEmailToken(t.tokenHash, 'email_change'))?.newEmail).toBe(t.newEmail)
+      const at = new Date('2026-11-23T12:00:00Z')
+      await repo.setEmail(ash.id, t.newEmail, at)
+      expect(await repo.findUserIdByEmail(t.newEmail)).toBe(ash.id)
+      expect(await repo.findUserIdByEmail(ash.email)).toBeNull()
+    })
+
+    it('returns the recipient of an account without email, its email null (Q55)', async () => {
+      const repo = await make()
+      const ash = { ...user(), email: null, passwordHash: null }
+      await repo.createUser(ash)
+      expect(await repo.findRecipient(ash.id)).toEqual({ email: null, username: ash.username, locale: 'fr' })
     })
 
     it('US-04.3 replaces the password hash of an account', async () => {

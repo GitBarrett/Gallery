@@ -86,6 +86,17 @@ export const ChangePasswordBody = z.strictObject({
 })
 export type ChangePasswordBody = z.infer<typeof ChangePasswordBody>
 
+/** GET /api/me/account (US-07.2): email of the account (null: Battle.net, Q55), whether a password guards it. */
+export const AccountResponse = z.strictObject({ email: z.email().nullable(), hasPassword: z.boolean() })
+export type AccountResponse = z.infer<typeof AccountResponse>
+
+/** POST /api/me/email (US-07.2): `currentPassword` required when the account has one. */
+export const EmailChangeBody = z.strictObject({
+  newEmail: z.email().max(254),
+  currentPassword: z.string().max(512).optional(),
+})
+export type EmailChangeBody = z.infer<typeof EmailChangeBody>
+
 /** PUT and GET /api/me/social-links (US-82.1–3): the whole list of identifiers, one per network at most. */
 export const SocialLinksBody = z.strictObject({
   links: z

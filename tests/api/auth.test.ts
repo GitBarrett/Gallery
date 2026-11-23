@@ -424,6 +424,40 @@ describe('sessions', () => {
     ])
   })
 
+  it('US-07.2 changes the email with the current password, once its link is opened', async () => {
+    const credentials = await account()
+    const cookie = sessionCookie(await signin(credentials)).value
+    const change = (body: unknown, withCookie = true) =>
+      fetch('/api/me/email', {
+        method: 'POST',
+        headers: {
+          'sec-fetch-site': 'same-origin',
+          'content-type': 'application/json',
+          ...(withCookie ? { cookie } : {}),
+        },
+        body: JSON.stringify(body),
+      })
+    const newEmail = `new.${credentials.email}`
+    expect((await change({ newEmail }, false)).status).toBe(401)
+    const wrong = await change({ newEmail, currentPassword: 'not the password' })
+    expect((await errorOf(wrong)).details).toEqual({ field: 'currentPassword', reason: 'wrong' })
+    expect((await change({ newEmail, currentPassword: credentials.password })).status).toBe(204)
+    const own = await fetch('/api/me/account', { headers: { cookie } })
+    expect(await own.json()).toEqual({ email: credentials.email, hasPassword: true }) // unchanged until confirmed
+
+    // The link the `emails` consumer would mail to the new address
+    const [user] = await db.select({ id: users.id }).from(users).where(eq(users.email, credentials.email))
+    const token = crypto.randomUUID()
+    const tokenHash = createHash('sha256').update(token).digest('hex')
+    const expiresAt = new Date(Date.now() + 3600_000)
+    await db.insert(emailTokens).values({ userId: user!.id, type: 'email_change', tokenHash, newEmail, expiresAt })
+    const confirm = () => post('/api/auth/email/confirm', { token })
+    expect((await confirm()).status).toBe(204)
+    expect((await errorOf(await confirm())).details).toEqual({ field: 'token', reason: 'invalid' })
+    expect((await signin({ email: newEmail, password: credentials.password })).status).toBe(204)
+    expect((await signin(credentials)).status).toBe(401)
+  })
+
   it('US-07.3 changes the password with the old one and revokes the other sessions only', async () => {
     const credentials = await account()
     const laptop = sessionCookie(await signin(credentials)).value
