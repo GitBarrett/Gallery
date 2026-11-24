@@ -287,7 +287,7 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Module `media` : `requestUploadUrl` (politiques, quotas, URL présignée du bucket privé signée sur taille et type), `completeUpload` (idempotent, contrôle `R2.head`), nettoyage des orphelins (cron horaire).
   Stories : US-10.1–2, US-10.5–7, US-08.1 (email vérifié requis). Tests : U, I, contrat `ObjectStorage`, E (PUT navigateur réel sur la preview : CORS et CSP).
 
-- [ ] **T-22a Suppression des métadonnées** (dép. T-01b)
+- [x] **T-22a Suppression des métadonnées** (dép. T-01b)
   Traitement d'octets pur dans `media/domain` (ADR-011) : JPEG (APP1, APP3–APP13, APP15, COM retirés ; APP0, ICC, APP14 conservés), PNG (`eXIf`, `tEXt`, `iTXt`, `zTXt`, `tIME`), WebP (`EXIF`, `XMP ` et drapeaux `VP8X`), refus d'une orientation ≠ 1, calcul de la taille finale.
   Stories : US-14.1 (suppression des métadonnées). Tests : U (corpus `tests/fixtures/images` et `malicious` : pixels identiques, aucune métadonnée, ICC conservé ; JPEG Display P3 et APP14, PNG `iCCP`, WebP `VP8X` avec EXIF).
 
