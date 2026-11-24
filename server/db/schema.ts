@@ -234,6 +234,29 @@ export const siteSettings = pgTable('site_settings', {
   updatedAt: at('updated_at').notNull().defaultNow(),
 })
 
+/** Game versions of the catalogue (02 § Galerie), seeded by migration 0009; archived ones are hidden. */
+export const gameVersions = pgTable('game_versions', {
+  id: id(),
+  slug: text('slug').notNull().unique(), // URL /v/{slug}
+  nameEn: text('name_en').notNull(),
+  nameFr: text('name_fr').notNull(),
+  position: integer('position').notNull(),
+  archived: boolean('archived').notNull().default(false),
+  createdAt: createdAt(),
+})
+
+/** Tags, normalised (US-11.1): `slug` is the normalised form, searched by prefix. */
+export const tags = pgTable(
+  'tags',
+  {
+    id: id(),
+    slug: text('slug').notNull().unique(),
+    label: text('label').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index('tags_slug_prefix_idx').on(t.slug.op('text_pattern_ops'))],
+)
+
 /** Insert-only audit log: the application role has neither UPDATE nor DELETE (migration 0001). */
 export const auditLog = pgTable(
   'audit_log',

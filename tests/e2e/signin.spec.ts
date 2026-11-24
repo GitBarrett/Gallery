@@ -192,6 +192,7 @@ test('US-82.1 US-82.2 US-82.5 the social networks are entered in the settings an
 })
 
 test('US-07.2 the email changes in the settings once the link sent to the new address is opened', async ({ page }) => {
+  test.slow() // two Argon2id hashes and the `emails` queue on a preview exceed the default 30 s
   const ash = await member(page)
   await page.goto('/signin?redirect=/settings')
   await signIn(page, ash)

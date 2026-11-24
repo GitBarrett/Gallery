@@ -43,6 +43,7 @@ import {
   turnstileVerifier,
   verifyEmail,
 } from '../modules/identity'
+import { drizzleCatalogRepository, listGameVersions, suggestTags } from '../modules/catalog'
 import type { SiteSettings } from '../modules/settings'
 import { systemClock, type Clock } from './clock'
 import type { Config } from './config'
@@ -57,6 +58,10 @@ export interface Container {
   clock: Clock
   ids: IdGenerator
   logger: Logger
+  catalog: {
+    listGameVersions: UseCase<typeof listGameVersions>
+    suggestTags: UseCase<typeof suggestTags>
+  }
   /** Site settings, cached 60 s per isolate (settings module). */
   settings: () => Promise<SiteSettings>
   identity: {
@@ -166,6 +171,10 @@ export function createContainer({
     ids,
     logger,
     settings: () => readSettings(logger),
+    catalog: {
+      listGameVersions: () => listGameVersions({ repo: drizzleCatalogRepository(db()) })(),
+      suggestTags: (cmd) => suggestTags({ repo: drizzleCatalogRepository(db()) })(cmd),
+    },
     identity: {
       signup: (cmd) =>
         signup({
