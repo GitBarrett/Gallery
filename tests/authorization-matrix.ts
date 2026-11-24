@@ -2,10 +2,11 @@
 // server/api and server/routes/auth, its access and its row of annexe B. Deny by default: a route missing here fails
 // tests/architecture.test.ts, and tests/api/authorization-matrix.test.ts calls each one as a visitor and as a member.
 // `member`: a session is required (`requireContext`, 401 without); the use case then declares the rest (own
-// resources, `notSanctioned`, `requireVerified`, `requireRole`…). `public`: open to visitors.
-// Moderator, admin and MFA columns join with T-18b and T-18c; the owner column with the first shared resources (T-21).
+// resources, `notSanctioned`, `requireVerified`, `requireRole`…). `public`: open to visitors. `staff`: a session
+// too, then `requireStaff` (403 for a member, T-18b). The admin routes (T-18c) add the MFA columns; the owner column
+// joins with the first shared resources (T-21).
 
-export type Access = 'public' | 'member'
+export type Access = 'public' | 'member' | 'staff'
 
 export const ROUTES: Record<string, { access: Access; row: string }> = {
   'GET /api/health': { access: 'public', row: 'Lectures publiques' },
@@ -25,6 +26,9 @@ export const ROUTES: Record<string, { access: Access; row: string }> = {
   'GET /auth/[provider]': { access: 'public', row: 'Auth sans session' },
   'GET /auth/[provider]/callback': { access: 'public', row: 'Auth sans session' },
   'POST /api/auth/resend-verification': { access: 'member', row: 'Compte' },
+  'POST /api/auth/mfa/setup': { access: 'staff', row: '`POST /api/auth/mfa/*`' },
+  'POST /api/auth/mfa/verify': { access: 'staff', row: '`POST /api/auth/mfa/*`' },
+  'POST /api/auth/mfa/challenge': { access: 'staff', row: '`POST /api/auth/mfa/*`' },
   'GET /api/me': { access: 'member', row: 'Compte' },
   'PATCH /api/me': { access: 'member', row: 'Compte' },
   'GET /api/me/account': { access: 'member', row: 'Compte' },

@@ -86,6 +86,21 @@ export const ChangePasswordBody = z.strictObject({
 })
 export type ChangePasswordBody = z.infer<typeof ChangePasswordBody>
 
+/** POST /api/auth/mfa/setup (US-55.2): the new TOTP secret, as text and as the URI of the QR code. */
+export const MfaSetupResponse = z.strictObject({ secret: z.string(), uri: z.string() })
+export type MfaSetupResponse = z.infer<typeof MfaSetupResponse>
+
+/**
+ * POST /api/auth/mfa/verify (first code of the setup) and /challenge (after a staff sign-in): a 6-digit TOTP code,
+ * or for the challenge a recovery code (US-55.2, US-55.5).
+ */
+export const MfaCodeBody = z.strictObject({ code: z.string().min(1).max(32) })
+export type MfaCodeBody = z.infer<typeof MfaCodeBody>
+
+/** The 10 recovery codes, in the answer of /verify only (shown once). */
+export const MfaVerifyResponse = z.strictObject({ recoveryCodes: z.array(z.string()) })
+export type MfaVerifyResponse = z.infer<typeof MfaVerifyResponse>
+
 /**
  * GET /api/me/account: email of the account (null: Battle.net, Q55), whether a password guards it (US-07.2), linked
  * providers (US-07.4).

@@ -95,6 +95,23 @@ export interface Actor {
   role: 'user' | 'moderator' | 'admin'
   status: string
   emailVerified: boolean
+  /** Staff: the session passed the TOTP (08-securite.md § 3). */
+  mfaVerified: boolean
+}
+
+/** Port: authenticated encryption of the TOTP secrets (AES-GCM, `MFA_ENCRYPTION_KEY`). */
+export interface SecretBox {
+  seal(plain: string): Promise<string>
+  /** Rejects for a value sealed with another key or altered. */
+  open(sealed: string): Promise<string>
+}
+
+/** TOTP of a staff account: `secretEnc` without `enabledAt` is a setup waiting for its first code. */
+export interface MfaState {
+  secretEnc: string | null
+  enabledAt: Date | null
+  /** Last accepted 30 s step: a code of this step or before is refused (replay). */
+  lastStep: number | null
 }
 
 export interface NewSession {
@@ -104,6 +121,8 @@ export interface NewSession {
   lastSeenAt: Date
   expiresAt: Date
   userAgentSummary: string | null
+  /** Set when the session is opened by the TOTP (a new id at this privilege change, 08-securite.md § 3). */
+  mfaVerifiedAt?: Date
 }
 
 export interface SessionSummary {
@@ -164,9 +183,14 @@ export interface IdentityRepository {
   /** `false` (nothing deleted) when this provider is not linked to the account. */
   unlinkOAuthAccount(userId: string, provider: OAuthProviderName): Promise<boolean>
   createSession(session: NewSession): Promise<void>
-  findSession(
-    idHash: string,
-  ): Promise<{ lastSeenAt: Date; expiresAt: Date; revokedAt: Date | null; account: Actor } | null>
+  findSession(idHash: string): Promise<{
+    createdAt: Date
+    lastSeenAt: Date
+    expiresAt: Date
+    revokedAt: Date | null
+    mfaVerifiedAt: Date | null
+    account: Omit<Actor, 'mfaVerified'>
+  } | null>
   touchSession(idHash: string, lastSeenAt: Date, expiresAt: Date): Promise<void>
   revokeSession(idHash: string, at: Date): Promise<void>
   /** Sessions of `userId` neither revoked nor expired at `at`, latest activity first (US-03.7). */
@@ -174,6 +198,15 @@ export interface IdentityRepository {
   /** Revokes an active session of `userId`; `false` when none matches (another member's, unknown or ended). */
   revokeUserSession(userId: string, idHash: string, at: Date): Promise<boolean>
   revokeOtherSessions(userId: string, keptIdHash: string, at: Date): Promise<void>
+  findMfa(userId: string): Promise<MfaState | null>
+  /** Stores a new secret waiting for its first code; does nothing once the TOTP is enabled. */
+  setPendingMfa(userId: string, secretEnc: string): Promise<void>
+  /** Enables the TOTP at its first code (`step`) and replaces the recovery codes by these hashes. */
+  enableMfa(userId: string, enable: { at: Date; step: number; codeHashes: string[] }): Promise<void>
+  /** Records `step` as the last accepted one; `false` if it is not after the stored one (replay, concurrent use). */
+  useTotpStep(userId: string, step: number): Promise<boolean>
+  /** Marks an unused recovery code of `userId` used; `false` when none matches. */
+  useRecoveryCode(userId: string, codeHash: string, at: Date): Promise<boolean>
   createInvite(invite: BetaInvite): Promise<void>
   /** Id of the invitation of this token if it is unused and not expired at `at`. */
   findUsableInvite(tokenHash: string, at: Date): Promise<string | null>

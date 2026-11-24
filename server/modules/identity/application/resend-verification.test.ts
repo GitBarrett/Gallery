@@ -18,7 +18,14 @@ function setup() {
   return { run, sent }
 }
 
-const ash: Actor = { id: 'ash', username: 'Ash', role: 'user', status: 'active', emailVerified: false }
+const ash: Actor = {
+  id: 'ash',
+  username: 'Ash',
+  role: 'user',
+  status: 'active',
+  emailVerified: false,
+  mfaVerified: false,
+}
 const cmd = { actor: ash, turnstileToken: 'human', ip: '203.0.113.7' }
 const done = { ok: true, value: undefined }
 const verifyEmail = { topic: 'emails', payload: { template: 'verify', userId: 'ash' } }

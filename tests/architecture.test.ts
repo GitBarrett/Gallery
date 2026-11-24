@@ -50,10 +50,10 @@ describe('authorization matrix', () => {
     expect(files.map(routeOf).sort()).toEqual(Object.keys(ROUTES).sort())
   })
 
-  it('US-55 asks for a session in exactly the member routes, each one tied to a row of annexe B', () => {
+  it('US-55 asks for a session in exactly the member and staff routes, each one tied to a row of annexe B', () => {
     for (const file of files) {
       const { access, row } = ROUTES[routeOf(file)]!
-      expect(readFileSync(file, 'utf8').includes('requireContext(event)'), file).toBe(access === 'member')
+      expect(readFileSync(file, 'utf8').includes('requireContext(event)'), file).toBe(access !== 'public')
       expect(annexB.includes(`| ${row}`), `${file}: row "${row}"`).toBe(true)
     }
   })

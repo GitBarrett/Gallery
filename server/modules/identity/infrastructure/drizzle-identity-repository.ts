@@ -1,9 +1,10 @@
-import { and, desc, eq, gt, isNull, lt, ne, sql } from 'drizzle-orm'
+import { and, desc, eq, gt, isNull, lt, ne, or, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import type { Clock } from '../../../platform/clock'
 import {
   betaInvites,
   emailTokens,
+  mfaRecoveryCodes,
   oauthAccounts,
   sessions,
   usernameRedirects,
@@ -186,9 +187,11 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
   async findSession(idHash) {
     const [row] = await db
       .select({
+        createdAt: sessions.createdAt,
         lastSeenAt: sessions.lastSeenAt,
         expiresAt: sessions.expiresAt,
         revokedAt: sessions.revokedAt,
+        mfaVerifiedAt: sessions.mfaVerifiedAt,
         id: users.id,
         username: users.username,
         role: users.role,
@@ -199,9 +202,9 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .innerJoin(users, eq(users.id, sessions.userId))
       .where(eq(sessions.idHash, idHash))
     if (!row) return null
-    const { lastSeenAt, expiresAt, revokedAt, id, username, role, status, emailVerifiedAt } = row
+    const { id, username, role, status, emailVerifiedAt, ...session } = row
     const account = { id, username, role: role as Actor['role'], status, emailVerified: Boolean(emailVerifiedAt) }
-    return { lastSeenAt, expiresAt, revokedAt, account }
+    return { ...session, account }
   },
   async touchSession(idHash, lastSeenAt, expiresAt) {
     await db.update(sessions).set({ lastSeenAt, expiresAt }).where(eq(sessions.idHash, idHash))
@@ -237,6 +240,46 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .update(sessions)
       .set({ revokedAt: at })
       .where(and(activeOf(userId, at), ne(sessions.idHash, keptIdHash)))
+  },
+  async findMfa(userId) {
+    const [row] = await db
+      .select({ secretEnc: users.mfaTotpSecretEnc, enabledAt: users.mfaEnabledAt, lastStep: users.mfaLastStep })
+      .from(users)
+      .where(eq(users.id, userId))
+    return row ?? null
+  },
+  async setPendingMfa(userId, secretEnc) {
+    await db
+      .update(users)
+      .set({ mfaTotpSecretEnc: secretEnc })
+      .where(and(eq(users.id, userId), isNull(users.mfaEnabledAt)))
+  },
+  async enableMfa(userId, { at, step, codeHashes }) {
+    await db.update(users).set({ mfaEnabledAt: at, mfaLastStep: step }).where(eq(users.id, userId))
+    await db.delete(mfaRecoveryCodes).where(eq(mfaRecoveryCodes.userId, userId))
+    await db.insert(mfaRecoveryCodes).values(codeHashes.map((codeHash) => ({ userId, codeHash })))
+  },
+  async useTotpStep(userId, step) {
+    const rows = await db
+      .update(users)
+      .set({ mfaLastStep: step })
+      .where(and(eq(users.id, userId), or(isNull(users.mfaLastStep), lt(users.mfaLastStep, step))))
+      .returning({ id: users.id })
+    return rows.length > 0
+  },
+  async useRecoveryCode(userId, codeHash, at) {
+    const rows = await db
+      .update(mfaRecoveryCodes)
+      .set({ usedAt: at })
+      .where(
+        and(
+          eq(mfaRecoveryCodes.userId, userId),
+          eq(mfaRecoveryCodes.codeHash, codeHash),
+          isNull(mfaRecoveryCodes.usedAt),
+        ),
+      )
+      .returning({ userId: mfaRecoveryCodes.userId })
+    return rows.length > 0
   },
   async createInvite(invite) {
     await db.insert(betaInvites).values(invite)

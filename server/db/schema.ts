@@ -74,6 +74,8 @@ export const users = pgTable(
     notificationPrefs: jsonb('notification_prefs').notNull().default({}),
     mfaTotpSecretEnc: text('mfa_totp_secret_enc'), // AES-GCM, MFA_ENCRYPTION_KEY
     mfaEnabledAt: at('mfa_enabled_at'),
+    mfaLastStep: integer('mfa_last_step'), // last accepted 30 s TOTP step: replay refused
+
     contestBanUntil: at('contest_ban_until'),
     createdAt: createdAt(),
   },
@@ -155,6 +157,19 @@ export const sessions = pgTable(
     userAgentSummary: text('user_agent_summary'),
   },
   (t) => [index('sessions_user_idx').on(t.userId), index('sessions_expires_idx').on(t.expiresAt)],
+)
+
+/** 10 single-use staff recovery codes, made when the TOTP is enabled; only their SHA-256 is stored. */
+export const mfaRecoveryCodes = pgTable(
+  'mfa_recovery_codes',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    codeHash: text('code_hash').notNull(),
+    usedAt: at('used_at'),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.codeHash] })],
 )
 
 /** Single-use email links: 256-bit token, only its SHA-256 is stored (08-securite.md § 3). */
