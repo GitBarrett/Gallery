@@ -1,6 +1,8 @@
 # Questions ouvertes (à partir de Q62)
 
-Une question par fichier, `Qnn-slug.md`, pour que deux PR n'éditent jamais les mêmes lignes. Les questions Q1 à Q61
+Une question par fichier, `Qnn-slug.md`, pour que deux PR n'éditent jamais les mêmes lignes. Seulement pour les
+décisions produit (comportement visible, règle métier, donnée, sécurité) ; un choix technique mineur se note dans la
+section « Choix non spécifiés » de la PR (CLAUDE.md, règle 6). Les questions Q1 à Q61
 restent dans le tableau de `docs/09-questions-ouvertes.md`.
 
 Gabarit :

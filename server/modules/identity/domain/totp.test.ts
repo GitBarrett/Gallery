@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { matchTotp, newRecoveryCodes, newTotpSecret, normalizeRecoveryCode, otpauthUri, totpAt } from './totp'
 
 // RFC 6238 appendix B, SHA-1: the ASCII secret "12345678901234567890" in base32
-const RFC_SECRET = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ' // gitleaks:allow (public RFC 6238 test vector)
+const RFC_SECRET = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ' // nosemgrep gitleaks:allow (public RFC 6238 test vector)
 const at = (seconds: number) => new Date(seconds * 1000)
 
 describe('TOTP (RFC 6238)', () => {
