@@ -1,6 +1,6 @@
 # Pull request checks (T-04a, 11-strategie-de-tests.md § 7). Each guard is a separate step that runs even when
-# another one fails, to see everything in one pass. No protection of main (Q26): a pull request is only merged
-# with this CI green.
+# another one fails, to see everything in one pass. main is protected (Q26, reviewed 24/11/2026): the `checks` and
+# `security` jobs must be green before a merge, admins included.
 name: ci
 
 on:

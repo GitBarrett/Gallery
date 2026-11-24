@@ -1,10 +1,10 @@
 # 06 — Plan de tâches
 
 ## Règles d'exécution
-1. Prendre **la première tâche non cochée** dont toutes les dépendances sont cochées. Ne jamais anticiper une tâche suivante.
+1. Prendre **la première tâche non cochée** dont toutes les dépendances sont cochées. Ne jamais anticiper une tâche suivante. L'ordre des phases privilégie la valeur métier (24/11/2026) : la fin du chantier staff (T-18d, T-18e, T-18c) est placée en tête de la phase 5, juste avant la modération qui en a besoin.
 2. **Definition of Ready** (vérifiée avant de coder) : stories et AC référencés lus ; sections d'architecture, de sécurité et de Clean Architecture concernées lues ; questions bloquantes absentes de `09-questions-ouvertes.md` (sinon : appliquer l'option par défaut et le signaler).
 3. **TDD** : écrire d'abord les tests listés dans la tâche (identifiants `US-xx.n`), les voir échouer, puis coder.
-4. **Une tâche = une branche `feat/T-xx-slug` = une PR**, ≈ 400 lignes de code applicatif au plus (hors tests et migrations). Si c'est plus gros, découper et le noter dans la PR.
+4. **Une tâche = une branche `feat/T-xx-slug` = une PR**, ≈ 800 lignes de code applicatif au plus (hors tests et migrations ; 400 jusqu'au 24/11/2026). Si c'est plus gros, découper et le noter dans la PR.
 5. **Definition of Done** (toutes obligatoires) :
    - tests listés écrits et verts ; couverture et `pnpm test:trace` OK (`11-strategie-de-tests.md`) ;
    - lint, typecheck, dependency-cruiser, gitleaks OK ;
@@ -18,7 +18,7 @@
    - tâche cochée ici, écarts et décisions résumés dans la PR, ADR si nouvelle décision d'architecture.
 6. Toute fonctionnalité incomplète en production est masquée par un flag (`site_settings.features.*`).
 7. **Action humaine** : certaines tâches demandent une action d'Adrien (comptes, domaines, secrets). Préparer tout le reste, documenter la marche à suivre dans la PR et s'arrêter.
-8. **Découpage** (20/11/2026) : une tâche trop grosse est découpée en sous-tâches suffixées (`T-03a`, `T-03b`…) qui gardent le numéro d'origine, pour que les renvois des autres documents restent valables. Chaque sous-tâche vise ≈ 400 lignes de code applicatif ou moins et liste ses dépendances.
+8. **Découpage** (20/11/2026) : une tâche trop grosse est découpée en sous-tâches suffixées (`T-03a`, `T-03b`…) qui gardent le numéro d'origine, pour que les renvois des autres documents restent valables. Chaque sous-tâche vise ≈ 800 lignes de code applicatif ou moins et liste ses dépendances.
 
 Légende des tests : **U** unitaire, **I** intégration (API/base), **E** E2E Playwright.
 
@@ -271,17 +271,7 @@ T-17a (réglages du compte : bio, langue, mot de passe, réseaux sociaux) est d�
   TOTP obligatoire après tout mode de connexion (`POST /api/auth/mfa/setup`, `/verify`, `/challenge`), secret chiffré AES-GCM, 10 codes de secours, `sessions.mfa_verified_at` (nouvel identifiant de session), sessions staff de 12 h, `requireRole` exige le TOTP, 5 échecs / 15 min.
   Stories : US-55.2, US-55.5. Tests : U, I. **Action humaine** : secret `MFA_ENCRYPTION_KEY` en production.
 
-- [ ] **T-18d Double authentification du staff : pages** (dép. T-18b)
-  Page de configuration (QR code, secret, 10 codes de secours affichés une fois) et page de défi après connexion ; `GET /api/me` indique l'état MFA ; seed : modérateur avec TOTP de test.
-  Stories : US-55.2, US-55.5. Tests : C, E (connexion OAuth puis TOTP exigé ; code de secours ; code réutilisé refusé).
-
-- [ ] **T-18e Réauthentification, alerte et commandes staff** (dép. T-18b)
-  `POST /api/auth/reauth` (`sessions.reauth_at`, < 5 min), alerte aux admins au blocage du TOTP, commandes `pnpm admin:promote` (premier admin) et `pnpm admin:reset-mfa` (sessions révoquées, journalisé).
-  Stories : US-55.4, US-55.5. Tests : U, I. **Action humaine** : exécuter `admin:promote` en production après le premier déploiement.
-
-- [ ] **T-18c Rôles, audit et squelette d'admin** (dép. T-18d, T-18e)
-  Promotion et rétrogradation, écriture de l'`audit_log`, squelette `/admin` (accès MFA).
-  Stories : US-55, US-58.1. Tests : I, E.
+T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
 
 ## Phase 2 — Catalogue et publication
 
@@ -401,6 +391,18 @@ T-17a (réglages du compte : bio, langue, mot de passe, réseaux sociaux) est d�
   Stories : US-70. Tests : U, E.
 
 ## Phase 5 — Modération, administration, conformité
+
+- [ ] **T-18d Double authentification du staff : pages** (dép. T-18b)
+  Page de configuration (QR code, secret, 10 codes de secours affichés une fois) et page de défi après connexion ; `GET /api/me` indique l'état MFA ; seed : modérateur avec TOTP de test.
+  Stories : US-55.2, US-55.5. Tests : C, E (connexion OAuth puis TOTP exigé ; code de secours ; code réutilisé refusé).
+
+- [ ] **T-18e Réauthentification, alerte et commandes staff** (dép. T-18b)
+  `POST /api/auth/reauth` (`sessions.reauth_at`, < 5 min), alerte aux admins au blocage du TOTP, commandes `pnpm admin:promote` (premier admin) et `pnpm admin:reset-mfa` (sessions révoquées, journalisé).
+  Stories : US-55.4, US-55.5. Tests : U, I. **Action humaine** : exécuter `admin:promote` en production après le premier déploiement.
+
+- [ ] **T-18c Rôles, audit et squelette d'admin** (dép. T-18d, T-18e)
+  Promotion et rétrogradation, écriture de l'`audit_log`, squelette `/admin` (accès MFA).
+  Stories : US-55, US-58.1. Tests : I, E.
 
 - [ ] **T-50 Signalements** (dép. T-41)
   Motifs, signalement de profil, masquage automatique limité aux signalements de comptes éligibles (vérifiés depuis plus de 7 jours, non sanctionnés).
