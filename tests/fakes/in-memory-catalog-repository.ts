@@ -1,4 +1,5 @@
-import type { CatalogRepository, GameVersion } from '../../server/modules/catalog'
+import type { CatalogRepository, GameVersion, Zone } from '../../server/modules/catalog'
+import { normalizeTag } from '../../shared/domain/tags'
 
 /** The versions seeded by migration 0009, in their order. */
 export const LAUNCH_GAME_VERSIONS: GameVersion[] = [
@@ -9,8 +10,14 @@ export const LAUNCH_GAME_VERSIONS: GameVersion[] = [
   { slug: 'other', nameEn: 'Other', nameFr: 'Autre' },
 ]
 
-/** In-memory CatalogRepository: the launch versions and `tags` (normalised), sorted by code point like the database. */
-export function inMemoryCatalogRepository(seed: { tags?: string[] } = {}): CatalogRepository {
+/** A row of the zones table. */
+export type SeedZone = Zone & { aliases: string[]; status: 'active' | 'pending' }
+
+/**
+ * In-memory CatalogRepository: the launch versions, `tags` (normalised) sorted by code point like the database, and
+ * `zones` found by substring of their names and aliases (the database also tolerates typos, pg_trgm).
+ */
+export function inMemoryCatalogRepository(seed: { tags?: string[]; zones?: SeedZone[] } = {}): CatalogRepository {
   return {
     async listGameVersions() {
       return LAUNCH_GAME_VERSIONS.map((v) => ({ ...v }))
@@ -19,6 +26,13 @@ export function inMemoryCatalogRepository(seed: { tags?: string[] } = {}): Catal
       return (seed.tags ?? [])
         .filter((t) => t.startsWith(prefix))
         .sort()
+        .slice(0, limit)
+    },
+    async suggestZones(text, limit) {
+      return (seed.zones ?? [])
+        .filter((z) => z.status === 'active')
+        .filter((z) => normalizeTag([z.nameEn, z.nameFr, ...z.aliases].join(' ')).includes(text))
+        .map(({ slug, nameEn, nameFr }) => ({ slug, nameEn, nameFr }))
         .slice(0, limit)
     },
   }

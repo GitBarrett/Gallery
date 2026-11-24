@@ -29,15 +29,15 @@ export async function migrate(url) {
 }
 
 /**
- * Empties every table except the site settings, whose author is erased, and the game versions (reference data of
- * the catalogue): no personal data remains.
+ * Empties every table except the site settings, whose author is erased, the game versions and the zones (reference
+ * data of the catalogue): no personal data remains.
  */
 export async function emptyData(url) {
   await withSql(url, async (sql) => {
     // users is emptied with DELETE: TRUNCATE … CASCADE would also empty site_settings, which references it
     await sql`update site_settings set updated_by = null`
     const tables =
-      await sql`select tablename from pg_tables where schemaname = 'public' and tablename not in ('site_settings', 'users', 'game_versions')`
+      await sql`select tablename from pg_tables where schemaname = 'public' and tablename not in ('site_settings', 'users', 'game_versions', 'zones')`
     if (tables.length) await sql.unsafe(`truncate ${tables.map((t) => `"${t.tablename}"`).join(', ')} cascade`)
     await sql`delete from users`
   })

@@ -279,7 +279,7 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Module `catalog` : versions du jeu (EN/FR, ordre, archivage), tags (normalisation, suggestion), `GET /api/game-versions`, `GET /api/tags/suggest`.
   Stories : US-11.1 (API ; la suggestion de zones est en T-20b). Tests : U (normalisation), I.
 
-- [ ] **T-20b Catalogue : dictionnaire des zones** (dép. T-20a)
+- [x] **T-20b Catalogue : dictionnaire des zones** (dép. T-20a)
   Import `docs/seed/zones.csv`, alias, suggestion EN/FR avec `pg_trgm` et `unaccent`, `GET /api/zones/suggest`.
   Stories : US-57.2, US-11.1 (API), US-11.2, US-62.4. Tests : I (suggestion « Hurl », « Stormw », « SW »).
 

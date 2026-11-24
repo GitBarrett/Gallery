@@ -7,12 +7,21 @@ export interface GameVersion {
   nameFr: string
 }
 
-/** Port: game versions and tags of the catalogue. */
+/** A zone of the dictionary (US-57), names in both languages of the site. */
+export interface Zone {
+  slug: string
+  nameEn: string
+  nameFr: string
+}
+
+/** Port: game versions, zones and tags of the catalogue. */
 export interface CatalogRepository {
   /** Versions not archived, in their display order. */
   listGameVersions(): Promise<GameVersion[]>
   /** Normalised tags starting with `prefix` (itself normalised), alphabetical, `limit` at most. */
   suggestTags(prefix: string, limit: number): Promise<string[]>
+  /** Active zones whose names or aliases hold `text` (normalised), closest first, `limit` at most. */
+  suggestZones(text: string, limit: number): Promise<Zone[]>
 }
 
 const SUGGESTIONS = 10
@@ -28,4 +37,12 @@ export const suggestTags =
   async (cmd: { q: string }): Promise<string[]> => {
     const prefix = normalizeTag(cmd.q)
     return POSSIBLE_PREFIX.test(prefix) ? deps.repo.suggestTags(prefix, SUGGESTIONS) : []
+  }
+
+/** Zones of the dictionary completing the Zone field (US-11.2), open to every visitor. */
+export const suggestZones =
+  (deps: { repo: CatalogRepository }) =>
+  async (cmd: { q: string }): Promise<Zone[]> => {
+    const text = normalizeTag(cmd.q)
+    return text ? deps.repo.suggestZones(text, SUGGESTIONS) : []
   }
