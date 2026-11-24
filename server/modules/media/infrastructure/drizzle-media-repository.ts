@@ -3,7 +3,7 @@ import type { Db, Transaction } from '../../../db/client'
 import { gameVersions, photos } from '../../../db/schema'
 import type { MediaRepository } from '../application/ports'
 
-/** photos table: the uploads of T-21, the other columns arrive with their tasks. */
+/** photos table: the uploads of T-21 and their processing (T-22b), the other columns arrive with their tasks. */
 export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository => ({
   async createUpload(upload) {
     await db.insert(photos).values(upload)
@@ -22,6 +22,7 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
         userId: photos.userId,
         mime: photos.mime,
         bytes: photos.bytes,
+        status: photos.status,
         uploadedAt: photos.uploadedAt,
       })
       .from(photos)
@@ -52,5 +53,21 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
   },
   async deleteIncomplete(id) {
     await db.delete(photos).where(and(eq(photos.id, id), isNull(photos.uploadedAt)))
+  },
+  async finishProcessing(id, status, processed) {
+    const rows = await db
+      .update(photos)
+      .set({ status, ...processed })
+      .where(and(eq(photos.id, id), eq(photos.status, 'processing')))
+      .returning({ id: photos.id })
+    return rows.length > 0
+  },
+  async failProcessing(id) {
+    const rows = await db
+      .update(photos)
+      .set({ status: 'failed' })
+      .where(and(eq(photos.id, id), eq(photos.status, 'processing')))
+      .returning({ id: photos.id })
+    return rows.length > 0
   },
 })

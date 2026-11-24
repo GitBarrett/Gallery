@@ -291,9 +291,9 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Traitement d'octets pur dans `media/domain` (ADR-011) : JPEG (APP1, APP3–APP13, APP15, COM retirés ; APP0, ICC, APP14 conservés), PNG (`eXIf`, `tEXt`, `iTXt`, `zTXt`, `tIME`), WebP (`EXIF`, `XMP ` et drapeaux `VP8X`), refus d'une orientation ≠ 1, calcul de la taille finale.
   Stories : US-14.1 (suppression des métadonnées). Tests : U (corpus `tests/fixtures/images` et `malicious` : pixels identiques, aucune métadonnée, ICC conservé ; JPEG Display P3 et APP14, PNG `iCCP`, WebP `VP8X` avec EXIF).
 
-- [ ] **T-22b Traitement des captures** (dép. T-21, T-22a)
+- [x] **T-22b Traitement des captures** (dép. T-21, T-22a)
   Consommateur `photo-process` (ADR-011, ADR-012, résultats T-00a–c) : octets magiques, `IMAGES.info()`, original nettoyé écrit en deux passes (`FixedLengthStream`), variantes écrites une fois (PNG 64 temporaire, JPEG 1200, WebP 400/800/1200/2400), luminance, idempotence, retries et DLQ.
-  Stories : US-14.1–3, US-14.5–6, US-10.3–4, US-10.8. Tests : I (double livraison), charge (US-14.5).
+  Stories : US-14.1–2 (sans l'appel à la modération), US-14.5–6, US-10.3–4, US-10.8 (Q68). Tests : I (double livraison), charge (US-14.5).
 
 - [ ] **T-23a Notifications : module** (dép. T-12a, T-05b)
   Module `notifications` : création via événements, regroupement des likes, préférences par type, purge à 6 mois.
@@ -304,8 +304,8 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Stories : US-35.3. Tests : E.
 
 - [ ] **T-24 Modération automatique** (dép. T-22b, T-23a, T-08)
-  Port `ModerationProvider` (Sightengine + fake), seuils depuis `site_settings`, retries, historique `moderation_decisions`, notification de l'auteur.
-  Stories : US-50. Tests : U (seuils), I (pannes), E (fichier NSFW de fixture refusé).
+  Port `ModerationProvider` (Sightengine + fake), appelé par `photo-process` avec le JPEG 1200 après les variantes, seuils depuis `site_settings`, retries, historique `moderation_decisions`, notification de l'auteur (capture publiée, en revue, refusée ou en échec de traitement).
+  Stories : US-50, US-14.1 (appel de la modération), US-14.3, US-10.3 (notification) (Q68). Tests : U (seuils), I (pannes), E (fichier NSFW de fixture refusé).
 
 - [ ] **T-25a Service des images** (dép. T-22b)
   Routes `/img/{id}/{w}` et `/img/{id}/og.jpg` (variantes lues dans R2 sans transformation, largeurs fixes, captures publiées uniquement, API Cache), aperçu privé `?preview=1` pour l'auteur et les modérateurs, masquage = variantes dans `trash/` + purge par URL.

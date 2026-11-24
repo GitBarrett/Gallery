@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { crc32 } from 'node:zlib'
+import { crc32, deflateSync } from 'node:zlib'
 
 // Builds captures with metadata around the pixel files of tests/fixtures/images (made by Chromium's canvas:
 // display-p3.jpg has a real ICC APP2, display-p3.png an iCCP chunk, srgb.webp a VP8X with ICCP). The stripper tests
@@ -103,3 +103,58 @@ export function simpleWebp(): Uint8Array {
 export async function* chunked(bytes: Uint8Array, size = 4096): AsyncGenerator<Uint8Array> {
   for (let at = 0; at < bytes.length; at += size) yield bytes.slice(at, at + size)
 }
+
+/**
+ * A PNG of `pixel(x, y)` (RGB 0–255), as the Images binding writes the luminance thumbnail: 8-bit RGB by default,
+ * or grey, palette (the first 256 colours met) or with alpha; rows filtered in turn by `filters` (0 None to 4 Paeth).
+ */
+export function pngImage(
+  width: number,
+  height: number,
+  pixel: (x: number, y: number) => [number, number, number],
+  { colorType = 2, filters = [0] }: { colorType?: 0 | 2 | 3 | 4 | 6; filters?: number[] } = {},
+): Uint8Array<ArrayBuffer> {
+  const channels = { 0: 1, 2: 3, 3: 1, 4: 2, 6: 4 }[colorType]
+  const palette: number[][] = []
+  const samples = (x: number, y: number) => {
+    const [r, g, b] = pixel(x, y)
+    if (colorType === 0) return [r]
+    if (colorType === 4) return [r, 255]
+    if (colorType === 6) return [r, g, b, 255]
+    if (colorType === 2) return [r, g, b]
+    let index = palette.findIndex((c) => c[0] === r && c[1] === g && c[2] === b)
+    if (index === -1) index = palette.push([r, g, b]) - 1
+    return [index]
+  }
+  const stride = width * channels
+  const rows = Array.from({ length: height }, (_, y) => Array.from({ length: width }, (_, x) => samples(x, y)).flat())
+  const raw: number[] = []
+  rows.forEach((row, y) => {
+    const filter = filters[y % filters.length]!
+    raw.push(filter)
+    for (let x = 0; x < stride; x++) {
+      const a = x >= channels ? row[x - channels]! : 0
+      const b = y > 0 ? rows[y - 1]![x]! : 0
+      const c = x >= channels && y > 0 ? rows[y - 1]![x - channels]! : 0
+      const p = a + b - c
+      const paeth =
+        Math.abs(p - a) <= Math.abs(p - b) && Math.abs(p - a) <= Math.abs(p - c)
+          ? a
+          : Math.abs(p - b) <= Math.abs(p - c)
+            ? b
+            : c
+      raw.push((row[x]! - [0, a, b, (a + b) >> 1, paeth][filter]! + 256) & 0xff)
+    }
+  })
+  const ihdr = concat(u32be(width), u32be(height), new Uint8Array([8, colorType, 0, 0, 0]))
+  return new Uint8Array(
+    concat(
+      PNG_SIGNATURE_BYTES,
+      pngChunk('IHDR', ihdr),
+      ...(colorType === 3 ? [pngChunk('PLTE', new Uint8Array(palette.flat()))] : []),
+      pngChunk('IDAT', new Uint8Array(deflateSync(new Uint8Array(raw)))),
+      pngChunk('IEND', new Uint8Array()),
+    ),
+  )
+}
+const PNG_SIGNATURE_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])

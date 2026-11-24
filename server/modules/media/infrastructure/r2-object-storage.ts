@@ -3,8 +3,21 @@ import type { ObjectStorage, StoredObject } from '../application/ports'
 /** The R2 binding, reduced to what the adapter uses. */
 export interface R2Bucket {
   head(key: string): Promise<{ size: number; httpMetadata?: { contentType?: string } } | null>
+  get(
+    key: string,
+    options?: { range: { offset: number; length: number } },
+  ): Promise<{ body: ReadableStream<Uint8Array> } | null>
+  put(
+    key: string,
+    value: ReadableStream<Uint8Array> | Uint8Array,
+    options: { httpMetadata: { contentType: string } },
+  ): Promise<unknown>
   delete(key: string): Promise<void>
 }
+
+/** Workers global: a stream of known length, which R2 requires for a streamed put. Absent in Node runs. */
+type FixedLength = new (bytes: number) => TransformStream<Uint8Array, Uint8Array>
+const FixedLengthStream = (globalThis as { FixedLengthStream?: FixedLength }).FixedLengthStream
 
 /** S3 token limited to the bucket (03-architecture.md § Configuration et secrets): signs the presigned URLs. */
 export interface S3Credentials {
@@ -104,21 +117,43 @@ export function r2ObjectStorage(deps: {
       const object = await bucket.head(`${prefix}${key}`)
       return object && { bytes: object.size, contentType: object.httpMetadata?.contentType }
     },
+    async read(key, length) {
+      const object = await bucket.get(`${prefix}${key}`, length ? { range: { offset: 0, length } } : undefined)
+      return object?.body ?? null
+    },
+    async put(key, body, { bytes, contentType }) {
+      const options = { httpMetadata: { contentType } }
+      if (body instanceof Uint8Array || !FixedLengthStream)
+        return void (await bucket.put(`${prefix}${key}`, body, options))
+      const fixed = new FixedLengthStream(bytes)
+      // Both awaited: an error of the source fails the put instead of being lost
+      await Promise.all([bucket.put(`${prefix}${key}`, fixed.readable, options), body.pipeTo(fixed.writable)])
+    },
     delete: (key) => bucket.delete(`${prefix}${key}`),
   }
 }
 
 /**
- * Bucket in memory for the Node test server and local runs without the R2 binding (fake providers only): nothing
- * reaches it, since the browser cannot PUT there; `complete` then answers 422 `missing`.
+ * Bucket in memory for the Node test server, local runs without the R2 binding (fake providers only) and the
+ * processing tests: the browser cannot PUT there, so `complete` answers 422 `missing` unless a test puts the object.
  */
-export function memoryBucket(): R2Bucket & { objects: Map<string, { size: number; contentType: string }> } {
-  const objects = new Map<string, { size: number; contentType: string }>()
+export function memoryBucket(): R2Bucket & { objects: Map<string, { data: Uint8Array; contentType: string }> } {
+  const objects = new Map<string, { data: Uint8Array; contentType: string }>()
   return {
     objects,
     async head(key) {
       const object = objects.get(key)
-      return object ? { size: object.size, httpMetadata: { contentType: object.contentType } } : null
+      return object ? { size: object.data.length, httpMetadata: { contentType: object.contentType } } : null
+    },
+    async get(key, options) {
+      const object = objects.get(key)
+      if (!object) return null
+      const { offset, length } = options?.range ?? { offset: 0, length: object.data.length }
+      return { body: new Blob([object.data.slice(offset, offset + length)]).stream() }
+    },
+    async put(key, value, { httpMetadata }) {
+      const data = value instanceof Uint8Array ? value : new Uint8Array(await new Response(value).arrayBuffer())
+      objects.set(key, { data, contentType: httpMetadata.contentType })
     },
     async delete(key) {
       objects.delete(key)
