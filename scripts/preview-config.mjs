@@ -34,6 +34,7 @@ export function previewConfig(productionToml, { pr, hyperdriveId }) {
     'NUXT_PUBLIC_TURNSTILE_SITE_KEY',
   )
   replace(/^bucket_name = "ls-prod"$/m, 'bucket_name = "ls-preview"', 'bucket_name = "ls-prod"')
+  replace(/^R2_BUCKET = "ls-prod"$/m, 'R2_BUCKET = "ls-preview"', 'R2_BUCKET')
   replace(/(\[\[hyperdrive\]\]\nbinding = "HYPERDRIVE"\nid = )"[0-9a-f]+"/, `$1"${hyperdriveId}"`, 'hyperdrive')
   replace(/^namespace_id = "1001"$/m, 'namespace_id = "1002"', 'ratelimits namespace_id')
   replace(/^(queue|dead_letter_queue) = "([a-z-]+)"$/gm, `$1 = "$2${suffix}"`, 'queues')

@@ -38,6 +38,7 @@ export default defineNitroPlugin((nitroApp) => {
       readSettings,
       db,
       queues: queuesOf(env),
+      bucket: env.R2,
     })
   })
   // Called after errors too (h3): the request's connection is closed once the response is sent

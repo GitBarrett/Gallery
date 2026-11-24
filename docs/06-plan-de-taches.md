@@ -283,7 +283,7 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Import `docs/seed/zones.csv`, alias, suggestion EN/FR avec `pg_trgm` et `unaccent`, `GET /api/zones/suggest`.
   Stories : US-57.2, US-11.1 (API), US-11.2, US-62.4. Tests : I (suggestion « Hurl », « Stormw », « SW »).
 
-- [ ] **T-21 Demande d'upload** (dép. T-18a, T-20a, T-05c)
+- [x] **T-21 Demande d'upload** (dép. T-18a, T-20a, T-05c)
   Module `media` : `requestUploadUrl` (politiques, quotas, URL présignée du bucket privé signée sur taille et type), `completeUpload` (idempotent, contrôle `R2.head`), nettoyage des orphelins (cron horaire).
   Stories : US-10.1–2, US-10.5–7, US-08.1 (email vérifié requis). Tests : U, I, contrat `ObjectStorage`, E (PUT navigateur réel sur la preview : CORS et CSP).
 

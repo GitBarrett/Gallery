@@ -75,6 +75,8 @@ beforeAll(async () => {
       turnstileToken: TURNSTILE_DUMMY_TOKEN,
       inviteToken: token,
     })
+    // Verified: posting a capture needs it (US-08.1), the unverified column is checked by tests/api/photos.test.ts
+    await db.update(users).set({ emailVerifiedAt: new Date() }).where(eq(users.email, email))
     if (as === 'staff') await db.update(users).set({ role: 'moderator' }).where(eq(users.email, email))
     const signedIn = await post('/api/auth/signin', { email, password })
     cookies[as] = (signedIn.headers.get('set-cookie') ?? '').split(';')[0]!

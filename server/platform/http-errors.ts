@@ -19,6 +19,7 @@ const STATUS: Record<ErrorCode, number> = {
   NOT_FOUND: 404,
   CONFLICT: 409,
   PAYLOAD_TOO_LARGE: 413,
+  UNPROCESSABLE: 422, // business rule, e.g. the uploaded object differs from what was declared
   RATE_LIMITED: 429,
   INTERNAL: 500,
 }

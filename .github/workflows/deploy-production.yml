@@ -34,6 +34,7 @@ jobs:
         run: pnpm build
         env:
           NITRO_PRESET: cloudflare_module
+          R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # R2 host allowed in connect-src (presigned uploads)
       - name: Storybook under /storybook/ (ADR-019)
         run: pnpm exec storybook build --quiet -o .output/public/storybook
       - name: No test route in the production artifact

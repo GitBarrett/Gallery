@@ -32,6 +32,7 @@ describe('toErrorResponse', () => {
     [401, 'UNAUTHENTICATED'],
     [403, 'FORBIDDEN'],
     [413, 'PAYLOAD_TOO_LARGE'],
+    [422, 'UNPROCESSABLE'],
     [429, 'RATE_LIMITED'],
   ] as const)('maps HTTP %i to %s', (statusCode, code) => {
     expect(toErrorResponse(createError({ statusCode }), 'ray').body.error.code).toBe(code)

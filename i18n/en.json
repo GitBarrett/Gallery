@@ -36,6 +36,7 @@
     "NOT_FOUND": "This content does not exist or is no longer available.",
     "CONFLICT": "This was changed in the meantime. Reload and try again.",
     "PAYLOAD_TOO_LARGE": "This file is too large.",
+    "UNPROCESSABLE": "The file received does not match the one selected. Try again.",
     "RATE_LIMITED": "Too many attempts. Wait a moment and try again.",
     "INTERNAL": "Something went wrong. Please try again."
   },

@@ -31,6 +31,14 @@ const schema = z
     NUXT_OAUTH_GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
     NUXT_OAUTH_BATTLEDOTNET_CLIENT_ID: z.string().min(1).optional(),
     NUXT_OAUTH_BATTLEDOTNET_CLIENT_SECRET: z.string().min(1).optional(),
+    // Presigned uploads (T-21): S3 token limited to the bucket; fake values sign the URLs of fake-provider runs
+    R2_ACCOUNT_ID: z
+      .string()
+      .regex(/^[0-9a-f]{32}$/)
+      .optional(),
+    R2_BUCKET: z.string().min(3).optional(),
+    R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+    R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
     // Consent page of the fake OAuth providers: a test route, only on previews and in tests (ADR-013)
     NUXT_FAKE_OAUTH_CONSENT_URL: z.url().optional(),
   })
@@ -53,6 +61,10 @@ export interface Config {
   battlenetClientId?: string
   battlenetClientSecret?: string
   fakeOAuthConsentUrl?: string
+  r2AccountId?: string
+  r2Bucket?: string
+  r2AccessKeyId?: string
+  r2SecretAccessKey?: string
 }
 
 /** Validates the environment; a missing or invalid variable fails the startup, without printing its value. */
@@ -76,5 +88,9 @@ export function loadConfig(env: Record<string, string | undefined>): Config {
     battlenetClientId: parsed.data.NUXT_OAUTH_BATTLEDOTNET_CLIENT_ID,
     battlenetClientSecret: parsed.data.NUXT_OAUTH_BATTLEDOTNET_CLIENT_SECRET,
     fakeOAuthConsentUrl: parsed.data.NUXT_FAKE_OAUTH_CONSENT_URL,
+    r2AccountId: parsed.data.R2_ACCOUNT_ID,
+    r2Bucket: parsed.data.R2_BUCKET,
+    r2AccessKeyId: parsed.data.R2_ACCESS_KEY_ID,
+    r2SecretAccessKey: parsed.data.R2_SECRET_ACCESS_KEY,
   }
 }
