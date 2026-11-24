@@ -104,12 +104,18 @@ export type MfaVerifyResponse = z.infer<typeof MfaVerifyResponse>
 
 /**
  * GET /api/me/account: email of the account (null: Battle.net, Q55), whether a password guards it (US-07.2), linked
- * providers (US-07.4).
+ * providers (US-07.4), notification preferences (US-07.5, Q69).
  */
 export const AccountResponse = z.strictObject({
   email: z.email().nullable(),
   hasPassword: z.boolean(),
   providers: z.array(z.enum(['google', 'battlenet'])),
+  notificationPrefs: z.strictObject({
+    likes: z.boolean(),
+    comments: z.boolean(),
+    followers: z.boolean(),
+    contests: z.boolean(),
+  } satisfies Record<NotificationPref, unknown>),
 })
 export type AccountResponse = z.infer<typeof AccountResponse>
 

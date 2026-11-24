@@ -2,6 +2,7 @@
 // Shared header (07-design.md § Header): one line from 1180 px, icon-only navigation from 768 px, below that the
 // emblem, search icon and profile or Sign in (the tab bar takes the navigation), hidden while scrolling down.
 import type { FeatureFlags } from '~/composables/useFeatureFlags'
+import UnreadBadge from '~/features/notifications/UnreadBadge.vue'
 import NavIcon, { type NavIconName } from './NavIcon.vue'
 
 const props = defineProps<{ flags: FeatureFlags; username?: string }>()
@@ -76,12 +77,10 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
         ><NavIcon name="upload" />{{ t('layout.upload') }}</UiButton
       >
       <template v-if="username">
-        <NuxtLink
-          :to="localePath('/notifications')"
-          class="icon-link desktop-only"
-          :aria-label="t('layout.notifications')"
-        >
+        <NuxtLink :to="localePath('/notifications')" class="icon-link bell desktop-only">
           <NavIcon name="notifications" />
+          <span class="visually-hidden">{{ t('layout.notifications') }}</span>
+          <UnreadBadge />
         </NuxtLink>
         <NuxtLink :to="localePath(`/u/${username}`)" class="icon-link" :aria-label="t('layout.myProfile')">
           <NavIcon name="profile" />
@@ -145,6 +144,10 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
 
 .icon-link {
   padding: 0;
+}
+
+.bell {
+  position: relative;
 }
 
 .nav-link:hover,

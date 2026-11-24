@@ -260,5 +260,70 @@
     "website": "Website",
     "copyDiscord": "Copy the Discord username {handle}",
     "discordCopied": "Discord username copied"
+  },
+  "notifications": {
+    "title": "Quest log",
+    "filter": "Filter",
+    "all": "All",
+    "unreadTab": "Unread · {count}",
+    "markAll": "Mark all as read",
+    "today": "Today",
+    "earlier": "Earlier",
+    "read": "Read",
+    "unread": "Unread",
+    "unreadCount": "{count} unread",
+    "empty": "No new quests. Go capture something beautiful.",
+    "untitled": "(untitled)",
+    "quoted": "“{title}”",
+    "text": {
+      "like": "{actor} liked {title}. | {actor} and {others} other liked {title}. | {actor} and {others} others liked {title}.",
+      "comment": "{actor} commented on {title}.",
+      "follow": "{actor} started following you.",
+      "quality": "Your capture {title} reached {quality} quality.",
+      "moderation": {
+        "published": "Your capture {title} was published.",
+        "pending_review": "Your capture {title} is being reviewed by a moderator.",
+        "rejected": "Your capture {title} was rejected by moderation.",
+        "failed": "Your capture {title} could not be processed. Please upload it again."
+      },
+      "avatar": {
+        "published": "Your new avatar is live.",
+        "pending_review": "Your new avatar is being reviewed by a moderator.",
+        "rejected": "Your new avatar was rejected by moderation.",
+        "failed": "Your new avatar could not be processed. Please try again."
+      },
+      "contest": {
+        "opened": "A new contest is open.",
+        "ending": "A contest you entered ends soon.",
+        "extended": "A contest was extended.",
+        "disqualified": "Your contest entry was disqualified.",
+        "results": "Contest results are out."
+      }
+    },
+    "quality": {
+      "poor": "Poor",
+      "uncommon": "Uncommon",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "cta": {
+      "view": "View",
+      "profile": "Profile",
+      "settings": "Settings",
+      "upload": "Upload",
+      "contests": "Contests"
+    },
+    "prefs": {
+      "title": "Notification settings",
+      "legend": "In-app",
+      "likes": "Likes on my captures",
+      "comments": "Comments",
+      "followers": "New followers",
+      "contests": "Contests and results",
+      "moderation": "Moderation decisions and quality tiers (always on)",
+      "grouped": "Likes are grouped: “Ysolde and 23 others liked…” to avoid flooding your log.",
+      "saved": "Saved"
+    }
   }
 }

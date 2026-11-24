@@ -4,6 +4,7 @@ import type { FetchError } from 'ofetch'
 import { z } from '~~/shared/contracts/zod'
 import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
+import { NotificationsResponse, UnreadCountResponse } from '~~/shared/contracts/notifications'
 import { PublicSettings } from '~~/shared/contracts/settings'
 import {
   AccountResponse,
@@ -119,4 +120,9 @@ export const api = {
   oauthPending: () => call('/api/auth/oauth/pending', OAuthPendingResponse),
   // 204: account created and session opened (US-02.1)
   completeOAuth: (body: OAuthCompleteBody) => call('/api/auth/oauth/complete', z.unknown(), { method: 'POST', body }),
+  // Quest log and bell (US-35.1, US-35.3); 404 for another member's notification
+  notifications: () => call('/api/notifications', NotificationsResponse),
+  unreadCount: () => call('/api/notifications/unread-count', UnreadCountResponse),
+  markNotificationRead: (id: string) => call(`/api/notifications/${id}/read`, z.unknown(), { method: 'POST' }),
+  markAllNotificationsRead: () => call('/api/notifications/read-all', z.unknown(), { method: 'POST' }),
 }

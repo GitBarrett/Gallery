@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gte, isNull, lt, sql } from 'drizzle-orm'
+import { and, asc, count, eq, gte, inArray, isNull, lt, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import { gameVersions, photos } from '../../../db/schema'
 import type { MediaRepository } from '../application/ports'
@@ -69,5 +69,10 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
       .where(and(eq(photos.id, id), eq(photos.status, 'processing')))
       .returning({ id: photos.id })
     return rows.length > 0
+  },
+  async titles(ids) {
+    if (!ids.length) return new Map()
+    const rows = await db.select({ id: photos.id, title: photos.title }).from(photos).where(inArray(photos.id, ids))
+    return new Map(rows.map((r) => [r.id, r.title]))
   },
 })

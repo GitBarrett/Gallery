@@ -7,6 +7,7 @@ registerEndpoint('/api/me/account', () => ({
   email: 'ash@example.com',
   hasPassword: false,
   providers: ['google', 'battlenet'],
+  notificationPrefs: { likes: true, comments: true, followers: true, contests: true },
 }))
 let lastMethod = false
 registerEndpoint('/api/me/oauth/battlenet', { method: 'DELETE', handler: () => null })

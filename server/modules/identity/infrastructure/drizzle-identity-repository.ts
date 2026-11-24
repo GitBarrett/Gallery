@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, isNull, lt, ne, or, sql } from 'drizzle-orm'
+import { and, desc, eq, gt, inArray, isNull, lt, ne, notInArray, or, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import type { Clock } from '../../../platform/clock'
 import {
@@ -128,6 +128,14 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .from(users)
       .where(eq(users.id, userId))
     return row ?? null
+  },
+  async usernames(ids) {
+    if (!ids.length) return new Map()
+    const rows = await db
+      .select({ id: users.id, username: users.username })
+      .from(users)
+      .where(and(inArray(users.id, ids), notInArray(users.status, ['banned', 'pending_deletion'])))
+    return new Map(rows.map((r) => [r.id, r.username]))
   },
   async usernameOwner(username, at) {
     const [holder] = await db

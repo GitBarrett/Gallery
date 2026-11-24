@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // Shared layout: skip link first (US-75.1), the cookie panel (US-61.1), header, content, footer and, below 768 px, the tab bar (US-67.1).
+// It keeps the bell's counter fresh for the member (US-35.1).
 import ConsentPanel from '~/features/consent/ConsentPanel.vue'
 import AppFooter from '~/features/layout/AppFooter.vue'
 import AppHeader from '~/features/layout/AppHeader.vue'
@@ -7,10 +8,12 @@ import AppTabBar from '~/features/layout/AppTabBar.vue'
 import OfflineBanner from '~/features/layout/OfflineBanner.vue'
 import InstallBanner from '~/features/pwa/InstallBanner.vue'
 import UpdateToast from '~/features/pwa/UpdateToast.vue'
+import { useUnreadPolling } from '~/features/notifications/useUnread'
 
 const flags = useFeatureFlags()
 const { me } = await useMe()
 const username = computed(() => me.value?.username)
+useUnreadPolling(computed(() => Boolean(me.value)))
 </script>
 
 <template>

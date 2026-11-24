@@ -61,6 +61,9 @@ export function inMemoryMediaRepository(clock: Clock) {
       Object.assign(row, { status, processed, bytes: processed.bytes })
       return true
     },
+    async titles(ids) {
+      return new Map(ids.filter((id) => rows.has(id)).map((id) => [id, rows.get(id)!.title]))
+    },
     async failProcessing(id) {
       const row = rows.get(id)
       if (row?.status !== 'processing') return false

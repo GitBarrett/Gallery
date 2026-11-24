@@ -43,6 +43,11 @@ export const ROUTES: Record<string, { access: Access; row: string }> = {
   'POST /api/me/sessions/revoke-others': { access: 'member', row: 'Compte' },
   'GET /api/me/social-links': { access: 'member', row: '`GET/PUT /api/me/social-links`' },
   'PUT /api/me/social-links': { access: 'member', row: '`GET/PUT /api/me/social-links`' },
+  // The member's own notifications only (another's: 404), verified or not
+  'GET /api/notifications': { access: 'member', row: '`/api/notifications*`' },
+  'GET /api/notifications/unread-count': { access: 'member', row: '`/api/notifications*`' },
+  'POST /api/notifications/[id]/read': { access: 'member', row: '`/api/notifications*`' },
+  'POST /api/notifications/read-all': { access: 'member', row: '`/api/notifications*`' },
   // requireVerified + notSanctioned in the use cases (403 unverified or suspended), the owner's capture only (404)
   'POST /api/photos/upload-url': { access: 'member', row: '`POST /api/photos/upload-url`, `/complete`' },
   'POST /api/photos/[id]/complete': { access: 'member', row: '`POST /api/photos/upload-url`, `/complete`' },

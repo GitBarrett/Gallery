@@ -19,6 +19,24 @@ export function inMemoryNotificationsRepository() {
       const row = rows.find((r) => r.id === id)
       if (row) Object.assign(row, { payload: { ...row.payload, actorIds }, readAt: null })
     },
+    async list(userId, limit) {
+      return rows
+        .filter((r) => r.userId === userId)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+        .slice(0, limit)
+        .map(({ id, type, payload, readAt, createdAt }) => ({ id, type, payload, readAt, createdAt }))
+    },
+    async countUnread(userId) {
+      return rows.filter((r) => r.userId === userId && !r.readAt).length
+    },
+    async markRead(userId, id, at) {
+      const row = rows.find((r) => r.id === id && r.userId === userId)
+      if (row) row.readAt ??= at
+      return Boolean(row)
+    },
+    async markAllRead(userId, at) {
+      for (const row of rows) if (row.userId === userId) row.readAt ??= at
+    },
     async purgeBefore(before) {
       rows.splice(0, rows.length, ...rows.filter((r) => r.createdAt >= before))
     },
