@@ -10,7 +10,8 @@ objectStorageContract('R2 (binding in memory)', () => {
   const bucket = memoryBucket()
   return {
     storage: r2ObjectStorage({ bucket, prefix: 'pr-7/', credentials, now }),
-    put: (key, { bytes, contentType }) => bucket.objects.set(`pr-7/${key}`, { size: bytes, contentType }),
+    put: (key, { bytes, contentType }) =>
+      bucket.objects.set(`pr-7/${key}`, { data: new Uint8Array(bytes), contentType }),
   }
 })
 

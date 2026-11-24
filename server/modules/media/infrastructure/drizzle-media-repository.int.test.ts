@@ -1,6 +1,10 @@
 import { eq } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
+import { baseJpeg, jpegExif, jpegWith } from '../../../../tests/builders/images'
 import { withRollback } from '../../../../tests/db'
+import { fakeImageService } from '../../../../tests/fakes/fake-image-service'
+import { inMemoryObjectStorage } from '../../../../tests/fakes/in-memory-object-storage'
+import { photoProcessConsumer } from '../interface/photo-process-consumer'
 import { gameVersions, photos, users } from '../../../db/schema'
 import { drizzleMediaRepository } from './drizzle-media-repository'
 
@@ -34,6 +38,7 @@ describe('drizzleMediaRepository', () => {
         userId,
         mime: 'image/png',
         bytes: 42,
+        status: 'processing',
         uploadedAt: null,
       })
       const at = new Date()
@@ -80,6 +85,68 @@ describe('drizzleMediaRepository', () => {
       for (const id of ids) await repo.deleteIncomplete(id)
       const left = await tx.select({ id: photos.id }).from(photos).where(eq(photos.userId, userId))
       expect(left.map((r) => r.id)).toEqual([ids[1]])
+    })
+  })
+
+  it('US-14.2 a message delivered twice processes the capture once, with the same result', async () => {
+    await withRollback(async (tx) => {
+      const repo = drizzleMediaRepository(tx)
+      const userId = await member(tx)
+      const file = jpegWith([jpegExif()])
+      await repo.createUpload({ ...upload(ids[0]!, userId), mime: 'image/jpeg', bytes: file.length })
+      await repo.complete(ids[0]!, { title: 'Dusk', gameVersion: 'wow-forever', at: new Date() })
+      const { storage, objects } = inMemoryObjectStorage()
+      objects.set(`incoming/${ids[0]}`, { bytes: file.length, contentType: 'image/jpeg', data: file })
+      const { images, renders } = fakeImageService({ format: 'image/jpeg', width: 3840, height: 2160 })
+      const consume = photoProcessConsumer({ repo, storage, images })
+      const body = { eventId: ids[1], payload: { kind: 'capture', photoId: ids[0] } }
+      const message = { id: 'm1', body, attempts: 1, ack() {}, retry() {} }
+      await consume(body, message)
+      const first = new Map(objects)
+      await consume(body, { ...message, attempts: 2 })
+      expect(objects).toEqual(first)
+      expect(renders).toHaveLength(6)
+      const [row] = await tx
+        .select({
+          status: photos.status,
+          bytes: photos.bytes,
+          width: photos.width,
+          height: photos.height,
+          lumaBl: photos.lumaBl,
+          lumaTr: photos.lumaTr,
+        })
+        .from(photos)
+        .where(eq(photos.id, ids[0]!))
+      expect(row).toEqual({
+        status: 'pending_review',
+        bytes: baseJpeg().length,
+        width: 3840,
+        height: 2160,
+        lumaBl: 0,
+        lumaTr: 0,
+      })
+    })
+  })
+
+  it('US-10.8 ends only a capture still processing failed', async () => {
+    await withRollback(async (tx) => {
+      const repo = drizzleMediaRepository(tx)
+      const userId = await member(tx)
+      for (const id of ids) await repo.createUpload(upload(id, userId))
+      const measures = { bytes: 40, width: 1920, height: 1080, lumaBl: 0.5, lumaTr: 0.25 }
+      expect(await repo.finishProcessing(ids[0]!, 'pending_review', measures)).toBe(true)
+      expect(await repo.finishProcessing(ids[0]!, 'pending_review', measures)).toBe(false)
+      expect(await repo.failProcessing(ids[0]!)).toBe(false)
+      expect(await repo.failProcessing(ids[1]!)).toBe(true)
+      expect(await repo.failProcessing(ids[1]!)).toBe(false)
+      const rows = await tx
+        .select({ id: photos.id, status: photos.status })
+        .from(photos)
+        .where(eq(photos.userId, userId))
+      expect(Object.fromEntries(rows.map((r) => [r.id, r.status]))).toEqual({
+        [ids[0]!]: 'pending_review',
+        [ids[1]!]: 'failed',
+      })
     })
   })
 })

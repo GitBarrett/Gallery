@@ -14,8 +14,38 @@ export interface ObjectStorage {
   /** URL accepting one PUT of exactly `bytes` bytes of `contentType`, for `expiresInSeconds`. */
   presignPut(key: string, file: { contentType: CaptureType; bytes: number; expiresInSeconds: number }): Promise<string>
   head(key: string): Promise<StoredObject | null>
+  /** The object as a stream, or its first `length` bytes; null for a missing key. */
+  read(key: string, length?: number): Promise<ReadableStream<Uint8Array> | null>
+  /** Writes the object; a stream must give exactly `bytes` bytes (R2 wants the length of a stream). */
+  put(
+    key: string,
+    body: ReadableStream<Uint8Array> | Uint8Array,
+    object: { bytes: number; contentType: string },
+  ): Promise<void>
   /** Does nothing for a missing key. */
   delete(key: string): Promise<void>
+}
+
+/** What the Images binding reads in a file (ADR-011). */
+export interface ImageInfo {
+  format: string
+  width: number
+  height: number
+}
+
+export type VariantFormat = 'image/webp' | 'image/jpeg' | 'image/png'
+
+/**
+ * Port: the Images binding, called by the processing only (ADR-012: never on display). `render` is one billed
+ * transformation: the image scaled down to `width` at most, keeping its ratio. Both throw when the service fails or
+ * cannot decode the file.
+ */
+export interface ImageService {
+  info(image: ReadableStream<Uint8Array>): Promise<ImageInfo>
+  render(
+    image: ReadableStream<Uint8Array>,
+    output: { width: number; format: VariantFormat; quality?: number },
+  ): Promise<Uint8Array<ArrayBuffer>>
 }
 
 export interface NewUpload {
@@ -32,7 +62,17 @@ export interface Upload {
   userId: string
   mime: string
   bytes: number
+  status: string
   uploadedAt: Date | null
+}
+
+/** What the processing measured on the cleaned original. */
+export interface Processed {
+  bytes: number
+  width: number
+  height: number
+  lumaBl: number
+  lumaTr: number
 }
 
 /** Port: the captures of the media module. */
@@ -46,7 +86,15 @@ export interface MediaRepository {
   /** Uploads requested before `before` and never completed, `limit` at most. */
   incompleteBefore(before: Date, limit: number): Promise<string[]>
   deleteIncomplete(id: string): Promise<void>
+  /** A capture still `processing` goes to `status` with its measures; false if it no longer was (replay). */
+  finishProcessing(id: string, status: 'pending_review', processed: Processed): Promise<boolean>
+  /** A capture still `processing` goes to `failed`; false if it no longer was. */
+  failProcessing(id: string): Promise<boolean>
 }
 
 /** Key where the browser puts the file (03 § Pipeline image 2): server-made, no extension, never served. */
 export const incomingKey = (photoId: string) => `incoming/${photoId}`
+/** The cleaned original (03 § Pipeline image 5), never served publicly. */
+export const originalKey = (photoId: string) => `originals/${photoId}`
+/** Display variants (ADR-012): `{400,800,1200,2400}.webp` and `1200.jpg`. */
+export const variantKey = (photoId: string, name: string) => `variants/${photoId}/${name}`

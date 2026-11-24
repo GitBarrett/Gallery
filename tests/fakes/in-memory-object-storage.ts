@@ -1,11 +1,14 @@
 import type { ObjectStorage, StoredObject } from '../../server/modules/media'
 
+type Stored = StoredObject & { data?: Uint8Array }
+
 /**
- * In-memory ObjectStorage for use case tests (11-strategie-de-tests.md § 3): `objects` holds what the browser put;
- * the URL carries what a presigned URL is signed on, with a dummy signature.
+ * In-memory ObjectStorage for use case tests (11-strategie-de-tests.md § 3): `objects` holds what the browser put
+ * (`data` when the content matters, zeros otherwise); the URL carries what a presigned URL is signed on, with a dummy
+ * signature.
  */
 export function inMemoryObjectStorage() {
-  const objects = new Map<string, StoredObject>()
+  const objects = new Map<string, Stored>()
   const storage: ObjectStorage = {
     async presignPut(key, { contentType, bytes, expiresInSeconds }) {
       const query = new URLSearchParams({
@@ -17,7 +20,20 @@ export function inMemoryObjectStorage() {
       })
       return `https://r2.test/${key}?${query}`
     },
-    head: async (key) => objects.get(key) ?? null,
+    async head(key) {
+      const object = objects.get(key)
+      return object ? { bytes: object.bytes, contentType: object.contentType } : null
+    },
+    async read(key, length) {
+      const object = objects.get(key)
+      if (!object) return null
+      return new Blob([(object.data ?? new Uint8Array(object.bytes)).slice(0, length)]).stream()
+    },
+    async put(key, body, { bytes, contentType }) {
+      const data = body instanceof Uint8Array ? body : new Uint8Array(await new Response(body).arrayBuffer())
+      if (data.length !== bytes) throw new Error(`length ${data.length} differs from the declared ${bytes}`)
+      objects.set(key, { bytes, contentType, data })
+    },
     async delete(key) {
       objects.delete(key)
     },

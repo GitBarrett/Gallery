@@ -20,7 +20,14 @@ import {
   resendMailer,
   type Mailer,
 } from '../modules/identity'
-import { drizzleMediaRepository, purgeOrphanUploads, r2ObjectStorage, type R2Bucket } from '../modules/media'
+import {
+  drizzleMediaRepository,
+  imagesBindingService,
+  photoProcessConsumer,
+  purgeOrphanUploads,
+  r2ObjectStorage,
+  type R2Bucket,
+} from '../modules/media'
 import { loadConfig } from '../platform/config'
 import { uuidV7Generator } from '../platform/ids'
 import { createLogger, type Logger } from '../platform/logger'
@@ -51,7 +58,17 @@ function consumers(db: Db, logger: Logger, env: Bindings): Record<string, Messag
           }).send(message),
       }
   const ids = uuidV7Generator(systemClock)
-  return { emails: emailsConsumer({ db, mailer, clock: systemClock, ids, siteUrl: config.siteUrl }) }
+  const handlers: Record<string, MessageHandler> = {
+    emails: emailsConsumer({ db, mailer, clock: systemClock, ids, siteUrl: config.siteUrl }),
+  }
+  // Without R2 or Images (local runs), captures wait in the queue
+  if (env.R2 && env.IMAGES)
+    handlers['photo-process'] = photoProcessConsumer({
+      repo: drizzleMediaRepository(db),
+      storage: r2ObjectStorage({ bucket: env.R2, prefix: config.r2Prefix, now: systemClock.now }),
+      images: imagesBindingService(env.IMAGES),
+    })
+  return handlers
 }
 
 /** Runs a job with the database (Hyperdrive), then closes the connection: each cron opens its own. */

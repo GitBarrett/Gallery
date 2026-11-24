@@ -1,5 +1,5 @@
 import type { Clock } from '../../server/platform/clock'
-import type { MediaRepository } from '../../server/modules/media'
+import type { MediaRepository, Processed } from '../../server/modules/media'
 
 type Row = {
   id: string
@@ -10,6 +10,8 @@ type Row = {
   uploadedAt: Date | null
   title: string | null
   gameVersion: string | null
+  status: string
+  processed?: Processed
 }
 
 /** In-memory MediaRepository for use case tests; `rows` shows the captures. */
@@ -26,6 +28,7 @@ export function inMemoryMediaRepository(clock: Clock) {
         uploadedAt: null,
         title: null,
         gameVersion: null,
+        status: 'processing',
       })
     },
     async countIncomplete(userId, since) {
@@ -33,7 +36,9 @@ export function inMemoryMediaRepository(clock: Clock) {
     },
     async findUpload(id) {
       const row = rows.get(id)
-      return row ? { id, userId: row.userId, mime: row.mime, bytes: row.bytes, uploadedAt: row.uploadedAt } : null
+      return row
+        ? { id, userId: row.userId, mime: row.mime, bytes: row.bytes, status: row.status, uploadedAt: row.uploadedAt }
+        : null
     },
     async complete(id, { title, gameVersion, at }) {
       const row = rows.get(id)
@@ -49,6 +54,18 @@ export function inMemoryMediaRepository(clock: Clock) {
     },
     async deleteIncomplete(id) {
       if (!rows.get(id)?.uploadedAt) rows.delete(id)
+    },
+    async finishProcessing(id, status, processed) {
+      const row = rows.get(id)
+      if (row?.status !== 'processing') return false
+      Object.assign(row, { status, processed, bytes: processed.bytes })
+      return true
+    },
+    async failProcessing(id) {
+      const row = rows.get(id)
+      if (row?.status !== 'processing') return false
+      row.status = 'failed'
+      return true
     },
   }
   return { repo, rows }

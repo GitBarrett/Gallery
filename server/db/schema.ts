@@ -7,6 +7,7 @@ import {
   jsonb,
   pgTable,
   primaryKey,
+  real,
   text,
   timestamp,
   uniqueIndex,
@@ -280,8 +281,9 @@ export const zones = pgTable(
 
 /**
  * Captures (03-architecture.md § Modèle de données), created `processing` by the upload request (T-21) with the
- * declared file; `uploaded_at` set by `complete` with the title and the version. The other columns arrive with their
- * tasks (expand). shortcut: declared width and height until the processing reads the real ones (T-22b).
+ * declared file; `uploaded_at` set by `complete` with the title and the version; size and dimensions of the cleaned
+ * original and luminances (0–1, 07-design.md § Texte sur image) set by the processing (T-22b). The other columns
+ * arrive with their tasks (expand).
  */
 export const photos = pgTable(
   'photos',
@@ -297,6 +299,8 @@ export const photos = pgTable(
     bytes: integer('bytes').notNull(),
     width: integer('width').notNull(),
     height: integer('height').notNull(),
+    lumaBl: real('luma_bl'),
+    lumaTr: real('luma_tr'),
     uploadedAt: at('uploaded_at'),
     createdAt: createdAt(),
   },
