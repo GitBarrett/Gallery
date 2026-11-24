@@ -267,11 +267,19 @@ T-17a (réglages du compte : bio, langue, mot de passe, réseaux sociaux) est d�
   Politiques d'autorisation déclarées par use case (refus par défaut), harnais de **matrice d'autorisation** généré depuis l'inventaire des routes (`08-securite.md` annexe B).
   Stories : US-55 (règles). Tests : U, I (matrice).
 
-- [ ] **T-18b Double authentification du staff** (dép. T-18a)
-  TOTP obligatoire après tout mode de connexion, 10 codes de secours, `sessions.mfa_verified_at` et `reauth_at`, commandes `pnpm admin:promote` (premier admin) et `pnpm admin:reset-mfa`.
-  Stories : US-55. Tests : U, I, E. **Action humaine** : exécuter `admin:promote` en production après le premier déploiement.
+- [x] **T-18b Double authentification du staff : serveur** (dép. T-18a)
+  TOTP obligatoire après tout mode de connexion (`POST /api/auth/mfa/setup`, `/verify`, `/challenge`), secret chiffré AES-GCM, 10 codes de secours, `sessions.mfa_verified_at` (nouvel identifiant de session), sessions staff de 12 h, `requireRole` exige le TOTP, 5 échecs / 15 min.
+  Stories : US-55.2, US-55.5. Tests : U, I. **Action humaine** : secret `MFA_ENCRYPTION_KEY` en production.
 
-- [ ] **T-18c Rôles, audit et squelette d'admin** (dép. T-18b)
+- [ ] **T-18d Double authentification du staff : pages** (dép. T-18b)
+  Page de configuration (QR code, secret, 10 codes de secours affichés une fois) et page de défi après connexion ; `GET /api/me` indique l'état MFA ; seed : modérateur avec TOTP de test.
+  Stories : US-55.2, US-55.5. Tests : C, E (connexion OAuth puis TOTP exigé ; code de secours ; code réutilisé refusé).
+
+- [ ] **T-18e Réauthentification, alerte et commandes staff** (dép. T-18b)
+  `POST /api/auth/reauth` (`sessions.reauth_at`, < 5 min), alerte aux admins au blocage du TOTP, commandes `pnpm admin:promote` (premier admin) et `pnpm admin:reset-mfa` (sessions révoquées, journalisé).
+  Stories : US-55.4, US-55.5. Tests : U, I. **Action humaine** : exécuter `admin:promote` en production après le premier déploiement.
+
+- [ ] **T-18c Rôles, audit et squelette d'admin** (dép. T-18d, T-18e)
   Promotion et rétrogradation, écriture de l'`audit_log`, squelette `/admin` (accès MFA).
   Stories : US-55, US-58.1. Tests : I, E.
 

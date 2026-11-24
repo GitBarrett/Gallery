@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { notSanctioned, requireOwner, requireRole, requireVerified } from './policies'
+import { notSanctioned, requireOwner, requireRole, requireStaff, requireVerified } from './policies'
 
 describe('requireVerified', () => {
   it('US-08.1 refuses a member whose email is not verified, with the reason the banner shows', () => {
@@ -25,12 +25,31 @@ describe('notSanctioned', () => {
 })
 
 describe('requireRole', () => {
+  const refused = { ok: false, error: { kind: 'forbidden', reason: 'role' } }
+  const mfa = { mfaVerified: true }
+
   it('US-55 lets an admin moderate, refuses a member, and keeps administration to admins', () => {
-    const refused = { ok: false, error: { kind: 'forbidden', reason: 'role' } }
-    expect(requireRole({ role: 'admin' }, 'moderator')).toEqual({ ok: true, value: undefined })
-    expect(requireRole({ role: 'moderator' }, 'moderator')).toEqual({ ok: true, value: undefined })
-    expect(requireRole({ role: 'user' }, 'moderator')).toEqual(refused)
-    expect(requireRole({ role: 'moderator' }, 'admin')).toEqual(refused)
+    expect(requireRole({ role: 'admin', ...mfa }, 'moderator')).toEqual({ ok: true, value: undefined })
+    expect(requireRole({ role: 'moderator', ...mfa }, 'moderator')).toEqual({ ok: true, value: undefined })
+    expect(requireRole({ role: 'user', ...mfa }, 'moderator')).toEqual(refused)
+    expect(requireRole({ role: 'moderator', ...mfa }, 'admin')).toEqual(refused)
+  })
+
+  it('US-55.2 refuses the staff whose session has not passed the TOTP', () => {
+    expect(requireRole({ role: 'admin', mfaVerified: false }, 'moderator')).toEqual({
+      ok: false,
+      error: { kind: 'forbidden', reason: 'mfa_required' },
+    })
+  })
+})
+
+describe('requireStaff', () => {
+  const refused = { ok: false, error: { kind: 'forbidden', reason: 'role' } }
+
+  it('US-55.2 opens the TOTP setup and challenge to the staff only, before the TOTP', () => {
+    expect(requireStaff({ role: 'moderator' })).toEqual({ ok: true, value: undefined })
+    expect(requireStaff({ role: 'admin' })).toEqual({ ok: true, value: undefined })
+    expect(requireStaff({ role: 'user' })).toEqual(refused)
   })
 })
 

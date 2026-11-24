@@ -24,6 +24,10 @@ import {
   usernameAvailability,
   resetPassword,
   changePassword,
+  aesGcmSecretBox,
+  startMfaSetup,
+  verifyMfa,
+  challengeMfa,
   getSocialLinks,
   setSocialLinks,
   getAccount,
@@ -69,6 +73,9 @@ export interface Container {
     forgotPassword: UseCase<typeof forgotPassword>
     resetPassword: UseCase<typeof resetPassword>
     changePassword: UseCase<typeof changePassword>
+    startMfaSetup: UseCase<typeof startMfaSetup>
+    verifyMfa: UseCase<typeof verifyMfa>
+    challengeMfa: UseCase<typeof challengeMfa>
     getSocialLinks: UseCase<typeof getSocialLinks>
     setSocialLinks: UseCase<typeof setSocialLinks>
     getAccount: UseCase<typeof getAccount>
@@ -87,6 +94,8 @@ export interface Container {
 
 // Rate limiting key of local runs and previews without the secret: their counters are throwaway
 const FAKE_IP_HASH_KEY = 'fake-providers-ip-hash-key-not-secret'
+// TOTP secrets of local runs and previews without the secret: test accounts only
+const FAKE_MFA_KEY = 'fake-providers-mfa-key-not-secret'
 
 const required = (value: string | undefined, name: string) => {
   if (!value) throw new Error(`${name} is not configured`)
@@ -139,6 +148,15 @@ export function createContainer({
             clientSecret: required(config.googleClientSecret, 'NUXT_OAUTH_GOOGLE_CLIENT_SECRET'),
             fetch: fetcher,
           })
+  const mfaDeps = () => ({
+    repo: drizzleIdentityRepository(db()),
+    uow: identityUow(),
+    box: aesGcmSecretBox(
+      config.mfaKey ?? (config.fakeProviders ? FAKE_MFA_KEY : required(undefined, 'MFA_ENCRYPTION_KEY')),
+    ),
+    limiter: dbRateLimiter(db(), ipHashKey(), clock),
+    clock,
+  })
   // Registered as is with the provider (08-securite.md § 3)
   const redirectUri = (provider: OAuthProviderName) => `${config.siteUrl}/auth/${provider}/callback`
 
@@ -216,6 +234,9 @@ export function createContainer({
           limiter: dbRateLimiter(db(), ipHashKey(), clock),
           clock,
         })(cmd),
+      startMfaSetup: (cmd) => startMfaSetup(mfaDeps())(cmd),
+      verifyMfa: (cmd) => verifyMfa(mfaDeps())(cmd),
+      challengeMfa: (cmd) => challengeMfa(mfaDeps())(cmd),
       getSocialLinks: (cmd) => getSocialLinks({ repo: drizzleIdentityRepository(db()) })(cmd),
       setSocialLinks: (cmd) =>
         setSocialLinks({ uow: identityUow(), limiter: dbRateLimiter(db(), ipHashKey(), clock) })(cmd),

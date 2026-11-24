@@ -9,12 +9,14 @@ export type {
   IdentityRepository,
   Locale,
   Mailer,
+  MfaState,
   NewSession,
   SessionSummary,
   NewUser,
   OAuthProvider,
   OAuthProviderName,
   PasswordHasher,
+  SecretBox,
   SocialLink,
 } from './application/ports'
 export { signup, SIGNUP_PER_IP, TERMS_VERSION } from './application/signup'
@@ -29,12 +31,21 @@ export { resendVerification } from './application/resend-verification'
 export { forgotPassword } from './application/forgot-password'
 export { resetPassword } from './application/reset-password'
 export { changePassword } from './application/change-password'
+export { challengeMfa, startMfaSetup, verifyMfa } from './application/mfa'
+export { aesGcmSecretBox } from './infrastructure/aes-gcm-secret-box'
 export { getSocialLinks, setSocialLinks } from './application/social-links'
 export { confirmEmailChange, getAccount, requestEmailChange } from './application/email-change'
 export { unlinkOAuth } from './application/linked-accounts'
 export { getProfile, updateProfile } from './application/profiles'
 export { changeUsername, usernameAvailability } from './application/usernames'
-export { notSanctioned, requireOwner, requireRole, requireVerified, type PolicyDenial } from './domain/policies'
+export {
+  notSanctioned,
+  requireOwner,
+  requireRole,
+  requireStaff,
+  requireVerified,
+  type PolicyDenial,
+} from './domain/policies'
 export { argon2idHasher } from './infrastructure/argon2id-hasher'
 export {
   drizzleIdentityRepository,

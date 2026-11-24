@@ -5,7 +5,7 @@ import { err, ok, type Result } from '../../../../shared/domain/result'
 // call are listed in tests/authorization-matrix.ts, checked by the architecture and the matrix tests.
 
 export type PolicyDenial =
-  { kind: 'forbidden'; reason: 'email_unverified' | 'suspended' | 'role' } | { kind: 'not_found' }
+  { kind: 'forbidden'; reason: 'email_unverified' | 'suspended' | 'role' | 'mfa_required' } | { kind: 'not_found' }
 
 /**
  * Publishing, commenting and taking part in a contest need a verified email (US-08.1); liking and following do
@@ -21,12 +21,20 @@ export const notSanctioned = (actor: { status: string }): Result<void, PolicyDen
 
 const RANK = { user: 0, moderator: 1, admin: 2 } as const
 
-/** Moderation needs a moderator or an admin, administration an admin (US-55; the TOTP check comes with T-18b). */
+/** Moderation needs a moderator or an admin, administration an admin, both after the TOTP (US-55, US-55.2). */
 export const requireRole = (
-  actor: { role: keyof typeof RANK },
+  actor: { role: keyof typeof RANK; mfaVerified: boolean },
   role: 'moderator' | 'admin',
 ): Result<void, PolicyDenial> =>
-  RANK[actor.role] >= RANK[role] ? ok(undefined) : err({ kind: 'forbidden', reason: 'role' })
+  RANK[actor.role] < RANK[role]
+    ? err({ kind: 'forbidden', reason: 'role' })
+    : actor.mfaVerified
+      ? ok(undefined)
+      : err({ kind: 'forbidden', reason: 'mfa_required' })
+
+/** The TOTP setup and challenge themselves: any staff account, before the TOTP (annexe B, `POST /api/auth/mfa/*`). */
+export const requireStaff = (actor: { role: keyof typeof RANK }): Result<void, PolicyDenial> =>
+  RANK[actor.role] >= RANK.moderator ? ok(undefined) : err({ kind: 'forbidden', reason: 'role' })
 
 /** Another member's private resource is not found, so its existence is not revealed (08-securite.md § 4). */
 export const requireOwner = (actor: { id: string }, ownerId: string): Result<void, PolicyDenial> =>

@@ -26,6 +26,7 @@ const schema = z
     TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
     RESEND_API_KEY: z.string().min(1).optional(),
     IP_HASH_KEY_CURRENT: z.string().min(32).optional(),
+    MFA_ENCRYPTION_KEY: z.string().min(32).optional(),
     NUXT_OAUTH_GOOGLE_CLIENT_ID: z.string().min(1).optional(),
     NUXT_OAUTH_GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
     NUXT_OAUTH_BATTLEDOTNET_CLIENT_ID: z.string().min(1).optional(),
@@ -46,6 +47,7 @@ export interface Config {
   turnstileSecret?: string
   resendApiKey?: string
   ipHashKey?: string
+  mfaKey?: string
   googleClientId?: string
   googleClientSecret?: string
   battlenetClientId?: string
@@ -68,6 +70,7 @@ export function loadConfig(env: Record<string, string | undefined>): Config {
     turnstileSecret: parsed.data.TURNSTILE_SECRET_KEY,
     resendApiKey: parsed.data.RESEND_API_KEY,
     ipHashKey: parsed.data.IP_HASH_KEY_CURRENT,
+    mfaKey: parsed.data.MFA_ENCRYPTION_KEY,
     googleClientId: parsed.data.NUXT_OAUTH_GOOGLE_CLIENT_ID,
     googleClientSecret: parsed.data.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
     battlenetClientId: parsed.data.NUXT_OAUTH_BATTLEDOTNET_CLIENT_ID,

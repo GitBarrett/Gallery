@@ -3,6 +3,7 @@ import type {
   EmailToken,
   IdentityRepository,
   Locale,
+  MfaState,
   NewSession,
   NewUser,
   SocialLink,
@@ -18,6 +19,7 @@ type StoredUser = Omit<NewUser, 'passwordHash' | 'emailVerifiedAt'> & {
   usernameChangedAt?: Date | null
   bio?: string | null
   createdAt?: Date
+  mfa?: MfaState
 }
 
 /** In-memory IdentityRepository with the same case-insensitive uniqueness as the database indexes. */
@@ -25,6 +27,12 @@ export function inMemoryIdentityRepository() {
   const users: StoredUser[] = []
   const tokens: EmailToken[] = []
   const sessions: (NewSession & { createdAt: Date; revokedAt: Date | null })[] = []
+  const recoveryCodes: { userId: string; codeHash: string; usedAt: Date | null }[] = []
+  const mfaOf = (userId: string) => {
+    const user = users.find((u) => u.id === userId)
+    if (user) user.mfa ??= { secretEnc: null, enabledAt: null, lastStep: null }
+    return user?.mfa
+  }
   const active = (userId: string, at: Date) =>
     sessions.filter((s) => s.userId === userId && !s.revokedAt && s.expiresAt > at)
   const invites: (BetaInvite & { usedAt: Date | null })[] = []
@@ -149,9 +157,11 @@ export function inMemoryIdentityRepository() {
       if (!session || !user) return null
       const { id, username, role, status } = user
       return {
+        createdAt: session.createdAt,
         lastSeenAt: session.lastSeenAt,
         expiresAt: session.expiresAt,
         revokedAt: session.revokedAt,
+        mfaVerifiedAt: session.mfaVerifiedAt ?? null,
         account: { id, username, role, status, emailVerified: Boolean(user.emailVerifiedAt) },
       }
     },
@@ -180,6 +190,31 @@ export function inMemoryIdentityRepository() {
     },
     async revokeOtherSessions(userId, keptIdHash, at) {
       for (const s of active(userId, at)) if (s.idHash !== keptIdHash) s.revokedAt = at
+    },
+    async findMfa(userId) {
+      const mfa = mfaOf(userId)
+      return mfa ? { ...mfa } : null
+    },
+    async setPendingMfa(userId, secretEnc) {
+      const mfa = mfaOf(userId)
+      if (mfa && !mfa.enabledAt) mfa.secretEnc = secretEnc
+    },
+    async enableMfa(userId, { at, step, codeHashes }) {
+      Object.assign(mfaOf(userId)!, { enabledAt: at, lastStep: step })
+      for (let i = recoveryCodes.length - 1; i >= 0; i--)
+        if (recoveryCodes[i]!.userId === userId) recoveryCodes.splice(i, 1)
+      for (const codeHash of codeHashes) recoveryCodes.push({ userId, codeHash, usedAt: null })
+    },
+    async useTotpStep(userId, step) {
+      const mfa = mfaOf(userId)
+      if (!mfa || step <= (mfa.lastStep ?? -1)) return false
+      mfa.lastStep = step
+      return true
+    },
+    async useRecoveryCode(userId, codeHash, at) {
+      const code = recoveryCodes.find((c) => c.userId === userId && c.codeHash === codeHash && !c.usedAt)
+      if (code) code.usedAt = at
+      return Boolean(code)
     },
     async createInvite(invite) {
       invites.push({ ...invite, usedAt: null })

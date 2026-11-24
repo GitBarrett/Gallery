@@ -8,6 +8,7 @@ import {
   revokeSession,
   SESSION_TTL_MS,
   signout,
+  STAFF_SESSION_MS,
   startSession,
 } from './sessions'
 
@@ -40,9 +41,30 @@ const kael = {
 }
 const notFound = { ok: false, error: { kind: 'not_found' } }
 
-const ash = { id: 'ash', username: 'Ash_Barrett', role: 'user', status: 'active', emailVerified: false }
+const ash = {
+  id: 'ash',
+  username: 'Ash_Barrett',
+  role: 'user',
+  status: 'active',
+  emailVerified: false,
+  mfaVerified: false,
+}
 
 describe('sessions', () => {
+  it('US-55.2 marks the session opened by the TOTP, and ends a staff session 12 h after its start', async () => {
+    const { repo, users, clock, travel, resolve } = await setup()
+    users[0]!.role = 'moderator'
+    const pending = await startSession(repo, clock.now(), { userId: 'ash' })
+    const verified = await startSession(repo, clock.now(), { userId: 'ash', mfaVerified: true })
+    expect(await resolve({ sessionId: pending })).toMatchObject({ actor: { role: 'moderator', mfaVerified: false } })
+    expect(await resolve({ sessionId: verified })).toMatchObject({ actor: { mfaVerified: true } })
+    travel(STAFF_SESSION_MS - 1)
+    expect(await resolve({ sessionId: verified })).not.toBeNull()
+    travel(1)
+    expect(await resolve({ sessionId: verified })).toBeNull()
+    expect(await resolve({ sessionId: pending })).toBeNull()
+  })
+
   it('US-03.1 opens a 30-day session whose id is random and stored hashed only', async () => {
     const { repo, clock, sessions, resolve } = await setup()
     const id = await startSession(repo, clock.now(), { userId: 'ash', userAgent: 'Firefox' })

@@ -208,17 +208,49 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       await repo.createSession(session)
       const account = { id: ash.id, username: ash.username, role: 'user', status: 'active', emailVerified: false }
       expect(await repo.findSession(session.idHash)).toEqual({
+        createdAt: expect.any(Date),
         lastSeenAt: at,
         expiresAt: session.expiresAt,
         revokedAt: null,
+        mfaVerifiedAt: null,
         account,
       })
+      const verified = { ...session, idHash: crypto.randomUUID(), mfaVerifiedAt: at }
+      await repo.createSession(verified)
+      expect(await repo.findSession(verified.idHash)).toMatchObject({ mfaVerifiedAt: at })
       const later = new Date('2026-11-23T12:00:00Z')
       await repo.touchSession(session.idHash, later, new Date('2026-12-23T12:00:00Z'))
       expect(await repo.findSession(session.idHash)).toMatchObject({ lastSeenAt: later })
       await repo.revokeSession(session.idHash, later)
       expect(await repo.findSession(session.idHash)).toMatchObject({ revokedAt: later })
       expect(await repo.findSession(crypto.randomUUID())).toBeNull()
+    })
+
+    it('US-55.2 keeps a pending TOTP secret, enables it with its recovery codes, each step and code once', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      const at = new Date('2026-11-24T12:00:00Z')
+      expect(await repo.findMfa(ash.id)).toEqual({ secretEnc: null, enabledAt: null, lastStep: null })
+      await repo.setPendingMfa(ash.id, 'sealed-1')
+      await repo.setPendingMfa(ash.id, 'sealed-2')
+      expect(await repo.findMfa(ash.id)).toEqual({ secretEnc: 'sealed-2', enabledAt: null, lastStep: null })
+      await repo.enableMfa(ash.id, { at, step: 100, codeHashes: ['h1', 'h2'] })
+      await repo.setPendingMfa(ash.id, 'sealed-3')
+      expect(await repo.findMfa(ash.id)).toEqual({ secretEnc: 'sealed-2', enabledAt: at, lastStep: 100 })
+      expect(await repo.useTotpStep(ash.id, 100)).toBe(false)
+      expect(await repo.useTotpStep(ash.id, 101)).toBe(true)
+      expect(await repo.findMfa(ash.id)).toMatchObject({ lastStep: 101 })
+      expect(await repo.useRecoveryCode(ash.id, 'h1', at)).toBe(true)
+      expect(await repo.useRecoveryCode(ash.id, 'h1', at)).toBe(false)
+      expect(await repo.useRecoveryCode(ash.id, 'unknown', at)).toBe(false)
+      const other = user()
+      await repo.createUser(other)
+      expect(await repo.useRecoveryCode(other.id, 'h2', at)).toBe(false)
+      await repo.enableMfa(ash.id, { at, step: 200, codeHashes: ['h3'] })
+      expect(await repo.useRecoveryCode(ash.id, 'h2', at)).toBe(false)
+      expect(await repo.useRecoveryCode(ash.id, 'h3', at)).toBe(true)
+      expect(await repo.findMfa(crypto.randomUUID())).toBeNull()
     })
 
     it('US-56.4 finds an invitation only while it is unused and unexpired, and uses it once', async () => {
