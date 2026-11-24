@@ -126,6 +126,16 @@ describe('PATCH /api/me (bio and language)', () => {
     expect((await update('', { bio: 'Hello' })).status).toBe(401)
   })
 
+  it('US-07.5 saves the given notification preferences and keeps the others', async () => {
+    const { cookie, username } = await member()
+    expect((await update(cookie, { notificationPrefs: { likes: false } })).status).toBe(200)
+    expect((await update(cookie, { notificationPrefs: { contests: false } })).status).toBe(200)
+    expect((await update(cookie, { notificationPrefs: { moderation: false } })).status).toBe(400)
+    expect((await update(cookie, { notificationPrefs: { likes: 'no' } })).status).toBe(400)
+    const [row] = await db.select({ prefs: users.notificationPrefs }).from(users).where(eq(users.username, username))
+    expect(row?.prefs).toEqual({ likes: false, contests: false })
+  })
+
   it('US-07.1 answers 403 to the bio of a suspended member, who may still change their language', async () => {
     const { cookie, username } = await member()
     await db.update(users).set({ status: 'suspended' }).where(eq(users.username, username))

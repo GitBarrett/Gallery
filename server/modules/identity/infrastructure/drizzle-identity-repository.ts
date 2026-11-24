@@ -12,6 +12,7 @@ import {
   users,
   waitlistEntries,
 } from '../../../db/schema'
+import { notificationPrefs } from '../../../../shared/domain/notification-prefs'
 import { SOCIAL_PLATFORMS } from '../../../../shared/domain/social-links'
 import type { Actor, EmailTokenType, IdentityRepository, Locale, SocialLink } from '../application/ports'
 
@@ -43,10 +44,12 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
   },
   async findRecipient(userId) {
     const [row] = await db
-      .select({ email: users.email, username: users.username, locale: users.locale })
+      .select({ email: users.email, username: users.username, locale: users.locale, prefs: users.notificationPrefs })
       .from(users)
       .where(eq(users.id, userId))
-    return row ? { ...row, locale: row.locale as Locale } : null
+    if (!row) return null
+    const { prefs, ...recipient } = row
+    return { ...recipient, locale: row.locale as Locale, notificationPrefs: notificationPrefs(prefs) }
   },
   async createEmailToken(token) {
     await db.insert(emailTokens).values(token)
@@ -108,8 +111,12 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .where(eq(userSocialLinks.userId, id))
     return { ...profile, socialLinks: inPlatformOrder(links as SocialLink[]) }
   },
-  async updateProfile(userId, fields) {
-    if (Object.keys(fields).length) await db.update(users).set(fields).where(eq(users.id, userId))
+  async updateProfile(userId, { notificationPrefs: prefs, ...fields }) {
+    const set = {
+      ...fields,
+      ...(prefs && { notificationPrefs: sql`${users.notificationPrefs} || ${JSON.stringify(prefs)}::jsonb` }),
+    }
+    if (Object.keys(set).length) await db.update(users).set(set).where(eq(users.id, userId))
   },
   async setSocialLinks(userId, links) {
     await db.delete(userSocialLinks).where(eq(userSocialLinks.userId, userId))

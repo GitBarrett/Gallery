@@ -322,6 +322,29 @@ export const photos = pgTable(
   ],
 )
 
+/** In-app notifications (US-35): created by the `notifications` consumer, purged after 6 months (US-35.5). */
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: id(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    type: text('type').notNull(),
+    payload: jsonb('payload').notNull(),
+    readAt: at('read_at'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check(
+      'notifications_type_check',
+      sql`${t.type} in ('like', 'comment', 'follow', 'moderation', 'quality', 'contest')`,
+    ),
+    index('notifications_user_idx').on(t.userId, t.createdAt),
+    index('notifications_created_idx').on(t.createdAt), // daily purge
+  ],
+)
+
 /** Insert-only audit log: the application role has neither UPDATE nor DELETE (migration 0001). */
 export const auditLog = pgTable(
   'audit_log',

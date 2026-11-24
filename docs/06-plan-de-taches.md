@@ -295,7 +295,7 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Consommateur `photo-process` (ADR-011, ADR-012, résultats T-00a–c) : octets magiques, `IMAGES.info()`, original nettoyé écrit en deux passes (`FixedLengthStream`), variantes écrites une fois (PNG 64 temporaire, JPEG 1200, WebP 400/800/1200/2400), luminance, idempotence, retries et DLQ.
   Stories : US-14.1–2 (sans l'appel à la modération), US-14.5–6, US-10.3–4, US-10.8 (Q68). Tests : I (double livraison), charge (US-14.5).
 
-- [ ] **T-23a Notifications : module** (dép. T-12a, T-05b)
+- [x] **T-23a Notifications : module** (dép. T-12a, T-05b)
   Module `notifications` : création via événements, regroupement des likes, préférences par type, purge à 6 mois.
   Stories : US-35.1–2, US-35.4–5, US-07.5. Tests : U (regroupement, préférences), I.
 

@@ -1,4 +1,5 @@
 import { validateBio } from '../../../../shared/domain/account-rules'
+import type { NotificationPrefs } from '../../../../shared/domain/notification-prefs'
 import { err, ok, type Result } from '../../../../shared/domain/result'
 import { socialLink, type SocialPlatform } from '../../../../shared/domain/social-links'
 import type { Clock } from '../../../platform/clock'
@@ -45,18 +46,24 @@ async function formerProfile(deps: { repo: IdentityRepository; clock: Clock }, u
 }
 
 /**
- * Bio and language of the signed-in member (US-07.1), saved at once; a field left out keeps its value. A suspended
- * member may not change their bio (08-securite.md annexe B), only their language.
+ * Bio, language and notification preferences of the signed-in member (US-07.1, US-07.5), saved at once; a field
+ * left out keeps its value. A suspended member may not change their bio (08-securite.md annexe B), only the rest.
  */
 export const updateProfile =
   (deps: { repo: IdentityRepository }) =>
-  async (cmd: { actor: { id: string; status: string }; bio?: string; locale?: Locale }): Promise<IdentityResult> => {
+  async (cmd: {
+    actor: { id: string; status: string }
+    bio?: string
+    locale?: Locale
+    notificationPrefs?: Partial<NotificationPrefs>
+  }): Promise<IdentityResult> => {
     if (cmd.bio !== undefined) {
       const allowed = notSanctioned(cmd.actor)
       if (!allowed.ok) return allowed
     }
-    const fields: { bio?: string | null; locale?: Locale } = {}
+    const fields: Parameters<IdentityRepository['updateProfile']>[1] = {}
     if (cmd.locale) fields.locale = cmd.locale
+    if (cmd.notificationPrefs) fields.notificationPrefs = cmd.notificationPrefs
     if (cmd.bio !== undefined) {
       const bio = validateBio(cmd.bio)
       if (!bio.ok) return err(invalid('bio', bio.error))
