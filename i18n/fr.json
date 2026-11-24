@@ -260,5 +260,70 @@
     "website": "Site web",
     "copyDiscord": "Copier le pseudo Discord {handle}",
     "discordCopied": "Pseudo Discord copié"
+  },
+  "notifications": {
+    "title": "Journal de quêtes",
+    "filter": "Filtre",
+    "all": "Toutes",
+    "unreadTab": "Non lues · {count}",
+    "markAll": "Tout marquer comme lu",
+    "today": "Aujourd'hui",
+    "earlier": "Plus tôt",
+    "read": "Lue",
+    "unread": "Non lue",
+    "unreadCount": "{count} non lue | {count} non lue | {count} non lues",
+    "empty": "Aucune nouvelle quête. Partez capturer quelque chose de beau.",
+    "untitled": "(sans titre)",
+    "quoted": "« {title} »",
+    "text": {
+      "like": "{actor} a aimé {title}. | {actor} et {others} autre personne ont aimé {title}. | {actor} et {others} autres personnes ont aimé {title}.",
+      "comment": "{actor} a commenté {title}.",
+      "follow": "{actor} vous suit désormais.",
+      "quality": "Votre capture {title} a atteint la qualité {quality}.",
+      "moderation": {
+        "published": "Votre capture {title} est publiée.",
+        "pending_review": "Votre capture {title} est en cours de vérification par un modérateur.",
+        "rejected": "Votre capture {title} a été refusée par la modération.",
+        "failed": "Votre capture {title} n'a pas pu être traitée. Envoyez-la de nouveau."
+      },
+      "avatar": {
+        "published": "Votre nouvel avatar est en ligne.",
+        "pending_review": "Votre nouvel avatar est en cours de vérification par un modérateur.",
+        "rejected": "Votre nouvel avatar a été refusé par la modération.",
+        "failed": "Votre nouvel avatar n'a pas pu être traité. Réessayez."
+      },
+      "contest": {
+        "opened": "Un nouveau concours est ouvert.",
+        "ending": "Un concours auquel vous participez se termine bientôt.",
+        "extended": "Un concours a été prolongé.",
+        "disqualified": "Votre participation à un concours a été disqualifiée.",
+        "results": "Les résultats du concours sont publiés."
+      }
+    },
+    "quality": {
+      "poor": "Médiocre",
+      "uncommon": "Inhabituelle",
+      "rare": "Rare",
+      "epic": "Épique",
+      "legendary": "Légendaire"
+    },
+    "cta": {
+      "view": "Voir",
+      "profile": "Profil",
+      "settings": "Réglages",
+      "upload": "Publier",
+      "contests": "Concours"
+    },
+    "prefs": {
+      "title": "Réglages des notifications",
+      "legend": "Dans l'application",
+      "likes": "Mentions J'aime sur mes captures",
+      "comments": "Commentaires",
+      "followers": "Nouveaux abonnés",
+      "contests": "Concours et résultats",
+      "moderation": "Décisions de modération et paliers de qualité (toujours actifs)",
+      "grouped": "Les likes sont regroupés : « Ysolde et 23 autres personnes ont aimé… » pour ne pas inonder votre journal.",
+      "saved": "Enregistré"
+    }
   }
 }

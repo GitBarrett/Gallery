@@ -61,6 +61,7 @@ describe('getAccount', () => {
       email: 'ash@example.com',
       hasPassword: false,
       providers: ['google', 'battlenet'],
+      notificationPrefs: { likes: true, comments: true, followers: true, contests: true },
     })
   })
 })

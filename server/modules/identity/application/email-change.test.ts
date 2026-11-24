@@ -122,6 +122,7 @@ describe('getAccount', () => {
       email: 'ash@example.com',
       hasPassword: true,
       providers: [],
+      notificationPrefs: { likes: true, comments: true, followers: true, contests: true },
     })
   })
 })

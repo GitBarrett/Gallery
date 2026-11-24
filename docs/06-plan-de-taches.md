@@ -299,7 +299,7 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Module `notifications` : création via événements, regroupement des likes, préférences par type, purge à 6 mois.
   Stories : US-35.1–2, US-35.4–5, US-07.5. Tests : U (regroupement, préférences), I.
 
-- [ ] **T-23b Notifications : cloche et Quest log** (dép. T-23a, T-07c)
+- [x] **T-23b Notifications : cloche et Quest log** (dép. T-23a, T-07c)
   Compteur de non-lus, page « Quest log », lecture unitaire et globale.
   Stories : US-35.3. Tests : E.
 

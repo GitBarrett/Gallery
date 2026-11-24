@@ -118,6 +118,10 @@ export function inMemoryIdentityRepository() {
     async setSocialLinks(userId, links) {
       socials = [...socials.filter((l) => l.userId !== userId), ...links.map((link) => ({ userId, ...link }))]
     },
+    async usernames(ids) {
+      const found = users.filter((u) => ids.includes(u.id) && !['banned', 'pending_deletion'].includes(u.status))
+      return new Map(found.map((u) => [u.id, u.username]))
+    },
     async findUsername(userId) {
       const user = users.find((u) => u.id === userId)
       return user ? { username: user.username, changedAt: user.usernameChangedAt ?? null } : null

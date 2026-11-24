@@ -90,6 +90,8 @@ export interface MediaRepository {
   finishProcessing(id: string, status: 'pending_review', processed: Processed): Promise<boolean>
   /** A capture still `processing` goes to `failed`; false if it no longer was. */
   failProcessing(id: string): Promise<boolean>
+  /** Titles of the captures among `ids` that still exist, by id (null: not completed yet). */
+  titles(ids: string[]): Promise<Map<string, string | null>>
 }
 
 /** Key where the browser puts the file (03 § Pipeline image 2): server-made, no extension, never served. */

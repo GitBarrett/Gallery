@@ -2,6 +2,7 @@
 // Bottom tab bar below 768 px (07-design.md § Responsive, US-67.1): Explore · Search · Upload (centre, emphasised)
 // · Notifications · Profile at launch; Leaderboard takes Search's place and Contests Notifications' with their flag.
 import type { FeatureFlags } from '~/composables/useFeatureFlags'
+import UnreadBadge from '~/features/notifications/UnreadBadge.vue'
 import NavIcon, { type NavIconName } from './NavIcon.vue'
 
 const props = defineProps<{ flags: FeatureFlags; username?: string }>()
@@ -39,7 +40,7 @@ const tabs = computed((): { to: string; label: string; icon: NavIconName }[] =>
         <span class="label">{{ tab.label }}</span>
       </span>
       <NuxtLink v-else :to="tab.to" class="tab" :class="{ upload: tab.icon === 'upload' }">
-        <span class="glyph"><NavIcon :name="tab.icon" /></span>
+        <span class="glyph"><NavIcon :name="tab.icon" /><UnreadBadge v-if="tab.icon === 'notifications'" /></span>
         <span class="label">{{ tab.label }}</span>
       </NuxtLink>
     </template>
@@ -88,6 +89,7 @@ const tabs = computed((): { to: string; label: string; icon: NavIconName }[] =>
 }
 
 .glyph {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;

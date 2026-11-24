@@ -52,6 +52,13 @@ import {
   requestUploadUrl,
   type R2Bucket,
 } from '../modules/media'
+import {
+  drizzleNotificationsRepository,
+  listNotifications,
+  markAllRead,
+  markRead,
+  unreadCount,
+} from '../modules/notifications'
 import type { SiteSettings } from '../modules/settings'
 import { systemClock, type Clock } from './clock'
 import type { Config } from './config'
@@ -74,6 +81,12 @@ export interface Container {
   media: {
     requestUploadUrl: UseCase<typeof requestUploadUrl>
     completeUpload: UseCase<typeof completeUpload>
+  }
+  notifications: {
+    list: UseCase<typeof listNotifications>
+    unreadCount: UseCase<typeof unreadCount>
+    markRead: UseCase<typeof markRead>
+    markAllRead: UseCase<typeof markAllRead>
   }
   /** Site settings, cached 60 s per isolate (settings module). */
   settings: () => Promise<SiteSettings>
@@ -226,6 +239,17 @@ export function createContainer({
           gameVersions: listGameVersions({ repo: drizzleCatalogRepository(db()) }),
           clock,
         })(cmd),
+    },
+    notifications: {
+      list: (cmd) =>
+        listNotifications({
+          repo: drizzleNotificationsRepository(db()),
+          usernames: (ids) => drizzleIdentityRepository(db()).usernames(ids),
+          titles: (ids) => drizzleMediaRepository(db()).titles(ids),
+        })(cmd),
+      unreadCount: (cmd) => unreadCount({ repo: drizzleNotificationsRepository(db()) })(cmd),
+      markRead: (cmd) => markRead({ repo: drizzleNotificationsRepository(db()), clock })(cmd),
+      markAllRead: (cmd) => markAllRead({ repo: drizzleNotificationsRepository(db()), clock })(cmd),
     },
     catalog: {
       listGameVersions: () => listGameVersions({ repo: drizzleCatalogRepository(db()) })(),

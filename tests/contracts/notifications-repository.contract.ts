@@ -40,6 +40,35 @@ export function notificationsRepositoryContract(
       ])
     })
 
+    it('US-35.3 lists the latest first, counts the unread, marks one of its own and then all as read', async () => {
+      const { repo, userId } = await make()
+      await repo.create(like(userId, '2026-11-24T09:00:00Z', ['first']))
+      await repo.create({
+        userId,
+        type: 'follow',
+        payload: { actorId: 'second' },
+        createdAt: new Date('2026-11-24T10:00:00Z'),
+      })
+      await repo.create(like(userId, '2026-11-24T11:00:00Z', ['third'], crypto.randomUUID()))
+      const listed = await repo.list(userId, 2)
+      expect(listed.map((n) => [n.type, n.readAt])).toEqual([
+        ['like', null],
+        ['follow', null],
+      ])
+      expect(listed[0]).toMatchObject({ payload: { actorIds: ['third'] }, createdAt: new Date('2026-11-24T11:00:00Z') })
+      expect(await repo.countUnread(userId)).toBe(3)
+      expect(await repo.list(crypto.randomUUID(), 10)).toEqual([])
+
+      const at = new Date('2026-11-24T12:00:00Z')
+      expect(await repo.markRead(crypto.randomUUID(), listed[0]!.id, at)).toBe(false) // another member's: untouched
+      expect(await repo.markRead(userId, listed[0]!.id, at)).toBe(true)
+      expect(await repo.markRead(userId, listed[0]!.id, new Date('2026-11-24T13:00:00Z'))).toBe(true) // kept date
+      expect((await repo.list(userId, 1))[0]?.readAt).toEqual(at)
+      expect(await repo.countUnread(userId)).toBe(2)
+      await repo.markAllRead(userId, at)
+      expect(await repo.countUnread(userId)).toBe(0)
+    })
+
     it('US-35.5 deletes the notifications created before a date, and keeps the others', async () => {
       const { repo, userId } = await make()
       await repo.create(like(userId, '2026-05-23T23:59:59Z', ['old']))

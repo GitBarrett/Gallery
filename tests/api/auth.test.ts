@@ -443,7 +443,7 @@ describe('sessions', () => {
     expect((await errorOf(wrong)).details).toEqual({ field: 'currentPassword', reason: 'wrong' })
     expect((await change({ newEmail, currentPassword: credentials.password })).status).toBe(204)
     const own = await fetch('/api/me/account', { headers: { cookie } })
-    expect(await own.json()).toEqual({ email: credentials.email, hasPassword: true, providers: [] }) // unchanged until confirmed
+    expect(await own.json()).toMatchObject({ email: credentials.email, hasPassword: true, providers: [] }) // unchanged until confirmed
 
     // The link the `emails` consumer would mail to the new address
     const [user] = await db.select({ id: users.id }).from(users).where(eq(users.email, credentials.email))

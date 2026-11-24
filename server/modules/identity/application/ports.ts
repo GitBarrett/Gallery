@@ -174,6 +174,8 @@ export interface IdentityRepository {
   setSocialLinks(userId: string, links: SocialLink[]): Promise<void>
   /** Current username of the account and date of its last change (US-05.4). */
   findUsername(userId: string): Promise<{ username: string; changedAt: Date | null } | null>
+  /** Usernames of the accounts among `ids`, by id, without the banned ones or those being deleted (Q69). */
+  usernames(ids: string[]): Promise<Map<string, string>>
   /** Account holding `username` ignoring case: as its current name, or as a former one redirected after `at`. */
   usernameOwner(username: string, at: Date): Promise<string | null>
   /** Renames; the previous name redirects to the account until `redirectUntil`, the new one stops redirecting. */

@@ -85,6 +85,21 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect(await repo.findRecipient(ash.id)).toMatchObject({ email: null, username: ash.username, locale: 'fr' })
     })
 
+    it('US-35.3 gives the usernames of the existing accounts among ids, for the notifications', async () => {
+      const repo = await make()
+      const [ash, jaina] = [user(), user()]
+      await repo.createUser(ash)
+      await repo.createUser(jaina)
+      const missing = crypto.randomUUID()
+      expect(await repo.usernames([ash.id, jaina.id, missing])).toEqual(
+        new Map([
+          [ash.id, ash.username],
+          [jaina.id, jaina.username],
+        ]),
+      )
+      expect(await repo.usernames([])).toEqual(new Map())
+    })
+
     it('US-04.3 replaces the password hash of an account', async () => {
       const repo = await make()
       const ash = user()

@@ -54,6 +54,24 @@ describe('drizzleMediaRepository', () => {
     })
   })
 
+  it('US-35.3 gives the titles of the captures that still exist, for the notifications', async () => {
+    await withRollback(async (tx) => {
+      const repo = drizzleMediaRepository(tx)
+      const userId = await member(tx)
+      await repo.createUpload(upload(ids[0]!, userId))
+      await repo.createUpload(upload(ids[1]!, userId))
+      await repo.complete(ids[0]!, { title: 'Dusk', gameVersion: 'wow-forever', at: new Date() })
+      const gone = crypto.randomUUID()
+      expect(await repo.titles([ids[0]!, ids[1]!, gone])).toEqual(
+        new Map([
+          [ids[0]!, 'Dusk'],
+          [ids[1]!, null],
+        ]),
+      )
+      expect(await repo.titles([])).toEqual(new Map())
+    })
+  })
+
   it('US-10.5 counts the incomplete uploads of the member since a date', async () => {
     await withRollback(async (tx) => {
       const repo = drizzleMediaRepository(tx)

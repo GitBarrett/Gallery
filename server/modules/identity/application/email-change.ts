@@ -1,3 +1,4 @@
+import { notificationPrefs, type NotificationPrefs } from '../../../../shared/domain/notification-prefs'
 import { err, ok } from '../../../../shared/domain/result'
 import type { Clock } from '../../../platform/clock'
 import type { RateLimiter, RateLimitRule } from '../../../platform/rate-limiter'
@@ -8,24 +9,34 @@ import type { IdentityRepository, OAuthProviderName, PasswordHasher } from './po
 // Every request counts, a wrong password included: it also stops guessing the password (same pace as US-01.5)
 export const EMAIL_CHANGE_REQUESTS: RateLimitRule = { name: 'email-change', limit: 3, windowSeconds: 3600 }
 
-/** Email and password hash of an account (both null: Battle.net without email, Q55). */
+/** Email, password hash (both null: Battle.net without email, Q55) and notification preferences of an account. */
 export async function accountOf(repo: IdentityRepository, userId: string) {
   const recipient = await repo.findRecipient(userId)
   const passwordHash = recipient?.email ? (await repo.findCredentials(recipient.email))?.passwordHash : null
-  return { email: recipient?.email ?? null, passwordHash: passwordHash ?? null }
+  return {
+    email: recipient?.email ?? null,
+    passwordHash: passwordHash ?? null,
+    notificationPrefs: recipient?.notificationPrefs ?? notificationPrefs({}),
+  }
 }
 
 /**
  * Email of the signed-in member, whether a password guards its change (US-07.2) and its linked providers (US-07.4),
- * own account only.
+ * own account only, with its notification preferences (US-07.5, Q69).
  */
 export const getAccount =
   (deps: { repo: IdentityRepository }) =>
   async (cmd: {
     userId: string
-  }): Promise<{ email: string | null; hasPassword: boolean; providers: OAuthProviderName[] }> => {
-    const { email, passwordHash } = await accountOf(deps.repo, cmd.userId)
-    return { email, hasPassword: Boolean(passwordHash), providers: await deps.repo.listOAuthProviders(cmd.userId) }
+  }): Promise<{
+    email: string | null
+    hasPassword: boolean
+    providers: OAuthProviderName[]
+    notificationPrefs: NotificationPrefs
+  }> => {
+    const { email, passwordHash, notificationPrefs: prefs } = await accountOf(deps.repo, cmd.userId)
+    const providers = await deps.repo.listOAuthProviders(cmd.userId)
+    return { email, hasPassword: Boolean(passwordHash), providers, notificationPrefs: prefs }
   }
 
 /**
