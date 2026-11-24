@@ -8,6 +8,7 @@ export const ERROR_CODES = [
   'NOT_FOUND',
   'CONFLICT',
   'PAYLOAD_TOO_LARGE',
+  'UNPROCESSABLE',
   'RATE_LIMITED',
   'INTERNAL',
 ] as const

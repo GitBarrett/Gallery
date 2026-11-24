@@ -44,6 +44,14 @@ import {
   verifyEmail,
 } from '../modules/identity'
 import { drizzleCatalogRepository, listGameVersions, suggestTags, suggestZones } from '../modules/catalog'
+import {
+  completeUpload,
+  drizzleMediaRepository,
+  memoryBucket,
+  r2ObjectStorage,
+  requestUploadUrl,
+  type R2Bucket,
+} from '../modules/media'
 import type { SiteSettings } from '../modules/settings'
 import { systemClock, type Clock } from './clock'
 import type { Config } from './config'
@@ -62,6 +70,10 @@ export interface Container {
     listGameVersions: UseCase<typeof listGameVersions>
     suggestTags: UseCase<typeof suggestTags>
     suggestZones: UseCase<typeof suggestZones>
+  }
+  media: {
+    requestUploadUrl: UseCase<typeof requestUploadUrl>
+    completeUpload: UseCase<typeof completeUpload>
   }
   /** Site settings, cached 60 s per isolate (settings module). */
   settings: () => Promise<SiteSettings>
@@ -103,6 +115,16 @@ const FAKE_IP_HASH_KEY = 'fake-providers-ip-hash-key-not-secret'
 // TOTP secrets of local runs and previews without the secret: test accounts only
 const FAKE_MFA_KEY = 'fake-providers-mfa-key-not-secret'
 
+// Presigned URLs of local runs and previews without the S3 token: refused by R2, enough for the API tests
+const FAKE_S3 = {
+  accountId: '0'.repeat(32),
+  bucket: 'ls-local',
+  accessKeyId: 'fake',
+  secretAccessKey: 'fake-not-secret',
+}
+// Node test server and local runs without the R2 binding (fake providers only)
+const localBucket = memoryBucket()
+
 const required = (value: string | undefined, name: string) => {
   if (!value) throw new Error(`${name} is not configured`)
   return value
@@ -116,6 +138,7 @@ export function createContainer({
     throw new Error('no database in this environment')
   },
   queues = {} as QueueProducers,
+  bucket,
 }: {
   config: Config
   correlationId: string
@@ -123,6 +146,8 @@ export function createContainer({
   /** Connection of the request, opened at the first use. */
   db?: () => Db
   queues?: QueueProducers
+  /** R2 binding, absent in Node runs. */
+  bucket?: R2Bucket
 }): Container {
   const logger = createLogger({ correlationId })
   const clock = systemClock
@@ -163,6 +188,18 @@ export function createContainer({
     limiter: dbRateLimiter(db(), ipHashKey(), clock),
     clock,
   })
+  // Private bucket; a missing token or binding only fails the uploads (Q42)
+  const storage = () => {
+    const { r2AccountId: accountId, r2Bucket: name, r2AccessKeyId: accessKeyId, r2SecretAccessKey: secret } = config
+    const credentials =
+      accountId && name && accessKeyId && secret
+        ? { accountId, bucket: name, accessKeyId, secretAccessKey: secret }
+        : config.fakeProviders
+          ? FAKE_S3
+          : undefined
+    if (!bucket && !config.fakeProviders) throw new Error('R2 is not bound')
+    return r2ObjectStorage({ bucket: bucket ?? localBucket, prefix: config.r2Prefix, credentials, now: clock.now })
+  }
   // Registered as is with the provider (08-securite.md § 3)
   const redirectUri = (provider: OAuthProviderName) => `${config.siteUrl}/auth/${provider}/callback`
 
@@ -172,6 +209,24 @@ export function createContainer({
     ids,
     logger,
     settings: () => readSettings(logger),
+    media: {
+      requestUploadUrl: (cmd) =>
+        requestUploadUrl({
+          repo: drizzleMediaRepository(db()),
+          storage: storage(),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
+          ids,
+          clock,
+        })(cmd),
+      completeUpload: (cmd) =>
+        completeUpload({
+          repo: drizzleMediaRepository(db()),
+          uow: drizzleUnitOfWork(db(), drizzleMediaRepository, outboxRelay(db(), queues, clock), logger),
+          storage: storage(),
+          gameVersions: listGameVersions({ repo: drizzleCatalogRepository(db()) }),
+          clock,
+        })(cmd),
+    },
     catalog: {
       listGameVersions: () => listGameVersions({ repo: drizzleCatalogRepository(db()) })(),
       suggestTags: (cmd) => suggestTags({ repo: drizzleCatalogRepository(db()) })(cmd),

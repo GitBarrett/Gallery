@@ -11,9 +11,10 @@ export interface QueueProducer {
 export interface Bindings {
   HYPERDRIVE?: { connectionString: string }
   R2?: {
-    head(key: string): Promise<unknown>
+    head(key: string): Promise<{ size: number; httpMetadata?: { contentType?: string } } | null>
     get(key: string): Promise<{ text(): Promise<string> } | null>
     put(key: string, value: string): Promise<unknown>
+    delete(key: string): Promise<void>
   }
   PHOTO_PROCESS_QUEUE?: QueueProducer
   NOTIFICATIONS_QUEUE?: QueueProducer

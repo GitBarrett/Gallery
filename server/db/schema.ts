@@ -278,6 +278,46 @@ export const zones = pgTable(
   (t) => [check('zones_status_check', sql`${t.status} in ('active', 'pending')`)],
 )
 
+/**
+ * Captures (03-architecture.md § Modèle de données), created `processing` by the upload request (T-21) with the
+ * declared file; `uploaded_at` set by `complete` with the title and the version. The other columns arrive with their
+ * tasks (expand). shortcut: declared width and height until the processing reads the real ones (T-22b).
+ */
+export const photos = pgTable(
+  'photos',
+  {
+    id: id(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    gameVersionId: uuid('game_version_id').references(() => gameVersions.id),
+    title: text('title'),
+    status: text('status').notNull().default('processing'),
+    mime: text('mime').notNull(),
+    bytes: integer('bytes').notNull(),
+    width: integer('width').notNull(),
+    height: integer('height').notNull(),
+    uploadedAt: at('uploaded_at'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check(
+      'photos_status_check',
+      sql`${t.status} in ('processing', 'failed', 'pending_review', 'published', 'rejected', 'hidden')`,
+    ),
+    check(
+      'photos_uploaded_check',
+      sql`${t.uploadedAt} is null or (${t.title} is not null and ${t.gameVersionId} is not null)`,
+    ),
+    index('photos_user_idx').on(t.userId, t.createdAt),
+    index('photos_game_version_idx').on(t.gameVersionId),
+    // Uploads never completed: the concurrent ones (3 per account) and the orphans of the hourly cron (US-10.7)
+    index('photos_incomplete_idx')
+      .on(t.createdAt)
+      .where(sql`${t.uploadedAt} is null`),
+  ],
+)
+
 /** Insert-only audit log: the application role has neither UPDATE nor DELETE (migration 0001). */
 export const auditLog = pgTable(
   'audit_log',

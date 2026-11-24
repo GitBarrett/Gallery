@@ -43,6 +43,9 @@ export const ROUTES: Record<string, { access: Access; row: string }> = {
   'POST /api/me/sessions/revoke-others': { access: 'member', row: 'Compte' },
   'GET /api/me/social-links': { access: 'member', row: '`GET/PUT /api/me/social-links`' },
   'PUT /api/me/social-links': { access: 'member', row: '`GET/PUT /api/me/social-links`' },
+  // requireVerified + notSanctioned in the use cases (403 unverified or suspended), the owner's capture only (404)
+  'POST /api/photos/upload-url': { access: 'member', row: '`POST /api/photos/upload-url`, `/complete`' },
+  'POST /api/photos/[id]/complete': { access: 'member', row: '`POST /api/photos/upload-url`, `/complete`' },
 }
 
 /** `server/api/me/sessions/[id].delete.ts` → `DELETE /api/me/sessions/[id]` (Nitro file routing). */

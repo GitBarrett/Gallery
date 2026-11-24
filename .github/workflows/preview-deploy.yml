@@ -41,6 +41,7 @@ jobs:
         env:
           NITRO_PRESET: cloudflare_module
           NUXT_DEPLOY_ENV: preview
+          R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # R2 host allowed in connect-src (presigned uploads)
       - name: Storybook under /storybook/ (ADR-019)
         run: pnpm exec storybook build --quiet -o .output/public/storybook
       - name: Create or update the preview
@@ -53,6 +54,8 @@ jobs:
           NEON_PROJECT_ID: calm-mode-49605156
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          PREVIEW_R2_ACCESS_KEY_ID: ${{ secrets.PREVIEW_R2_ACCESS_KEY_ID }}
+          PREVIEW_R2_SECRET_ACCESS_KEY: ${{ secrets.PREVIEW_R2_SECRET_ACCESS_KEY }}
       # Preview tests (T-04b): the Access token is only sent to the preview's domain (Playwright fixture,
       # scripts/lighthouse.mjs), never to third parties
       # Browsers downloaded once per Playwright version (T-04d); their system packages still install at each run.

@@ -19,6 +19,8 @@ NUXT_PUBLIC_SITE_URL = "https://legendary-shots.aleygues.workers.dev"
 NUXT_DEPLOY_ENV = "production"
 NUXT_FAKE_PROVIDERS = "false"
 NUXT_R2_PREFIX = ""
+# Bucket of the presigned uploads (T-21); R2_ACCOUNT_ID and the S3 token R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY are secrets
+R2_BUCKET = "ls-prod"
 # Public values served to the browser (T-03f, Q25)
 NUXT_PUBLIC_SENTRY_DSN = "https://cdcf8f3e3a474494448cff10947009ea@o4512469379055616.ingest.de.sentry.io/4512469385412688"
 NUXT_PUBLIC_CF_BEACON_TOKEN = "458bbb78a91d42189f5b66bff09f87de" # gitleaks:allow (public: served in every page)

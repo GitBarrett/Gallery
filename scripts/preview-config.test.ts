@@ -25,6 +25,7 @@ describe('previewConfig (ADR-013)', () => {
 
   it('points to the preview bucket and the dedicated Hyperdrive config, never to production', () => {
     expect(preview.toml).toContain('bucket_name = "ls-preview"')
+    expect(preview.toml).toContain('R2_BUCKET = "ls-preview"') // presigned uploads (T-21)
     expect(preview.toml).toContain('id = "aaaabbbbccccddddeeeeffff00001111"')
     expect(preview.toml).not.toContain('ls-prod')
     expect(preview.toml).not.toMatch(/legendary-shots/)

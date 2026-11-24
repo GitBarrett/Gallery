@@ -122,9 +122,19 @@ async function up() {
   await ensureQueues(queues)
   await ensureBucket()
   writeFileSync('wrangler.preview.toml', toml) // at the root: main and assets are relative to the configuration file
-  // Seal of the session cookie (NUXT_APP_SECRET): random at each deploy, the sessions of a preview are throwaway
+  // Seal of the session cookie (NUXT_APP_SECRET): random at each deploy, the sessions of a preview are throwaway.
+  // S3 token of ls-preview for the presigned uploads (T-21): without it, the URLs are signed with fake values
   const secrets = join(tmpdir(), `${NAME}-secrets.json`)
-  writeFileSync(secrets, JSON.stringify({ NUXT_APP_SECRET: randomBytes(32).toString('base64') }))
+  const { PREVIEW_R2_ACCESS_KEY_ID: keyId, PREVIEW_R2_SECRET_ACCESS_KEY: secretKey } = process.env
+  const r2 = keyId && secretKey ? { R2_ACCESS_KEY_ID: keyId, R2_SECRET_ACCESS_KEY: secretKey } : {}
+  writeFileSync(
+    secrets,
+    JSON.stringify({
+      NUXT_APP_SECRET: randomBytes(32).toString('base64'),
+      R2_ACCOUNT_ID: env('CLOUDFLARE_ACCOUNT_ID'),
+      ...r2,
+    }),
+  )
   try {
     wrangler('deploy', '-c', 'wrangler.preview.toml', '--secrets-file', secrets)
   } finally {

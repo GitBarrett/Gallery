@@ -20,6 +20,7 @@ import {
   resendMailer,
   type Mailer,
 } from '../modules/identity'
+import { drizzleMediaRepository, purgeOrphanUploads, r2ObjectStorage, type R2Bucket } from '../modules/media'
 import { loadConfig } from '../platform/config'
 import { uuidV7Generator } from '../platform/ids'
 import { createLogger, type Logger } from '../platform/logger'
@@ -67,6 +68,14 @@ const withDb =
   }
 const relayOf = (env: Bindings, db: ReturnType<typeof createDb>) => outboxRelay(db, queuesOf(env), systemClock)
 
+// Deletes through the binding only: the S3 token, which signs uploads, is not needed
+const purgeOrphans = (db: Db, bucket: R2Bucket) =>
+  purgeOrphanUploads({
+    repo: drizzleMediaRepository(db),
+    storage: r2ObjectStorage({ bucket, prefix: loadConfig(process.env).r2Prefix, now: systemClock.now }),
+    clock: systemClock,
+  })()
+
 const crons = (env: Bindings): Record<string, CronHandler[]> => ({
   '0 * * * *': [
     ...(env.NOTIFICATIONS_QUEUE ? [heartbeatCron(env.NOTIFICATIONS_QUEUE, systemClock)] : []),
@@ -75,6 +84,7 @@ const crons = (env: Bindings): Record<string, CronHandler[]> => ({
     withDb(env, (db) => relayOf(env, db).publish()),
     withDb(env, (db) => purgeRateLimitCounters(db, systemClock)), // ended windows (T-05c)
     withDb(env, (db) => purgeExpiredTokens(db, systemClock)),
+    ...(env.R2 ? [withDb(env, (db) => purgeOrphans(db, env.R2!))] : []), // uploads never completed (US-10.7)
   ],
   '15 3 * * *': [
     withDb(env, (db) => relayOf(env, db).purge()),
