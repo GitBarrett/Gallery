@@ -4,10 +4,11 @@ import { like } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/db/client'
 import { tags } from '../../server/db/schema'
-import { GameVersionsResponse, TagSuggestResponse } from '../../shared/contracts/catalog'
+import { GameVersionsResponse, TagSuggestResponse, ZoneSuggestResponse } from '../../shared/contracts/catalog'
 import { LAUNCH_GAME_VERSIONS } from '../fakes/in-memory-catalog-repository'
 
-// Catalogue reads over HTTP and Postgres (T-20a): game versions (migration 0009) and tag suggestions (US-11.1).
+// Catalogue reads over HTTP and Postgres (T-20a): game versions (migration 0009), tag suggestions (US-11.1)
+// and zone suggestions on the seeded zones (migration 0011, US-11.2).
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
 await startTestServer()
 
@@ -42,5 +43,23 @@ describe('catalogue (API)', () => {
   it('US-11.1 refuses a missing or too long query with 400', async () => {
     expect((await fetch('/api/tags/suggest')).status).toBe(400)
     expect((await fetch(`/api/tags/suggest?q=${'a'.repeat(101)}`)).status).toBe(400)
+  })
+  it('US-11.2 suggests Stormwind City / Hurlevent for "Hurl", "Stormw" and "SW"', async () => {
+    for (const q of ['Hurl', 'Stormw', 'SW']) {
+      const response = await fetch(`/api/zones/suggest?q=${q}`)
+      expect(response.headers.get('cache-control')).toBe('public, max-age=60, stale-while-revalidate=300')
+      const { zones } = ZoneSuggestResponse.parse(await response.json())
+      expect(zones).toContainEqual({ slug: 'stormwind', nameEn: 'Stormwind City', nameFr: 'Hurlevent' })
+    }
+  })
+
+  it('US-62.4 gives each suggested zone its EN and FR names, for the language of the visitor', async () => {
+    const { zones } = ZoneSuggestResponse.parse(await (await fetch('/api/zones/suggest?q=forgefer')).json())
+    expect(zones[0]).toEqual({ slug: 'ironforge', nameEn: 'Ironforge', nameFr: 'Forgefer' })
+  })
+
+  it('US-11.2 refuses a missing or too long zone query with 400', async () => {
+    expect((await fetch('/api/zones/suggest')).status).toBe(400)
+    expect((await fetch(`/api/zones/suggest?q=${'a'.repeat(101)}`)).status).toBe(400)
   })
 })

@@ -30,6 +30,7 @@ describe('migrations (T-05a)', () => {
     tables.push('username_redirects') // T-16b
     tables.push('user_social_links') // T-16c
     tables.push('game_versions', 'tags') // T-20a
+    tables.push('zones') // T-20b
     tables.push('mfa_recovery_codes') // T-18b
     const found = await sql`select tablename from pg_tables where schemaname = 'public'`
     expect(found.map((t) => t.tablename).sort()).toEqual(tables.sort())

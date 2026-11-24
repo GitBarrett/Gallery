@@ -257,6 +257,27 @@ export const tags = pgTable(
   (t) => [index('tags_slug_prefix_idx').on(t.slug.op('text_pattern_ops'))],
 )
 
+/**
+ * Zones dictionary (US-57), seeded from docs/seed/zones.csv (migration 0011). Searched on both names and the aliases,
+ * accents ignored and typos tolerated (pg_trgm, unaccent: migration 0010). `pending`: typed freely, to review.
+ */
+export const zones = pgTable(
+  'zones',
+  {
+    id: id(),
+    slug: text('slug').notNull().unique(),
+    nameEn: text('name_en').notNull(),
+    nameFr: text('name_fr').notNull(),
+    aliases: text('aliases')
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    status: text('status').notNull().default('active'),
+    createdAt: createdAt(),
+  },
+  (t) => [check('zones_status_check', sql`${t.status} in ('active', 'pending')`)],
+)
+
 /** Insert-only audit log: the application role has neither UPDATE nor DELETE (migration 0001). */
 export const auditLog = pgTable(
   'audit_log',
