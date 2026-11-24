@@ -31,14 +31,15 @@ const schema = z
     NUXT_OAUTH_GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
     NUXT_OAUTH_BATTLEDOTNET_CLIENT_ID: z.string().min(1).optional(),
     NUXT_OAUTH_BATTLEDOTNET_CLIENT_SECRET: z.string().min(1).optional(),
-    // Presigned uploads (T-21): S3 token limited to the bucket; fake values sign the URLs of fake-provider runs
+    // Presigned uploads (T-21): S3 token limited to the bucket; fake values sign the URLs of fake-provider runs.
+    // Trimmed: a pasted secret often ends with a newline, which breaks the signature
     R2_ACCOUNT_ID: z
       .string()
       .regex(/^[0-9a-f]{32}$/)
       .optional(),
     R2_BUCKET: z.string().min(3).optional(),
-    R2_ACCESS_KEY_ID: z.string().min(1).optional(),
-    R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+    R2_ACCESS_KEY_ID: z.string().trim().min(1).optional(),
+    R2_SECRET_ACCESS_KEY: z.string().trim().min(1).optional(),
     // Consent page of the fake OAuth providers: a test route, only on previews and in tests (ADR-013)
     NUXT_FAKE_OAUTH_CONSENT_URL: z.url().optional(),
   })

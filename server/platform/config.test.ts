@@ -23,6 +23,13 @@ describe('loadConfig', () => {
     expect(() => loadConfig({ ...valid, IP_HASH_KEY_CURRENT: 'short' })).toThrow(/IP_HASH_KEY_CURRENT/)
   })
 
+  it('US-10.6 trims the pasted S3 token of the presigned uploads, a newline would break the signature', () => {
+    expect(loadConfig({ ...valid, R2_ACCESS_KEY_ID: 'key-id\n', R2_SECRET_ACCESS_KEY: ' secret\n' })).toMatchObject({
+      r2AccessKeyId: 'key-id',
+      r2SecretAccessKey: 'secret',
+    })
+  })
+
   it('fails at startup when a required variable is missing, naming it', () => {
     expect(() => loadConfig({ NUXT_FAKE_PROVIDERS: 'true' })).toThrow(/NUXT_PUBLIC_SITE_URL/)
   })
