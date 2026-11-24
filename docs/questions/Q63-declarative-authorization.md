@@ -1,6 +1,6 @@
 # Q63 — Autorisation déclarative (T-18a)
 
-- **Statut** : À valider — Adrien (23/11/2026)
+- **Statut** : Tranché — Adrien, 24/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - US-55 n'a pas de critère sur l'autorisation déclarative : les tests portent l'identifiant `US-55` sans numéro (aucun critère ajouté à 04, `test:trace` n'en exige donc aucun).
   - `requireMember` n'est pas une fonction : c'est le `requireContext(event)` de la route (401), comme aujourd'hui ; les autres politiques (`requireVerified`, `notSanctioned`, `requireRole`, `requireOwner`) sont des fonctions pures du domaine `identity`, exposées par son `index.ts`. `notSanctioned` lit le statut du compte (pas encore de table de sanctions) ; `updateProfile` l'utilise pour la bio d'un membre suspendu.
