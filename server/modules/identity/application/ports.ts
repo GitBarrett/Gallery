@@ -1,3 +1,4 @@
+import type { NotificationPrefs } from '../../../../shared/domain/notification-prefs'
 import type { SocialPlatform } from '../../../../shared/domain/social-links'
 
 /** A stored social network identifier (US-82); the website is its https URL. */
@@ -139,7 +140,9 @@ export interface IdentityRepository {
   /** `email_taken` / `username_taken`: a concurrent sign-up won the unique index. */
   createUser(user: NewUser): Promise<'created' | 'email_taken' | 'username_taken'>
   /** `email` null: account without email (Battle.net, Q55). */
-  findRecipient(userId: string): Promise<{ email: string | null; username: string; locale: Locale } | null>
+  findRecipient(
+    userId: string,
+  ): Promise<{ email: string | null; username: string; locale: Locale; notificationPrefs: NotificationPrefs } | null>
   createEmailToken(token: Omit<EmailToken, 'usedAt' | 'newEmail'> & { newEmail?: string }): Promise<void>
   findEmailToken(tokenHash: string, type: EmailTokenType): Promise<EmailToken | null>
   /** Marks the token used; `false` if it already was (concurrent use). */
@@ -159,8 +162,14 @@ export interface IdentityRepository {
     status: string
     socialLinks: SocialLink[] // in the order of SOCIAL_PLATFORMS
   } | null>
-  /** Bio and language of the account (US-07.1); a field left out keeps its value. */
-  updateProfile(userId: string, fields: { bio?: string | null; locale?: Locale }): Promise<void>
+  /**
+   * Bio, language and notification preferences of the account (US-07.1, US-07.5); a field left out keeps its
+   * value, the given preferences are merged into the stored ones.
+   */
+  updateProfile(
+    userId: string,
+    fields: { bio?: string | null; locale?: Locale; notificationPrefs?: Partial<NotificationPrefs> },
+  ): Promise<void>
   /** Replaces all the social links of the account (US-82). */
   setSocialLinks(userId: string, links: SocialLink[]): Promise<void>
   /** Current username of the account and date of its last change (US-05.4). */

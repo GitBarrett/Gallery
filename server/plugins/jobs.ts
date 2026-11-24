@@ -28,6 +28,7 @@ import {
   r2ObjectStorage,
   type R2Bucket,
 } from '../modules/media'
+import { drizzleNotificationsRepository, notificationsConsumer, purgeNotifications } from '../modules/notifications'
 import { loadConfig } from '../platform/config'
 import { uuidV7Generator } from '../platform/ids'
 import { createLogger, type Logger } from '../platform/logger'
@@ -60,6 +61,7 @@ function consumers(db: Db, logger: Logger, env: Bindings): Record<string, Messag
   const ids = uuidV7Generator(systemClock)
   const handlers: Record<string, MessageHandler> = {
     emails: emailsConsumer({ db, mailer, clock: systemClock, ids, siteUrl: config.siteUrl }),
+    notifications: notificationsConsumer({ db, clock: systemClock }),
   }
   // Without R2 or Images (local runs), captures wait in the queue
   if (env.R2 && env.IMAGES)
@@ -106,6 +108,7 @@ const crons = (env: Bindings): Record<string, CronHandler[]> => ({
   '15 3 * * *': [
     withDb(env, (db) => relayOf(env, db).purge()),
     withDb(env, (db) => purgeExpiredRedirects(db, systemClock)), // former usernames (T-16b)
+    withDb(env, (db) => purgeNotifications({ repo: drizzleNotificationsRepository(db), clock: systemClock })()),
   ],
 })
 

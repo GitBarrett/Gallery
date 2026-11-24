@@ -1,3 +1,4 @@
+import type { NotificationPref } from '../domain/notification-prefs'
 import { SOCIAL_PLATFORMS } from '../domain/social-links'
 import { z } from './zod'
 
@@ -161,14 +162,23 @@ export const OAuthCompleteBody = z.strictObject({
 export type OAuthCompleteBody = z.infer<typeof OAuthCompleteBody>
 
 /**
- * PATCH /api/me: new username, once every 30 days (US-05.1, US-05.4), bio and language (US-07.1); at least one
- * field. The bio rules are checked by the server (shared/domain/account-rules). Answers MeResponse.
+ * PATCH /api/me: new username, once every 30 days (US-05.1, US-05.4), bio and language (US-07.1), notification
+ * preferences (US-07.5, only the given types change); at least one field. The bio rules are checked by the server
+ * (shared/domain/account-rules). Answers MeResponse.
  */
 export const MeUpdateBody = z
   .strictObject({
     username: z.string().max(64).optional(),
     bio: z.string().max(2000).optional(),
     locale: z.enum(['en', 'fr']).optional(),
+    notificationPrefs: z
+      .strictObject({
+        likes: z.boolean().optional(),
+        comments: z.boolean().optional(),
+        followers: z.boolean().optional(),
+        contests: z.boolean().optional(),
+      } satisfies Record<NotificationPref, unknown>)
+      .optional(),
   })
   .refine((body) => Object.keys(body).length > 0, 'Nothing to update')
 export type MeUpdateBody = z.infer<typeof MeUpdateBody>

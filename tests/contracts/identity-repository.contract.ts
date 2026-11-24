@@ -33,7 +33,12 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect(await repo.usernameTaken(ash.username.toLowerCase())).toBe(true)
       expect(await repo.findUserIdByEmail(`other.${ash.email}`)).toBeNull()
       expect(await repo.usernameTaken(`${ash.username}x`)).toBe(false)
-      expect(await repo.findRecipient(ash.id)).toEqual({ email: ash.email, username: ash.username, locale: 'fr' })
+      expect(await repo.findRecipient(ash.id)).toEqual({
+        email: ash.email,
+        username: ash.username,
+        locale: 'fr',
+        notificationPrefs: { likes: true, comments: true, followers: true, contests: true },
+      })
     })
 
     it('refuses a second account with the same email or username in another case', async () => {
@@ -77,7 +82,7 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       const repo = await make()
       const ash = { ...user(), email: null, passwordHash: null }
       await repo.createUser(ash)
-      expect(await repo.findRecipient(ash.id)).toEqual({ email: null, username: ash.username, locale: 'fr' })
+      expect(await repo.findRecipient(ash.id)).toMatchObject({ email: null, username: ash.username, locale: 'fr' })
     })
 
     it('US-04.3 replaces the password hash of an account', async () => {
@@ -161,6 +166,21 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect((await repo.findRecipient(ash.id))?.locale).toBe('en')
       await repo.updateProfile(ash.id, { bio: null })
       expect(await repo.findProfile(ash.username)).toMatchObject({ bio: null })
+    })
+
+    it('US-07.5 merges the notification preferences of an account into the stored ones', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      await repo.updateProfile(ash.id, { notificationPrefs: { likes: false } })
+      await repo.updateProfile(ash.id, { notificationPrefs: { followers: false } })
+      await repo.updateProfile(ash.id, { bio: 'Unchanged preferences.' })
+      expect((await repo.findRecipient(ash.id))?.notificationPrefs).toEqual({
+        likes: false,
+        comments: true,
+        followers: false,
+        contests: true,
+      })
     })
 
     it('US-82.4 stores the social links of an account, replaced as a whole, read in network order', async () => {

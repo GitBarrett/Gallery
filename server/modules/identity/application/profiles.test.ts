@@ -107,6 +107,19 @@ describe('updateProfile', () => {
     expect(fake.users[0]).toMatchObject({ locale: 'en' })
   })
 
+  it('US-07.5 saves the given notification preferences, a suspended member too', async () => {
+    const { fake, run } = await fresh()
+    expect((await run({ actor: { id: 'ash', status: 'suspended' }, notificationPrefs: { likes: false } })).ok).toBe(
+      true,
+    )
+    expect((await fake.repo.findRecipient('ash'))?.notificationPrefs).toEqual({
+      likes: false,
+      comments: true,
+      followers: true,
+      contests: true,
+    })
+  })
+
   it('US-07.1 lets a suspended member change their language, not their bio', async () => {
     const { fake, run } = await fresh()
     const suspended = { id: 'ash', status: 'suspended' }

@@ -8,6 +8,7 @@ import type {
   NewUser,
   SocialLink,
 } from '../../server/modules/identity'
+import { notificationPrefs, type NotificationPrefs } from '../../shared/domain/notification-prefs'
 import { SOCIAL_PLATFORMS } from '../../shared/domain/social-links'
 
 type StoredUser = Omit<NewUser, 'passwordHash' | 'emailVerifiedAt'> & {
@@ -18,6 +19,7 @@ type StoredUser = Omit<NewUser, 'passwordHash' | 'emailVerifiedAt'> & {
   // set by the tests that need them (not written by createUser, so that its rows compare simply)
   usernameChangedAt?: Date | null
   bio?: string | null
+  notificationPrefs?: Partial<NotificationPrefs>
   createdAt?: Date
   mfa?: MfaState
 }
@@ -57,7 +59,14 @@ export function inMemoryIdentityRepository() {
     },
     async findRecipient(userId) {
       const user = users.find((u) => u.id === userId)
-      return user ? { email: user.email, username: user.username, locale: user.locale } : null
+      return user
+        ? {
+            email: user.email,
+            username: user.username,
+            locale: user.locale,
+            notificationPrefs: notificationPrefs(user.notificationPrefs),
+          }
+        : null
     },
     async createEmailToken(token) {
       tokens.push({ ...token, newEmail: token.newEmail ?? null, usedAt: null })
@@ -103,7 +112,8 @@ export function inMemoryIdentityRepository() {
     },
     async updateProfile(userId, fields) {
       const user = users.find((u) => u.id === userId)
-      if (user) Object.assign(user, fields)
+      const { notificationPrefs: prefs, ...rest } = fields
+      if (user) Object.assign(user, rest, prefs && { notificationPrefs: { ...user.notificationPrefs, ...prefs } })
     },
     async setSocialLinks(userId, links) {
       socials = [...socials.filter((l) => l.userId !== userId), ...links.map((link) => ({ userId, ...link }))]

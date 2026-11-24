@@ -33,6 +33,7 @@ describe('migrations (T-05a)', () => {
     tables.push('zones') // T-20b
     tables.push('mfa_recovery_codes') // T-18b
     tables.push('photos') // T-21
+    tables.push('notifications') // T-23a
     const found = await sql`select tablename from pg_tables where schemaname = 'public'`
     expect(found.map((t) => t.tablename).sort()).toEqual(tables.sort())
   })
