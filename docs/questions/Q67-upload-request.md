@@ -1,6 +1,6 @@
 # Q67 — Demande d'upload (T-21)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 24/11/2026
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Quota de 20 uploads « sur les dernières 24 h »** (US-10.5) : compté par le limiteur exact existant (`rate_limit_counters`, T-05c), en fenêtre fixe d'un jour alignée sur minuit UTC. Le 429 donne l'attente jusqu'à minuit UTC (`Retry-After`). Conséquence : jusqu'à 40 uploads possibles de part et d'autre de minuit. Chaque demande d'URL compte, même si l'upload n'est jamais terminé. Une fenêtre glissante exacte demanderait de compter les captures en base (et une capture supprimée libérerait alors du quota).
   - **« 3 simultanés »** (08 § 8) : demandes d'URL du membre non terminées (`complete` pas encore appelé) depuis moins de 10 min, durée de vie de l'URL présignée. La 4e est refusée en 429 avec `Retry-After: 600` (majorant). Une demande abandonnée libère sa place au bout de 10 min.
