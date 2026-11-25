@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // Public profile (US-05.3, Profile mockup): avatar, username, bio, membership date, then the captures. The avatar is
 // the initial until avatars come (T-28); statistics and the Follow / Share buttons come with the photos and follows
-// (every counter is under 10 until then, hidden: US-70). The member's own profile leads to the settings (sign-out).
+// (every counter is under 10 until then, hidden: US-70). The member's own profile leads to « My captures » and the
+// settings (sign-out).
 import type { ProfileResponse } from '~~/shared/contracts/auth'
 import SocialLinks from './SocialLinks.vue'
 
@@ -26,7 +27,10 @@ const since = computed(() =>
         <p class="since">{{ t('profile.memberSince', { date: since }) }}</p>
         <SocialLinks :links="profile.socialLinks" />
       </div>
-      <UiButton v-if="own" :to="localePath('/settings')" variant="secondary">{{ t('profile.settings') }}</UiButton>
+      <div v-if="own" class="own-links">
+        <UiButton :to="localePath('/my-captures')" variant="secondary">{{ t('captures.title') }}</UiButton>
+        <UiButton :to="localePath('/settings')" variant="secondary">{{ t('profile.settings') }}</UiButton>
+      </div>
     </section>
     <section class="captures" aria-labelledby="profile-captures">
       <h2 id="profile-captures" class="section-title">{{ t('profile.captures') }}</h2>
@@ -40,6 +44,12 @@ const since = computed(() =>
 </template>
 
 <style scoped>
+.own-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
 .profile {
   display: flex;
   flex-direction: column;

@@ -38,6 +38,7 @@ export const ROUTES: Record<string, { access: Access; row: string }> = {
   'POST /api/me/email': { access: 'member', row: 'Compte' },
   'POST /api/me/password': { access: 'member', row: 'Compte' },
   'DELETE /api/me/oauth/[provider]': { access: 'member', row: 'Compte' },
+  'GET /api/me/photos': { access: 'member', row: 'Compte' },
   'GET /api/me/sessions': { access: 'member', row: 'Compte' },
   'DELETE /api/me/sessions/[id]': { access: 'member', row: 'Compte' },
   'POST /api/me/sessions/revoke-others': { access: 'member', row: 'Compte' },

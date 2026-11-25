@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook-vue/nuxt'
 import { h } from 'vue'
 import ImageScrim from './ImageScrim.vue'
-import WowImage from './WowImage.vue'
 
 // Worst cases for readability: a pure white and a pure black "photo".
 const plain = (fill: string) =>
@@ -15,7 +14,14 @@ const meta: Meta<typeof ImageScrim> = {
   argTypes: { level: { control: 'inline-radio', options: ['default', 'max'] } },
   render: (args) => () =>
     h(ImageScrim, args, {
-      default: () => h(WowImage, { src: plain('#fff'), alt: 'A plain white capture', width: 800, height: 450 }),
+      default: () =>
+        h('img', {
+          src: plain('#fff'),
+          alt: 'A plain white capture',
+          width: 800,
+          height: 450,
+          style: 'display: block; width: 100%; height: auto',
+        }),
       caption: () => [h('strong', 'Arcane Dusk'), h('div', 'by Lunelame · Suramar')],
     }),
   parameters: {
@@ -45,7 +51,14 @@ export const OnWhiteMax: Story = { args: { level: 'max' } }
 export const OnBlack: Story = {
   render: (args) => () =>
     h(ImageScrim, args, {
-      default: () => h(WowImage, { src: plain('#000'), alt: 'A plain black capture', width: 800, height: 450 }),
+      default: () =>
+        h('img', {
+          src: plain('#000'),
+          alt: 'A plain black capture',
+          width: 800,
+          height: 450,
+          style: 'display: block; width: 100%; height: auto',
+        }),
       caption: () => [h('strong', 'Arcane Dusk'), h('div', 'by Lunelame · Suramar')],
     }),
 }

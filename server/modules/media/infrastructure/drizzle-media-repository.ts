@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gte, inArray, isNull, lt, sql } from 'drizzle-orm'
+import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, lt, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import { gameVersions, photos } from '../../../db/schema'
 import type { MediaRepository } from '../application/ports'
@@ -75,5 +75,21 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
     if (!ids.length) return new Map()
     const rows = await db.select({ id: photos.id, title: photos.title }).from(photos).where(inArray(photos.id, ids))
     return new Map(rows.map((r) => [r.id, r.title]))
+  },
+  async listOwn(userId, { before, limit }) {
+    const rows = await db
+      .select({
+        id: photos.id,
+        title: photos.title,
+        status: photos.status,
+        width: photos.width,
+        height: photos.height,
+        uploadedAt: photos.uploadedAt,
+      })
+      .from(photos)
+      .where(and(eq(photos.userId, userId), isNotNull(photos.uploadedAt), before ? lt(photos.id, before) : undefined))
+      .orderBy(desc(photos.id))
+      .limit(limit)
+    return rows.map((r) => ({ ...r, uploadedAt: r.uploadedAt! }))
   },
 })

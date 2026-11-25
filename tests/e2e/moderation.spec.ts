@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 // A sign-up, three uploads and their processing through the queues
 test.describe.configure({ timeout: 240_000 })
 
-test('US-50.1 US-50.3 US-14.3 US-14.4 US-68.3 the NSFW fixture is rejected into trash/, a clean capture published, both notified', async ({
+test('US-50.1 US-50.3 US-14.3 US-14.4 US-68.3 US-75.3 the NSFW fixture is rejected into trash/, a clean capture published, both notified', async ({
   page,
 }) => {
   await verifiedMember(page)
@@ -95,4 +95,18 @@ test('US-50.1 US-50.3 US-14.3 US-14.4 US-68.3 the NSFW fixture is rejected into 
     page.evaluate(async (url) => (await fetch(url, { credentials: 'omit' })).status, path)
   expect(await anonymous(`/img/${photoIds.review}/800?preview=1`)).toBe(404)
   expect(await anonymous(`/img/${photoIds.published}/400`)).toBe(200)
+
+  // US-14.4 (T-25b): « My captures » shows each status in words, the images loaded through /img (preview included)
+  await page.goto('/my-captures')
+  const cards = page.getByRole('listitem')
+  await expect(cards).toHaveCount(3)
+  await expect(cards.filter({ hasText: 'Fixture_review' })).toContainText('In review')
+  await expect(cards.filter({ hasText: 'Fixture_nsfw' })).toContainText('Rejected')
+  await expect(cards.filter({ hasText: 'Fixture_nsfw' }).locator('img')).toHaveCount(0)
+  for (const title of ['Ice Crown', 'Fixture_review']) {
+    const img = cards.filter({ hasText: title }).locator('img')
+    await img.scrollIntoViewIfNeeded()
+    await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth)).toBeGreaterThan(0)
+    await expect(img).toHaveAttribute('alt', new RegExp(`^${title}, captured by `))
+  }
 })

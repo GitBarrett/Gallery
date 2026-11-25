@@ -4,8 +4,8 @@
 import { ExpirationPlugin } from 'workbox-expiration'
 import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching'
 import { registerRoute, setCatchHandler } from 'workbox-routing'
-import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
-import { cacheRule, offlinePage } from './rules'
+import { CacheFirst, NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
+import { cacheRule, IMG_CACHE, offlinePage } from './rules'
 
 declare const self: ServiceWorkerGlobalScope
 
@@ -36,6 +36,14 @@ registerRoute(
   new StaleWhileRevalidate({
     cacheName: 'api-public',
     plugins: [new ExpirationPlugin({ maxEntries: 100, maxAgeSeconds: DAY })],
+  }),
+)
+// Display images (US-64.1, US-64.6): immutable, so cache first; CacheFirst only stores 200 answers
+registerRoute(
+  (options) => ruleOf(options) === 'img',
+  new CacheFirst({
+    cacheName: 'img',
+    plugins: [new ExpirationPlugin({ ...IMG_CACHE, purgeOnQuotaError: true })],
   }),
 )
 // Private pages: network only, but still the offline page rather than the browser error

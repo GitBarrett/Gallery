@@ -51,6 +51,7 @@ import {
   r2ObjectStorage,
   requestUploadUrl,
   serveImage,
+  listMyCaptures,
   type R2Bucket,
 } from '../modules/media'
 import {
@@ -83,6 +84,7 @@ export interface Container {
     requestUploadUrl: UseCase<typeof requestUploadUrl>
     completeUpload: UseCase<typeof completeUpload>
     serveImage: UseCase<typeof serveImage>
+    listMyCaptures: UseCase<typeof listMyCaptures>
   }
   notifications: {
     list: UseCase<typeof listNotifications>
@@ -226,6 +228,7 @@ export function createContainer({
     settings: () => readSettings(logger),
     media: {
       serveImage: (cmd) => serveImage({ repo: drizzleMediaRepository(db()), storage: storage() })(cmd),
+      listMyCaptures: (cmd) => listMyCaptures({ repo: drizzleMediaRepository(db()) })(cmd),
       requestUploadUrl: (cmd) =>
         requestUploadUrl({
           repo: drizzleMediaRepository(db()),

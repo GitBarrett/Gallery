@@ -5,6 +5,7 @@ import { z } from '~~/shared/contracts/zod'
 import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
 import { NotificationsResponse, UnreadCountResponse } from '~~/shared/contracts/notifications'
+import { MyPhotosResponse } from '~~/shared/contracts/photos'
 import { PublicSettings } from '~~/shared/contracts/settings'
 import {
   AccountResponse,
@@ -125,4 +126,6 @@ export const api = {
   unreadCount: () => call('/api/notifications/unread-count', UnreadCountResponse),
   markNotificationRead: (id: string) => call(`/api/notifications/${id}/read`, z.unknown(), { method: 'POST' }),
   markAllNotificationsRead: () => call('/api/notifications/read-all', z.unknown(), { method: 'POST' }),
+  // « My captures » (US-14.4): every status, 30 per page
+  myPhotos: (cursor?: string) => call('/api/me/photos', MyPhotosResponse, { query: cursor ? { cursor } : {} }),
 }

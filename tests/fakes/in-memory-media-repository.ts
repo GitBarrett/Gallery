@@ -17,8 +17,10 @@ type Row = {
 /** In-memory MediaRepository for use case tests; `rows` shows the captures. */
 export function inMemoryMediaRepository(clock: Clock) {
   const rows = new Map<string, Row>()
+  const sizes = new Map<string, { width: number; height: number }>() // apart: the rows compare as before
   const repo: MediaRepository = {
-    async createUpload({ id, userId, mime, bytes }) {
+    async createUpload({ id, userId, mime, bytes, width, height }) {
+      sizes.set(id, { width, height })
       rows.set(id, {
         id,
         userId,
@@ -68,6 +70,13 @@ export function inMemoryMediaRepository(clock: Clock) {
       if (row?.status !== 'processing') return false
       Object.assign(row, { status, processed, bytes: processed.bytes })
       return true
+    },
+    async listOwn(userId, { before, limit }) {
+      return [...rows.values()]
+        .filter((r) => r.userId === userId && r.uploadedAt && (!before || r.id < before))
+        .sort((a, b) => (a.id < b.id ? 1 : -1))
+        .slice(0, limit)
+        .map((r) => ({ id: r.id, title: r.title, status: r.status, ...sizes.get(r.id)!, uploadedAt: r.uploadedAt! }))
     },
     async titles(ids) {
       return new Map(ids.filter((id) => rows.has(id)).map((id) => [id, rows.get(id)!.title]))

@@ -311,7 +311,7 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Routes `/img/{id}/{w}` et `/img/{id}/og.jpg` (variantes lues dans R2 sans transformation, largeurs fixes, captures publiées uniquement, API Cache), aperçu privé `?preview=1` pour l'auteur et les modérateurs, masquage = variantes dans `trash/` + purge par URL.
   Stories : US-14.4, US-68.3. Tests : I (largeur invalide = 404, capture non publiée = 404 publiquement et 200 pour l'auteur).
 
-- [ ] **T-25b Images dans l'interface et « My captures »** (dép. T-25a, T-06c, T-09a)
+- [x] **T-25b Images dans l'interface et « My captures »** (dép. T-25a, T-06c, T-09a)
   `WowImage` branché sur `/img` (`srcset`, `sizes`, dimensions, texte alternatif), règles du service worker pour `/img`, page « My captures » avec statuts.
   Stories : US-64.1, US-64.5–6, US-75.3. Tests : E.
 

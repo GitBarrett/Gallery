@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cacheRule, offlinePage } from './rules'
+import { cacheRule, IMG_CACHE, offlinePage } from './rules'
 
 const rule = (path: string, request: { method?: string; mode?: string; sameOrigin?: boolean } = {}) =>
   cacheRule(new URL(path, 'https://legendary.test'), {
@@ -41,9 +41,27 @@ describe('service worker rules (03-architecture.md § PWA)', () => {
     expect(rule('/api/photos', { sameOrigin: false })).toBe('network')
   })
 
-  it('leaves display images to T-25b and every other request to the network', () => {
+  const id = '0193a000-0000-7000-8000-0000000000aa'
+  it('US-64.1 keeps the display images up to 1200 px in the img cache', () => {
+    for (const width of ['400', '800', '1200']) expect(rule(`/img/${id}/${width}`)).toBe('img')
+  })
+
+  it('US-64.5 never stores the 2400 px variant, the og:image, a private preview, an original or a malformed path', () => {
+    expect(rule(`/img/${id}/2400`)).toBe('network')
+    expect(rule(`/img/${id}/og.jpg`)).toBe('network')
+    expect(rule(`/img/${id}/800?preview=1`)).toBe('network')
+    expect(rule(`/img/${id}/800`, { sameOrigin: false })).toBe('network') // R2 and any other origin
     expect(rule('/img/1/800')).toBe('network')
     expect(rule('/storybook/index.html', { mode: 'navigate' })).toBe('network')
+  })
+
+  it('US-64.6 drops the oldest image beyond 300, after 30 days at most', () => {
+    expect(IMG_CACHE).toEqual({ maxEntries: 300, maxAgeSeconds: 2_592_000 })
+  })
+
+  it('US-14.4 never caches « My captures », a private page', () => {
+    expect(rule('/my-captures', { mode: 'navigate' })).toBe('network')
+    expect(rule('/fr/my-captures', { mode: 'navigate' })).toBe('network')
   })
 
   it('US-64.2 falls back on the offline page of the language of the URL', () => {
