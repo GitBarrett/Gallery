@@ -309,6 +309,9 @@ export const photos = pgTable(
     /** Focal point chosen by the author (US-13.1), 0–1 from the left and the top; null: the centre (US-13.2). */
     focalX: real('focal_x'),
     focalY: real('focal_y'),
+    // shortcut: written by the likes (T-40) and the HD downloads (T-34), 0 until then; the grids sort on them (US-20.3)
+    likesCount: integer('likes_count').notNull().default(0),
+    downloadsCount: integer('downloads_count').notNull().default(0),
     uploadedAt: at('uploaded_at'),
     createdAt: createdAt(),
   },
@@ -323,6 +326,10 @@ export const photos = pgTable(
     ),
     index('photos_user_idx').on(t.userId, t.createdAt),
     index('photos_game_version_idx').on(t.gameVersionId),
+    // The grids (03 § Modèle de données): the published captures of a version, most recent first
+    index('photos_grid_idx')
+      .on(t.gameVersionId, t.publishedAt.desc(), t.id.desc())
+      .where(sql`${t.status} = 'published'`),
     // Uploads never completed: the concurrent ones (3 per account) and the orphans of the hourly cron (US-10.7)
     index('photos_incomplete_idx')
       .on(t.createdAt)

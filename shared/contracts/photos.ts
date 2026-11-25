@@ -1,4 +1,7 @@
 import { z } from './zod'
+import { GRID_SORTS } from '../domain/grid-sort'
+import { QUALITIES } from '../domain/quality'
+import { TIMES_OF_DAY } from '../domain/time-of-day'
 
 /**
  * POST /api/photos/upload-url: the file the browser is about to send (US-10.1), checked again by the server against
@@ -128,3 +131,36 @@ export const AvatarUploadUrlResponse = z.strictObject({ version: z.uuid(), url: 
 export type AvatarUploadUrlResponse = z.infer<typeof AvatarUploadUrlResponse>
 /** POST /api/me/avatar/complete: the version put, sent to processing and moderation (204). */
 export const AvatarCompleteBody = z.strictObject({ version: z.uuid() })
+
+/**
+ * GET /api/photos (US-20.1, US-20.3): a page of a grid, published captures only. `version`: slug of
+ * GET /api/game-versions (unknown or archived: 404); `zone`: slug of the dictionary (unknown: 400); `cursor`: the
+ * `nextCursor` of the previous page, for the same filters and sort.
+ */
+export const PhotosQuery = z.strictObject({
+  version: z.string().min(1).max(64).optional(),
+  zone: z.string().min(1).max(64).optional(),
+  timeOfDay: z.enum(TIMES_OF_DAY).optional(),
+  minQuality: z.enum(QUALITIES).optional(),
+  sort: z.enum(GRID_SORTS).default('recent'),
+  cursor: z.string().min(1).max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(60).default(30),
+})
+export type PhotosQuery = z.infer<typeof PhotosQuery>
+export const PhotosResponse = z.strictObject({
+  items: z.array(
+    z.strictObject({
+      id: z.uuid(),
+      title: z.string(),
+      width: z.int(),
+      height: z.int(),
+      author: z.strictObject({ username: z.string() }),
+      zone: z.strictObject({ slug: z.string(), nameEn: z.string(), nameFr: z.string() }).nullable(),
+      likes: z.int(),
+      quality: z.enum(QUALITIES),
+      publishedAt: z.iso.datetime(),
+    }),
+  ),
+  nextCursor: z.string().nullable(),
+})
+export type PhotosResponse = z.infer<typeof PhotosResponse>

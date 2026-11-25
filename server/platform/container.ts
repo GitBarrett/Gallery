@@ -53,6 +53,7 @@ import {
   suggestTags,
   suggestZones,
 } from '../modules/catalog'
+import { browseGrid, drizzleGalleryRepository } from '../modules/gallery'
 import {
   completeUpload,
   drizzleMediaRepository,
@@ -95,6 +96,9 @@ export interface Container {
     listGameVersions: UseCase<typeof listGameVersions>
     suggestTags: UseCase<typeof suggestTags>
     suggestZones: UseCase<typeof suggestZones>
+  }
+  gallery: {
+    browseGrid: UseCase<typeof browseGrid>
   }
   media: {
     requestUploadUrl: UseCase<typeof requestUploadUrl>
@@ -248,6 +252,15 @@ export function createContainer({
     ids,
     logger,
     settings: () => readSettings(logger),
+    gallery: {
+      browseGrid: (cmd) =>
+        browseGrid({
+          repo: drizzleGalleryRepository(db()),
+          gameVersions: listGameVersions({ repo: drizzleCatalogRepository(db()) }),
+          zoneOf: findZone({ repo: drizzleCatalogRepository(db()) }),
+          thresholds: async () => (await readSettings(logger))['quality.thresholds'],
+        })(cmd),
+    },
     media: {
       serveImage: (cmd) => serveImage({ repo: drizzleMediaRepository(db()), storage: storage() })(cmd),
       listMyCaptures: (cmd) => listMyCaptures({ repo: drizzleMediaRepository(db()) })(cmd),

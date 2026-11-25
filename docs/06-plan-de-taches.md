@@ -355,9 +355,15 @@ T-28 (avatar) est découpée le 25/11/2026 en T-28a (serveur) et T-28b (écran).
 
 ## Phase 3 — Découverte
 
-- [ ] **T-30 Galerie et PLP** (dép. T-25b, T-08)
-  Module `gallery` : requêtes de grille par version, filtres, tris, pagination par curseur, état vide « Be the first », infobulle de qualité « ? ».
-  Stories : US-20, US-70.5, US-71.1. Tests : U, I (pagination stable), E.
+T-30 (galerie et PLP) est découpée le 25/11/2026 en T-30a (serveur) et T-30b (écran) ; les tâches qui dépendent de T-30 attendent les deux.
+
+- [x] **T-30a Galerie : serveur** (dép. T-25b, T-08)
+  Module `gallery` : requêtes de grille par version, filtres (zone, moment de la journée, qualité minimale), tris (récent, populaire, téléchargements), pagination par curseur, `GET /api/photos` ; compteurs `likes_count` et `downloads_count` et index de grille.
+  Stories : US-20.1, US-20.3, US-20.4. Tests : U, I (pagination stable).
+
+- [ ] **T-30b Galerie : écran** (dép. T-30a)
+  PLP `/v/{version}` : grille masonry, filtres dans l'URL (barre, bottom sheet sur mobile), défilement infini et « You've seen everything », 404, état vide « Be the first », infobulle de qualité « ? ».
+  Stories : US-20, US-70.5, US-71.1. Tests : composants, E.
 
 - [ ] **T-31a Page photo** (dép. T-30)
   PDP, infobulle façon objet, Open Graph, `ImageObject`.
