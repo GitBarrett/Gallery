@@ -18,6 +18,7 @@ import {
 } from './ports'
 import type { Clock } from '../../../platform/clock'
 import type { DomainEvent, UnitOfWork } from '../../../platform/unit-of-work'
+import { moveToTrash } from './trash'
 
 /** Luminance thumbnail (03 § Pipeline image 5): decoded here, never written. */
 const THUMBNAIL = { width: 64, format: 'image/png' } as const
@@ -98,13 +99,7 @@ export const processCapture =
 
 /** The cleaned original moves to `trash/` (R2 lifecycle: deleted after 30 days, US-12.2); the variants go. */
 async function toTrash(storage: ObjectStorage, photoId: string) {
-  const key = originalKey(photoId)
-  const stored = await storage.head(key)
-  if (stored) {
-    const contentType = stored.contentType ?? 'application/octet-stream'
-    await storage.put(`trash/${key}`, await open(storage, key), { bytes: stored.bytes, contentType })
-    await storage.delete(key)
-  }
+  await moveToTrash(storage, originalKey(photoId))
   for (const variant of VARIANTS) await storage.delete(variantKey(photoId, variant.name))
 }
 

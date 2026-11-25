@@ -307,7 +307,7 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Port `ModerationProvider` (Sightengine + fake), appelé par `photo-process` avec le JPEG 1200 après les variantes, seuils depuis `site_settings`, retries, historique `moderation_decisions`, notification de l'auteur (capture publiée, en revue, refusée ou en échec de traitement).
   Stories : US-50, US-14.1 (appel de la modération), US-14.3, US-10.3 (notification) (Q68). Tests : U (seuils), I (pannes), E (fichier NSFW de fixture refusé).
 
-- [ ] **T-25a Service des images** (dép. T-22b)
+- [x] **T-25a Service des images** (dép. T-22b)
   Routes `/img/{id}/{w}` et `/img/{id}/og.jpg` (variantes lues dans R2 sans transformation, largeurs fixes, captures publiées uniquement, API Cache), aperçu privé `?preview=1` pour l'auteur et les modérateurs, masquage = variantes dans `trash/` + purge par URL.
   Stories : US-14.4, US-68.3. Tests : I (largeur invalide = 404, capture non publiée = 404 publiquement et 200 pour l'auteur).
 

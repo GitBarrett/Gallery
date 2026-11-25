@@ -50,6 +50,7 @@ import {
   memoryBucket,
   r2ObjectStorage,
   requestUploadUrl,
+  serveImage,
   type R2Bucket,
 } from '../modules/media'
 import {
@@ -81,6 +82,7 @@ export interface Container {
   media: {
     requestUploadUrl: UseCase<typeof requestUploadUrl>
     completeUpload: UseCase<typeof completeUpload>
+    serveImage: UseCase<typeof serveImage>
   }
   notifications: {
     list: UseCase<typeof listNotifications>
@@ -223,6 +225,7 @@ export function createContainer({
     logger,
     settings: () => readSettings(logger),
     media: {
+      serveImage: (cmd) => serveImage({ repo: drizzleMediaRepository(db()), storage: storage() })(cmd),
       requestUploadUrl: (cmd) =>
         requestUploadUrl({
           repo: drizzleMediaRepository(db()),
