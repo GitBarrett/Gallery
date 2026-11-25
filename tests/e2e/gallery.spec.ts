@@ -1,0 +1,79 @@
+import { expect, test } from './fixtures'
+import { expectImageLoaded, hydrated } from './helpers'
+import { testRoute, verifiedMember } from './members'
+
+// PLP (T-30b) on the preview: a capture published through the real pipeline (API upload, Images binding, fake
+// moderation) shows in the grid of its version. The other specs publish in WoW Forever: this one uses Classic Era, and
+// Classic progression stays empty. Desktop Chromium only (sign-up limits, test routes).
+
+test.beforeEach(async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'sign-up limits shared by the CI address')
+  await page.goto('/signin')
+  const reset = await testRoute(page, '/__test/rate-limits', 'DELETE')
+  test.skip(reset.status === 404, 'test routes are only built for previews')
+})
+
+// A sign-up, its email, then the processing through the queue
+test.describe.configure({ timeout: 180_000 })
+
+test('US-20.1 US-20.2 a published capture shows in the grid of its version, newest first, then the end', async ({
+  page,
+}) => {
+  await verifiedMember(page)
+  const title = `Grid ${crypto.randomUUID().slice(0, 8)}`
+  // A 1600 × 900 JPEG drawn in the page, uploaded and completed as the form does
+  const photoId = await page.evaluate(async (name) => {
+    const canvas = new OffscreenCanvas(1600, 900)
+    const context = canvas.getContext('2d')!
+    context.fillStyle = '#3d566e'
+    context.fillRect(0, 0, 1600, 900)
+    const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.9 })
+    const json = { 'content-type': 'application/json' }
+    const declared = { contentType: blob.type, bytes: blob.size, width: 1600, height: 900 }
+    const asked = await fetch('/api/photos/upload-url', {
+      method: 'POST',
+      headers: json,
+      body: JSON.stringify(declared),
+    })
+    const { photoId: id, url } = await asked.json()
+    await fetch(url, { method: 'PUT', headers: { 'content-type': blob.type }, body: blob })
+    await fetch(`/api/photos/${id}/complete`, {
+      method: 'POST',
+      headers: json,
+      body: JSON.stringify({ title: name, gameVersion: 'classic-era' }),
+    })
+    return id as string
+  }, title)
+  await expect
+    .poll(async () => (await testRoute(page, `/__test/photos/${photoId}`, 'GET')).body?.status, { timeout: 120_000 })
+    .toBe('published')
+
+  await page.goto('/v/classic-era')
+  await expect(page.getByRole('heading', { level: 1, name: 'Classic Era' })).toBeVisible()
+  const tile = page.getByRole('article').filter({ hasText: title })
+  await expect(tile).toBeVisible()
+  await expect(tile).toContainText('Poor')
+  await expect(tile).toContainText('New') // under 10 likes, no counter
+  await expectImageLoaded(tile.getByRole('img'))
+  // Fewer than 30 captures in this version: a single page, then the end of the grid
+  await expect(page.getByText("You've seen everything")).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Classic Era' })).toHaveAttribute('aria-current', 'page')
+})
+
+test('US-70.5 a version without capture invites to be the first, with the upload', async ({ page }) => {
+  await page.goto('/v/classic-progression')
+  await expect(page.getByRole('heading', { name: 'Be the first to capture Classic progression' })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('link', { name: 'Upload a capture' })).toHaveAttribute(
+    'href',
+    '/upload',
+  )
+})
+
+test('US-20.4 an unknown version is the 404 page; Explore opens the first version', async ({ page }) => {
+  expect((await page.goto('/v/cataclysm'))?.status()).toBe(404)
+  await page.goto('/')
+  await hydrated(page)
+  await page.getByRole('banner').getByRole('link', { name: 'Explore' }).click()
+  await expect(page).toHaveURL('/v/wow-forever')
+  await expect(page.getByRole('heading', { level: 1, name: 'WoW Forever' })).toBeVisible()
+})

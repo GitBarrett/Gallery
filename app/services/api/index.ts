@@ -12,6 +12,8 @@ import {
   CompleteUploadResponse,
   MyPhotoResponse,
   MyPhotosResponse,
+  type PhotosQuery,
+  PhotosResponse,
   type UpdatePhotoBody,
   type UploadUrlBody,
   UploadUrlResponse,
@@ -138,6 +140,8 @@ export const api = {
   markAllNotificationsRead: () => call('/api/notifications/read-all', z.unknown(), { method: 'POST' }),
   // « My captures » (US-14.4): every status, 30 per page
   myPhotos: (cursor?: string) => call('/api/me/photos', MyPhotosResponse, { query: cursor ? { cursor } : {} }),
+  // Grids (US-20.1): published captures by pages of 30; 404 NOT_FOUND for an unknown or archived version
+  photos: (query: Partial<PhotosQuery>) => call('/api/photos', PhotosResponse, { query }),
   // Upload form (US-10, US-11): catalogue reads, then the presigned URL and the completion (03 § Pipeline image)
   gameVersions: () => call('/api/game-versions', GameVersionsResponse),
   suggestTags: (q: string) => call('/api/tags/suggest', TagSuggestResponse, { query: { q } }),

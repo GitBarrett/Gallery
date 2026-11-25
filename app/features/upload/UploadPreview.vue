@@ -29,7 +29,7 @@ const name = computed(() => props.title.trim() || t('upload.preview.untitled'))
           class="thumbnail"
           :style="focal ? { objectPosition: `${focal.x * 100}% ${focal.y * 100}%` } : undefined"
         />
-        <UiQualityBadge quality="poor" :label="t('notifications.quality.poor')" class="badge" />
+        <UiQualityBadge quality="poor" :label="t('quality.poor')" class="badge" />
       </div>
       <p class="name">{{ name }}</p>
     </div>
