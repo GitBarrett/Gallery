@@ -5,7 +5,14 @@ import { z } from '~~/shared/contracts/zod'
 import { ErrorResponse, type ErrorCode } from '~~/shared/contracts/errors'
 import { HealthResponse } from '~~/shared/contracts/health'
 import { NotificationsResponse, UnreadCountResponse } from '~~/shared/contracts/notifications'
-import { MyPhotosResponse } from '~~/shared/contracts/photos'
+import { GameVersionsResponse, TagSuggestResponse, ZoneSuggestResponse } from '~~/shared/contracts/catalog'
+import {
+  type CompleteUploadBody,
+  CompleteUploadResponse,
+  MyPhotosResponse,
+  type UploadUrlBody,
+  UploadUrlResponse,
+} from '~~/shared/contracts/photos'
 import { PublicSettings } from '~~/shared/contracts/settings'
 import {
   AccountResponse,
@@ -128,4 +135,16 @@ export const api = {
   markAllNotificationsRead: () => call('/api/notifications/read-all', z.unknown(), { method: 'POST' }),
   // « My captures » (US-14.4): every status, 30 per page
   myPhotos: (cursor?: string) => call('/api/me/photos', MyPhotosResponse, { query: cursor ? { cursor } : {} }),
+  // Upload form (US-10, US-11): catalogue reads, then the presigned URL and the completion (03 § Pipeline image)
+  gameVersions: () => call('/api/game-versions', GameVersionsResponse),
+  suggestTags: (q: string) => call('/api/tags/suggest', TagSuggestResponse, { query: { q } }),
+  suggestZones: (q: string) => call('/api/zones/suggest', ZoneSuggestResponse, { query: { q } }),
+  uploadUrl: (body: UploadUrlBody) => call('/api/photos/upload-url', UploadUrlResponse, { method: 'POST', body }),
+  // Idempotent on the server: a retry after a lost answer completes once
+  completeUpload: (photoId: string, body: CompleteUploadBody) =>
+    call(`/api/photos/${photoId}/complete`, CompleteUploadResponse, {
+      method: 'POST',
+      body,
+      headers: { 'idempotency-key': photoId },
+    }),
 }

@@ -349,5 +349,78 @@
       "hidden": "Hidden by a moderator. Only you can see it.",
       "failed": "This file could not be processed. Please upload it again."
     }
+  },
+  "upload": {
+    "title": "Upload a capture",
+    "steps": {
+      "label": "Steps",
+      "file": "File",
+      "details": "Details",
+      "review": "Review"
+    },
+    "accepted": "Quest accepted.",
+    "acceptedLabel": "Quest accepted",
+    "acceptedText": "Your capture is being checked by our moderation, usually in under a minute. You'll get a notification when it's live.",
+    "file": {
+      "title": "Your file",
+      "choose": "Choose a file",
+      "another": "Choose another file",
+      "size": "✓ {size} MB, under the 20 MB limit",
+      "dimensions": "The long side must be between 640 and 7680 px, and the image at most 8K (33.2 Mpx).",
+      "metadata": "Metadata (EXIF) will be removed.",
+      "accepted": "Accepted: JPEG, PNG, WebP · max 20 MB · up to 8K (7680 px) · 20 uploads per day.",
+      "type": "This format is not accepted: choose a JPEG, PNG or WebP file.",
+      "tooLarge": "This file is over 20 MB.",
+      "empty": "This file is empty or could not be read as an image."
+    },
+    "about": "About this capture",
+    "fields": {
+      "title": "Title",
+      "version": "Game version",
+      "versionPick": "Choose a version",
+      "zone": "Zone",
+      "zoneHint": "EN or FR name. Not listed? Type it: it will be reviewed.",
+      "time": "In-game time",
+      "graphics": "Graphics settings",
+      "character": "Character",
+      "caption": "Caption",
+      "captionHint": "Shown in yellow italics, like item flavor text.",
+      "description": "Description",
+      "alt": "Alternative text",
+      "altHint": "What the capture shows, for screen readers. By default: its title, zone and author."
+    },
+    "tags": {
+      "label": "Tags",
+      "max": "up to 10",
+      "placeholder": "Add a tag",
+      "remove": "Remove the tag {tag}",
+      "length": "A tag has 2 to 30 characters.",
+      "charset": "Letters, digits, spaces and hyphens only.",
+      "too_many": "Up to 10 tags."
+    },
+    "consent": "I took this capture myself and accept the community rules. Others can download it for personal use.",
+    "publish": "Publish",
+    "cancel": "Cancel",
+    "progress": "Upload progress",
+    "failed": "The file could not be sent. Check your connection and try again.",
+    "limited": "You reached 20 uploads for today. Next one possible at {time}.",
+    "errors": {
+      "insult": "This text contains a word that is not allowed.",
+      "unknown": "Choose a value from the list.",
+      "length": "A tag has 2 to 30 characters.",
+      "charset": "Letters, digits, spaces and hyphens only.",
+      "too_many": "Up to 10 tags.",
+      "invalid": "This value is not valid."
+    },
+    "verify": "Verify your email to post captures. We sent you a link when you signed up; you can get a new one.",
+    "verifyResend": "Get a new link",
+    "preview": {
+      "title": "Live preview",
+      "untitled": "Untitled capture",
+      "kind": "Poor capture · {version}",
+      "time": "{time} in-game",
+      "use": "Use: download the original as a wallpaper.",
+      "quality": "Every capture starts as Poor and levels up with likes."
+    }
   }
 }

@@ -349,5 +349,78 @@
       "hidden": "Masquée par un modérateur. Elle n’est visible que par vous.",
       "failed": "Ce fichier n’a pas pu être traité. Envoyez-le de nouveau."
     }
+  },
+  "upload": {
+    "title": "Publier une capture",
+    "steps": {
+      "label": "Étapes",
+      "file": "Fichier",
+      "details": "Détails",
+      "review": "Revue"
+    },
+    "accepted": "Quête acceptée.",
+    "acceptedLabel": "Quête acceptée",
+    "acceptedText": "Votre capture est vérifiée par notre modération, en général en moins d’une minute. Une notification vous préviendra de sa mise en ligne.",
+    "file": {
+      "title": "Votre fichier",
+      "choose": "Choisir un fichier",
+      "another": "Choisir un autre fichier",
+      "size": "✓ {size} Mo, sous la limite de 20 Mo",
+      "dimensions": "Le grand côté doit mesurer entre 640 et 7680 px, et l’image 8K (33,2 Mpx) au plus.",
+      "metadata": "Les métadonnées (EXIF) seront retirées.",
+      "accepted": "Acceptés : JPEG, PNG, WebP · 20 Mo max · jusqu’au 8K (7680 px) · 20 envois par jour.",
+      "type": "Ce format n’est pas accepté : choisissez un fichier JPEG, PNG ou WebP.",
+      "tooLarge": "Ce fichier dépasse 20 Mo.",
+      "empty": "Ce fichier est vide ou ne se lit pas comme une image."
+    },
+    "about": "À propos de cette capture",
+    "fields": {
+      "title": "Titre",
+      "version": "Version du jeu",
+      "versionPick": "Choisir une version",
+      "zone": "Zone",
+      "zoneHint": "Nom anglais ou français. Absente de la liste ? Saisissez-la : elle sera vérifiée.",
+      "time": "Heure en jeu",
+      "graphics": "Réglages graphiques",
+      "character": "Personnage",
+      "caption": "Légende",
+      "captionHint": "Affichée en italique jaune, comme le texte d’ambiance d’un objet.",
+      "description": "Description",
+      "alt": "Texte alternatif",
+      "altHint": "Ce que montre la capture, pour les lecteurs d’écran. Par défaut : son titre, sa zone et son auteur."
+    },
+    "tags": {
+      "label": "Tags",
+      "max": "10 au plus",
+      "placeholder": "Ajouter un tag",
+      "remove": "Retirer le tag {tag}",
+      "length": "Un tag compte de 2 à 30 caractères.",
+      "charset": "Lettres, chiffres, espaces et tirets seulement.",
+      "too_many": "10 tags au plus."
+    },
+    "consent": "J’ai pris cette capture moi-même et j’accepte les règles de la communauté. D’autres peuvent la télécharger pour un usage personnel.",
+    "publish": "Publier",
+    "cancel": "Annuler",
+    "progress": "Progression de l’envoi",
+    "failed": "Le fichier n’a pas pu être envoyé. Vérifiez votre connexion et réessayez.",
+    "limited": "Vous avez atteint 20 envois aujourd’hui. Prochain envoi possible à {time}.",
+    "errors": {
+      "insult": "Ce texte contient un mot non autorisé.",
+      "unknown": "Choisissez une valeur de la liste.",
+      "length": "Un tag compte de 2 à 30 caractères.",
+      "charset": "Lettres, chiffres, espaces et tirets seulement.",
+      "too_many": "10 tags au plus.",
+      "invalid": "Cette valeur n’est pas valide."
+    },
+    "verify": "Vérifiez votre email pour publier des captures. Un lien vous a été envoyé à l’inscription ; vous pouvez en recevoir un nouveau.",
+    "verifyResend": "Recevoir un nouveau lien",
+    "preview": {
+      "title": "Aperçu en direct",
+      "untitled": "Capture sans titre",
+      "kind": "Capture médiocre · {version}",
+      "time": "{time} en jeu",
+      "use": "Utilisation : télécharger l’original en fond d’écran.",
+      "quality": "Toute capture commence Médiocre et monte en qualité avec les likes."
+    }
   }
 }
