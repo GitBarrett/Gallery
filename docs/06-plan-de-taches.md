@@ -349,7 +349,7 @@ T-28 (avatar) est découpée le 25/11/2026 en T-28a (serveur) et T-28b (écran).
   Upload présigné dédié (2 Mo, carré), message `avatar-process` sur la file `photo-process`, variantes WebP 64/128/256 écrites une fois, modération automatique, ancien avatar conservé jusqu'à validation, route `/avatar/{userId}/{version}/{size}`.
   Stories : US-07.6. Tests : U, I.
 
-- [ ] **T-28b Avatar : écran** (dép. T-28a)
+- [x] **T-28b Avatar : écran** (dép. T-28a)
   Recadrage carré dans le navigateur, envoi depuis `/settings`, composant `UiAvatar` (initiale par défaut) dans l'en-tête et le profil, URL de l'avatar dans `MeResponse` et `ProfileResponse`.
   Stories : US-07.6, US-05.3. Tests : composants, E.
 

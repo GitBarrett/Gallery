@@ -36,12 +36,19 @@ export const SigninBody = z.strictObject({
 })
 export type SigninBody = z.infer<typeof SigninBody>
 
+/** Base address of the avatar shown (US-07.6): append `/64`, `/128` or `/256`; null shows the initial. */
+const AvatarUrl = z
+  .string()
+  .regex(/^\/avatar\/[0-9a-f-]{36}\/[0-9a-f-]{36}$/)
+  .nullable()
+
 /** GET /api/me: the signed-in member. */
 export const MeResponse = z.strictObject({
   id: z.uuid(),
   username: z.string(),
   role: z.enum(['user', 'moderator', 'admin']),
   emailVerified: z.boolean(),
+  avatarUrl: AvatarUrl,
 })
 export type MeResponse = z.infer<typeof MeResponse>
 
@@ -206,6 +213,7 @@ export const ProfileParams = z.strictObject({ username: z.string().min(1).max(64
 /** GET /api/users/{username} (US-05.3): public profile, the username in its display case. */
 export const ProfileResponse = z.strictObject({
   username: z.string(),
+  avatarUrl: AvatarUrl,
   bio: z.string().nullable(),
   memberSince: z.iso.datetime(),
   // US-82.4: built by the server, Discord has no link (copied); empty when hidden (US-82.5)

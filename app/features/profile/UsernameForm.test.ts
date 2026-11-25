@@ -31,6 +31,7 @@ describe('UsernameForm', () => {
       username: 'Thrall_Fan',
       role: 'user',
       emailVerified: true,
+      avatarUrl: null,
     })
   })
   afterEach(() => vi.useRealTimers())

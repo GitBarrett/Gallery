@@ -7,6 +7,7 @@ import { HealthResponse } from '~~/shared/contracts/health'
 import { NotificationsResponse, UnreadCountResponse } from '~~/shared/contracts/notifications'
 import { GameVersionsResponse, TagSuggestResponse, ZoneSuggestResponse } from '~~/shared/contracts/catalog'
 import {
+  AvatarUploadUrlResponse,
   type CompleteUploadBody,
   CompleteUploadResponse,
   MyPhotoResponse,
@@ -153,4 +154,9 @@ export const api = {
   myPhoto: (id: string) => call(`/api/me/photos/${id}`, MyPhotoResponse),
   updatePhoto: (id: string, body: UpdatePhotoBody) => call(`/api/photos/${id}`, z.unknown(), { method: 'PATCH', body }),
   deletePhoto: (id: string) => call(`/api/photos/${id}`, z.unknown(), { method: 'DELETE' }),
+  // New avatar (US-07.6): a square file of 2 MB at most, put, then 204 once sent to moderation; 429 after 10 a day
+  avatarUploadUrl: (body: UploadUrlBody) =>
+    call('/api/me/avatar-upload-url', AvatarUploadUrlResponse, { method: 'POST', body }),
+  completeAvatar: (version: string) =>
+    call('/api/me/avatar/complete', z.unknown(), { method: 'POST', body: { version } }),
 }

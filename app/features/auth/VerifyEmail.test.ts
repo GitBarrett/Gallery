@@ -23,7 +23,13 @@ registerEndpoint('/api/auth/verify-email', { method: 'POST', handler: (event) =>
 registerEndpoint('/api/auth/resend-verification', { method: 'POST', handler: () => (resent++, null) })
 registerEndpoint('/api/me', (event) => {
   if (signedIn)
-    return { id: '01937f1e-0000-7000-8000-000000000001', username: 'ash', role: 'user', emailVerified: false }
+    return {
+      id: '01937f1e-0000-7000-8000-000000000001',
+      username: 'ash',
+      role: 'user',
+      emailVerified: false,
+      avatarUrl: null,
+    }
   setResponseStatus(event, 401)
   return { error: { code: 'UNAUTHENTICATED', message: 'x', correlationId: 'c' } }
 })

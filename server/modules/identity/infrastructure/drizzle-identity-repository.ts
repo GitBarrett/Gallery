@@ -100,16 +100,16 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
         bio: users.bio,
         createdAt: users.createdAt,
         status: users.status,
+        avatar: users.avatarKey,
       })
       .from(users)
       .where(sql`lower(${users.username}) = lower(${username})`)
     if (!row) return null
-    const { id, ...profile } = row
     const links = await db
       .select({ platform: userSocialLinks.platform, handle: userSocialLinks.handle })
       .from(userSocialLinks)
-      .where(eq(userSocialLinks.userId, id))
-    return { ...profile, socialLinks: inPlatformOrder(links as SocialLink[]) }
+      .where(eq(userSocialLinks.userId, row.id))
+    return { ...row, socialLinks: inPlatformOrder(links as SocialLink[]) }
   },
   async updateProfile(userId, { notificationPrefs: prefs, ...fields }) {
     const set = {
@@ -240,13 +240,21 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
         role: users.role,
         status: users.status,
         emailVerifiedAt: users.emailVerifiedAt,
+        avatar: users.avatarKey,
       })
       .from(sessions)
       .innerJoin(users, eq(users.id, sessions.userId))
       .where(eq(sessions.idHash, idHash))
     if (!row) return null
-    const { id, username, role, status, emailVerifiedAt, ...session } = row
-    const account = { id, username, role: role as Actor['role'], status, emailVerified: Boolean(emailVerifiedAt) }
+    const { id, username, role, status, emailVerifiedAt, avatar, ...session } = row
+    const account = {
+      id,
+      username,
+      role: role as Actor['role'],
+      status,
+      emailVerified: Boolean(emailVerifiedAt),
+      avatar,
+    }
     return { ...session, account }
   },
   async touchSession(idHash, lastSeenAt, expiresAt) {

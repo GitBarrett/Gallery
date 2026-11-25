@@ -59,7 +59,7 @@ async function sizeOf(file: File) {
 }
 
 /** PUT of the file through the presigned URL, with its progress (0–1); the status, 0 when the browser saw no answer. */
-function put(url: string, file: File, progress: (share: number) => void): Promise<number> {
+export function put(url: string, file: File, progress: (share: number) => void): Promise<number> {
   return new Promise((resolve) => {
     const request = new XMLHttpRequest()
     request.open('PUT', url)

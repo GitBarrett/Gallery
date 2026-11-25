@@ -1,4 +1,5 @@
 import { MeUpdateBody, type MeResponse } from '../../shared/contracts/auth'
+import { avatarPath } from '../../shared/domain/avatar-file'
 import { orThrow } from '../modules/identity'
 import { requireContext } from '../platform/auth-context'
 
@@ -11,5 +12,11 @@ export default defineEventHandler(async (event): Promise<MeResponse> => {
   if (bio !== undefined || locale || notificationPrefs)
     orThrow(await container.identity.updateProfile({ actor, bio, locale, notificationPrefs }))
   if (username) orThrow(await container.identity.changeUsername({ userId: actor.id, username }))
-  return { id: actor.id, username: username ?? actor.username, role: actor.role, emailVerified: actor.emailVerified }
+  return {
+    id: actor.id,
+    username: username ?? actor.username,
+    role: actor.role,
+    emailVerified: actor.emailVerified,
+    avatarUrl: avatarPath(actor.id, actor.avatar),
+  }
 })

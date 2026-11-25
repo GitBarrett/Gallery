@@ -1,3 +1,4 @@
+import { avatarPath } from '../../../../shared/domain/avatar-file'
 import { validateBio } from '../../../../shared/domain/account-rules'
 import type { NotificationPrefs } from '../../../../shared/domain/notification-prefs'
 import { err, ok, type Result } from '../../../../shared/domain/result'
@@ -10,6 +11,8 @@ import { notSanctioned } from '../domain/policies'
 
 export interface PublicProfile {
   username: string
+  /** Base address of the avatar shown, `/64`, `/128` or `/256` appended (US-07.6); null: the initial. */
+  avatarUrl: string | null
   bio: string | null
   memberSince: Date
   /** Built by the server from the fixed templates (US-82.4); `url` null for Discord, copied instead. */
@@ -35,7 +38,13 @@ export const getProfile =
           const link = socialLink(platform, handle)
           return link ? [{ platform, ...link }] : []
         })
-    return ok({ username: found.username, bio: found.bio, memberSince: found.createdAt, socialLinks })
+    return ok({
+      username: found.username,
+      avatarUrl: avatarPath(found.id, found.avatar),
+      bio: found.bio,
+      memberSince: found.createdAt,
+      socialLinks,
+    })
   }
 
 // A former name for 90 days (US-05.4): the profile under its current name, the page redirects to it

@@ -100,6 +100,8 @@ export function inMemoryIdentityRepository() {
       const user = users.find((u) => same(u.username, username))
       return user
         ? {
+            id: user.id,
+            avatar: user.avatar?.current ?? null,
             username: user.username,
             bio: user.bio ?? null,
             createdAt: user.createdAt ?? new Date(0),
@@ -198,7 +200,14 @@ export function inMemoryIdentityRepository() {
         expiresAt: session.expiresAt,
         revokedAt: session.revokedAt,
         mfaVerifiedAt: session.mfaVerifiedAt ?? null,
-        account: { id, username, role, status, emailVerified: Boolean(user.emailVerifiedAt) },
+        account: {
+          id,
+          username,
+          role,
+          status,
+          emailVerified: Boolean(user.emailVerifiedAt),
+          avatar: user.avatar?.current ?? null,
+        },
       }
     },
     async touchSession(idHash, lastSeenAt, expiresAt) {

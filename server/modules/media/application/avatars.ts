@@ -1,4 +1,4 @@
-import { AVATAR_SIZES, MAX_AVATAR_BYTES, validateAvatarFile } from '../../../../shared/domain/avatar-file'
+import { AVATAR_SIZES, avatarPath, MAX_AVATAR_BYTES, validateAvatarFile } from '../../../../shared/domain/avatar-file'
 import { isCaptureType, type CaptureFile } from '../../../../shared/domain/capture-file'
 import { err, ok, type Result } from '../../../../shared/domain/result'
 import type { Clock } from '../../../platform/clock'
@@ -104,7 +104,7 @@ type ProcessDeps = {
 }
 
 const urlsOf = (deps: { siteUrl: string }, userId: string, version: string) =>
-  AVATAR_SIZES.map((size) => `${deps.siteUrl}/avatar/${userId}/${version}/${size}`)
+  AVATAR_SIZES.map((size) => `${deps.siteUrl}${avatarPath(userId, version)}/${size}`)
 async function removeVersion(deps: Pick<ProcessDeps, 'storage'>, userId: string, version: string) {
   for (const size of AVATAR_SIZES) await deps.storage.delete(avatarKey(userId, version, size))
 }

@@ -17,3 +17,7 @@ export function validateAvatarFile(file: CaptureFile): Result<CaptureType, Captu
     return err('dimensions')
   return ok(file.contentType)
 }
+
+/** Base address of an avatar version (`/avatar/{userId}/{version}`), `/64`, `/128` or `/256` appended to show it. */
+export const avatarPath = (userId: string, version: string | null | undefined) =>
+  version ? `/avatar/${userId}/${version}` : null
