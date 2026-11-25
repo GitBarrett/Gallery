@@ -76,6 +76,8 @@ describe('UploadForm', () => {
     await tag.setValue('Nuit Étoilée')
     await tag.trigger('keydown', { key: 'Enter' })
     expect(wrapper.text()).toContain('#nuit etoilee')
+    expect(wrapper.text()).toContain('✓ 3840 × 2160, within 640–7680 px')
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
     await wrapper.get('form').trigger('submit')
     await vi.waitFor(() => expect(wrapper.find('[role="status"]').exists()).toBe(true))
     expect(send).toHaveBeenCalledWith(chosen.value, {

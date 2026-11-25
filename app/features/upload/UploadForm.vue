@@ -117,13 +117,9 @@ async function submit() {
   }
 }
 
-const FILE_HINTS: Record<CaptureFileProblem, string> = {
-  type: 'upload.file.type',
-  too_large: 'upload.file.tooLarge',
-  empty: 'upload.file.empty',
-  dimensions: 'upload.file.dimensions',
-}
-const megabytes = (bytes: number) => (bytes / 1_000_000).toLocaleString(locale.value, { maximumFractionDigits: 1 })
+// Two decimals under 1 MB, so that a small file never reads « 0 MB »
+const megabytes = (bytes: number) =>
+  (bytes / 1_000_000).toLocaleString(locale.value, { maximumFractionDigits: bytes < 1_000_000 ? 2 : 1 })
 const versionName = computed(() => versions.value.find((v) => v.slug === form.gameVersion))
 const steps = computed(() => [
   { key: 'file', done: Boolean(chosen.value), current: !chosen.value },
@@ -180,7 +176,7 @@ const steps = computed(() => [
                 <p class="ok">{{ t('upload.file.dimensions', { width: chosen.width, height: chosen.height }) }}</p>
                 <p class="muted">{{ t('upload.file.metadata') }}</p>
               </template>
-              <p v-if="fileProblem" class="error" role="alert">{{ t(FILE_HINTS[fileProblem]) }}</p>
+              <p v-if="fileProblem" class="error" role="alert">{{ t(`upload.file.problem.${fileProblem}`) }}</p>
             </div>
           </div>
           <p class="muted">{{ t('upload.file.accepted') }}</p>

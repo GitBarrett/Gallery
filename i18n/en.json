@@ -366,12 +366,15 @@
       "choose": "Choose a file",
       "another": "Choose another file",
       "size": "✓ {size} MB, under the 20 MB limit",
-      "dimensions": "The long side must be between 640 and 7680 px, and the image at most 8K (33.2 Mpx).",
+      "dimensions": "✓ {width} × {height}, within 640–7680 px",
       "metadata": "Metadata (EXIF) will be removed.",
       "accepted": "Accepted: JPEG, PNG, WebP · max 20 MB · up to 8K (7680 px) · 20 uploads per day.",
-      "type": "This format is not accepted: choose a JPEG, PNG or WebP file.",
-      "tooLarge": "This file is over 20 MB.",
-      "empty": "This file is empty or could not be read as an image."
+      "problem": {
+        "type": "This format is not accepted: choose a JPEG, PNG or WebP file.",
+        "too_large": "This file is over 20 MB.",
+        "empty": "This file is empty or could not be read as an image.",
+        "dimensions": "The long side must be between 640 and 7680 px, and the image at most 8K (33.2 Mpx)."
+      }
     },
     "about": "About this capture",
     "fields": {
