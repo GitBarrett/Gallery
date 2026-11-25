@@ -26,6 +26,10 @@ export interface CatalogRepository {
   zoneId(slug: string): Promise<string | null>
   /** Ids of the normalised tags `slugs`, in their order, the missing ones created. */
   ensureTags(slugs: string[]): Promise<string[]>
+  /** The zone of this id, whatever its status; null if gone. */
+  zoneById(id: string): Promise<Zone | null>
+  /** Slugs of the tags of these ids, in their order. */
+  tagSlugs(ids: string[]): Promise<string[]>
 }
 
 const SUGGESTIONS = 10
@@ -56,3 +60,7 @@ export const findZone = (deps: { repo: CatalogRepository }) => (slug: string) =>
 
 /** Tags of a capture (US-11.1), already validated by shared/domain/tags: their ids, new ones created. */
 export const ensureTags = (deps: { repo: CatalogRepository }) => (slugs: string[]) => deps.repo.ensureTags(slugs)
+
+/** Names of a capture's zone and tags, for its edit form (US-12.1). */
+export const zoneById = (deps: { repo: CatalogRepository }) => (id: string) => deps.repo.zoneById(id)
+export const tagSlugs = (deps: { repo: CatalogRepository }) => (ids: string[]) => deps.repo.tagSlugs(ids)

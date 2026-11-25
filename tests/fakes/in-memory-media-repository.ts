@@ -100,6 +100,31 @@ export function inMemoryMediaRepository(clock: Clock) {
       })
       if (fields.title) rows.get(id)!.title = fields.title
     },
+    async findDetails(id) {
+      const row = rows.get(id)
+      if (!row?.uploadedAt) return null
+      const done = captureDetails.get(id)
+      const edited = edits.get(id)
+      const pick = <T>(key: string, fallback: T) => ((edited as Record<string, unknown>)?.[key] ?? fallback) as T
+      return {
+        id,
+        userId: row.userId,
+        status: row.status,
+        title: row.title,
+        ...sizes.get(id)!,
+        description: pick('description', done?.description ?? null),
+        altText: pick('altText', done?.altText ?? null),
+        focalX: pick('focalX', done?.focalX ?? null),
+        focalY: pick('focalY', done?.focalY ?? null),
+        zoneId: done?.zoneId ?? null,
+        zoneCustom: done?.zoneCustom ?? null,
+        inGameTime: done?.inGameTime ?? null,
+        graphicsSettings: done?.graphicsSettings ?? null,
+        characterName: done?.characterName ?? null,
+        caption: done?.caption ?? null,
+        tagIds: edited?.tagIds ?? done?.tagIds ?? [],
+      }
+    },
     async deleteCapture(id) {
       return rows.delete(id)
     },

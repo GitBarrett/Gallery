@@ -339,7 +339,7 @@ T-27 (modifier et supprimer une capture) est découpée le 25/11/2026 en T-27a (
   `PATCH` et `DELETE /api/photos/{id}` : champs envoyés seuls modifiés, filtre d'insultes, point focal, zone et tags ; suppression : original et variantes dans `trash/`, purge des adresses `/img`, ligne supprimée ; l'auteur seul (403 publiée, 404 sinon), suspendu : suppression permise, modification refusée.
   Stories : US-12.1–3, US-13.1. Tests : U (propriété), I (IDOR).
 
-- [ ] **T-27b Modifier et supprimer une capture : écran** (dép. T-27a, T-25b)
+- [x] **T-27b Modifier et supprimer une capture : écran** (dép. T-27a, T-25b)
   Actions « Edit » et « Delete » (confirmation) dans « My captures », formulaire de modification (champs et point focal de l'upload).
   Stories : US-12.1–2. Tests : composants, E.
 

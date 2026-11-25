@@ -29,6 +29,26 @@ async function load(cursor?: string) {
 }
 onMounted(() => load())
 
+// Deletion after a confirmation (US-12.2): the capture leaves the list
+const removing = ref<Capture>()
+const deleting = ref(false)
+const deleted = ref(false)
+async function remove() {
+  if (!removing.value) return
+  deleting.value = true
+  error.value = undefined
+  try {
+    await api.deletePhoto(removing.value.id)
+    captures.value = captures.value?.filter((c) => c.id !== removing.value?.id)
+    deleted.value = true
+  } catch (thrown) {
+    error.value = t(errorMessageKey(thrown))
+  } finally {
+    deleting.value = false
+    removing.value = undefined
+  }
+}
+
 const WITH_IMAGES = ['published', 'pending_review', 'hidden']
 // US-75.3: the zone joins the text when captures get one (T-26a)
 const alt = (c: Capture) => t('captures.alt', { title: c.title ?? t('captures.untitled'), author: props.username })
@@ -53,9 +73,39 @@ const alt = (c: Capture) => t('captures.alt', { title: c.title ?? t('captures.un
           <p class="name">{{ c.title ?? t('captures.untitled') }}</p>
           <p class="status" :class="c.status">{{ t(`captures.status.${c.status}`) }}</p>
           <p v-if="c.status !== 'published'" class="hint">{{ t(`captures.hint.${c.status}`) }}</p>
+          <!-- A capture still processing can be neither edited nor deleted yet (US-12) -->
+          <div v-if="c.status !== 'processing'" class="actions">
+            <UiButton
+              :to="localePath(`/my-captures/${c.id}`)"
+              variant="ghost"
+              :aria-label="t('captures.edit.label', { title: c.title ?? t('captures.untitled') })"
+            >
+              {{ t('captures.edit.action') }}
+            </UiButton>
+            <UiButton
+              variant="ghost"
+              :aria-label="t('captures.delete.label', { title: c.title ?? t('captures.untitled') })"
+              @click="removing = c"
+            >
+              {{ t('captures.delete.action') }}
+            </UiButton>
+          </div>
         </div>
       </li>
     </ul>
+    <UiModal
+      :open="Boolean(removing)"
+      :title="t('captures.delete.title')"
+      :close-label="t('captures.delete.cancel')"
+      @update:open="(open: boolean) => !open && (removing = undefined)"
+    >
+      <p class="confirm">{{ t('captures.delete.confirm', { title: removing?.title ?? t('captures.untitled') }) }}</p>
+      <div class="actions">
+        <UiButton :disabled="deleting" @click="remove">{{ t('captures.delete.yes') }}</UiButton>
+        <UiButton variant="secondary" @click="removing = undefined">{{ t('captures.delete.cancel') }}</UiButton>
+      </div>
+    </UiModal>
+    <p v-if="deleted" class="deleted" role="status">{{ t('captures.delete.done') }}</p>
     <UiEmptyState
       v-else-if="captures"
       :title="t('captures.empty')"
@@ -161,6 +211,21 @@ const alt = (c: Capture) => t('captures.alt', { title: c.title ?? t('captures.un
 .error {
   margin: 0;
   color: var(--color-danger);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.confirm,
+.deleted {
+  margin: 0;
+}
+
+.deleted {
+  color: var(--color-text-soft);
 }
 
 .more {

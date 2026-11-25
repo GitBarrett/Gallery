@@ -9,7 +9,9 @@ import { GameVersionsResponse, TagSuggestResponse, ZoneSuggestResponse } from '~
 import {
   type CompleteUploadBody,
   CompleteUploadResponse,
+  MyPhotoResponse,
   MyPhotosResponse,
+  type UpdatePhotoBody,
   type UploadUrlBody,
   UploadUrlResponse,
 } from '~~/shared/contracts/photos'
@@ -147,4 +149,8 @@ export const api = {
       body,
       headers: { 'idempotency-key': photoId },
     }),
+  // Edit and deletion of one's own capture (US-12.1, US-12.2)
+  myPhoto: (id: string) => call(`/api/me/photos/${id}`, MyPhotoResponse),
+  updatePhoto: (id: string, body: UpdatePhotoBody) => call(`/api/photos/${id}`, z.unknown(), { method: 'PATCH', body }),
+  deletePhoto: (id: string) => call(`/api/photos/${id}`, z.unknown(), { method: 'DELETE' }),
 }

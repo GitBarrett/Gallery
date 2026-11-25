@@ -121,6 +121,8 @@ export interface MediaRepository {
   updateDetails(id: string, changes: DetailsChanges): Promise<void>
   /** Deletes the capture and, by cascade, its details and tags; false if it was already gone. */
   deleteCapture(id: string): Promise<boolean>
+  /** A completed capture with its details, for its edit form (US-12.1); null if missing or not completed. */
+  findDetails(id: string): Promise<StoredDetails | null>
 }
 
 /** Key where the browser puts the file (03 § Pipeline image 2): server-made, no extension, never served. */
@@ -180,4 +182,25 @@ export interface DetailsChanges {
     caption?: string | null
   }
   tagIds?: string[]
+}
+
+/** What an edit form shows (US-12.1): the zone and the tags as their ids, named by the catalogue. */
+export interface StoredDetails {
+  id: string
+  userId: string
+  status: string
+  title: string | null
+  width: number
+  height: number
+  description: string | null
+  altText: string | null
+  focalX: number | null
+  focalY: number | null
+  zoneId: string | null
+  zoneCustom: string | null
+  inGameTime: string | null
+  graphicsSettings: string | null
+  characterName: string | null
+  caption: string | null
+  tagIds: string[]
 }

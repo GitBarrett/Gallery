@@ -348,6 +348,23 @@
       "rejected": "Refusée par la modération. Vous pouvez contester sous 6 mois : voir les conditions d’utilisation.",
       "hidden": "Masquée par un modérateur. Elle n’est visible que par vous.",
       "failed": "Ce fichier n’a pas pu être traité. Envoyez-le de nouveau."
+    },
+    "edit": {
+      "title": "Modifier la capture",
+      "action": "Modifier",
+      "label": "Modifier « {title} »",
+      "save": "Enregistrer les modifications",
+      "saved": "Modifications enregistrées.",
+      "back": "Retour à mes captures"
+    },
+    "delete": {
+      "action": "Supprimer",
+      "label": "Supprimer « {title} »",
+      "title": "Supprimer cette capture ?",
+      "confirm": "« {title} » disparaîtra partout sur le site. C’est définitif.",
+      "yes": "La supprimer",
+      "cancel": "Annuler",
+      "done": "La capture a été supprimée."
     }
   },
   "upload": {

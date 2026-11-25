@@ -348,6 +348,23 @@
       "rejected": "Refused by the moderation. You can appeal within 6 months: see the Terms.",
       "hidden": "Hidden by a moderator. Only you can see it.",
       "failed": "This file could not be processed. Please upload it again."
+    },
+    "edit": {
+      "title": "Edit the capture",
+      "action": "Edit",
+      "label": "Edit « {title} »",
+      "save": "Save the changes",
+      "saved": "Changes saved.",
+      "back": "Back to my captures"
+    },
+    "delete": {
+      "action": "Delete",
+      "label": "Delete « {title} »",
+      "title": "Delete this capture?",
+      "confirm": "« {title} » will disappear everywhere on the site. This cannot be undone.",
+      "yes": "Delete it",
+      "cancel": "Cancel",
+      "done": "The capture was deleted."
     }
   },
   "upload": {

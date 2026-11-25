@@ -67,5 +67,16 @@ export function catalogRepositoryContract(
         expect(await repo.ensureTags([])).toEqual([])
       })
     })
+
+    it('US-12.1 reads back a zone and tags by their ids, for the edit form', async () => {
+      const zones = [zone('back', 'Back Zone', 'Zone Retour')]
+      await run({ zones, tags: [`${p} back`] }, async (repo) => {
+        const zoneId = (await repo.zoneId(`${p}-back`))!
+        expect(await repo.zoneById(zoneId)).toEqual({ slug: `${p}-back`, nameEn: 'Back Zone', nameFr: 'Zone Retour' })
+        const [tagId] = await repo.ensureTags([`${p} back`])
+        expect(await repo.tagSlugs([tagId!])).toEqual([`${p} back`])
+        expect(await repo.tagSlugs([])).toEqual([])
+      })
+    })
   })
 }

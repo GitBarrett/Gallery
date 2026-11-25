@@ -47,6 +47,8 @@ import {
   drizzleCatalogRepository,
   ensureTags,
   findZone,
+  tagSlugs,
+  zoneById,
   listGameVersions,
   suggestTags,
   suggestZones,
@@ -59,6 +61,7 @@ import {
   requestUploadUrl,
   serveImage,
   listMyCaptures,
+  getMyCapture,
   editCapture,
   deleteCapture,
   cloudflareCachePurger,
@@ -95,6 +98,7 @@ export interface Container {
     completeUpload: UseCase<typeof completeUpload>
     serveImage: UseCase<typeof serveImage>
     listMyCaptures: UseCase<typeof listMyCaptures>
+    getMyCapture: UseCase<typeof getMyCapture>
     editCapture: UseCase<typeof editCapture>
     deleteCapture: UseCase<typeof deleteCapture>
   }
@@ -241,6 +245,12 @@ export function createContainer({
     media: {
       serveImage: (cmd) => serveImage({ repo: drizzleMediaRepository(db()), storage: storage() })(cmd),
       listMyCaptures: (cmd) => listMyCaptures({ repo: drizzleMediaRepository(db()) })(cmd),
+      getMyCapture: (cmd) =>
+        getMyCapture({
+          repo: drizzleMediaRepository(db()),
+          zoneById: zoneById({ repo: drizzleCatalogRepository(db()) }),
+          tagSlugs: tagSlugs({ repo: drizzleCatalogRepository(db()) }),
+        })(cmd),
       editCapture: (cmd) =>
         editCapture({
           repo: drizzleMediaRepository(db()),
