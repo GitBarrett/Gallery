@@ -22,6 +22,8 @@ test('US-10.1 US-11.1 US-11.2 a JPEG goes from the form to the gallery, with its
   })
   await verifiedMember(page)
   await page.goto('/upload')
+  // The game versions load once the form is mounted: a file chosen before would find no handler
+  await expect(page.getByLabel('Game version').locator('option')).not.toHaveCount(1)
 
   // A 1920 × 1080 JPEG drawn in the page
   const jpeg = await page.evaluate(async () => {
@@ -55,7 +57,7 @@ test('US-10.1 US-11.1 US-11.2 a JPEG goes from the form to the gallery, with its
   await expect(page.getByRole('complementary')).toContainText('Dawn on the Plains') // live preview
   await page.getByLabel(/I took this capture myself/).check()
   await page.getByRole('button', { name: 'Publish' }).click()
-  await expect(page.getByRole('status')).toContainText('Quest accepted.', { timeout: 60_000 })
+  await expect(page.getByRole('status').filter({ hasText: 'Quest accepted.' })).toBeVisible({ timeout: 60_000 })
 
   // The capture, then its processing and the fake moderation (published)
   const { body } = await testRoute(page, '/api/me/photos', 'GET')
