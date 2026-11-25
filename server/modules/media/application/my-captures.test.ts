@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { inMemoryMediaRepository } from '../../../../tests/fakes/in-memory-media-repository'
-import { listMyCaptures, MY_CAPTURES_PAGE } from './my-captures'
+import { getMyCapture, listMyCaptures, MY_CAPTURES_PAGE } from './my-captures'
 
 const at = new Date('2026-11-25T10:00:00Z')
 const id = (n: number) => `0193a000-0000-7000-8000-${String(n).padStart(12, '0')}`
@@ -42,5 +42,27 @@ describe('listMyCaptures', () => {
     const second = await list({ userId: 'u-ash', cursor: first.nextCursor! })
     expect(second).toMatchObject({ nextCursor: null })
     expect(second.items.map((c) => c.id)).toEqual([5, 4, 3, 2, 1].map(id))
+  })
+})
+
+describe('getMyCapture', () => {
+  it('US-12.1 gives the author the details of a capture to edit, zone and tags named; 404 to anyone else', async () => {
+    const { repo } = await setup(1)
+    await repo.complete(id(9), { title: 'unused', gameVersion: 'wow-forever', at }) // not a capture: ignored
+    const get = getMyCapture({
+      repo,
+      zoneById: async (zoneId) =>
+        zoneId === 'zone-1' ? { slug: 'stormwind', nameEn: 'Stormwind City', nameFr: 'Hurlevent' } : null,
+      tagSlugs: async (tagIds) => tagIds.map((tagId) => tagId.replace('tag-', '')),
+    })
+    await repo.updateDetails(id(1), { focalX: 0.3, focalY: 0.6, tagIds: ['tag-aube'] })
+    // The details given at upload, then edited
+    const found = await get({ userId: 'u-ash', photoId: id(1) })
+    expect(found).toMatchObject({
+      ok: true,
+      value: { id: id(1), title: 'Capture 1', focalX: 0.3, tags: ['aube'], zone: null },
+    })
+    expect(await get({ userId: 'u-jaina', photoId: id(1) })).toEqual({ ok: false, error: { kind: 'not_found' } })
+    expect(await get({ userId: 'u-ash', photoId: id(5) })).toEqual({ ok: false, error: { kind: 'not_found' } })
   })
 })

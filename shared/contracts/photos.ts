@@ -101,3 +101,24 @@ export const MyPhotosResponse = z.strictObject({
   nextCursor: z.uuid().nullable(),
 })
 export type MyPhotosResponse = z.infer<typeof MyPhotosResponse>
+
+/** GET /api/me/photos/{id}: one of the member's captures with its details, for its edit form (US-12.1). */
+export const MyPhotoResponse = z.strictObject({
+  id: z.uuid(),
+  status: z.enum(['processing', 'failed', 'pending_review', 'published', 'rejected', 'hidden']),
+  title: z.string().nullable(),
+  width: z.int(),
+  height: z.int(),
+  description: z.string().nullable(),
+  altText: z.string().nullable(),
+  caption: z.string().nullable(),
+  zone: z.strictObject({ slug: z.string(), nameEn: z.string(), nameFr: z.string() }).nullable(),
+  zoneCustom: z.string().nullable(),
+  inGameTime: z.string().nullable(),
+  graphicsSettings: z.string().nullable(),
+  characterName: z.string().nullable(),
+  tags: z.array(z.string()),
+  focalX: z.number().nullable(),
+  focalY: z.number().nullable(),
+})
+export type MyPhotoResponse = z.infer<typeof MyPhotoResponse>

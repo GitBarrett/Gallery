@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 
 test.describe.configure({ timeout: 180_000 })
 
-test('US-10.1 US-11.1 US-11.2 a JPEG goes from the form to the gallery, with its details, without a CSP violation', async ({
+test('US-10.1 US-11.1 US-11.2 US-12.1 US-12.2 a JPEG goes from the form to the gallery, with its details, without a CSP violation', async ({
   page,
 }) => {
   const violations: string[] = []
@@ -78,4 +78,25 @@ test('US-10.1 US-11.1 US-11.2 a JPEG goes from the form to the gallery, with its
   await page.goto('/upload')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Upload a capture')
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
+
+  // US-12.1 (T-27b): edited from « My captures », the change is visible without a new moderation
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto('/my-captures')
+  await page.getByRole('link', { name: 'Edit « Dawn on the Plains »' }).click()
+  await expect(page.getByLabel('Title')).toHaveValue('Dawn on the Plains')
+  await expect(page.getByLabel('Zone', { exact: true })).toHaveValue('Stormwind City')
+  await page.getByLabel('Title').fill('Dawn over the Harbour')
+  await page.getByRole('button', { name: 'Save the changes' }).click()
+  await expect(page.getByRole('status').filter({ hasText: 'Changes saved.' })).toBeVisible()
+  expect((await testRoute(page, `/__test/photos/${photoId}`, 'GET')).body).toMatchObject({ status: 'published' })
+
+  // US-12.2: deleted after the confirmation, its objects in trash/
+  await page.goto('/my-captures')
+  await page.getByRole('button', { name: 'Delete « Dawn over the Harbour »' }).click()
+  await page.getByRole('button', { name: 'Delete it' }).click()
+  // Up to six objects move to trash/ in R2, one after the other
+  await expect(page.getByRole('status').filter({ hasText: 'The capture was deleted.' })).toBeVisible({
+    timeout: 30_000,
+  })
+  expect((await testRoute(page, `/__test/photos/${photoId}`, 'GET')).status).toBe(404)
 })

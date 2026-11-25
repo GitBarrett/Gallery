@@ -3,6 +3,8 @@ export {
   ensureTags,
   findZone,
   listGameVersions,
+  tagSlugs,
+  zoneById,
   suggestTags,
   suggestZones,
   type CatalogRepository,

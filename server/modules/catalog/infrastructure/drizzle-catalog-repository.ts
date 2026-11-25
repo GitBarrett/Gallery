@@ -58,4 +58,17 @@ export const drizzleCatalogRepository = (db: Db | Transaction): CatalogRepositor
     const ids = new Map(rows.map((r) => [r.slug, r.id]))
     return slugs.map((slug) => ids.get(slug)!)
   },
+  async zoneById(id) {
+    const [row] = await db
+      .select({ slug: zones.slug, nameEn: zones.nameEn, nameFr: zones.nameFr })
+      .from(zones)
+      .where(eq(zones.id, id))
+    return row ?? null
+  },
+  async tagSlugs(ids) {
+    if (!ids.length) return []
+    const rows = await db.select({ id: tags.id, slug: tags.slug }).from(tags).where(inArray(tags.id, ids))
+    const slugs = new Map(rows.map((r) => [r.id, r.slug]))
+    return ids.flatMap((id) => slugs.get(id) ?? [])
+  },
 })

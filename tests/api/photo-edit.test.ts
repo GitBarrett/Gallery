@@ -6,6 +6,7 @@ import { phc } from '../../scripts/seed.mjs'
 import { createDb } from '../../server/db/client'
 import { gameVersions, photos, users } from '../../server/db/schema'
 import { ErrorResponse } from '../../shared/contracts/errors'
+import { MyPhotoResponse } from '../../shared/contracts/photos'
 
 // Edit and deletion of a capture over HTTP and Postgres (T-27a): the author only (IDOR, 08-securite.md annexe B).
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
@@ -78,12 +79,19 @@ describe('PATCH and DELETE /api/photos/{id}', () => {
     expect([await titleOf(ids.published), await titleOf(ids.review)]).toEqual(['Dusk', 'Dusk'])
   })
 
-  it('US-12.1 lets the author edit, with the insult filter; US-12.2 then delete, once', async () => {
+  it('US-12.1 lets the author edit, with the insult filter, and read the details back; US-12.2 then delete, once', async () => {
     expect((await send('PATCH', ids.published, 'author', { title: 'Dawn', caption: 'First light' })).status).toBe(204)
     expect(await titleOf(ids.published)).toBe('Dawn')
     const insult = await send('PATCH', ids.published, 'author', { caption: 'quel connard' })
     expect(insult.status).toBe(400)
     expect((await send('PATCH', ids.published, 'author', {})).status).toBe(400) // nothing to change
+    const details = await fetch(`/api/me/photos/${ids.published}`, { headers: { cookie: cookies.author } })
+    expect(MyPhotoResponse.parse(await details.json())).toMatchObject({
+      title: 'Dawn',
+      caption: 'First light',
+      tags: [],
+    })
+    expect((await fetch(`/api/me/photos/${ids.published}`, { headers: { cookie: cookies.other } })).status).toBe(404)
     expect((await send('DELETE', ids.published, 'author')).status).toBe(204)
     expect(await titleOf(ids.published)).toBeUndefined()
     expect((await send('DELETE', ids.published, 'author')).status).toBe(404)

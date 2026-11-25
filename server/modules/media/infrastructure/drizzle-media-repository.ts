@@ -115,6 +115,33 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
       }
     })
   },
+  async findDetails(id) {
+    const [row] = await db
+      .select({
+        id: photos.id,
+        userId: photos.userId,
+        status: photos.status,
+        title: photos.title,
+        width: photos.width,
+        height: photos.height,
+        description: photos.description,
+        altText: photos.altText,
+        focalX: photos.focalX,
+        focalY: photos.focalY,
+        zoneId: photoMetadata.zoneId,
+        zoneCustom: photoMetadata.zoneCustom,
+        inGameTime: photoMetadata.inGameTime,
+        graphicsSettings: photoMetadata.graphicsSettings,
+        characterName: photoMetadata.characterName,
+        caption: photoMetadata.caption,
+      })
+      .from(photos)
+      .leftJoin(photoMetadata, eq(photoMetadata.photoId, photos.id))
+      .where(and(eq(photos.id, id), isNotNull(photos.uploadedAt)))
+    if (!row) return null
+    const tagged = await db.select({ tagId: photoTags.tagId }).from(photoTags).where(eq(photoTags.photoId, id))
+    return { ...row, tagIds: tagged.map((t) => t.tagId) }
+  },
   async deleteCapture(id) {
     const rows = await db.delete(photos).where(eq(photos.id, id)).returning({ id: photos.id })
     return rows.length > 0

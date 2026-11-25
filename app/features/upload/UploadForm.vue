@@ -2,13 +2,14 @@
 // Upload form (Upload mockup, US-10, US-11): the file checked in the browser by the shared rules (US-10.2), the
 // details, the consent, then the upload with its progress. A TGA or a PNG over 20 MB is converted first (T-26b,
 // US-10.9). Zone and tags are suggested by native lists: a zone typed but not chosen is sent as a free zone (US-11.3).
-import type { GameVersionsResponse, ZoneSuggestResponse } from '~~/shared/contracts/catalog'
+import type { GameVersionsResponse } from '~~/shared/contracts/catalog'
 import type { CompleteUploadBody } from '~~/shared/contracts/photos'
 import { api, ApiError, errorMessageKey } from '~/services/api'
 import FocalPicker from './FocalPicker.vue'
 import TagsField from './TagsField.vue'
 import UploadPreview from './UploadPreview.vue'
 import { inspectFile, useUpload, type ChosenFile, type FileProblem } from './useUpload'
+import { useZoneSuggestions } from './useZoneSuggestions'
 
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
@@ -19,7 +20,6 @@ const chosen = ref<ChosenFile>()
 const fileProblem = ref<FileProblem>()
 const converting = ref(false)
 const versions = ref<GameVersionsResponse['versions']>([])
-const zones = ref<ZoneSuggestResponse['zones']>([])
 const form = reactive({
   title: '',
   gameVersion: '',
@@ -44,17 +44,7 @@ onMounted(async () => {
   versions.value = (await api.gameVersions().catch(() => ({ versions: [] }))).versions
 })
 
-let zoneTimer: ReturnType<typeof setTimeout> | undefined
-watch(
-  () => form.zone,
-  (text) => {
-    clearTimeout(zoneTimer)
-    if (text.trim().length < 2) return
-    zoneTimer = setTimeout(async () => {
-      zones.value = (await api.suggestZones(text).catch(() => ({ zones: [] }))).zones
-    }, 200)
-  },
-)
+const { zones, read: zoneFields } = useZoneSuggestions(toRef(form, 'zone'))
 
 async function choose(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
@@ -66,14 +56,6 @@ async function choose(event: Event) {
   converting.value = false
   chosen.value = inspected.ok ? inspected.value : undefined
   fileProblem.value = inspected.ok ? undefined : inspected.error
-}
-
-// A zone of the dictionary when the text is one of its names, else a free zone (US-11.3)
-function zoneFields(): Pick<CompleteUploadBody, 'zone' | 'zoneCustom'> {
-  const text = form.zone.trim()
-  if (!text) return {}
-  const known = zones.value.find((z) => [z.nameEn, z.nameFr].some((n) => n.toLowerCase() === text.toLowerCase()))
-  return known ? { zone: known.slug } : { zoneCustom: text }
 }
 
 const optional = (text: string) => text.trim() || undefined
