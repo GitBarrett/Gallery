@@ -141,9 +141,9 @@ export const api = {
   // « My captures » (US-14.4): every status, 30 per page
   myPhotos: (cursor?: string) => call('/api/me/photos', MyPhotosResponse, { query: cursor ? { cursor } : {} }),
   // Grids (US-20.1): published captures by pages of 30; 404 NOT_FOUND for an unknown or archived version
-  photos: (query: Partial<PhotosQuery>) => call('/api/photos', PhotosResponse, { query }),
+  photos: (query: Partial<PhotosQuery>, fetch?: typeof $fetch) => call('/api/photos', PhotosResponse, { query }, fetch),
   // Upload form (US-10, US-11): catalogue reads, then the presigned URL and the completion (03 § Pipeline image)
-  gameVersions: () => call('/api/game-versions', GameVersionsResponse),
+  gameVersions: (fetch?: typeof $fetch) => call('/api/game-versions', GameVersionsResponse, {}, fetch),
   suggestTags: (q: string) => call('/api/tags/suggest', TagSuggestResponse, { query: { q } }),
   suggestZones: (q: string) => call('/api/zones/suggest', ZoneSuggestResponse, { query: { q } }),
   uploadUrl: (body: UploadUrlBody) => call('/api/photos/upload-url', UploadUrlResponse, { method: 'POST', body }),

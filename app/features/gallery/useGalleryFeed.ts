@@ -8,8 +8,9 @@ export type GridCapture = PhotosResponse['items'][number]
  * loaded on demand by their cursor, until the last. `found` is false for an unknown or archived version (404).
  */
 export async function useGalleryFeed(version: string) {
+  const fetch = useRequestFetch() // during SSR, forwards the visitor's cookies (Cloudflare Access on previews)
   const { data, error: failed } = await useAsyncData(`gallery:${version}`, () =>
-    api.photos({ version }).catch((error) => {
+    api.photos({ version }, fetch).catch((error) => {
       if (error instanceof ApiError && error.code === 'NOT_FOUND') return null
       throw error
     }),
