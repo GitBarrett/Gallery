@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { QUALITIES, qualityFromLikes } from './quality'
+import { QUALITIES, qualityFromLikes, qualityProgress } from './quality'
 
 // Launch values (07-design.md § Codes visuels WoW); the real ones come from site_settings.quality_thresholds.
 const launch = { uncommon: 3, rare: 15, epic: 50, legendary: 150 }
@@ -28,5 +28,14 @@ describe('qualityFromLikes', () => {
 
   it('lists the tiers from lowest to highest', () => {
     expect(QUALITIES).toEqual(['poor', 'uncommon', 'rare', 'epic', 'legendary'])
+  })
+})
+
+describe('qualityProgress', () => {
+  it('US-71.2 gives the tier, its threshold and the likes missing for the next one', () => {
+    expect(qualityProgress(0, launch)).toEqual({ quality: 'poor', from: 0, next: { quality: 'uncommon', missing: 3 } })
+    expect(qualityProgress(15, launch)).toEqual({ quality: 'rare', from: 15, next: { quality: 'epic', missing: 35 } })
+    expect(qualityProgress(149, launch).next).toEqual({ quality: 'legendary', missing: 1 })
+    expect(qualityProgress(400, launch)).toEqual({ quality: 'legendary', from: 150, next: null })
   })
 })

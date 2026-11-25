@@ -12,6 +12,7 @@ import {
   CompleteUploadResponse,
   MyPhotoResponse,
   MyPhotosResponse,
+  PhotoResponse,
   type PhotosQuery,
   PhotosResponse,
   type UpdatePhotoBody,
@@ -142,6 +143,8 @@ export const api = {
   myPhotos: (cursor?: string) => call('/api/me/photos', MyPhotosResponse, { query: cursor ? { cursor } : {} }),
   // Grids (US-20.1): published captures by pages of 30; 404 NOT_FOUND for an unknown or archived version
   photos: (query: Partial<PhotosQuery>, fetch?: typeof $fetch) => call('/api/photos', PhotosResponse, { query }, fetch),
+  // Photo page (US-25.1): 404 NOT_FOUND for a capture that is not published
+  photo: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}`, PhotoResponse, {}, fetch),
   // Upload form (US-10, US-11): catalogue reads, then the presigned URL and the completion (03 § Pipeline image)
   gameVersions: (fetch?: typeof $fetch) => call('/api/game-versions', GameVersionsResponse, {}, fetch),
   suggestTags: (q: string) => call('/api/tags/suggest', TagSuggestResponse, { query: { q } }),

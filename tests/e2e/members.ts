@@ -48,3 +48,35 @@ export async function verifiedMember(page: Page) {
     .toBeTruthy()
   expect((await post(page, '/api/auth/verify-email', { token })).status).toBe(204)
 }
+
+/**
+ * A 1600 × 900 JPEG drawn in the page, uploaded and completed as the form does, then waited for until the queue and
+ * the fake moderation publish it (a title without `_nsfw` / `_review`). The member must be verified. Returns its id.
+ */
+export async function publishCapture(
+  page: Page,
+  capture: { title: string; gameVersion: string } & Record<string, unknown>, // + the details of CompleteUploadBody
+) {
+  const photoId = await page.evaluate(async (details) => {
+    const canvas = new OffscreenCanvas(1600, 900)
+    const context = canvas.getContext('2d')!
+    context.fillStyle = '#3d566e'
+    context.fillRect(0, 0, 1600, 900)
+    const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.9 })
+    const json = { 'content-type': 'application/json' }
+    const declared = { contentType: blob.type, bytes: blob.size, width: 1600, height: 900 }
+    const asked = await fetch('/api/photos/upload-url', {
+      method: 'POST',
+      headers: json,
+      body: JSON.stringify(declared),
+    })
+    const { photoId: id, url } = await asked.json()
+    await fetch(url, { method: 'PUT', headers: { 'content-type': blob.type }, body: blob })
+    await fetch(`/api/photos/${id}/complete`, { method: 'POST', headers: json, body: JSON.stringify(details) })
+    return id as string
+  }, capture)
+  await expect
+    .poll(async () => (await testRoute(page, `/__test/photos/${photoId}`, 'GET')).body?.status, { timeout: 120_000 })
+    .toBe('published')
+  return photoId
+}

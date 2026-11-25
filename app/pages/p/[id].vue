@@ -1,0 +1,171 @@
+<script setup lang="ts">
+// Photo page /p/{id} (US-25.1, Photo mockup), rendered by the server: the image, its quality badge (US-71.2), its
+// details as an item of the game, the author and the tags; Open Graph, Twitter Card, canonical, hreflang and
+// ImageObject for robots. A capture that is not public is the 404 page. Likes, download, share, comments and the
+// navigation between captures come with their tasks (T-40, T-34, T-42, T-41, T-31b).
+import PhotoDetails from '~/features/photo/PhotoDetails.vue'
+import QualityBadgeTip from '~/features/photo/QualityBadgeTip.vue'
+import { usePhoto } from '~/features/photo/usePhoto'
+import { usePhotoHead } from '~/features/photo/usePhotoHead'
+import type { PhotoResponse } from '~~/shared/contracts/photos'
+
+definePageMeta({ key: (route) => route.path })
+const route = useRoute()
+const { t, locale } = useI18n()
+const localePath = useLocalePath()
+const found = await usePhoto(String(route.params.id))
+if (!found.value) throw createError({ statusCode: 404, statusMessage: 'Not found', fatal: true })
+const photo = computed(() => found.value as PhotoResponse)
+const alt = usePhotoHead(photo)
+const version = computed(() => (locale.value === 'fr' ? photo.value.version.nameFr : photo.value.version.nameEn))
+</script>
+
+<template>
+  <article class="pdp" aria-labelledby="pdp-title">
+    <nav :aria-label="t('gallery.breadcrumb')" class="breadcrumb">
+      <NuxtLink :to="localePath('/')">{{ t('gallery.home') }}</NuxtLink>
+      <span aria-hidden="true">/</span>
+      <NuxtLink :to="localePath(`/v/${photo.version.slug}`)">{{ version }}</NuxtLink>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{{ photo.title }}</span>
+    </nav>
+    <div class="layout">
+      <figure class="figure" :class="photo.quality">
+        <UiWowImage
+          :photo-id="photo.id"
+          :alt="alt"
+          :width="photo.width"
+          :height="photo.height"
+          priority
+          sizes="(width >= 1024px) 66vw, 100vw"
+        />
+        <QualityBadgeTip :quality="photo.quality" :likes="photo.likes" class="badge" />
+      </figure>
+      <aside class="aside">
+        <h1 id="pdp-title" class="visually-hidden">{{ photo.title }}</h1>
+        <PhotoDetails :photo="photo" />
+        <p v-if="photo.description" class="description">{{ photo.description }}</p>
+        <NuxtLink :to="localePath(`/u/${photo.author.username}`)" class="author">
+          <UiAvatar :src="photo.author.avatarUrl" :name="photo.author.username" />
+          <span>{{ t('photo.by', { author: photo.author.username }) }}</span>
+        </NuxtLink>
+        <ul v-if="photo.tags.length" class="tags" :aria-label="t('photo.tags')">
+          <li v-for="tag in photo.tags" :key="tag" class="tag">#{{ tag }}</li>
+        </ul>
+      </aside>
+    </div>
+  </article>
+</template>
+
+<style scoped>
+.pdp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-4) var(--space-8);
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+  color: var(--color-text-faint);
+  font-size: var(--text-sm);
+}
+
+/* US-67.5: a touch target of 44 px */
+.breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--control-md);
+  min-height: var(--control-md);
+}
+
+.layout {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (width >= 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    align-items: start;
+  }
+}
+
+/* No overflow: hidden, which would cut the tooltip of the badge: the image takes the rounded corners itself */
+.figure {
+  position: relative;
+  margin: 0;
+  border: 2px solid var(--quality-poor);
+  border-radius: var(--radius-md);
+}
+
+.figure :deep(.wow-image) {
+  border-radius: calc(var(--radius-md) - 2px);
+}
+
+.figure.uncommon {
+  border-color: var(--quality-uncommon);
+}
+
+.figure.rare {
+  border-color: var(--quality-rare);
+}
+
+.figure.epic {
+  border-color: var(--quality-epic);
+}
+
+.figure.legendary {
+  border-color: var(--quality-legendary);
+}
+
+.badge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.description {
+  margin: 0;
+  color: var(--color-text-soft);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.author {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  align-self: flex-start;
+  min-height: var(--control-md);
+  color: var(--color-text);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+</style>

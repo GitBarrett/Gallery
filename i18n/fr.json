@@ -385,6 +385,26 @@
       "link": "Comment fonctionne la qualité"
     }
   },
+  "photo": {
+    "title": "{title} — {version}",
+    "description": "{title}, une capture de {version} par {author} sur Legendary Shots.",
+    "alt": "{title} — {zone}, capturée par {author}",
+    "by": "Capturée par {author}",
+    "tags": "Tags",
+    "quality": {
+      "new": "nouvelle capture",
+      "from": "{count} J'aime et plus",
+      "missing": "{count} J'aime avant {quality}"
+    },
+    "details": {
+      "tier": "Capture {quality} · {version}",
+      "inGame": "{time} en jeu",
+      "character": "Personnage : {name}",
+      "size": "{width} × {height} · {format}",
+      "published": "Publiée le {date}",
+      "downloads": "{count} téléchargements"
+    }
+  },
   "captures": {
     "title": "Mes captures",
     "loadMore": "Plus de captures",

@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures'
 import { expectImageLoaded, hydrated } from './helpers'
-import { testRoute, verifiedMember } from './members'
+import { publishCapture, testRoute, verifiedMember } from './members'
 
 // PLP (T-30b) on the preview: a capture published through the real pipeline (API upload, Images binding, fake
 // moderation) shows in the grid of its version. The other specs publish in WoW Forever: this one uses Classic Era, and
@@ -21,32 +21,7 @@ test('US-20.1 US-20.2 a published capture shows in the grid of its version, newe
 }) => {
   await verifiedMember(page)
   const title = `Grid ${crypto.randomUUID().slice(0, 8)}`
-  // A 1600 × 900 JPEG drawn in the page, uploaded and completed as the form does
-  const photoId = await page.evaluate(async (name) => {
-    const canvas = new OffscreenCanvas(1600, 900)
-    const context = canvas.getContext('2d')!
-    context.fillStyle = '#3d566e'
-    context.fillRect(0, 0, 1600, 900)
-    const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.9 })
-    const json = { 'content-type': 'application/json' }
-    const declared = { contentType: blob.type, bytes: blob.size, width: 1600, height: 900 }
-    const asked = await fetch('/api/photos/upload-url', {
-      method: 'POST',
-      headers: json,
-      body: JSON.stringify(declared),
-    })
-    const { photoId: id, url } = await asked.json()
-    await fetch(url, { method: 'PUT', headers: { 'content-type': blob.type }, body: blob })
-    await fetch(`/api/photos/${id}/complete`, {
-      method: 'POST',
-      headers: json,
-      body: JSON.stringify({ title: name, gameVersion: 'classic-era' }),
-    })
-    return id as string
-  }, title)
-  await expect
-    .poll(async () => (await testRoute(page, `/__test/photos/${photoId}`, 'GET')).body?.status, { timeout: 120_000 })
-    .toBe('published')
+  await publishCapture(page, { title, gameVersion: 'classic-era' })
 
   await page.goto('/v/classic-era')
   await expect(page.getByRole('heading', { level: 1, name: 'Classic Era' })).toBeVisible()
