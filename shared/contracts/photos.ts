@@ -38,8 +38,15 @@ export const CompleteUploadBody = z
     graphicsSettings: optionalText(100),
     characterName: optionalText(100),
     tags: z.array(z.string().max(64)).max(10).optional(), // normalised and checked by shared/domain/tags
+    // Focal point of the crops (US-13.1), 0–1 from the left and the top; both or neither (none: the centre)
+    focalX: z.number().min(0).max(1).optional(),
+    focalY: z.number().min(0).max(1).optional(),
   })
   .refine((body) => !(body.zone && body.zoneCustom), { path: ['zoneCustom'], message: 'A zone or a free zone' })
+  .refine((body) => (body.focalX === undefined) === (body.focalY === undefined), {
+    path: ['focalY'],
+    message: 'Both coordinates of the focal point',
+  })
 export type CompleteUploadBody = z.infer<typeof CompleteUploadBody>
 
 export const CompleteUploadResponse = z.strictObject({ photoId: z.uuid(), status: z.literal('processing') })

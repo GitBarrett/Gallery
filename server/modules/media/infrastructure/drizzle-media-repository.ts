@@ -31,7 +31,7 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
     return row ?? null
   },
   async complete(id, { title, gameVersion, at, details }) {
-    const { description, altText, tagIds = [], ...metadata } = details ?? { tagIds: [] }
+    const { description, altText, focalX, focalY, tagIds = [], ...metadata } = details ?? { tagIds: [] }
     // Conditional: of two concurrent calls, one only completes the capture (and publishes its event)
     const rows = await db
       .update(photos)
@@ -39,6 +39,8 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
         title,
         description,
         altText,
+        focalX,
+        focalY,
         uploadedAt: at,
         gameVersionId: sql`(select ${gameVersions.id} from ${gameVersions} where ${gameVersions.slug} = ${gameVersion})`,
       })

@@ -44,6 +44,10 @@ test('US-10.1 US-11.1 US-11.2 a JPEG goes from the form to the gallery, with its
   })
   await expect(page.getByText('✓ 1920 × 1080, within 640–7680 px')).toBeVisible()
 
+  // US-13.1: the focal point touched on the image (a quarter from the left, the middle height)
+  const frame = page.locator('.frame')
+  const box = (await frame.boundingBox())!
+  await frame.click({ position: { x: box.width / 4, y: box.height / 2 } })
   await page.getByLabel('Title').fill('Dawn on the Plains')
   await page.getByLabel('Game version').selectOption('wow-forever')
   await page.getByLabel('Zone', { exact: true }).fill('Stormw')
@@ -66,6 +70,7 @@ test('US-10.1 US-11.1 US-11.2 a JPEG goes from the form to the gallery, with its
   await expect
     .poll(async () => (await testRoute(page, `/__test/photos/${photoId}`, 'GET')).body?.status, { timeout: 120_000 })
     .toBe('published')
+  expect((await testRoute(page, `/__test/photos/${photoId}`, 'GET')).body).toMatchObject({ focalX: 0.25, focalY: 0.5 })
   expect(violations).toEqual([])
 
   // 360 px: the form fits without a horizontal scroll

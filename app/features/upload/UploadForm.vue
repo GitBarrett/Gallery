@@ -5,6 +5,7 @@
 import type { GameVersionsResponse, ZoneSuggestResponse } from '~~/shared/contracts/catalog'
 import type { CompleteUploadBody } from '~~/shared/contracts/photos'
 import { api, ApiError, errorMessageKey } from '~/services/api'
+import FocalPicker from './FocalPicker.vue'
 import TagsField from './TagsField.vue'
 import UploadPreview from './UploadPreview.vue'
 import { inspectFile, useUpload, type ChosenFile, type FileProblem } from './useUpload'
@@ -30,6 +31,7 @@ const form = reactive({
   description: '',
   altText: '',
   tags: [] as string[],
+  focal: null as { x: number; y: number } | null,
   consent: false,
 })
 const errors = ref<Record<string, string>>({})
@@ -59,6 +61,7 @@ async function choose(event: Event) {
   if (!file) return
   if (chosen.value) URL.revokeObjectURL(chosen.value.preview)
   chosen.value = fileProblem.value = undefined
+  form.focal = null
   const inspected = await inspectFile(file, () => (converting.value = true))
   converting.value = false
   chosen.value = inspected.ok ? inspected.value : undefined
@@ -86,6 +89,7 @@ function body(): CompleteUploadBody {
     description: optional(form.description),
     altText: optional(form.altText),
     tags: form.tags.length ? form.tags : undefined,
+    ...(form.focal && { focalX: form.focal.x, focalY: form.focal.y }),
   }
 }
 
@@ -186,6 +190,7 @@ const steps = computed(() => [
             </div>
           </div>
           <p class="muted">{{ t('upload.file.accepted') }}</p>
+          <FocalPicker v-if="chosen" v-model="form.focal" :src="chosen.preview" />
         </section>
 
         <section class="section" aria-labelledby="upload-about">
@@ -302,6 +307,7 @@ const steps = computed(() => [
         :width="chosen?.width"
         :height="chosen?.height"
         :caption="form.caption"
+        :focal="form.focal"
       />
     </div>
   </div>

@@ -120,6 +120,13 @@
       "when": 1795570059830,
       "tag": "0016_capture_details",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795574899272,
+      "tag": "0017_focal_point",
+      "breakpoints": true
     }
   ]
 }

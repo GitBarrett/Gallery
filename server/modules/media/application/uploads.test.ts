@@ -215,6 +215,13 @@ describe('upload details', () => {
     })
   })
 
+  it('US-13.1 stores the focal point chosen by the author; US-13.2 none means the centre', async () => {
+    const { s, photoId } = await completed({ focalX: 0.25, focalY: 0.8 })
+    expect(s.captureDetails.get(photoId)).toMatchObject({ focalX: 0.25, focalY: 0.8 })
+    const centre = await completed({})
+    expect(centre.s.captureDetails.get(centre.photoId)).toMatchObject({ focalX: undefined, focalY: undefined })
+  })
+
   it('US-11.3 keeps a zone typed freely, out of the dictionary', async () => {
     const { s, photoId } = await completed({ zoneCustom: 'Hidden Glade' })
     expect(s.captureDetails.get(photoId)).toMatchObject({ zoneId: undefined, zoneCustom: 'Hidden Glade', tagIds: [] })

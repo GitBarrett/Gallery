@@ -122,6 +122,8 @@ describe('POST /api/photos/{id}/complete', () => {
     expect(await refused({ zone: 'atlantis' })).toEqual({ field: 'zone', reason: 'unknown' })
     await refused({ zone: 'stormwind', zoneCustom: 'Hidden Glade' })
     await refused({ inGameTime: '25:00' })
+    await refused({ focalX: 0.5 }) // US-13.1: both coordinates
+    await refused({ focalX: 1.2, focalY: 0.5 })
     await refused({ tags: Array.from({ length: 11 }, (_, i) => `tag ${i}`) })
   })
 

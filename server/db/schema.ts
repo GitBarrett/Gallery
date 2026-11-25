@@ -306,6 +306,9 @@ export const photos = pgTable(
     /** Max score of the automatic moderation (US-50), null when the provider did not answer. */
     moderationScore: real('moderation_score'),
     publishedAt: at('published_at'),
+    /** Focal point chosen by the author (US-13.1), 0–1 from the left and the top; null: the centre (US-13.2). */
+    focalX: real('focal_x'),
+    focalY: real('focal_y'),
     uploadedAt: at('uploaded_at'),
     createdAt: createdAt(),
   },

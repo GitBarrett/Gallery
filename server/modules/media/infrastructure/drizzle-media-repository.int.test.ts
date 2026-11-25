@@ -65,15 +65,28 @@ describe('drizzleMediaRepository', () => {
       await repo.createUpload(upload(ids[0]!, userId))
       const zoneId = (await catalog.zoneId('stormwind'))!
       const tagIds = await catalog.ensureTags([`t26d ${userId.slice(0, 6)}`, `night ${userId.slice(0, 6)}`])
-      const details = { description: 'Long story', altText: 'Canals at night', caption: 'Glow', zoneId, tagIds }
+      const details = {
+        description: 'Long story',
+        altText: 'Canals at night',
+        caption: 'Glow',
+        zoneId,
+        tagIds,
+        focalX: 0.25,
+        focalY: 0.75,
+      }
       const at = new Date()
       expect(await repo.complete(ids[0]!, { title: 'Dusk', gameVersion: 'wow-forever', at, details })).toBe(true)
       expect(await repo.complete(ids[0]!, { title: 'Again', gameVersion: 'wow-forever', at, details })).toBe(false)
       const [row] = await tx
-        .select({ description: photos.description, altText: photos.altText })
+        .select({
+          description: photos.description,
+          altText: photos.altText,
+          focalX: photos.focalX,
+          focalY: photos.focalY,
+        })
         .from(photos)
         .where(eq(photos.id, ids[0]!))
-      expect(row).toEqual({ description: 'Long story', altText: 'Canals at night' })
+      expect(row).toEqual({ description: 'Long story', altText: 'Canals at night', focalX: 0.25, focalY: 0.75 })
       const metadata = await tx.select().from(photoMetadata).where(eq(photoMetadata.photoId, ids[0]!))
       expect(metadata).toEqual([expect.objectContaining({ zoneId, zoneCustom: null, caption: 'Glow' })])
       const tagged = await tx.select().from(photoTags).where(eq(photoTags.photoId, ids[0]!))

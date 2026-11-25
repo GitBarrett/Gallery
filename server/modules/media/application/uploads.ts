@@ -89,6 +89,8 @@ export const completeUpload =
       gameVersion: string
       zone?: string
       inGameTime?: string
+      focalX?: number
+      focalY?: number
     },
   ): Promise<Result<{ photoId: string; status: 'processing' }, MediaError>> => {
     const allowed = mayPost(cmd.actor)
@@ -116,7 +118,7 @@ export const completeUpload =
     return done
   }
 
-const detailsOf = (cmd: DetailsInput & { inGameTime?: string }) => ({
+const detailsOf = (cmd: DetailsInput & { inGameTime?: string; focalX?: number; focalY?: number }) => ({
   description: textOrNone(cmd.description),
   altText: textOrNone(cmd.altText),
   caption: textOrNone(cmd.caption),
@@ -124,6 +126,8 @@ const detailsOf = (cmd: DetailsInput & { inGameTime?: string }) => ({
   inGameTime: cmd.inGameTime,
   graphicsSettings: textOrNone(cmd.graphicsSettings),
   characterName: textOrNone(cmd.characterName),
+  focalX: cmd.focalX,
+  focalY: cmd.focalY,
 })
 
 /**

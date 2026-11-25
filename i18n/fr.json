@@ -433,6 +433,13 @@
       "time": "{time} en jeu",
       "use": "Utilisation : télécharger l’original en fond d’écran.",
       "quality": "Toute capture commence Médiocre et monte en qualité avec les likes."
+    },
+    "focal": {
+      "title": "Point focal",
+      "hint": "Touchez l’image à l’endroit du sujet : les recadrages de la galerie le gardent visible. Par défaut, le centre.",
+      "x": "Position horizontale",
+      "y": "Position verticale",
+      "centre": "Revenir au centre"
     }
   }
 }

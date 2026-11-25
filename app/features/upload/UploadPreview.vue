@@ -10,6 +10,8 @@ const props = defineProps<{
   width?: number
   height?: number
   caption?: string
+  /** Focal point of the crop (US-13.1); none: the centre (US-13.2). */
+  focal?: { x: number; y: number } | null
 }>()
 const { t } = useI18n()
 const name = computed(() => props.title.trim() || t('upload.preview.untitled'))
@@ -20,7 +22,13 @@ const name = computed(() => props.title.trim() || t('upload.preview.untitled'))
     <h2 id="upload-preview-title" class="title">{{ t('upload.preview.title') }}</h2>
     <div class="card">
       <div class="image">
-        <img v-if="thumbnail" :src="thumbnail" alt="" class="thumbnail" />
+        <img
+          v-if="thumbnail"
+          :src="thumbnail"
+          alt=""
+          class="thumbnail"
+          :style="focal ? { objectPosition: `${focal.x * 100}% ${focal.y * 100}%` } : undefined"
+        />
         <UiQualityBadge quality="poor" :label="t('notifications.quality.poor')" class="badge" />
       </div>
       <p class="name">{{ name }}</p>

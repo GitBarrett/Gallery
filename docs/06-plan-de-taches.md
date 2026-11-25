@@ -329,7 +329,7 @@ T-26a (formulaire d'upload) est découpée le 25/11/2026 : le serveur des détai
   TGA → PNG ; au-delà de 20 Mo : WebP sans perte puis JPEG 95 4:4:4 avec avertissement ; Web Worker et encodeurs WebAssembly libwebp et MozJPEG chargés à la demande ; échec mémoire géré.
   Stories : US-10.9–10. Tests : U (choix de la chaîne), E (TGA de bout en bout ; PNG 5K2K de 25 Mo → WebP sans perte ; TGA 8K → JPEG 95 avec avertissement).
 
-- [ ] **T-26c Point focal et aperçu** (dép. T-26a)
+- [x] **T-26c Point focal et aperçu** (dép. T-26a)
   Point focal, aperçu en direct du recadrage.
   Stories : US-13. Tests : composants, E.
 

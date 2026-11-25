@@ -18,6 +18,8 @@ export default defineEventHandler(async (event) => {
       height: photos.height,
       lumaBl: photos.lumaBl,
       moderationScore: photos.moderationScore,
+      focalX: photos.focalX,
+      focalY: photos.focalY,
     })
     .from(photos)
     .where(eq(photos.id, id))
