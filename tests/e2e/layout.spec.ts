@@ -4,7 +4,7 @@ import { expect, test } from './fixtures'
 
 // Shared layout (T-07a). shortcut: extend PAGES as pages are added; the privacy page holds the widest table.
 // networkidle: leave a page once hydrated; WebKit takes its history.replaceState for a navigation otherwise
-const PAGES = ['/', '/privacy', '/terms', '/signup', '/signin', '/verify-email', '/reset']
+const PAGES = ['/', '/privacy', '/terms', '/signup', '/signin', '/verify-email', '/reset', '/v/wow-forever']
 const INTERACTIVE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
 const axePath = createRequire(import.meta.url).resolve('axe-core')
 

@@ -36,8 +36,7 @@ function text(n: NotificationItem) {
   const title = n.photoTitle ? t('notifications.quoted', { title: n.photoTitle }) : t('notifications.untitled')
   const values = { actor: n.actor, others: n.others, title }
   if (n.type === 'like') return t('notifications.text.like', values, n.others)
-  if (n.type === 'quality')
-    return t('notifications.text.quality', { title, quality: t(`notifications.quality.${n.detail}`) })
+  if (n.type === 'quality') return t('notifications.text.quality', { title, quality: t(`quality.${n.detail}`) })
   if (n.type === 'moderation')
     return n.photoId
       ? t(`notifications.text.moderation.${n.detail}`, values)

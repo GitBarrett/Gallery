@@ -311,13 +311,6 @@
         "results": "Contest results are out."
       }
     },
-    "quality": {
-      "poor": "Poor",
-      "uncommon": "Uncommon",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
-    },
     "cta": {
       "view": "View",
       "profile": "Profile",
@@ -337,6 +330,27 @@
       "grouped": "Likes are grouped: “Ysolde and 23 others liked…” to avoid flooding your log.",
       "saved": "Saved"
     }
+  },
+  "quality": {
+    "poor": "Poor",
+    "uncommon": "Uncommon",
+    "rare": "Rare",
+    "epic": "Epic",
+    "legendary": "Legendary"
+  },
+  "gallery": {
+    "breadcrumb": "Breadcrumb",
+    "home": "Home",
+    "versions": "Game versions",
+    "title": "{version} captures",
+    "description": "Screenshots of {version} shared by the community, newest first.",
+    "loadMore": "Load more captures",
+    "end": "You've seen everything",
+    "emptyTitle": "Be the first to capture {version}",
+    "emptyText": "No capture of this version yet: share yours to open its gallery.",
+    "upload": "Upload a capture",
+    "likes": "{count} likes",
+    "new": "New"
   },
   "captures": {
     "title": "My captures",

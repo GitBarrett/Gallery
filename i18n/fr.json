@@ -311,13 +311,6 @@
         "results": "Les résultats du concours sont publiés."
       }
     },
-    "quality": {
-      "poor": "Médiocre",
-      "uncommon": "Inhabituelle",
-      "rare": "Rare",
-      "epic": "Épique",
-      "legendary": "Légendaire"
-    },
     "cta": {
       "view": "Voir",
       "profile": "Profil",
@@ -337,6 +330,27 @@
       "grouped": "Les likes sont regroupés : « Ysolde et 23 autres personnes ont aimé… » pour ne pas inonder votre journal.",
       "saved": "Enregistré"
     }
+  },
+  "quality": {
+    "poor": "Médiocre",
+    "uncommon": "Inhabituelle",
+    "rare": "Rare",
+    "epic": "Épique",
+    "legendary": "Légendaire"
+  },
+  "gallery": {
+    "breadcrumb": "Fil d'Ariane",
+    "home": "Accueil",
+    "versions": "Versions du jeu",
+    "title": "Captures de {version}",
+    "description": "Captures d'écran de {version} partagées par la communauté, des plus récentes aux plus anciennes.",
+    "loadMore": "Plus de captures",
+    "end": "Vous avez tout vu",
+    "emptyTitle": "Soyez le premier à capturer {version}",
+    "emptyText": "Aucune capture de cette version pour l'instant : partagez la vôtre pour ouvrir sa galerie.",
+    "upload": "Publier une capture",
+    "likes": "{count} J'aime",
+    "new": "Nouveau"
   },
   "captures": {
     "title": "Mes captures",
