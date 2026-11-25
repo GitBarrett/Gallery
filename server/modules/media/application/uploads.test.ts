@@ -3,17 +3,10 @@ import { inMemoryMediaRepository } from '../../../../tests/fakes/in-memory-media
 import { inMemoryObjectStorage } from '../../../../tests/fakes/in-memory-object-storage'
 import { inMemoryRateLimiter } from '../../../../tests/fakes/in-memory-rate-limiter'
 import { inMemoryUnitOfWork } from '../../../../tests/fakes/in-memory-unit-of-work'
-import type { Actor } from '../../identity'
+import { anActor } from '../../../../tests/builders/actor'
 import { completeUpload, purgeOrphanUploads, requestUploadUrl } from './uploads'
 
-const ash: Actor = {
-  id: 'u-ash',
-  username: 'Ash',
-  role: 'user',
-  status: 'active',
-  emailVerified: true,
-  mfaVerified: false,
-}
+const ash = anActor({ id: 'u-ash' })
 const file = { contentType: 'image/png', bytes: 5_000_000, width: 1920, height: 1080 }
 const MIN = 60_000
 

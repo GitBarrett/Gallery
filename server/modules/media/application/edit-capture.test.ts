@@ -1,18 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { inMemoryMediaRepository } from '../../../../tests/fakes/in-memory-media-repository'
 import { inMemoryObjectStorage } from '../../../../tests/fakes/in-memory-object-storage'
+import { anActor } from '../../../../tests/builders/actor'
 import type { Actor } from '../../identity'
 import { deleteCapture, editCapture } from './edit-capture'
 
-const actor = (id: string, more: Partial<Actor> = {}): Actor => ({
-  id,
-  username: id,
-  role: 'user',
-  status: 'active',
-  emailVerified: true,
-  mfaVerified: false,
-  ...more,
-})
+const actor = (id: string, more: Partial<Actor> = {}) => anActor({ id, username: id, ...more })
 const [ash, jaina] = [actor('u-ash'), actor('u-jaina')]
 const ID = '0193a000-0000-7000-8000-0000000000aa'
 const NAMES = ['1200.jpg', '400.webp', '800.webp', '1200.webp', '2400.webp']

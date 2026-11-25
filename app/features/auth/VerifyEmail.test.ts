@@ -3,6 +3,7 @@ import { flushPromises } from '@vue/test-utils'
 import { setResponseStatus, type H3Event } from 'h3'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { defineComponent, h, onMounted } from 'vue'
+import { aMe } from '../../../tests/builders/accounts'
 import VerifyEmail from './VerifyEmail.vue'
 
 // The Turnstile check passes at once: the form only sees its token
@@ -22,14 +23,7 @@ let resent = 0
 registerEndpoint('/api/auth/verify-email', { method: 'POST', handler: (event) => verify(event) })
 registerEndpoint('/api/auth/resend-verification', { method: 'POST', handler: () => (resent++, null) })
 registerEndpoint('/api/me', (event) => {
-  if (signedIn)
-    return {
-      id: '01937f1e-0000-7000-8000-000000000001',
-      username: 'ash',
-      role: 'user',
-      emailVerified: false,
-      avatarUrl: null,
-    }
+  if (signedIn) return aMe({ username: 'ash', emailVerified: false })
   setResponseStatus(event, 401)
   return { error: { code: 'UNAUTHENTICATED', message: 'x', correlationId: 'c' } }
 })

@@ -5,20 +5,11 @@ import { inMemoryIdentityRepository } from '../../../../tests/fakes/in-memory-id
 import { inMemoryObjectStorage } from '../../../../tests/fakes/in-memory-object-storage'
 import { inMemoryRateLimiter } from '../../../../tests/fakes/in-memory-rate-limiter'
 import { inMemoryUnitOfWork } from '../../../../tests/fakes/in-memory-unit-of-work'
-import type { Actor } from '../../identity'
+import { anActor as actor } from '../../../../tests/builders/actor'
 import { completeAvatarUpload, processAvatar, requestAvatarUpload, serveAvatar } from './avatars'
 import type { ModerationGateway } from './ports'
 
-const USER = '0193a000-0000-7000-8000-0000000000a1'
-const actor = (more: Partial<Actor> = {}): Actor => ({
-  id: USER,
-  username: 'Ash',
-  role: 'user',
-  status: 'active',
-  emailVerified: true,
-  mfaVerified: false,
-  ...more,
-})
+const USER = actor().id
 const square = { contentType: 'image/jpeg', bytes: baseJpeg().length, width: 512, height: 512 }
 const sizes = (version: string) => [64, 128, 256].map((s) => `avatars/${USER}/${version}/${s}.webp`)
 

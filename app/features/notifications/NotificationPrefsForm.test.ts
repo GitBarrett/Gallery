@@ -2,6 +2,7 @@ import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { describe, expect, it, vi } from 'vitest'
 import { readBody } from 'h3'
 import { axeViolations } from '../../../tests/axe'
+import { aMe } from '../../../tests/builders/accounts'
 import NotificationPrefsForm from './NotificationPrefsForm.vue'
 
 const sent: unknown[] = []
@@ -15,13 +16,7 @@ registerEndpoint('/api/me', {
   method: 'PATCH',
   handler: async (event) => {
     sent.push(await readBody(event))
-    return {
-      id: '0193a000-0000-7000-8000-000000000001',
-      username: 'Ash',
-      role: 'user',
-      emailVerified: true,
-      avatarUrl: null,
-    }
+    return aMe()
   },
 })
 

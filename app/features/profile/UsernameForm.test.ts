@@ -2,6 +2,7 @@ import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { setResponseStatus, type H3Event } from 'h3'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { aMe } from '../../../tests/builders/accounts'
 import UsernameForm from './UsernameForm.vue'
 
 let update: (event: H3Event) => unknown
@@ -26,13 +27,7 @@ async function typed(name: string) {
 describe('UsernameForm', () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
-    update = () => ({
-      id: '0194b0d4-0000-7000-8000-000000000000',
-      username: 'Thrall_Fan',
-      role: 'user',
-      emailVerified: true,
-      avatarUrl: null,
-    })
+    update = () => aMe({ username: 'Thrall_Fan' })
   })
   afterEach(() => vi.useRealTimers())
 
