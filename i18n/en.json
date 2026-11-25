@@ -283,7 +283,7 @@
       "moderation": {
         "published": "Your capture {title} was published.",
         "pending_review": "Your capture {title} is being reviewed by a moderator.",
-        "rejected": "Your capture {title} was rejected by moderation.",
+        "rejected": "Your capture {title} was rejected by the automatic moderation (sensitive content). You can appeal within 6 months: see the Terms.",
         "failed": "Your capture {title} could not be processed. Please upload it again."
       },
       "avatar": {
@@ -312,7 +312,8 @@
       "profile": "Profile",
       "settings": "Settings",
       "upload": "Upload",
-      "contests": "Contests"
+      "contests": "Contests",
+      "appeal": "Appeal"
     },
     "prefs": {
       "title": "Notification settings",

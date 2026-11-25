@@ -283,7 +283,7 @@
       "moderation": {
         "published": "Votre capture {title} est publiée.",
         "pending_review": "Votre capture {title} est en cours de vérification par un modérateur.",
-        "rejected": "Votre capture {title} a été refusée par la modération.",
+        "rejected": "Votre capture {title} a été refusée par la modération automatique (contenu sensible). Vous pouvez contester sous 6 mois : voir les conditions d'utilisation.",
         "failed": "Votre capture {title} n'a pas pu être traitée. Envoyez-la de nouveau."
       },
       "avatar": {
@@ -312,7 +312,8 @@
       "profile": "Profil",
       "settings": "Réglages",
       "upload": "Publier",
-      "contests": "Concours"
+      "contests": "Concours",
+      "appeal": "Contester"
     },
     "prefs": {
       "title": "Réglages des notifications",

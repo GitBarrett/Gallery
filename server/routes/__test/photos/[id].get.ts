@@ -12,7 +12,13 @@ export default defineEventHandler(async (event) => {
   const env = (event.context.cloudflare?.env ?? {}) as Bindings
   const db = createDb(env.HYPERDRIVE?.connectionString ?? process.env.DATABASE_URL!)
   const [photo] = await db
-    .select({ status: photos.status, width: photos.width, height: photos.height, lumaBl: photos.lumaBl })
+    .select({
+      status: photos.status,
+      width: photos.width,
+      height: photos.height,
+      lumaBl: photos.lumaBl,
+      moderationScore: photos.moderationScore,
+    })
     .from(photos)
     .where(eq(photos.id, id))
   await db.$client.end()
@@ -20,5 +26,6 @@ export default defineEventHandler(async (event) => {
   const prefix = loadConfig(process.env).r2Prefix
   const keys = [originalKey(id), ...VARIANTS.map((v) => variantKey(id, v.name))]
   const stored = await Promise.all(keys.map(async (key) => ((await env.R2?.head(`${prefix}${key}`)) ? key : null)))
-  return { ...photo, objects: stored.filter(Boolean) }
+  const trashed = Boolean(await env.R2?.head(`${prefix}trash/${originalKey(id)}`))
+  return { ...photo, objects: stored.filter(Boolean), trashed }
 })

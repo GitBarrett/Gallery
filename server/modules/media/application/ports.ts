@@ -64,6 +64,7 @@ export interface Upload {
   bytes: number
   status: string
   uploadedAt: Date | null
+  title: string | null
 }
 
 /** What the processing measured on the cleaned original. */
@@ -73,7 +74,23 @@ export interface Processed {
   height: number
   lumaBl: number
   lumaTr: number
+  /** Max score of the automatic moderation, null when the provider did not answer (US-50.4). */
+  moderationScore: number | null
+  publishedAt: Date | null
 }
+
+/** End of the processing: the decision of the automatic moderation (US-50). */
+export type ProcessedStatus = 'published' | 'pending_review' | 'rejected'
+
+/**
+ * Port: the automatic moderation of a processed capture (moderation module, wired by the composition root), given its
+ * 1200 px JPEG; it records its decision and never throws for a provider down (US-50.4).
+ */
+export type ModerationGateway = (capture: {
+  photoId: string
+  title: string | null
+  image: Uint8Array
+}) => Promise<{ outcome: ProcessedStatus; score: number | null }>
 
 /** Port: the captures of the media module. */
 export interface MediaRepository {
@@ -87,7 +104,7 @@ export interface MediaRepository {
   incompleteBefore(before: Date, limit: number): Promise<string[]>
   deleteIncomplete(id: string): Promise<void>
   /** A capture still `processing` goes to `status` with its measures; false if it no longer was (replay). */
-  finishProcessing(id: string, status: 'pending_review', processed: Processed): Promise<boolean>
+  finishProcessing(id: string, status: ProcessedStatus, processed: Processed): Promise<boolean>
   /** A capture still `processing` goes to `failed`; false if it no longer was. */
   failProcessing(id: string): Promise<boolean>
   /** Titles of the captures among `ids` that still exist, by id (null: not completed yet). */

@@ -81,7 +81,7 @@ test('US-14.5 processes an 8K JPEG and a 5120 × 2160 PNG of 20 MB, three at a t
       .poll(async () => (await testRoute(page, `/__test/photos/${photoId}`, 'GET')).body?.status, { timeout: 240_000 })
       .not.toBe('processing')
     const { body } = await testRoute(page, `/__test/photos/${photoId}`, 'GET')
-    expect(body.status).toBe('pending_review') // not `failed`: no attempt ran out of memory
+    expect(body.status).toBe('published') // not `failed`: no attempt ran out of memory; published by the fake moderation
     expect(body.objects).toHaveLength(6) // the cleaned original and the 5 variants (US-14.1)
     expect(body.lumaBl).toBeGreaterThan(0)
   }

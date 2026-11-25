@@ -37,7 +37,15 @@ export function inMemoryMediaRepository(clock: Clock) {
     async findUpload(id) {
       const row = rows.get(id)
       return row
-        ? { id, userId: row.userId, mime: row.mime, bytes: row.bytes, status: row.status, uploadedAt: row.uploadedAt }
+        ? {
+            id,
+            userId: row.userId,
+            mime: row.mime,
+            bytes: row.bytes,
+            status: row.status,
+            uploadedAt: row.uploadedAt,
+            title: row.title,
+          }
         : null
     },
     async complete(id, { title, gameVersion, at }) {
