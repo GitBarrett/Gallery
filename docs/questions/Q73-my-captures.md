@@ -1,6 +1,6 @@
 # Q73 — Images dans l'interface et « My captures » (T-25b)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Adresse et accès** : page privée `/my-captures` (jamais mise en cache par le service worker), un bouton
     « My captures » sur son propre profil à côté de « Settings ». Pas de maquette : design system seul.

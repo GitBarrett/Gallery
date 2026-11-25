@@ -1,6 +1,6 @@
 # Q78 — Modifier et supprimer une capture : serveur (T-27a)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Découpage** : T-27 devient T-27a (serveur) et T-27b (écran) ; le retrait d'une capture supprimée d'un concours
     (US-12.4) passe dans T-64b et celui des collections dans T-61, ces tables n'existant pas encore.

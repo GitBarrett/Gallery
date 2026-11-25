@@ -1,6 +1,6 @@
 # Q71 — Modération automatique (T-24)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Score retenu** : le maximum de nudité explicite (`sexual_activity`, `sexual_display`, `erotica` de nudity-2.1),
     de `gore.prob` (gore-2.0) et de chaque symbole ou geste offensant (offensive-2.0). Les classes « suggestives »

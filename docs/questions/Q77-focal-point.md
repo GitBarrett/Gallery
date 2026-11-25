@@ -1,6 +1,6 @@
 # Q77 — Point focal (T-26c)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Saisie** : à l'upload, sous le fichier, en touchant l'image entière ; deux curseurs (position horizontale et
     verticale, 0 à 100 %) font la même chose au clavier ; « Back to the centre » efface le point. Pas de point par

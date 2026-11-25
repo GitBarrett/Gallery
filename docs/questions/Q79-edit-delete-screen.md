@@ -1,6 +1,6 @@
 # Q79 — Modifier et supprimer une capture : écran (T-27b)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Accès** : boutons « Edit » et « Delete » sur chaque carte de « My captures », sauf pendant le traitement.
     Pas de maquette : design system seul.

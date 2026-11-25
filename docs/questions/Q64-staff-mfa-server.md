@@ -1,6 +1,6 @@
 # Q64 — Double authentification du staff, serveur (T-18b)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - Découpage : T-18b (serveur) dépassait 400 lignes ; scindée en T-18b (TOTP côté serveur), T-18d (pages, seed, E2E) et T-18e (réauthentification, alerte aux admins, `admin:promote`, `admin:reset-mfa`). T-18c dépend de T-18d et T-18e.
   - TOTP RFC 6238 aux réglages lus par toutes les applications (HMAC-SHA-1, 6 chiffres, 30 s), tolérance d'un pas de part et d'autre, écrit avec WebCrypto (aucune dépendance) ; un pas déjà accepté est refusé ensuite (rejeu) grâce à la colonne `users.mfa_last_step` (migration expand).

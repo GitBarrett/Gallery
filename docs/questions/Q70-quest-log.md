@@ -1,6 +1,6 @@
 # Q70 — Cloche et Quest log (T-23b)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Taille du journal** : les 50 notifications les plus récentes, sans pagination ni « Load more » (rétention de
     6 mois, peu de notifications par membre au lancement). Le compteur de la cloche compte toutes les non lues.

@@ -4,7 +4,7 @@
 - Tranches en utilisateurs actifs mensuels (MAU).
 - 10 % des MAU publient ~5 images/mois de 8 Mo ; variantes ≈ 1 Mo par capture (ADR-012).
 - Stockage cumulé à 12 mois. 60 pages vues et ~100 événements analytics par MAU.
-- Modération : 2 opérations Sightengine par image.
+- Modération : 3 opérations Sightengine par image et par avatar (nudité, gore, symboles offensants ; Q71 tranchée le 25/11/2026).
 - Transformations : 6 transformations uniques par capture, une seule fois (ADR-012) ; 5 000 gratuites par mois, puis 0,50 $ / 1 000.
 - Prix publics vérifiés le 17/11/2026 (Cloudflare, Neon, Resend, Sightengine), à revérifier avant lancement.
 
@@ -26,6 +26,8 @@
 | Suivi d'erreurs et disponibilité (Sentry, sonde) | 0 | 0 | 0 | 26 | 26 |
 | Sauvegardes (`pg_dump` sur R2) | < 1 | < 1 | < 1 | 1 | 2 |
 | **Total** | **≈ 85** | **≈ 100** | **≈ 230** | **≈ 565** | **≈ 1 070** |
+
+La ligne Sightengine a été chiffrée avec 2 opérations par image : avec 3 (Q71), le volume d'opérations est multiplié par 1,5, avatars en plus ; à recalculer sur la grille du fournisseur avec la revérification des prix avant lancement.
 
 Coût ≈ 0,01 à 0,02 $ par MAU. Revenu pub indicatif à 100k MAU : 6 M pages vues × 2 $ RPM ≈ 12 000 $/mois.
 

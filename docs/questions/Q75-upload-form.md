@@ -1,6 +1,6 @@
 # Q75 — Formulaire d'upload (T-26a)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Zone et tags** : suggestions par listes natives (`datalist`), accessibles au clavier et aux lecteurs d'écran,
     plutôt que la liste dessinée de la maquette. Une zone saisie qui n'est pas exactement un nom (anglais ou

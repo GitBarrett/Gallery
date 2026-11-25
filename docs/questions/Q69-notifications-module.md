@@ -1,6 +1,6 @@
 # Q69 — Module notifications (T-23a)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Écran des préférences** (US-07.5) : aucune tâche ne prévoit les interrupteurs dans `/settings`. T-23a livre
     l'API (`PATCH /api/me` avec `notificationPrefs`, seuls les types envoyés changent) ; les interrupteurs et leur

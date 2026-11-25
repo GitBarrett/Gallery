@@ -1,6 +1,6 @@
 # Q68 — Traitement des captures (T-22b)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Statut en fin de traitement, avant la modération automatique** : T-24 (Sightengine) dépend de T-22b, donc
     l'appel à la modération (fin de US-14.1) ne peut pas encore exister. Une capture traitée passe en
