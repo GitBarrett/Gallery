@@ -1,6 +1,6 @@
 # Q66 — Catalogue : suggestion des zones (T-20b)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - Le seed `docs/seed/zones.csv` est importé par une migration (0011), comme les versions du jeu (Q65) : la production et chaque preview l'ont dès la migration. Un test vérifie que la base contient exactement le CSV ; une modification du CSV demande donc une nouvelle migration.
   - Les zones (comme les versions) sont des données de référence conservées par `emptyData` (remise à zéro de la base de démo).

@@ -1,0 +1,152 @@
+import { describe, expect, it } from 'vitest'
+import { withRollback } from '../../../../tests/db'
+import { gameVersions, photoMetadata, photos, users, zones } from '../../../db/schema'
+import type { GridFilter } from '../application/grid'
+import { drizzleGalleryRepository } from './drizzle-gallery-repository'
+
+type Tx = Parameters<Parameters<typeof withRollback>[0]>[0]
+const T0 = Date.UTC(2026, 10, 25, 10)
+const base: GridFilter = { minLikes: 0, sort: 'recent', limit: 30 }
+
+// A version and a zone of their own, so that the captures of the other tests never show
+async function world(tx: Tx) {
+  const run = crypto.randomUUID().slice(0, 8)
+  const [version] = await tx
+    .insert(gameVersions)
+    .values({ slug: `gv-${run}`, nameEn: 'Test', nameFr: 'Test', position: 99 })
+    .returning()
+  const [archived] = await tx
+    .insert(gameVersions)
+    .values({ slug: `old-${run}`, nameEn: 'Old', nameFr: 'Old', position: 100, archived: true })
+    .returning()
+  const [zone] = await tx
+    .insert(zones)
+    .values({ slug: `zone-${run}`, nameEn: 'Stormwind City', nameFr: 'Hurlevent' })
+    .returning()
+  const [author] = await tx
+    .insert(users)
+    .values({ username: `grid_${run}` })
+    .returning()
+  let n = 0
+  const capture = async (
+    more: Partial<typeof photos.$inferInsert> = {},
+    details: { time?: string; zone?: boolean } = {},
+  ) => {
+    n++
+    const [row] = await tx
+      .insert(photos)
+      .values({
+        userId: author!.id,
+        gameVersionId: version!.id,
+        title: `Capture ${n}`,
+        status: 'published',
+        mime: 'image/jpeg',
+        bytes: 1,
+        width: 1920,
+        height: 1080,
+        uploadedAt: new Date(T0),
+        publishedAt: new Date(T0 + n * 60_000),
+        ...more,
+      })
+      .returning()
+    if (details.time || details.zone)
+      await tx
+        .insert(photoMetadata)
+        .values({ photoId: row!.id, inGameTime: details.time, zoneId: details.zone ? zone!.id : null })
+    return row!.id
+  }
+  return {
+    version: version!.slug,
+    archived: archived!,
+    zone: zone!,
+    author: author!,
+    capture,
+    archivedId: archived!.id,
+  }
+}
+
+describe('drizzleGalleryRepository', () => {
+  it('US-20.1 lists the published captures of a version only, most recent first', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const older = await w.capture()
+      const newer = await w.capture({}, { zone: true })
+      for (const status of ['processing', 'pending_review', 'rejected', 'hidden']) await w.capture({ status })
+      await w.capture({ gameVersionId: w.archivedId })
+      const rows = await drizzleGalleryRepository(tx).grid({ ...base, gameVersion: w.version })
+      expect(rows.map((r) => r.id)).toEqual([newer, older])
+      expect(rows[0]).toEqual({
+        id: newer,
+        title: 'Capture 2',
+        width: 1920,
+        height: 1080,
+        username: w.author.username,
+        zone: { slug: w.zone.slug, nameEn: 'Stormwind City', nameFr: 'Hurlevent' },
+        likes: 0,
+        downloads: 0,
+        publishedAt: new Date(T0 + 2 * 60_000),
+      })
+      expect(await drizzleGalleryRepository(tx).grid({ ...base, gameVersion: w.archived.slug })).toEqual([])
+    })
+  })
+
+  it('US-20.1 keeps the pages stable: captures published between two pages neither repeat nor shift them', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const ids: string[] = []
+      for (let i = 0; i < 5; i++) ids.push(await w.capture())
+      // Two captures published at the same instant: the id breaks the tie
+      const same = { publishedAt: new Date(T0 + 3 * 60_000) }
+      ids.push(await w.capture(same), await w.capture(same))
+      const repo = drizzleGalleryRepository(tx)
+      const seen: string[] = []
+      let after: GridFilter['after']
+      for (;;) {
+        const page = await repo.grid({ ...base, gameVersion: w.version, limit: 2, after })
+        if (page.length === 0) break
+        seen.push(...page.map((r) => r.id))
+        const last = page.at(-1)!
+        after = { key: 0, publishedAt: last.publishedAt, id: last.id }
+        await w.capture({ publishedAt: new Date(T0 + 3_600_000 + seen.length) }) // newer: before the cursor
+      }
+      expect(seen).toHaveLength(ids.length)
+      expect(new Set(seen)).toEqual(new Set(ids))
+    })
+  })
+
+  it('US-20.3 filters by zone, time of day and minimum likes, sorts by likes or downloads', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const dawn = await w.capture({ likesCount: 20, downloadsCount: 1 }, { time: '06:30', zone: true })
+      const night = await w.capture({ likesCount: 5, downloadsCount: 9 }, { time: '23:10' })
+      const midnight = await w.capture({ likesCount: 60 }, { time: '02:00' })
+      const untimed = await w.capture({ likesCount: 1, downloadsCount: 4 })
+      const repo = drizzleGalleryRepository(tx)
+      const ids = async (filter: Partial<GridFilter>) =>
+        (await repo.grid({ ...base, gameVersion: w.version, ...filter })).map((r) => r.id)
+      expect(await ids({ zoneId: w.zone.id })).toEqual([dawn])
+      expect(await ids({ timeOfDay: 'dawn' })).toEqual([dawn])
+      expect(await ids({ timeOfDay: 'night' })).toEqual([midnight, night])
+      expect(await ids({ timeOfDay: 'day' })).toEqual([])
+      expect(await ids({ minLikes: 15 })).toEqual([midnight, dawn])
+      expect(await ids({ sort: 'popular' })).toEqual([midnight, dawn, night, untimed])
+      expect(await ids({ sort: 'downloads' })).toEqual([night, untimed, dawn, midnight])
+      // Next page of the popular sort: after the likes of the last capture seen
+      const after = { key: 20, publishedAt: new Date(T0 + 60_000), id: dawn }
+      expect(await ids({ sort: 'popular', after })).toEqual([night, untimed])
+    })
+  })
+
+  it('leaves out the captures of an account banned or being deleted', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      await w.capture()
+      const [banned] = await tx
+        .insert(users)
+        .values({ username: `banned_${crypto.randomUUID().slice(0, 8)}`, status: 'banned' })
+        .returning()
+      await w.capture({ userId: banned!.id })
+      expect(await drizzleGalleryRepository(tx).grid({ ...base, gameVersion: w.version })).toHaveLength(1)
+    })
+  })
+})

@@ -1,6 +1,6 @@
 # Q80 — Avatar : serveur (T-28a)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Découpage** : T-28 devient T-28a (serveur) et T-28b (écran : recadrage, réglages, `UiAvatar`).
   - **Fichier** : JPEG, PNG ou WebP, 2 Mo au plus, carré, de 128 à 2048 px de côté ; le recadrage carré se fait dans

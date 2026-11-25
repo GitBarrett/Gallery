@@ -1,6 +1,6 @@
 # Q76 — Conversion dans le navigateur (T-26b)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Encodeurs** : `@jsquash` (encodeurs de Squoosh, Apache-2.0), décodeur TGA maison ; décision en ADR-020.
   - **Chaîne** : un TGA devient un PNG sans perte ; s'il dépasse encore 20 Mo, un WebP sans perte ; sinon un JPEG

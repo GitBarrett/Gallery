@@ -1,6 +1,6 @@
 # Q65 — Catalogue : versions du jeu et tags (T-20a)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - Versions au lancement (migration 0009), dans cet ordre : `wow-forever` « WoW Forever », `retail` « Retail », `classic-era` « Classic Era », `classic-progression` « Classic progression », `other` « Other » / « Autre ». Seul « Other » est traduit en français ; les slugs servent aux URL `/v/{slug}`.
   - `GET /api/game-versions` ne renvoie que les versions non archivées (l'admin les listera toutes en T-53a).

@@ -13,3 +13,7 @@ export function qualityFromLikes(likes: number, thresholds: QualityThresholds): 
   if (likes >= thresholds.uncommon) return 'uncommon'
   return 'poor'
 }
+
+/** Fewest likes of a tier (the « Minimum quality » filter, US-20.3): 0 for Poor. */
+export const minLikes = (quality: Quality, thresholds: QualityThresholds) =>
+  quality === 'poor' ? 0 : thresholds[quality]

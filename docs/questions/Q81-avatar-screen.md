@@ -1,6 +1,6 @@
 # Q81 — Écran de l'avatar (T-28b)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - Recadrage : le **carré central** de l'image est gardé automatiquement, sans réglage par le membre (ni
     déplacement ni zoom) ; un aperçu le montre avant l'envoi. Un recadrage manuel pourra venir ensuite.

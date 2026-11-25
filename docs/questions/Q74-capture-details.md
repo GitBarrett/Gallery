@@ -1,6 +1,6 @@
 # Q74 — Détails d'une capture côté serveur (T-26d)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Découpage** : T-26a dépassait ≈ 800 lignes (le serveur ne recevait que titre et version) ; le serveur des détails
     devient T-26d, faite avant le formulaire. T-26a garde son numéro, les renvois de Q37, Q67 et Q73 restent valables.

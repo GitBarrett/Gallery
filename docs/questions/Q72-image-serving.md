@@ -1,6 +1,6 @@
 # Q72 — Service des images (T-25a)
 
-- **Statut** : À valider — Adrien
+- **Statut** : Tranché — Adrien, 25/11/2026 (options appliquées retenues)
 - **Points non précisés par les specs et option appliquée** (la plus simple et réversible) :
   - **Refus** : toute largeur hors `400/800/1200/2400/og.jpg`, capture inconnue, non publiée sans droit ou variante
     absente → 404 sans corps, `Cache-Control: no-store` (pas le format d'erreur de l'API, réservé à `/api`).
