@@ -1,4 +1,5 @@
 import { expect, test } from './fixtures'
+import { hydrated } from './helpers'
 
 // Bilingual site (T-07b): English at `/`, French under `/fr/`, browser detection on the root only.
 
@@ -25,7 +26,7 @@ test.describe('with a French browser', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'fr')
     await expect(page.getByRole('link', { name: 'Se connecter' })).toBeVisible()
 
-    await page.waitForLoadState('networkidle') // hydrated: the client navigation writes the cookie
+    await hydrated(page) // the client navigation writes the cookie
     await page.getByRole('link', { name: 'English' }).click()
     await expect(page).toHaveURL(/\/$/)
     await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible()

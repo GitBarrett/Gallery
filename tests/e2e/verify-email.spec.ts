@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
+import { hydrated } from './helpers'
 
 // Email verification screen (T-11f): sign-up → email in the preview's fake mailbox (/__test/mailbox) → link →
 // signed in. Desktop only, a single sign-up: the CI address has 3 sign-ups per hour, shared with the other specs.
@@ -58,7 +59,7 @@ test('US-01.1 US-01.4 US-01.5 the mailed link verifies the email and signs in, o
 
   // US-01.5: signed in before verifying (Q46), a member whose link does not work asks for a new one
   await page.goto('/signin')
-  await page.waitForLoadState('networkidle')
+  await hydrated(page)
   await page.getByLabel('Email').fill(ash.email)
   await page.getByLabel('Password').fill(ash.password)
   await page.getByRole('main').getByRole('button', { name: 'Sign in' }).click()

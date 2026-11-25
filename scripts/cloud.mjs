@@ -23,6 +23,12 @@ async function api(base, token, method, path, body) {
       await sleep(2000)
       continue
     }
+    // A 5xx of Cloudflare's API (codes 10013, 10500 on queue consumers) passes on retry; reads and deletions only,
+    // a creation retried could exist twice
+    if (res.status >= 500 && (method === 'GET' || method === 'DELETE') && attempt < 4) {
+      await sleep(2000 * attempt)
+      continue
+    }
     if (!res.ok)
       throw new Error(`${method} ${path} → ${res.status} ${JSON.stringify(json.errors ?? json.message ?? json)}`)
     return json

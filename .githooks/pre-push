@@ -1,0 +1,12 @@
+#!/bin/sh
+# Quick gates before a push (CI analysis of 25/11/2026: 7 failed runs were Prettier, ESLint, test:trace or
+# dependency-cruiser): only the files changed since main for Prettier and ESLint, a few seconds in all.
+# The CI `checks` job stays the reference (CLAUDE.md, rule 5).
+base=$(git merge-base HEAD origin/main 2>/dev/null) || exit 0
+files=$(git diff --name-only --diff-filter=ACMR "$base" HEAD)
+[ -z "$files" ] && exit 0
+
+echo "$files" | xargs pnpm exec prettier --check --ignore-unknown || exit 1
+code=$(echo "$files" | grep -E '\.(ts|vue|mjs)$')
+if [ -n "$code" ]; then echo "$code" | xargs pnpm exec eslint --no-warn-ignored || exit 1; fi
+pnpm -s arch && pnpm -s test:trace

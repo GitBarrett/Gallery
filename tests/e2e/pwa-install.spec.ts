@@ -1,5 +1,6 @@
 import type { BrowserContext, Page } from '@playwright/test'
 import { expect, test } from './fixtures'
+import { hydrated } from './helpers'
 
 // Install invitation (T-09b). Chrome's `beforeinstallprompt` is simulated: Playwright never fires it.
 const fireInstallPrompt = (page: Page) =>
@@ -15,7 +16,7 @@ const fireInstallPrompt = (page: Page) =>
 async function visit(context: BrowserContext) {
   const page = await context.newPage()
   await page.goto('/')
-  await page.waitForLoadState('networkidle') // hydrated
+  await hydrated(page)
   return page
 }
 

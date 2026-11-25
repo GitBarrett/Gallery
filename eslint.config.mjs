@@ -28,4 +28,30 @@ export default withNuxt(
     files: ['server/modules/*/domain/**', 'server/modules/*/application/**'],
     rules: { complexity: ['error', 10] },
   },
+  {
+    // E2E on previews behind Cloudflare Access: the forms that made CI runs fail (analysis of 25/11/2026)
+    files: ['tests/e2e/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "MemberExpression[property.name='request'][object.name=/^(page|context)$/]",
+          message: 'Cloudflare Access answers a bare request with its own page: check from the page (helpers.ts).',
+        },
+        {
+          selector: "ObjectPattern > Property[key.name='request']",
+          message: 'Cloudflare Access answers a bare request with its own page: check from the page (helpers.ts).',
+        },
+        {
+          selector:
+            "CallExpression[callee.object.name='page'][callee.property.name='getByRole'][arguments.0.value=/^(status|alert)$/]:not(MemberExpression[property.name='filter'] > CallExpression.object)",
+          message: 'Several status or alert regions can show at once: add .filter({ hasText }) or scope the locator.',
+        },
+        {
+          selector: "CallExpression[callee.property.name='waitForLoadState'][arguments.0.value='networkidle']",
+          message: 'networkidle hangs on polling pages and does not mean hydrated: await hydrated(page) (helpers.ts).',
+        },
+      ],
+    },
+  },
 )

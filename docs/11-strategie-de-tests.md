@@ -82,6 +82,7 @@ Chaque parcours vérifie aussi l'accessibilité de chaque page visitée avec `@a
 - `pnpm db:seed` (local, preview) : versions du jeu, zones (`docs/seed/zones.csv`), 3 comptes (membre, modérateur avec TOTP de test, admin), 60 captures de démonstration libres de droits générées (dégradés), likes répartis sur tous les paliers de qualité.
 - Les tests d'intégration créent leurs propres données dans une **transaction annulée** à la fin, ou dans un schéma dédié par worker Vitest.
 - Les E2E s'exécutent sur une base de preview réinitialisée (`POST /__test/reset`, actif seulement avec `NUXT_FAKE_PROVIDERS=true`).
+- Attentes des E2E (`tests/e2e/helpers.ts`, analyse de la CI du 25/11/2026) : `hydrated(page)` avant de saisir ou de cliquer (l'app pose `<html data-hydrated>`) ; `submitAndWait` pour une soumission qui attend la réponse de l'API (mot de passe : plusieurs secondes sur une preview) ; `expectImageLoaded` pour vérifier une image depuis la page. ESLint refuse dans `tests/e2e` une requête directe (`page.request`, fixture `request` : Cloudflare Access y répond par sa propre page), un `page.getByRole('status' | 'alert')` sans `.filter` et `waitForLoadState('networkidle')`.
 
 ## 7. CI (GitHub Actions)
 | Étape | Déclencheur | Bloquant |
