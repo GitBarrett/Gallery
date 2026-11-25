@@ -23,3 +23,6 @@ export { imagesBindingService, type ImagesBinding } from './infrastructure/image
 export { memoryBucket, r2ObjectStorage, type R2Bucket } from './infrastructure/r2-object-storage'
 export { orThrow } from './interface/media-http'
 export { PROCESS_ATTEMPTS, photoProcessConsumer } from './interface/photo-process-consumer'
+export type { CachePurger } from './application/ports'
+export { IMAGE_SIZES, removeImages, serveImage, type ServedImage } from './application/serve-image'
+export { cloudflareCachePurger } from './infrastructure/cloudflare-cache-purger'

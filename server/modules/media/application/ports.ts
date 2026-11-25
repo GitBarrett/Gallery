@@ -117,3 +117,8 @@ export const incomingKey = (photoId: string) => `incoming/${photoId}`
 export const originalKey = (photoId: string) => `originals/${photoId}`
 /** Display variants (ADR-012): `{400,800,1200,2400}.webp` and `1200.jpg`. */
 export const variantKey = (photoId: string, name: string) => `variants/${photoId}/${name}`
+
+/** Port: purge by URL of the edge cache (Cloudflare API Cache, 03 § Pipeline image 6). */
+export interface CachePurger {
+  purge(urls: string[]): Promise<void>
+}
