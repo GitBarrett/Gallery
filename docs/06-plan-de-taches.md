@@ -365,7 +365,7 @@ T-30 (galerie et PLP) est découpée le 25/11/2026 en T-30a (serveur), T-30b (gr
   PLP `/v/{version}` : bandeau et versions, grille masonry, défilement infini et « You've seen everything », 404, état vide « Be the first » ; « Explore » ouvre la PLP.
   Stories : US-20.1, US-20.2, US-20.4, US-70.5. Tests : composants, E.
 
-- [ ] **T-30c Galerie : filtres** (dép. T-30b)
+- [x] **T-30c Galerie : filtres** (dép. T-30b)
   Filtres de la PLP dans l'URL (barre dès 768 px, bottom sheet plein écran en dessous), infobulle de qualité « ? ».
   Stories : US-20.3, US-71.1. Tests : composants, E.
 

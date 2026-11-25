@@ -88,7 +88,7 @@ export const errorMessageKey = (error: unknown) => `errors.${error instanceof Ap
 
 export const api = {
   health: () => call('/api/health', HealthResponse),
-  publicSettings: () => call('/api/settings/public', PublicSettings),
+  publicSettings: (fetch?: typeof $fetch) => call('/api/settings/public', PublicSettings, {}, fetch),
   // 204 without body (US-01.2, US-56.4: the same answer whatever the email)
   signup: (body: SignupBody) => call('/api/auth/signup', z.unknown(), { method: 'POST', body }),
   waitlist: (body: WaitlistBody) => call('/api/waitlist', z.unknown(), { method: 'POST', body }),

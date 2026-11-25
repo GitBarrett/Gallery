@@ -58,6 +58,41 @@ test('US-20.1 US-20.2 a published capture shows in the grid of its version, newe
   // Fewer than 30 captures in this version: a single page, then the end of the grid
   await expect(page.getByText("You've seen everything")).toBeVisible()
   await expect(page.getByRole('link', { name: 'Classic Era' })).toHaveAttribute('aria-current', 'page')
+
+  // US-20.3: each filter is written to the URL; the back button returns to the previous grid
+  await hydrated(page)
+  const filters = page.getByRole('region', { name: 'Filters' })
+  await filters.getByLabel('Sort by').selectOption('popular')
+  await expect(page).toHaveURL('/v/classic-era?sort=popular')
+  await expect(tile).toBeVisible()
+  await filters.getByLabel('Time of day').selectOption('dawn') // the capture has no in-game time
+  await expect(page).toHaveURL('/v/classic-era?time=dawn&sort=popular')
+  await expect(page.getByRole('heading', { name: 'No capture matches these filters' })).toBeVisible()
+  await page.goBack()
+  await expect(page).toHaveURL('/v/classic-era?sort=popular')
+  await expect(tile).toBeVisible()
+  // A shared link gives the same grid, rendered by the server
+  await page.goto('/v/classic-era?time=dawn&sort=popular')
+  await expect(page.getByRole('heading', { name: 'No capture matches these filters' })).toBeVisible()
+})
+
+test('US-71.1 the « ? » of Minimum quality lists the five tiers with the thresholds of the settings', async ({
+  page,
+}) => {
+  await page.goto('/v/wow-forever')
+  await hydrated(page)
+  const filters = page.getByRole('region', { name: 'Filters' })
+  await filters.getByRole('button', { name: 'What is capture quality?' }).click()
+  const help = page.getByRole('region', { name: 'Capture quality' })
+  // Launch thresholds of site_settings (07 § Seuils de qualité au lancement)
+  await expect(help.getByRole('listitem')).toHaveText([
+    'Poornew capture',
+    'Uncommon3 likes',
+    'Rare15 likes',
+    'Epic50 likes',
+    'Legendary150 likes',
+  ])
+  await expect(help.getByRole('link', { name: 'How quality works' })).toHaveAttribute('href', '/help/quality')
 })
 
 test('US-70.5 a version without capture invites to be the first, with the upload', async ({ page }) => {
