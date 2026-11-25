@@ -151,5 +151,8 @@ export interface CaptureDetails {
   inGameTime?: string
   graphicsSettings?: string
   characterName?: string
+  /** Focal point (US-13.1), 0–1; absent: the centre (US-13.2). */
+  focalX?: number
+  focalY?: number
   tagIds: string[]
 }

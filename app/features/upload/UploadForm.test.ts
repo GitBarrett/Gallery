@@ -125,6 +125,19 @@ describe('UploadForm', () => {
     expect(send.mock.calls[0]![1].zoneCustom).toBeUndefined()
   })
 
+  it('US-13.1 sends the focal point touched on the image; US-13.2 none by default', async () => {
+    send.mockResolvedValue('0193a000-0000-7000-8000-0000000000aa')
+    const wrapper = await mounted()
+    await fill(wrapper)
+    const frame = wrapper.get('.frame')
+    frame.element.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 }) as DOMRect
+    await frame.trigger('click', { clientX: 50, clientY: 25 })
+    expect(wrapper.get('.preview .thumbnail').attributes('style')).toContain('object-position: 25% 25%') // live preview
+    await wrapper.get('form').trigger('submit')
+    await vi.waitFor(() => expect(send).toHaveBeenCalled())
+    expect(send.mock.calls[0]![1]).toMatchObject({ focalX: 0.25, focalY: 0.25 })
+  })
+
   it('US-10.5 tells when the next upload is possible after the 20th of the day', async () => {
     send.mockRejectedValue(new ApiError('RATE_LIMITED', 429, 'c', { retryAfterSeconds: 3600 }))
     const wrapper = await mounted()

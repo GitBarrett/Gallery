@@ -433,6 +433,13 @@
       "time": "{time} in-game",
       "use": "Use: download the original as a wallpaper.",
       "quality": "Every capture starts as Poor and levels up with likes."
+    },
+    "focal": {
+      "title": "Focal point",
+      "hint": "Touch the image where the subject is: the crops of the gallery keep it in view. By default, the centre.",
+      "x": "Horizontal position",
+      "y": "Vertical position",
+      "centre": "Back to the centre"
     }
   }
 }
