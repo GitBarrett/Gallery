@@ -1,6 +1,7 @@
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { describe, expect, it, vi } from 'vitest'
 import { readBody } from 'h3'
+import { aMe } from '../../../tests/builders/accounts'
 import ProfileForm from './ProfileForm.vue'
 
 const sent = vi.fn()
@@ -8,13 +9,7 @@ registerEndpoint('/api/me', {
   method: 'PATCH',
   handler: async (event) => {
     sent(await readBody(event))
-    return {
-      id: '0190c3a0-0000-7000-8000-000000000001',
-      username: 'Ash_Barrett',
-      role: 'user',
-      emailVerified: true,
-      avatarUrl: null,
-    }
+    return aMe({ username: 'Ash_Barrett' })
   },
 })
 

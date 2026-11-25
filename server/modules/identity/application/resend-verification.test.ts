@@ -3,7 +3,7 @@ import { fixedClock } from '../../../../tests/fakes/fixed-clock'
 import { inMemoryIdentityRepository } from '../../../../tests/fakes/in-memory-identity-repository'
 import { inMemoryRateLimiter } from '../../../../tests/fakes/in-memory-rate-limiter'
 import { inMemoryUnitOfWork } from '../../../../tests/fakes/in-memory-unit-of-work'
-import type { Actor } from './ports'
+import { anActor } from '../../../../tests/builders/actor'
 import { resendVerification } from './resend-verification'
 
 const clock = fixedClock('2026-11-22T12:00:00Z')
@@ -18,14 +18,7 @@ function setup() {
   return { run, sent }
 }
 
-const ash: Actor = {
-  id: 'ash',
-  username: 'Ash',
-  role: 'user',
-  status: 'active',
-  emailVerified: false,
-  mfaVerified: false,
-}
+const ash = anActor({ id: 'ash', emailVerified: false })
 const cmd = { actor: ash, turnstileToken: 'human', ip: '203.0.113.7' }
 const done = { ok: true, value: undefined }
 const verifyEmail = { topic: 'emails', payload: { template: 'verify', userId: 'ash' } }

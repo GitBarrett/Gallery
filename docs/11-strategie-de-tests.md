@@ -28,6 +28,7 @@ La couverture ne remplace pas la traçabilité : un script `pnpm test:trace` vé
 - Nom du test = identifiant + comportement : `it('US-10.3 rejects a PNG whose bytes are an HTML file')`.
 - Structure Given / When / Then reprise des AC ; un seul comportement par test.
 - Données construites par des **builders** (`aCapture().published().withLikes(12).build()`) dans `tests/builders/` ; jamais de dépendance à l'ordre d'exécution.
+- Une réponse d'API ou un objet partagé par plusieurs tests (`MeResponse`, `ProfileResponse`, `Actor`…) vient de son builder (`aMe()`, `aProfile()`, `anActor()`), jamais d'un littéral recopié : un champ ajouté à un contrat ne touche que le builder.
 - Temps : horloge injectée (`FixedClock`) côté serveur, `page.clock` côté Playwright ; aucun `sleep`.
 - Aucun appel réseau réel en test (sauf scan ZAP sur preview) : fournisseurs remplacés par fakes ou par **MSW** pour les appels HTTP sortants.
 - Fixtures de fichiers dans `tests/fixtures/images/` (JPEG, PNG, WebP, TGA valides aux formats réels 1920×1080, 3440×1440, 3840×2160, 5120×2160, 7680×4320 ; PNG de 25 Mo pour la chaîne de conversion ; blanc pur et noir pur pour le contraste) et `tests/fixtures/malicious/` (cf. `08-securite.md` § 11).

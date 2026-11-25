@@ -1,14 +1,12 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
+import { aProfile } from '../../../tests/builders/accounts'
 import PublicProfile from './PublicProfile.vue'
 
-const profile = {
-  username: 'Ash_Barrett',
-  avatarUrl: null,
+const profile = aProfile({
   bio: '<b>Night elf</b> hunter.',
-  memberSince: '2026-11-01T10:00:00.000Z',
-  socialLinks: [{ platform: 'twitch' as const, label: 'Ash_Barrett', url: 'https://twitch.tv/Ash_Barrett' }],
-}
+  socialLinks: [{ platform: 'twitch', label: 'Ash_Barrett', url: 'https://twitch.tv/Ash_Barrett' }],
+})
 
 describe('PublicProfile', () => {
   it('US-05.3 shows the username, the bio as text, the membership date and the empty captures', async () => {
