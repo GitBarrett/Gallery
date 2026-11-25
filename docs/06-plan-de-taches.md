@@ -369,11 +369,17 @@ T-30 (galerie et PLP) est découpée le 25/11/2026 en T-30a (serveur), T-30b (gr
   Filtres de la PLP dans l'URL (barre dès 768 px, bottom sheet plein écran en dessous), infobulle de qualité « ? ».
   Stories : US-20.3, US-71.1. Tests : composants, E.
 
-- [ ] **T-31a Page photo** (dép. T-30)
-  PDP, infobulle façon objet, Open Graph, `ImageObject`.
-  Stories : US-25.1, US-71.2. Tests : I, E.
+T-31a (page photo) est découpée le 26/11/2026 en T-31a (serveur) et T-31c (écran) ; T-31b attend les deux.
 
-- [ ] **T-31b Navigation entre captures** (dép. T-31a)
+- [x] **T-31a Page photo : serveur** (dép. T-30)
+  `GET /api/photos/{id}` : capture publiée seulement (404 sinon), détails, version, zone, tags, auteur et son avatar, likes et qualité, mis en cache en bordure.
+  Stories : US-25.1. Tests : U, I.
+
+- [ ] **T-31c Page photo : écran** (dép. T-31a)
+  PDP `/p/{id}`, infobulle façon objet, badge de qualité avec son seuil et les likes manquants, Open Graph, Twitter Card, `ImageObject` ; les tuiles de la grille mènent à la PDP.
+  Stories : US-25.1, US-71.2. Tests : U, I, E.
+
+- [ ] **T-31b Navigation entre captures** (dép. T-31c)
   Précédent/suivant, swipe, « More from » avec replis.
   Stories : US-67.2–3, US-70.1–2. Tests : E.
 

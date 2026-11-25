@@ -1,4 +1,5 @@
 import { z } from './zod'
+import { AvatarUrl } from './auth'
 import { GRID_SORTS } from '../domain/grid-sort'
 import { QUALITIES } from '../domain/quality'
 import { TIMES_OF_DAY } from '../domain/time-of-day'
@@ -164,3 +165,33 @@ export const PhotosResponse = z.strictObject({
   nextCursor: z.string().nullable(),
 })
 export type PhotosResponse = z.infer<typeof PhotosResponse>
+
+const Names = z.strictObject({ slug: z.string(), nameEn: z.string(), nameFr: z.string() })
+
+/**
+ * GET /api/photos/{id} (US-25.1, PDP): a published capture with its details, 404 otherwise (annexe B). Free text of
+ * the author as given (rendered as text); the counters raw, the page hides those under 10 (US-70.6).
+ */
+export const PhotoResponse = z.strictObject({
+  id: z.uuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  altText: z.string().nullable(),
+  caption: z.string().nullable(),
+  width: z.int(),
+  height: z.int(),
+  mime: z.string(),
+  bytes: z.int(),
+  version: Names,
+  zone: Names.nullable(),
+  inGameTime: z.string().nullable(),
+  graphicsSettings: z.string().nullable(),
+  characterName: z.string().nullable(),
+  tags: z.array(z.string()),
+  author: z.strictObject({ username: z.string(), avatarUrl: AvatarUrl }),
+  likes: z.int(),
+  downloads: z.int(),
+  quality: z.enum(QUALITIES),
+  publishedAt: z.iso.datetime(),
+})
+export type PhotoResponse = z.infer<typeof PhotoResponse>
