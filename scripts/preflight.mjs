@@ -1,6 +1,6 @@
 // Local checks before `pnpm dev`, the integration tests, the seed and the migrations: wakes the PostgreSQL of WSL
-// Ubuntu (T-04e, systemd starts it), warns when Node is older than `engines`, and stops at once with the fix when the
-// test database does not answer, instead of an obscure error minutes later. In CI the WSL step does nothing.
+// Ubuntu (T-04e, systemd starts it), then stops at once with the fix when Node is older than `engines` or the test
+// database does not answer, instead of an obscure error minutes later. In CI the WSL step does nothing.
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import postgres from 'postgres'
@@ -13,9 +13,12 @@ const wanted = JSON.parse(readFileSync('package.json', 'utf8')).engines.node.rep
 const version = (v) => v.split('.').map(Number)
 const [major, minor] = version(process.versions.node)
 const [needMajor, needMinor] = version(wanted)
-// A warning only: Nuxt still runs on an older 22.x, with its own warning
+// The CI runs Node 24: a local run on an older one tests something else
 if (major < needMajor || (major === needMajor && minor < needMinor))
-  console.warn(`preflight: Node ${process.versions.node} is older than ${wanted}: install a newer Node (nvm, winget).`)
+  problems.push(
+    `Node ${process.versions.node} is older than ${wanted} (the CI runs 24). On Windows: ` +
+      'winget uninstall --id OpenJS.NodeJS.22 -e, then winget install --id OpenJS.NodeJS.24 -e',
+  )
 
 if (existsSync('.env.test')) process.loadEnvFile('.env.test')
 const url = process.env.DATABASE_URL
