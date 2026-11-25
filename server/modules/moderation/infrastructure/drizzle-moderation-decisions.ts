@@ -4,11 +4,11 @@ import { moderationDecisions } from '../../../db/schema'
 import type { ModerationDecisionsRepository } from '../application/ports'
 
 export const drizzleModerationDecisions = (db: Db | Transaction): ModerationDecisionsRepository => ({
-  async recordAuto({ targetId, decision, scores, reason }) {
+  async recordAuto({ targetType = 'photo', targetId, decision, scores, reason }) {
     // One automatic decision per capture (partial unique index): a replay replaces it, the latest one is applied
     await db
       .insert(moderationDecisions)
-      .values({ targetType: 'photo', targetId, decision, source: 'auto', scores, reason })
+      .values({ targetType, targetId, decision, source: 'auto', scores, reason })
       .onConflictDoUpdate({
         target: [moderationDecisions.targetType, moderationDecisions.targetId],
         targetWhere: sql`${moderationDecisions.source} = 'auto'`,

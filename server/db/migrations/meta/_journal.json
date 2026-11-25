@@ -127,6 +127,13 @@
       "when": 1795574899272,
       "tag": "0017_focal_point",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1795596320694,
+      "tag": "0018_avatar_decisions",
+      "breakpoints": true
     }
   ]
 }

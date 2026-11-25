@@ -122,3 +122,9 @@ export const MyPhotoResponse = z.strictObject({
   focalY: z.number().nullable(),
 })
 export type MyPhotoResponse = z.infer<typeof MyPhotoResponse>
+
+/** POST /api/me/avatar-upload-url (US-07.6): the square file declared with UploadUrlBody; PUT it before `expiresAt`. */
+export const AvatarUploadUrlResponse = z.strictObject({ version: z.uuid(), url: z.url(), expiresAt: z.iso.datetime() })
+export type AvatarUploadUrlResponse = z.infer<typeof AvatarUploadUrlResponse>
+/** POST /api/me/avatar/complete: the version put, sent to processing and moderation (204). */
+export const AvatarCompleteBody = z.strictObject({ version: z.uuid() })

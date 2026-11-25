@@ -129,6 +129,34 @@ export const drizzleIdentityRepository = (db: Db | Transaction): IdentityReposit
       .where(eq(users.id, userId))
     return row ?? null
   },
+  async findAvatar(userId) {
+    const [row] = await db
+      .select({ current: users.avatarKey, pending: users.avatarPendingKey })
+      .from(users)
+      .where(eq(users.id, userId))
+    return row ?? null
+  },
+  async setPendingAvatar(userId, version) {
+    await db.update(users).set({ avatarPendingKey: version }).where(eq(users.id, userId))
+  },
+  async promoteAvatar(userId, version) {
+    // The current version read in the same statement (CTE): a concurrent promotion cannot slip in between
+    const rows = await db.execute<{ previous: string | null }>(sql`
+      with old as (select avatar_key from users where id = ${userId} and avatar_pending_key = ${version} for update)
+      update users set avatar_key = ${version}, avatar_pending_key = null
+      from old where users.id = ${userId} and users.avatar_pending_key = ${version}
+      returning old.avatar_key as previous`)
+    const [row] = Array.from(rows)
+    return row ? { previous: row.previous } : false
+  },
+  async dropPendingAvatar(userId, version) {
+    const rows = await db
+      .update(users)
+      .set({ avatarPendingKey: null })
+      .where(and(eq(users.id, userId), eq(users.avatarPendingKey, version)))
+      .returning({ id: users.id })
+    return rows.length > 0
+  },
   async usernames(ids) {
     if (!ids.length) return new Map()
     const rows = await db

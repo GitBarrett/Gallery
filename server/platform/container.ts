@@ -62,6 +62,9 @@ import {
   serveImage,
   listMyCaptures,
   getMyCapture,
+  requestAvatarUpload,
+  completeAvatarUpload,
+  serveAvatar,
   editCapture,
   deleteCapture,
   cloudflareCachePurger,
@@ -99,6 +102,9 @@ export interface Container {
     serveImage: UseCase<typeof serveImage>
     listMyCaptures: UseCase<typeof listMyCaptures>
     getMyCapture: UseCase<typeof getMyCapture>
+    requestAvatarUpload: UseCase<typeof requestAvatarUpload>
+    completeAvatarUpload: UseCase<typeof completeAvatarUpload>
+    serveAvatar: UseCase<typeof serveAvatar>
     editCapture: UseCase<typeof editCapture>
     deleteCapture: UseCase<typeof deleteCapture>
   }
@@ -251,6 +257,22 @@ export function createContainer({
           zoneById: zoneById({ repo: drizzleCatalogRepository(db()) }),
           tagSlugs: tagSlugs({ repo: drizzleCatalogRepository(db()) }),
         })(cmd),
+      // US-07.6: the avatar versions live on the account (identity)
+      requestAvatarUpload: (cmd) =>
+        requestAvatarUpload({
+          accounts: drizzleIdentityRepository(db()),
+          storage: storage(),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
+          ids,
+          clock,
+        })(cmd),
+      completeAvatarUpload: (cmd) =>
+        completeAvatarUpload({
+          accounts: drizzleIdentityRepository(db()),
+          uow: drizzleUnitOfWork(db(), () => ({}), outboxRelay(db(), queues, clock), logger),
+          storage: storage(),
+        })(cmd),
+      serveAvatar: (cmd) => serveAvatar({ accounts: drizzleIdentityRepository(db()), storage: storage() })(cmd),
       editCapture: (cmd) =>
         editCapture({
           repo: drizzleMediaRepository(db()),

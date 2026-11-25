@@ -176,6 +176,14 @@ export interface IdentityRepository {
   findUsername(userId: string): Promise<{ username: string; changedAt: Date | null } | null>
   /** Usernames of the accounts among `ids`, by id, without the banned ones or those being deleted (Q69). */
   usernames(ids: string[]): Promise<Map<string, string>>
+  /** Avatar of the account (US-07.6): the version shown and the one waiting for its processing or moderation. */
+  findAvatar(userId: string): Promise<{ current: string | null; pending: string | null } | null>
+  /** A new avatar waits as `pending`, replacing any other pending one; the current one stays shown. */
+  setPendingAvatar(userId: string, version: string): Promise<void>
+  /** The pending `version` becomes the avatar shown; the version it replaces, or false if `version` was not pending. */
+  promoteAvatar(userId: string, version: string): Promise<{ previous: string | null } | false>
+  /** Forgets the pending `version` (rejected or failed); false if it was not pending. */
+  dropPendingAvatar(userId: string, version: string): Promise<boolean>
   /** Account holding `username` ignoring case: as its current name, or as a former one redirected after `at`. */
   usernameOwner(username: string, at: Date): Promise<string | null>
   /** Renames; the previous name redirects to the account until `redirectUntil`, the new one stops redirecting. */

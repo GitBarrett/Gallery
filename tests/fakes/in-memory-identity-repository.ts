@@ -22,6 +22,7 @@ type StoredUser = Omit<NewUser, 'passwordHash' | 'emailVerifiedAt'> & {
   notificationPrefs?: Partial<NotificationPrefs>
   createdAt?: Date
   mfa?: MfaState
+  avatar?: { current: string | null; pending: string | null }
 }
 
 /** In-memory IdentityRepository with the same case-insensitive uniqueness as the database indexes. */
@@ -117,6 +118,27 @@ export function inMemoryIdentityRepository() {
     },
     async setSocialLinks(userId, links) {
       socials = [...socials.filter((l) => l.userId !== userId), ...links.map((link) => ({ userId, ...link }))]
+    },
+    async findAvatar(userId) {
+      const user = users.find((u) => u.id === userId)
+      return user ? (user.avatar ?? { current: null, pending: null }) : null
+    },
+    async setPendingAvatar(userId, version) {
+      const user = users.find((u) => u.id === userId)
+      if (user) user.avatar = { current: user.avatar?.current ?? null, pending: version }
+    },
+    async promoteAvatar(userId, version) {
+      const user = users.find((u) => u.id === userId)
+      if (user?.avatar?.pending !== version) return false
+      const previous = user.avatar.current
+      user.avatar = { current: version, pending: null }
+      return { previous }
+    },
+    async dropPendingAvatar(userId, version) {
+      const user = users.find((u) => u.id === userId)
+      if (user?.avatar?.pending !== version) return false
+      user.avatar.pending = null
+      return true
     },
     async usernames(ids) {
       const found = users.filter((u) => ids.includes(u.id) && !['banned', 'pending_deletion'].includes(u.status))

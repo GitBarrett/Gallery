@@ -343,9 +343,15 @@ T-27 (modifier et supprimer une capture) est découpée le 25/11/2026 en T-27a (
   Actions « Edit » et « Delete » (confirmation) dans « My captures », formulaire de modification (champs et point focal de l'upload).
   Stories : US-12.1–2. Tests : composants, E.
 
-- [ ] **T-28 Avatar** (dép. T-17a, T-24, T-25a)
-  Upload présigné dédié (2 Mo), recadrage carré, message `avatar-process`, variantes WebP 64/128/256 écrites une fois, modération automatique, ancien avatar conservé jusqu'à validation, route `/avatar/{userId}/{version}/{size}`.
-  Stories : US-07.6. Tests : U, I, E.
+T-28 (avatar) est découpée le 25/11/2026 en T-28a (serveur) et T-28b (écran).
+
+- [x] **T-28a Avatar : serveur** (dép. T-17a, T-24, T-25a)
+  Upload présigné dédié (2 Mo, carré), message `avatar-process` sur la file `photo-process`, variantes WebP 64/128/256 écrites une fois, modération automatique, ancien avatar conservé jusqu'à validation, route `/avatar/{userId}/{version}/{size}`.
+  Stories : US-07.6. Tests : U, I.
+
+- [ ] **T-28b Avatar : écran** (dép. T-28a)
+  Recadrage carré dans le navigateur, envoi depuis `/settings`, composant `UiAvatar` (initiale par défaut) dans l'en-tête et le profil, URL de l'avatar dans `MeResponse` et `ProfileResponse`.
+  Stories : US-07.6, US-05.3. Tests : composants, E.
 
 ## Phase 3 — Découverte
 

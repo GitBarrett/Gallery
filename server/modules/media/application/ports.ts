@@ -90,6 +90,8 @@ export type ModerationGateway = (capture: {
   photoId: string
   title: string | null
   image: Uint8Array
+  /** An avatar version as `photoId` (US-07.6). */
+  target?: 'photo' | 'avatar'
 }) => Promise<{ outcome: ProcessedStatus; score: number | null }>
 
 /** Port: the captures of the media module. */

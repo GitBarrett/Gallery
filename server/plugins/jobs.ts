@@ -13,6 +13,7 @@ import {
   type QueueMessage,
 } from '../platform/jobs'
 import {
+  drizzleIdentityRepository,
   emailsConsumer,
   fakeMailer,
   mailboxMailer,
@@ -22,6 +23,7 @@ import {
   type Mailer,
 } from '../modules/identity'
 import {
+  cloudflareCachePurger,
   drizzleMediaRepository,
   imagesBindingService,
   photoProcessConsumer,
@@ -73,15 +75,29 @@ function consumers(db: Db, logger: Logger, env: Bindings): Record<string, Messag
     notifications: notificationsConsumer({ db, clock: systemClock }),
   }
   // Without R2 or Images (local runs), captures wait in the queue
-  if (env.R2 && env.IMAGES)
+  if (env.R2 && env.IMAGES) {
+    const storage = r2ObjectStorage({ bucket: env.R2, prefix: config.r2Prefix, now: systemClock.now })
+    const images = imagesBindingService(env.IMAGES)
+    const moderate = autoModeration(db, logger, config, env)
     handlers['photo-process'] = photoProcessConsumer({
       repo: drizzleMediaRepository(db),
       uow: drizzleUnitOfWork(db, drizzleMediaRepository, relayOf(env, db), logger),
-      storage: r2ObjectStorage({ bucket: env.R2, prefix: config.r2Prefix, now: systemClock.now }),
-      images: imagesBindingService(env.IMAGES),
-      moderate: autoModeration(db, logger, config, env),
+      storage,
+      images,
+      moderate,
       clock: systemClock,
+      // US-07.6: the avatar versions live on the account (identity)
+      avatars: {
+        accounts: drizzleIdentityRepository(db),
+        uow: drizzleUnitOfWork(db, drizzleIdentityRepository, relayOf(env, db), logger),
+        storage,
+        images,
+        moderate,
+        purger: cloudflareCachePurger({ token: config.cfApiTokenPurge, zoneId: config.cfZoneId, fetch: fetcher }),
+        siteUrl: config.siteUrl,
+      },
     })
+  }
   return handlers
 }
 
