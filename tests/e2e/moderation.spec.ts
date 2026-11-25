@@ -54,12 +54,11 @@ test('US-50.1 US-50.3 US-14.3 US-14.4 US-68.3 the NSFW fixture is rejected into 
       .not.toBe('processing')
     return (await testRoute(page, `/__test/photos/${photoId}`, 'GET')).body
   }
-  expect(await settled(photoIds.rejected)).toMatchObject({
-    status: 'rejected',
-    moderationScore: 0.95,
-    objects: [],
-    trashed: true,
-  })
+  expect(await settled(photoIds.rejected)).toMatchObject({ status: 'rejected', moderationScore: 0.95 })
+  // The move to trash/ follows the status commit: wait for it
+  await expect
+    .poll(async () => (await testRoute(page, `/__test/photos/${photoIds.rejected}`, 'GET')).body, { timeout: 30_000 })
+    .toMatchObject({ objects: [], trashed: true })
   expect(await settled(photoIds.published)).toMatchObject({
     status: 'published',
     moderationScore: 0.02,
