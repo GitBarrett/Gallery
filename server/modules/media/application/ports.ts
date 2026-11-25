@@ -98,8 +98,14 @@ export interface MediaRepository {
   /** Uploads of the member requested since `since` and not completed. */
   countIncomplete(userId: string, since: Date): Promise<number>
   findUpload(id: string): Promise<Upload | null>
-  /** Completes a capture still incomplete with an existing game version; false if it already was (double click). */
-  complete(id: string, fields: { title: string; gameVersion: string; at: Date }): Promise<boolean>
+  /**
+   * Completes a capture still incomplete with an existing game version and its details (zone and tags already
+   * resolved); false if it already was (double click).
+   */
+  complete(
+    id: string,
+    fields: { title: string; gameVersion: string; at: Date; details?: CaptureDetails },
+  ): Promise<boolean>
   /** Uploads requested before `before` and never completed, `limit` at most. */
   incompleteBefore(before: Date, limit: number): Promise<string[]>
   deleteIncomplete(id: string): Promise<void>
@@ -133,4 +139,17 @@ export interface OwnCapture {
   width: number
   height: number
   uploadedAt: Date
+}
+
+/** Details given at upload (US-11): free texts already checked, zone and tags resolved by the catalogue. */
+export interface CaptureDetails {
+  description?: string
+  altText?: string
+  caption?: string
+  zoneId?: string
+  zoneCustom?: string
+  inGameTime?: string
+  graphicsSettings?: string
+  characterName?: string
+  tagIds: string[]
 }

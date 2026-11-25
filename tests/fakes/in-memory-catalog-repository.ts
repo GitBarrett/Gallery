@@ -18,12 +18,13 @@ export type SeedZone = Zone & { aliases: string[]; status: 'active' | 'pending' 
  * `zones` found by substring of their names and aliases (the database also tolerates typos, pg_trgm).
  */
 export function inMemoryCatalogRepository(seed: { tags?: string[]; zones?: SeedZone[] } = {}): CatalogRepository {
+  const tags = seed.tags ?? []
   return {
     async listGameVersions() {
       return LAUNCH_GAME_VERSIONS.map((v) => ({ ...v }))
     },
     async suggestTags(prefix, limit) {
-      return (seed.tags ?? [])
+      return tags
         .filter((t) => t.startsWith(prefix))
         .sort()
         .slice(0, limit)
@@ -34,6 +35,14 @@ export function inMemoryCatalogRepository(seed: { tags?: string[]; zones?: SeedZ
         .filter((z) => normalizeTag([z.nameEn, z.nameFr, ...z.aliases].join(' ')).includes(text))
         .map(({ slug, nameEn, nameFr }) => ({ slug, nameEn, nameFr }))
         .slice(0, limit)
+    },
+    async zoneId(slug) {
+      const zone = (seed.zones ?? []).find((z) => z.slug === slug && z.status === 'active')
+      return zone ? `zone-${zone.slug}` : null
+    },
+    async ensureTags(slugs) {
+      for (const slug of slugs) if (!tags.includes(slug)) tags.push(slug)
+      return slugs.map((slug) => `tag-${slug}`)
     },
   }
 }

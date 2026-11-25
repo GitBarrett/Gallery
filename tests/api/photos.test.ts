@@ -110,6 +110,21 @@ describe('POST /api/photos/{id}/complete', () => {
     expect((await post(`/api/photos/${photoId}/complete`, { ...body, title: '  ' }, 'verified')).status).toBe(400)
   })
 
+  it('US-11.5 US-11.1 US-11.3 refuses an insult, a bad tag, a zone and a free zone together, a bad in-game time', async () => {
+    const { photoId } = UploadUrlResponse.parse(await (await post('/api/photos/upload-url', file, 'other')).json())
+    const refused = async (extra: Record<string, unknown>) => {
+      const response = await post(`/api/photos/${photoId}/complete`, { ...body, ...extra }, 'other')
+      expect(response.status).toBe(400)
+      return (await codeOf(response)).details
+    }
+    expect(await refused({ caption: 'quel connard' })).toEqual({ field: 'caption', reason: 'insult' })
+    expect(await refused({ tags: ['#night'] })).toEqual({ field: 'tags', reason: 'charset' })
+    expect(await refused({ zone: 'atlantis' })).toEqual({ field: 'zone', reason: 'unknown' })
+    await refused({ zone: 'stormwind', zoneCustom: 'Hidden Glade' })
+    await refused({ inGameTime: '25:00' })
+    await refused({ tags: Array.from({ length: 11 }, (_, i) => `tag ${i}`) })
+  })
+
   it('US-10.1 answers the same to a capture already completed, without sending it twice', async () => {
     const { photoId } = UploadUrlResponse.parse(await (await post('/api/photos/upload-url', file, 'other')).json())
     // Completed as by an earlier call: the in-memory bucket of the Node server cannot receive the PUT

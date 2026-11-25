@@ -20,10 +20,26 @@ export type UploadUrlResponse = z.infer<typeof UploadUrlResponse>
  * POST /api/photos/{id}/complete, once the PUT succeeded: title and game version of the capture (US-10.1). Accepts
  * an `Idempotency-Key` header; a second call answers the same without processing the capture twice.
  */
-export const CompleteUploadBody = z.strictObject({
-  title: z.string().trim().min(1).max(100),
-  gameVersion: z.string().min(1).max(64), // slug of GET /api/game-versions
-})
+const optionalText = (max: number) => z.string().trim().max(max).optional()
+export const CompleteUploadBody = z
+  .strictObject({
+    title: z.string().trim().min(1).max(100),
+    gameVersion: z.string().min(1).max(64), // slug of GET /api/game-versions
+    // Details of the form (US-11, T-26d), all optional; free texts pass the insult filter on the server
+    description: optionalText(1000),
+    altText: optionalText(150), // US-75.3
+    caption: optionalText(140),
+    zone: z.string().min(1).max(64).optional(), // slug of GET /api/zones/suggest
+    zoneCustom: z.string().trim().min(2).max(100).optional(), // a zone not in the dictionary (US-11.3)
+    inGameTime: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+      .optional(),
+    graphicsSettings: optionalText(100),
+    characterName: optionalText(100),
+    tags: z.array(z.string().max(64)).max(10).optional(), // normalised and checked by shared/domain/tags
+  })
+  .refine((body) => !(body.zone && body.zoneCustom), { path: ['zoneCustom'], message: 'A zone or a free zone' })
 export type CompleteUploadBody = z.infer<typeof CompleteUploadBody>
 
 export const CompleteUploadResponse = z.strictObject({ photoId: z.uuid(), status: z.literal('processing') })

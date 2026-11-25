@@ -294,6 +294,8 @@ export const photos = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     gameVersionId: uuid('game_version_id').references(() => gameVersions.id),
     title: text('title'),
+    description: text('description'),
+    altText: text('alt_text'),
     status: text('status').notNull().default('processing'),
     mime: text('mime').notNull(),
     bytes: integer('bytes').notNull(),
@@ -429,4 +431,44 @@ export const moderationDecisions = pgTable(
     index('moderation_decisions_moderator_idx').on(t.moderatorId),
     index('moderation_decisions_created_idx').on(t.createdAt), // yearly purge
   ],
+)
+
+/**
+ * Details of a capture given at upload (US-11, 03-architecture.md § Modèle de données): zone of the dictionary or a
+ * free one awaiting review (US-11.3, US-57), in-game time, settings, character, caption. One row per completed capture.
+ */
+export const photoMetadata = pgTable(
+  'photo_metadata',
+  {
+    photoId: uuid('photo_id')
+      .primaryKey()
+      .references(() => photos.id, { onDelete: 'cascade' }),
+    zoneId: uuid('zone_id').references(() => zones.id),
+    zoneCustom: text('zone_custom'),
+    inGameTime: text('in_game_time'),
+    graphicsSettings: text('graphics_settings'),
+    characterName: text('character_name'),
+    caption: text('caption'),
+  },
+  (t) => [
+    index('photo_metadata_zone_idx').on(t.zoneId),
+    // The free zones to review (US-57)
+    index('photo_metadata_zone_custom_idx')
+      .on(t.zoneCustom)
+      .where(sql`${t.zoneCustom} is not null`),
+  ],
+)
+
+/** Tags of a capture (US-11.1), 10 at most (checked by the use case). */
+export const photoTags = pgTable(
+  'photo_tags',
+  {
+    photoId: uuid('photo_id')
+      .notNull()
+      .references(() => photos.id, { onDelete: 'cascade' }),
+    tagId: uuid('tag_id')
+      .notNull()
+      .references(() => tags.id, { onDelete: 'cascade' }),
+  },
+  (t) => [primaryKey({ columns: [t.photoId, t.tagId] }), index('photo_tags_tag_idx').on(t.tagId)],
 )

@@ -22,6 +22,10 @@ export interface CatalogRepository {
   suggestTags(prefix: string, limit: number): Promise<string[]>
   /** Active zones whose names or aliases hold `text` (normalised), closest first, `limit` at most. */
   suggestZones(text: string, limit: number): Promise<Zone[]>
+  /** Id of the active zone of this slug, null otherwise. */
+  zoneId(slug: string): Promise<string | null>
+  /** Ids of the normalised tags `slugs`, in their order, the missing ones created. */
+  ensureTags(slugs: string[]): Promise<string[]>
 }
 
 const SUGGESTIONS = 10
@@ -46,3 +50,9 @@ export const suggestZones =
     const text = normalizeTag(cmd.q)
     return text ? deps.repo.suggestZones(text, SUGGESTIONS) : []
   }
+
+/** Zone chosen in the upload form (US-11.2): its id, null when it is not an active zone of the dictionary. */
+export const findZone = (deps: { repo: CatalogRepository }) => (slug: string) => deps.repo.zoneId(slug)
+
+/** Tags of a capture (US-11.1), already validated by shared/domain/tags: their ids, new ones created. */
+export const ensureTags = (deps: { repo: CatalogRepository }) => (slugs: string[]) => deps.repo.ensureTags(slugs)

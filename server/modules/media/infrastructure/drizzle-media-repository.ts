@@ -1,6 +1,6 @@
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, lt, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
-import { gameVersions, photos } from '../../../db/schema'
+import { gameVersions, photoMetadata, photos, photoTags } from '../../../db/schema'
 import type { MediaRepository } from '../application/ports'
 
 /** photos table: the uploads of T-21 and their processing (T-22b), the other columns arrive with their tasks. */
@@ -30,18 +30,25 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
       .where(eq(photos.id, id))
     return row ?? null
   },
-  async complete(id, { title, gameVersion, at }) {
+  async complete(id, { title, gameVersion, at, details }) {
+    const { description, altText, tagIds = [], ...metadata } = details ?? { tagIds: [] }
     // Conditional: of two concurrent calls, one only completes the capture (and publishes its event)
     const rows = await db
       .update(photos)
       .set({
         title,
+        description,
+        altText,
         uploadedAt: at,
         gameVersionId: sql`(select ${gameVersions.id} from ${gameVersions} where ${gameVersions.slug} = ${gameVersion})`,
       })
       .where(and(eq(photos.id, id), isNull(photos.uploadedAt)))
       .returning({ id: photos.id })
-    return rows.length > 0
+    if (!rows.length) return false
+    // In the transaction of the caller (unit of work): the details are written with the completion or not at all
+    await db.insert(photoMetadata).values({ photoId: id, ...metadata })
+    if (tagIds.length) await db.insert(photoTags).values(tagIds.map((tagId) => ({ photoId: id, tagId })))
+    return true
   },
   async incompleteBefore(before, limit) {
     const rows = await db
