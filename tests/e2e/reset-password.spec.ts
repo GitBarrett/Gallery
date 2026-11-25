@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
+import { hydrated, submitAndWait } from './helpers'
 
 // Forgotten password (T-13b): sign-in page → request → email in the preview's fake mailbox (/__test/mailbox) →
 // new password → the other sessions are ended. Desktop only, a single sign-up: the CI address has 3 sign-ups per
@@ -55,16 +56,16 @@ test('US-04.1 US-04.2 US-04.3 the mailed link sets a new password, ends the othe
   await page.getByLabel('Email').fill(ash.email)
   await page.getByLabel('Password').fill(ash.password)
   await page.getByRole('checkbox', { name: /at least 15/ }).check()
-  await create.click()
-  await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible({ timeout: 15_000 })
+  await submitAndWait(page, create, '/api/auth/signup')
+  await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible()
 
   // A session on "another device", kept aside
   await page.goto('/signin')
-  await page.waitForLoadState('networkidle')
+  await hydrated(page)
   await page.getByLabel('Email').fill(ash.email)
   await page.getByLabel('Password').fill(ash.password)
-  await page.getByRole('main').getByRole('button', { name: 'Sign in' }).click()
-  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible({ timeout: 15_000 }) // Argon2id: seconds
+  await submitAndWait(page, page.getByRole('main').getByRole('button', { name: 'Sign in' }), '/api/auth/signin')
+  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible({ timeout: 15_000 })
   const otherDevice = await context.cookies()
 
   // US-04.1: "Forgot password?" on the sign-in page, the same answer whatever the email
@@ -83,9 +84,10 @@ test('US-04.1 US-04.2 US-04.3 the mailed link sets a new password, ends the othe
   const password = `a brand new passphrase ${run}`
   await page.goto('/') // a new document: from /reset, changing the fragment alone would not reload
   await page.goto(`/reset#${token}`)
+  await hydrated(page) // the page reads the token from the fragment once hydrated
   await page.getByRole('textbox', { name: 'New password' }).fill(password)
-  await page.getByRole('button', { name: 'Change my password' }).click()
-  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible({ timeout: 15_000 }) // Argon2id: seconds
+  await submitAndWait(page, page.getByRole('button', { name: 'Change my password' }), '/api/auth/password/reset')
+  await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible({ timeout: 15_000 })
   await expect(page).toHaveURL('/') // the token left the address bar
   const signedIn = await context.cookies()
   await context.clearCookies()
@@ -97,8 +99,9 @@ test('US-04.1 US-04.2 US-04.3 the mailed link sets a new password, ends the othe
 
   // US-04.2: the link is then refused, with a way to ask for a new one
   await page.goto(`/reset#${token}`)
+  await hydrated(page)
   await page.getByRole('textbox', { name: 'New password' }).fill(`yet another passphrase ${run}`)
-  await page.getByRole('button', { name: 'Change my password' }).click()
+  await submitAndWait(page, page.getByRole('button', { name: 'Change my password' }), '/api/auth/password/reset')
   await expect(page.getByRole('alert').filter({ hasText: 'already used' })).toBeVisible()
   await page.getByRole('button', { name: 'Get a new link' }).click()
   await expect(page.getByRole('button', { name: 'Send reset link' })).toBeVisible()

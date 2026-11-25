@@ -1,5 +1,6 @@
 import type { BrowserContext, Page } from '@playwright/test'
 import { expect, test } from './fixtures'
+import { hydrated } from './helpers'
 
 // Cookie consent (T-10a, docs/legal/cookies.md). Every PostHog request of the test is recorded.
 // CF_Authorization and CF_AppSession: Cloudflare Access, on previews only (ADR-013)
@@ -16,7 +17,7 @@ const cookieNames = async (context: BrowserContext) => (await context.cookies())
 
 async function open(page: Page, path = '/') {
   await page.goto(path)
-  await page.waitForLoadState('networkidle') // hydrated
+  await hydrated(page)
 }
 
 test('US-61.1 on a first visit, no PostHog script and a panel with Accept all, Reject all and Customise of equal weight', async ({

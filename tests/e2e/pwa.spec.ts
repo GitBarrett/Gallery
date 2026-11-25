@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
+import { hydrated } from './helpers'
 
 // PWA (T-09a): Chromium only (WebKit in Playwright runs no service worker); the service worker only exists in
 // production builds (previews), so these tests are skipped against `pnpm dev`.
@@ -68,7 +69,7 @@ test('US-64.2 offline, a page never visited shows /offline with the pages availa
 // Independent of the service worker: with a page it controls, Playwright's offline emulation fires no `offline` event
 test('US-64.3 offline, a banner says so', async ({ page, context }) => {
   await page.goto('/')
-  await page.waitForLoadState('networkidle') // hydrated
+  await hydrated(page)
   await context.setOffline(true)
   await expect(page.getByRole('status').filter({ hasText: "You're offline" })).toBeVisible()
   await context.setOffline(false)

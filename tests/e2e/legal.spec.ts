@@ -1,4 +1,5 @@
 import { expect, test } from './fixtures'
+import { hydrated } from './helpers'
 
 // Legal pages (T-10b, docs/legal): reached from the footer, in the reader's language, with their update date.
 const PAGES = [
@@ -10,7 +11,7 @@ const PAGES = [
 test('US-74.1 each footer link opens its legal page with its update date', async ({ page }) => {
   await page.goto('/')
   for (const { link, path, title } of PAGES) {
-    await page.waitForLoadState('networkidle') // hydrated
+    await hydrated(page)
     await page.getByRole('contentinfo').getByRole('link', { name: link }).click()
     await expect(page).toHaveURL(path)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
@@ -21,7 +22,7 @@ test('US-74.1 each footer link opens its legal page with its update date', async
 
 test('US-74.1 "Cookie settings" opens the cookie panel, which links to the cookie policy', async ({ page }) => {
   await page.goto('/')
-  await page.waitForLoadState('networkidle')
+  await hydrated(page)
   await page.getByRole('contentinfo').getByRole('button', { name: 'Cookie settings' }).click()
   await page.getByRole('dialog', { name: 'Your cookie choices' }).getByRole('link', { name: 'cookie policy' }).click()
   await expect(page).toHaveURL('/cookies')

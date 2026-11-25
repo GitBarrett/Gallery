@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
+import { hydrated } from './helpers'
 
 // OAuth sign-in through the fake Google and Battle.net providers of the previews (its consent page is a test route, ADR-013).
 // Desktop Chromium only, one account creation per run: the sign-up limit is shared by the CI address.
@@ -15,7 +16,7 @@ const testRoute = (page: Page, path: string, method: 'POST' | 'DELETE') =>
   )
 
 async function continueWithGoogle(page: Page) {
-  await page.waitForLoadState('networkidle')
+  await hydrated(page)
   await page.getByRole('link', { name: 'Continue with Google' }).click()
   await expect(page).toHaveURL(/\/__test\/oauth\/google\?/)
 }
@@ -41,7 +42,7 @@ test('US-02.1 US-02.2 US-07.4 a first Google sign-in asks for a username and the
 
   await expect(page).toHaveURL('/oauth/complete')
   await expect(page.getByRole('heading', { level: 1, name: 'Choose your username' })).toBeVisible()
-  await page.waitForLoadState('networkidle')
+  await hydrated(page)
   await page.getByRole('textbox', { name: 'Username' }).fill(`e2e_g_${run}`)
   await page.getByRole('checkbox', { name: /at least 15/ }).check()
   await page.getByRole('button', { name: 'Create my account' }).click()
@@ -72,14 +73,16 @@ test('US-02.5 a refusal on the consent screen comes back to the sign-in with a m
   await continueWithGoogle(page)
   await page.getByRole('link', { name: 'Deny' }).click()
   await expect(page).toHaveURL('/signin?oauth=failed')
-  await expect(page.getByRole('alert')).toHaveText('That sign-in did not work. Try again, or use your email.')
+  await expect(page.getByRole('alert').filter({ hasText: 'That sign-in did not work' })).toHaveText(
+    'That sign-in did not work. Try again, or use your email.',
+  )
   await expect(page.getByRole('link', { name: 'Continue with Google' })).toBeVisible()
 })
 
 test('US-02.6 Battle.net goes through its own consent step and comes back on a refusal, both providers offered', async ({
   page,
 }) => {
-  await page.waitForLoadState('networkidle')
+  await hydrated(page)
   await page.getByRole('link', { name: 'Continue with Battle.net' }).click()
   await expect(page).toHaveURL(/\/__test\/oauth\/battlenet\?/)
   await page.getByRole('link', { name: 'Deny' }).click()

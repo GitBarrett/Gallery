@@ -1,4 +1,5 @@
 import { expect, test } from './fixtures'
+import { hydrated } from './helpers'
 
 // Smoke test: the home page responds on every device, with no resource blocked by the CSP (08-securite.md § 5).
 test('home page responds without CSP violations', async ({ page, baseURL }) => {
@@ -11,6 +12,6 @@ test('home page responds without CSP violations', async ({ page, baseURL }) => {
   // Served by the tested site, not by the Cloudflare Access login page
   expect(new URL(page.url()).origin).toBe(new URL(baseURL!).origin)
   await expect(page.locator('main')).toBeAttached()
-  await page.waitForLoadState('networkidle')
+  await hydrated(page) // the app scripts ran: their CSP violations would be reported by now
   expect(violations).toEqual([])
 })

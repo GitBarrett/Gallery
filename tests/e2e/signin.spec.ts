@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
+import { hydrated, submitAndWait } from './helpers'
 
 // Sign-in and sign-out screens (T-12b). They need the preview's test routes (invitation, counters: ADR-013) and run
 // on desktop Chromium only: the sign-up and sign-in limits are shared by the CI address, and WebKit in Playwright
@@ -28,21 +29,17 @@ async function member(page: Page) {
   await page.getByLabel('Email').fill(ash.email)
   await page.getByLabel('Password').fill(ash.password)
   await page.getByRole('checkbox', { name: /at least 15/ }).check()
-  await submit.click()
-  // Argon2id and the breached-password check take a few seconds on the preview
-  await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible({ timeout: 15_000 })
+  await submitAndWait(page, submit, '/api/auth/signup')
+  await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible()
   created = ash
   return ash
 }
 
 async function signIn(page: Page, { email, password }: { email: string; password: string }) {
-  await page.waitForLoadState('networkidle') // hydrated: typing before would be lost
+  await hydrated(page)
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Password').fill(password)
-  // the password check (Argon2id) takes seconds on a preview: wait for its answer, not only the default 5 s
-  const answered = page.waitForResponse((r) => r.url().endsWith('/api/auth/signin'), { timeout: 15_000 })
-  await page.getByRole('main').getByRole('button', { name: 'Sign in' }).click()
-  await answered
+  await submitAndWait(page, page.getByRole('main').getByRole('button', { name: 'Sign in' }), '/api/auth/signin')
 }
 
 test.beforeEach(async ({ page, browserName }, testInfo) => {
@@ -56,7 +53,8 @@ test('US-03.6 a redirect outside the site is ignored after sign-in', async ({ pa
   const ash = await member(page)
   await page.goto('/signin?redirect=//evil.example')
   await signIn(page, ash)
-  await expect(page).toHaveURL('/')
+  // the session refreshes `me`, then the client navigation loads the next page: seconds on a cold preview
+  await expect(page).toHaveURL('/', { timeout: 15_000 })
   await expect(page.getByRole('link', { name: 'My profile' })).toBeVisible()
 })
 
@@ -65,7 +63,7 @@ test('US-03.6 a visitor sent to sign in comes back to the page of the site', asy
   await page.goto('/settings')
   await expect(page).toHaveURL('/signin?redirect=/settings')
   await signIn(page, ash)
-  await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible({ timeout: 15_000 })
 })
 
 test('US-05.3 the profile icon opens the public profile, which visitors see too', async ({ page, context }) => {
@@ -87,7 +85,7 @@ test('US-05.3 the profile icon opens the public profile, which visitors see too'
 
 test('US-03.2 wrong credentials get one message', async ({ page }) => {
   await signIn(page, { email: 'nobody@example.com', password: 'not the password' })
-  await expect(page.getByRole('alert')).toHaveText('Wrong email or password.')
+  await expect(page.getByRole('alert').filter({ hasText: 'Wrong email or password.' })).toBeVisible()
 })
 
 test('US-03.4 US-64.4 sign-out ends the session and empties the pages and api-public caches', async ({ page }) => {
@@ -104,7 +102,7 @@ test('US-03.4 US-64.4 sign-out ends the session and empties the pages and api-pu
   await expect.poll(cached).toBe(true)
 
   await page.goto('/settings')
-  await page.waitForLoadState('networkidle')
+  await hydrated(page)
   await page.getByRole('button', { name: 'Sign out', exact: true }).click()
   await expect(page).toHaveURL('/')
   await expect(page.getByRole('banner').getByRole('link', { name: 'Sign in' })).toBeVisible()

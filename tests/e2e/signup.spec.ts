@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from './fixtures'
+import { hydrated, submitAndWait } from './helpers'
 
 // Sign-up screen (T-11c). Submissions need the preview's test routes (invitations, counters: ADR-013) and run on
 // desktop only: the 3 sign-ups per hour and per IP are shared by every project of the CI run.
@@ -16,6 +17,7 @@ async function testRoute(page: Page, path: string, method: 'POST' | 'DELETE') {
 
 async function fill(page: Page, { username, email, password }: { username: string; email: string; password: string }) {
   // Test site key: the check passes by itself once the page is hydrated (typing before would be lost)
+  await hydrated(page)
   const submit = page.getByRole('button', { name: 'Create my account' })
   await expect(submit).toBeEnabled({ timeout: 15_000 })
   await page.getByLabel('Username').fill(username)
@@ -63,14 +65,14 @@ test.describe('submissions', () => {
       const { body } = await testRoute(page, '/__test/invite', 'POST')
       await page.goto(`/signup?invite=${body.token}`)
       await fill(page, { ...ash, username })
-      await page.getByRole('button', { name: 'Create my account' }).click()
+      await submitAndWait(page, page.getByRole('button', { name: 'Create my account' }), '/api/auth/signup')
       await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible()
     }
   })
 
   test('US-56.4 without invitation, the sign-up is refused with the waiting list form', async ({ page }) => {
     await fill(page, someone())
-    await page.getByRole('button', { name: 'Create my account' }).click()
+    await submitAndWait(page, page.getByRole('button', { name: 'Create my account' }), '/api/auth/signup')
     await expect(page.getByRole('heading', { level: 1, name: 'Join the waiting list' })).toBeVisible()
     // the form renders again once Turnstile mounts: a tick before that is lost, so tick until it holds
     const consent = page.getByRole('checkbox', { name: /receive an email/ })
@@ -80,7 +82,7 @@ test.describe('submissions', () => {
     }).toPass({ timeout: 15_000 })
     const join = page.getByRole('button', { name: 'Join the waiting list' })
     await expect(join).toBeEnabled({ timeout: 15_000 })
-    await join.click()
+    await submitAndWait(page, join, '/api/waitlist')
     await expect(page.getByRole('heading', { level: 1, name: "You're on the list" })).toBeVisible()
   })
 })
