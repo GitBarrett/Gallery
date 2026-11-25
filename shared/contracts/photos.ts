@@ -31,3 +31,20 @@ export type CompleteUploadResponse = z.infer<typeof CompleteUploadResponse>
 
 /** `{id}` of the /api/photos/{id}/… routes. */
 export const PhotoParams = z.strictObject({ id: z.uuid() })
+
+/** GET /api/me/photos (« My captures », US-14.4): `cursor` from the previous page. */
+export const MyPhotosQuery = z.strictObject({ cursor: z.uuid().optional() })
+export const MyPhotosResponse = z.strictObject({
+  items: z.array(
+    z.strictObject({
+      id: z.uuid(),
+      title: z.string().nullable(),
+      status: z.enum(['processing', 'failed', 'pending_review', 'published', 'rejected', 'hidden']),
+      width: z.int(),
+      height: z.int(),
+      uploadedAt: z.iso.datetime(),
+    }),
+  ),
+  nextCursor: z.uuid().nullable(),
+})
+export type MyPhotosResponse = z.infer<typeof MyPhotosResponse>

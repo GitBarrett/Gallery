@@ -1,12 +1,13 @@
 import { fetch } from '@nuxt/test-utils/e2e'
 import { startTestServer } from './server'
-import { like } from 'drizzle-orm'
+import { eq, like } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { phc } from '../../scripts/seed.mjs'
 import { createDb } from '../../server/db/client'
-import { photos, users } from '../../server/db/schema'
+import { gameVersions, photos, users } from '../../server/db/schema'
+import { MyPhotosResponse } from '../../shared/contracts/photos'
 
-// /img over HTTP and Postgres (T-25a). The Node server's bucket stays empty: the refusals are checked here, the
+// /img (T-25a) and « My captures » (T-25b) over HTTP and Postgres. The Node server's bucket stays empty: the refusals are checked here, the
 // images served by tests/e2e/moderation.spec.ts on the preview (real R2), the rules by serve-image.test.ts.
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
 process.env.NUXT_FAKE_PROVIDERS = 'true'
@@ -18,27 +19,35 @@ const run = crypto.randomUUID().slice(0, 8)
 const password = 'a long passphrase'
 const ids = { published: crypto.randomUUID(), review: crypto.randomUUID() }
 let member = ''
+let owner = ''
 
 const get = (path: string, cookie = '') => fetch(path, { headers: { cookie, 'cf-connecting-ip': run } })
 
 beforeAll(async () => {
-  const [owner] = await db
+  const [author] = await db
     .insert(users)
     .values({ email: `images.owner.${run}@example.com`, username: `img_o_${run}`, passwordHash: phc(password) })
     .returning()
   const email = `images.member.${run}@example.com`
   await db.insert(users).values({ email, username: `img_m_${run}`, passwordHash: phc(password) })
-  const capture = { userId: owner!.id, mime: 'image/png', bytes: 10, width: 1920, height: 1080 }
+  const [version] = await db.select().from(gameVersions).where(eq(gameVersions.slug, 'wow-forever'))
+  const capture = { userId: author!.id, mime: 'image/png', bytes: 10, width: 1920, height: 1080 }
+  const completed = { title: 'Dusk', gameVersionId: version!.id, uploadedAt: new Date() }
   await db.insert(photos).values([
-    { ...capture, id: ids.published, status: 'published' },
-    { ...capture, id: ids.review, status: 'pending_review' },
+    { ...capture, ...completed, id: ids.published, status: 'published' },
+    { ...capture, ...completed, id: ids.review, status: 'pending_review' },
+    { ...capture, id: crypto.randomUUID() }, // upload never completed: not listed
   ])
-  const signedIn = await fetch('/api/auth/signin', {
-    method: 'POST',
-    headers: { 'sec-fetch-site': 'same-origin', 'content-type': 'application/json', 'cf-connecting-ip': run },
-    body: JSON.stringify({ email, password }),
-  })
-  member = (signedIn.headers.get('set-cookie') ?? '').split(';')[0]!
+  const signin = async (address: string) => {
+    const signedIn = await fetch('/api/auth/signin', {
+      method: 'POST',
+      headers: { 'sec-fetch-site': 'same-origin', 'content-type': 'application/json', 'cf-connecting-ip': run },
+      body: JSON.stringify({ email: address, password }),
+    })
+    return (signedIn.headers.get('set-cookie') ?? '').split(';')[0]!
+  }
+  member = await signin(email)
+  owner = await signin(`images.owner.${run}@example.com`)
 }, 60_000)
 
 afterAll(async () => {
@@ -62,5 +71,21 @@ describe('GET /img/{id}/{size}', () => {
     expect((await get(`/img/${ids.review}/800`)).status).toBe(404)
     expect((await get(`/img/${ids.review}/800?preview=1`)).status).toBe(404)
     expect((await get(`/img/${ids.review}/800?preview=1`, member)).status).toBe(404)
+  })
+})
+
+describe('GET /api/me/photos', () => {
+  it('US-14.4 lists the member’s own completed captures of every status, and nobody else’s', async () => {
+    const own = MyPhotosResponse.parse(await (await get('/api/me/photos', owner)).json())
+    expect(own.items.map((c) => [c.id, c.status, c.width]).sort()).toEqual(
+      [
+        [ids.published, 'published', 1920],
+        [ids.review, 'pending_review', 1920],
+      ].sort(),
+    )
+    expect(own.nextCursor).toBeNull()
+    expect(MyPhotosResponse.parse(await (await get('/api/me/photos', member)).json()).items).toEqual([])
+    expect((await get('/api/me/photos')).status).toBe(401)
+    expect((await get('/api/me/photos?cursor=nope', owner)).status).toBe(400)
   })
 })

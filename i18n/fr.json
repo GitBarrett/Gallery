@@ -326,5 +326,28 @@
       "grouped": "Les likes sont regroupés : « Ysolde et 23 autres personnes ont aimé… » pour ne pas inonder votre journal.",
       "saved": "Enregistré"
     }
+  },
+  "captures": {
+    "title": "Mes captures",
+    "loadMore": "Plus de captures",
+    "empty": "Aucune capture pour l’instant",
+    "emptyText": "Vos envois apparaissent ici, avec leur statut, dès qu’ils sont partis.",
+    "untitled": "Sans titre",
+    "alt": "{title}, capturée par {author}",
+    "status": {
+      "processing": "En traitement",
+      "pending_review": "En revue",
+      "published": "Publiée",
+      "rejected": "Refusée",
+      "hidden": "Masquée",
+      "failed": "Échec du traitement"
+    },
+    "hint": {
+      "processing": "Nettoyage du fichier et création de ses tailles. Cela ne prend qu’un instant.",
+      "pending_review": "Un modérateur la vérifie avant sa mise en ligne. Elle n’est visible que par vous.",
+      "rejected": "Refusée par la modération. Vous pouvez contester sous 6 mois : voir les conditions d’utilisation.",
+      "hidden": "Masquée par un modérateur. Elle n’est visible que par vous.",
+      "failed": "Ce fichier n’a pas pu être traité. Envoyez-le de nouveau."
+    }
   }
 }

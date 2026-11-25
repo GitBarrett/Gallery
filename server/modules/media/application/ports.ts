@@ -109,6 +109,8 @@ export interface MediaRepository {
   failProcessing(id: string): Promise<boolean>
   /** Titles of the captures among `ids` that still exist, by id (null: not completed yet). */
   titles(ids: string[]): Promise<Map<string, string | null>>
+  /** Completed captures of `userId`, latest first, `limit` at most, after the id `before` when given (UUID v7: by time). */
+  listOwn(userId: string, page: { before?: string; limit: number }): Promise<OwnCapture[]>
 }
 
 /** Key where the browser puts the file (03 § Pipeline image 2): server-made, no extension, never served. */
@@ -121,4 +123,14 @@ export const variantKey = (photoId: string, name: string) => `variants/${photoId
 /** Port: purge by URL of the edge cache (Cloudflare API Cache, 03 § Pipeline image 6). */
 export interface CachePurger {
   purge(urls: string[]): Promise<void>
+}
+
+/** A capture of « My captures » (US-14.4): any status once the upload is completed. */
+export interface OwnCapture {
+  id: string
+  title: string | null
+  status: string
+  width: number
+  height: number
+  uploadedAt: Date
 }

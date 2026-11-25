@@ -326,5 +326,28 @@
       "grouped": "Likes are grouped: “Ysolde and 23 others liked…” to avoid flooding your log.",
       "saved": "Saved"
     }
+  },
+  "captures": {
+    "title": "My captures",
+    "loadMore": "Load more captures",
+    "empty": "No capture yet",
+    "emptyText": "Your uploads appear here, with their status, as soon as they are sent.",
+    "untitled": "Untitled",
+    "alt": "{title}, captured by {author}",
+    "status": {
+      "processing": "Processing",
+      "pending_review": "In review",
+      "published": "Published",
+      "rejected": "Rejected",
+      "hidden": "Hidden",
+      "failed": "Processing failed"
+    },
+    "hint": {
+      "processing": "Cleaning the file and making its sizes. It only takes a moment.",
+      "pending_review": "A moderator checks it before it goes online. Only you can see it.",
+      "rejected": "Refused by the moderation. You can appeal within 6 months: see the Terms.",
+      "hidden": "Hidden by a moderator. Only you can see it.",
+      "failed": "This file could not be processed. Please upload it again."
+    }
   }
 }
