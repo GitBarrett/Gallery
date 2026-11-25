@@ -56,9 +56,10 @@ test('US-07.6 US-05.3 an image chosen in the settings becomes the avatar of the 
     )
     .toMatch(/^\/avatar\/[0-9a-f-]{36}\/[0-9a-f-]{36}\/64$/)
   const src = (await profileLink.locator('img').getAttribute('src'))!
-  const served = await page.request.get(src)
-  expect(served.status()).toBe(200)
-  expect(served.headers()['content-type']).toBe('image/webp')
+  // Decoded by the browser (behind Cloudflare Access, which a bare API request does not pass): a real image
+  await expect
+    .poll(() => profileLink.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth))
+    .toBeGreaterThan(0)
 
   await profileLink.click()
   await expect(page.locator('.identity img')).toHaveAttribute('src', src.replace(/\/64$/, '/256'))
