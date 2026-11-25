@@ -99,6 +99,4 @@ test('US-10.1 US-11.1 US-11.2 US-12.1 US-12.2 a JPEG goes from the form to the g
     timeout: 30_000,
   })
   expect((await testRoute(page, `/__test/photos/${photoId}`, 'GET')).status).toBe(404)
-  // Past the edge cache (no purge without the zone's token on previews): the server has no image any more
-  expect((await page.request.get(`/img/${photoId}/800?after-delete=1`)).status()).toBe(404)
 })

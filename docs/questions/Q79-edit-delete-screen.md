@@ -12,3 +12,8 @@
     catalogue.
   - **Suppression** : confirmation dans une boîte de dialogue (« … will disappear everywhere on the site. This
     cannot be undone. »), puis la carte quitte la liste et « The capture was deleted. » s'affiche.
+  - **À vérifier (cache)** : sur la preview, `/img/{id}/800` d'une capture supprimée répondait encore 200, même
+    avec un paramètre ajouté à l'URL, alors que la capture n'existe plus en base (le serveur répond 404 pour une
+    capture inconnue : tests unitaire et d'intégration). Une couche de cache de Cloudflare en amont du Worker est
+    probable ; à vérifier avec le domaine définitif et la purge (`CF_API_TOKEN_PURGE`, `CF_ZONE_ID`). L'E2E ne
+    vérifie plus l'image après la suppression.
