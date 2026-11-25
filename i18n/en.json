@@ -368,13 +368,22 @@
       "size": "✓ {size} MB, under the 20 MB limit",
       "dimensions": "✓ {width} × {height}, within 640–7680 px",
       "metadata": "Metadata (EXIF) will be removed.",
-      "accepted": "Accepted: JPEG, PNG, WebP · max 20 MB · up to 8K (7680 px) · 20 uploads per day.",
+      "accepted": "Accepted: JPEG, PNG, WebP, TGA · max 20 MB (larger files are converted in your browser) · up to 8K (7680 px) · 20 uploads per day.",
       "problem": {
-        "type": "This format is not accepted: choose a JPEG, PNG or WebP file.",
+        "type": "This format is not accepted: choose a JPEG, PNG, WebP or TGA file.",
         "too_large": "This file is over 20 MB.",
         "empty": "This file is empty or could not be read as an image.",
-        "dimensions": "The long side must be between 640 and 7680 px, and the image at most 8K (33.2 Mpx)."
-      }
+        "dimensions": "The long side must be between 640 and 7680 px, and the image at most 8K (33.2 Mpx).",
+        "memory": "Convert this file on a computer: this device ran out of memory.",
+        "failed": "This file could not be converted. Try another export of the capture."
+      },
+      "converting": "Converting in your browser… This can take a few seconds for an 8K capture.",
+      "converted": {
+        "png": "✓ Format TGA, converted to lossless PNG",
+        "webp": "✓ Over 20 MB, converted to lossless WebP",
+        "jpeg": "✓ Converted to JPEG (quality 95)"
+      },
+      "lossy": "Even lossless, this file stays over 20 MB: it was converted to JPEG quality 95, which loses a little detail."
     },
     "about": "About this capture",
     "fields": {

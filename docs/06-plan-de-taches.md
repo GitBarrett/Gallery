@@ -325,7 +325,7 @@ T-26a (formulaire d'upload) est découpée le 25/11/2026 : le serveur des détai
   Page `/upload` conforme à la maquette : sélection, validation client (règles `shared/domain`), progression et reprise, champs, zone et tags en autocomplétion, légende, texte alternatif, case de consentement (JPEG, PNG, WebP).
   Stories : US-10 (parcours), US-11. Tests : composants, E (JPEG de bout en bout ; aucune violation CSP).
 
-- [ ] **T-26b Conversion dans le navigateur** (dép. T-26a)
+- [x] **T-26b Conversion dans le navigateur** (dép. T-26a)
   TGA → PNG ; au-delà de 20 Mo : WebP sans perte puis JPEG 95 4:4:4 avec avertissement ; Web Worker et encodeurs WebAssembly libwebp et MozJPEG chargés à la demande ; échec mémoire géré.
   Stories : US-10.9–10. Tests : U (choix de la chaîne), E (TGA de bout en bout ; PNG 5K2K de 25 Mo → WebP sans perte ; TGA 8K → JPEG 95 avec avertissement).
 

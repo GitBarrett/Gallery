@@ -58,6 +58,30 @@ beforeEach(() => {
 })
 
 describe('UploadForm', () => {
+  it('US-10.10 a conversion that ran out of memory says to convert on a computer, the form still usable', async () => {
+    inspect.mockResolvedValue({ ok: false, error: 'memory' })
+    const wrapper = await mounted()
+    const input = wrapper.get<HTMLInputElement>('input[type="file"]')
+    Object.defineProperty(input.element, 'files', { value: [file], configurable: true })
+    await input.trigger('change')
+    await vi.waitFor(() => expect(wrapper.get('[role="alert"]').text()).toContain('Convert this file on a computer'))
+    expect(input.attributes('disabled')).toBeUndefined() // another file can be chosen
+  })
+
+  it('US-10.9 tells the format a file was converted to, and warns only for the JPEG', async () => {
+    const converted = (encoding: string) => ({ ok: true, value: { ...chosen.value, converted: encoding } })
+    inspect.mockResolvedValueOnce(converted('webp')).mockResolvedValueOnce(converted('jpeg'))
+    const wrapper = await mounted()
+    const input = wrapper.get<HTMLInputElement>('input[type="file"]')
+    Object.defineProperty(input.element, 'files', { value: [file], configurable: true })
+    await input.trigger('change')
+    await vi.waitFor(() => expect(wrapper.text()).toContain('converted to lossless WebP'))
+    expect(wrapper.text()).not.toContain('loses a little detail')
+    await input.trigger('change')
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Converted to JPEG (quality 95)'))
+    expect(wrapper.get('[role="alert"]').text()).toContain('loses a little detail')
+  })
+
   it('US-10.2 refuses a file out of the rules in the browser, with its reason', async () => {
     inspect.mockResolvedValue({ ok: false, error: 'dimensions' })
     const wrapper = await mounted()

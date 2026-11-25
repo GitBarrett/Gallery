@@ -1,6 +1,9 @@
 import { validateCaptureFile, type CaptureFileProblem } from '~~/shared/domain/capture-file'
 import type { CompleteUploadBody } from '~~/shared/contracts/photos'
 import { api } from '~/services/api'
+import { sourceOf, type Encoding } from './convert/chain'
+import { convertFile } from './convert/convert'
+import { tgaSize } from './convert/tga'
 
 export interface ChosenFile {
   file: File
@@ -8,25 +11,51 @@ export interface ChosenFile {
   height: number
   /** Object URL of the file for the thumbnail (blob:, allowed by the CSP); revoked when another file is chosen. */
   preview: string
+  /** Set when the browser converted the file (TGA, PNG over 20 MB): its new format (US-10.9). */
+  converted?: Encoding
 }
+export type FileProblem = CaptureFileProblem | 'memory' | 'failed'
+type Inspected = { ok: true; value: ChosenFile } | { ok: false; error: FileProblem }
 
-/** Dimensions read by the browser, then the rules of shared/domain (US-10.2): the server checks them again. */
-export async function inspectFile(
-  file: File,
-): Promise<{ ok: true; value: ChosenFile } | { ok: false; error: CaptureFileProblem }> {
-  const preview = URL.createObjectURL(file)
-  const size = await new Promise<{ width: number; height: number }>((resolve) => {
+const imageSize = (url: string) =>
+  new Promise<{ width: number; height: number }>((resolve) => {
     const image = new Image()
     image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight })
     image.onerror = () => resolve({ width: 0, height: 0 }) // not an image the browser reads: refused below
-    image.src = preview
+    image.src = url
   })
+
+/**
+ * Dimensions read by the browser, then the rules of shared/domain (US-10.2): the server checks them again. A TGA or
+ * a PNG over 20 MB is converted first (US-10.9), once its dimensions are known to be accepted.
+ */
+export async function inspectFile(file: File, onConverting?: () => void): Promise<Inspected> {
+  const source = sourceOf(file)
+  if (source) {
+    const size = source === 'tga' ? tgaSize(new Uint8Array(await file.slice(0, 18).arrayBuffer())) : await sizeOf(file)
+    const dimensions = size && validateCaptureFile({ contentType: 'image/png', bytes: 1, ...size })
+    if (!dimensions?.ok) return { ok: false, error: dimensions ? dimensions.error : 'type' }
+    onConverting?.()
+    const converted = await convertFile(file, source)
+    if (!converted.ok) return { ok: false, error: converted.error === 'too_large' ? 'too_large' : converted.error }
+    const inspected = await inspectFile(converted.file)
+    return inspected.ok ? { ok: true, value: { ...inspected.value, converted: converted.encoding } } : inspected
+  }
+  const preview = URL.createObjectURL(file)
+  const size = await imageSize(preview)
   const checked = validateCaptureFile({ contentType: file.type, bytes: file.size, ...size })
   if (!checked.ok) {
     URL.revokeObjectURL(preview)
     return checked
   }
   return { ok: true, value: { file, ...size, preview } }
+}
+
+async function sizeOf(file: File) {
+  const url = URL.createObjectURL(file)
+  const size = await imageSize(url)
+  URL.revokeObjectURL(url)
+  return size
 }
 
 /** PUT of the file through the presigned URL, with its progress (0–1); the status, 0 when the browser saw no answer. */

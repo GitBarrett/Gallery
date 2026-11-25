@@ -163,3 +163,25 @@
 - **Organisation** (atomic design de Brad Frost, sans dossiers dédiés) : atomes et molécules = `app/components/ui` (stories « UI/… ») ; organismes = composants de `app/features/<f>/` ; templates = `app/layouts` ; pages = `app/pages`. Le classement apparaît dans l'arborescence de Storybook, pas dans les dossiers.
 - **Alternatives** : page vitrine maison `/styleguide` (aucune dépendance, mais ni isolement des états, ni panneau d'accessibilité, ni contrôles) ; Histoire (moins répandu, intégration Nuxt moins suivie).
 - **Conséquences** : dépendances de développement supplémentaires, jamais embarquées dans le code du Worker : `/storybook/` est un ensemble de fichiers statiques servis par les assets Workers, sans exécuter le Worker (donc sans les en-têtes de nuxt-security, ce qui convient à une documentation sans données ni compte ; l'en-tête `noindex` est posé par `public/_headers`). L'addon a11y sert à l'inspection pendant le développement ; le contrôle bloquant reste celui des tests de composants Vitest avec axe (`11-strategie-de-tests.md`). Chaque tâche qui crée un composant UI livre sa story (critère de la DoD).
+
+# ADR-020 — Encodeurs WebAssembly dans le navigateur (conversion des captures)
+
+- **Statut** : proposé (25/11/2026, T-26b) — à valider par Adrien
+- **Contexte** : ADR-011 et `03-architecture.md` § Pipeline image 1 imposent de convertir dans le navigateur un TGA
+  (en PNG sans perte) et un fichier de plus de 20 Mo (WebP sans perte, puis JPEG 95 en 4:4:4), dans un Web Worker,
+  avec des encodeurs WebAssembly libwebp et MozJPEG chargés à la demande, sans `canvas.toBlob`. Aucun paquet n'était
+  choisi.
+- **Décision** : les encodeurs de **Squoosh** repris par **`@jsquash`** (Apache-2.0) : `@jsquash/png` 3.1.1
+  (décodage et encodage PNG), `@jsquash/webp` 1.5.0 (libwebp, `lossless: 1, exact: 1`), `@jsquash/jpeg` 1.6.0
+  (MozJPEG, `quality: 95, chroma_subsample: 1` soit 4:4:4). Décodeur TGA écrit à la main (types 2 et 10, 24 et
+  32 bits, une soixantaine de lignes testées). Un worker module (`convert.worker.ts`, même origine : `worker-src
+  'self'`) importe chaque encodeur au moment où la chaîne en a besoin ; tous les fichiers de la construction du
+  worker sont nommés `_nuxt/convert-*` et exclus du précache du service worker. Aucune CSP à changer
+  (`'wasm-unsafe-eval'` et `worker-src 'self'` déjà là).
+- **Alternatives** : `canvas.toBlob` / `OffscreenCanvas.convertToBlob` (interdits : Safari rend un PNG pour un WebP,
+  sous-échantillonnage JPEG non maîtrisable) ; compiler soi-même libwebp et MozJPEG (même résultat, à maintenir) ;
+  conversion côté serveur (refusée par ADR-011 : décodage interdit dans le Worker).
+- **Conséquences** : environ 2,4 Mo de wasm et 60 Ko de JavaScript chargés seulement sur `/upload` et seulement
+  pour un TGA ou un gros PNG ; jamais dans le bundle des autres pages ni dans le précache. Mémoire : une capture
+  8K occupe environ 130 Mo de pixels en RGBA, plus les tampons des encodeurs ; un échec (mémoire, worker tué)
+  rend « Convert this file on a computer » sans planter l'onglet (US-10.10).
