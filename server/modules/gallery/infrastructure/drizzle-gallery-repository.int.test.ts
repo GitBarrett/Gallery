@@ -1,6 +1,7 @@
+import { eq } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
 import { withRollback } from '../../../../tests/db'
-import { gameVersions, photoMetadata, photos, users, zones } from '../../../db/schema'
+import { gameVersions, photoMetadata, photos, photoTags, tags, users, zones } from '../../../db/schema'
 import type { GridFilter } from '../application/grid'
 import { drizzleGalleryRepository } from './drizzle-gallery-repository'
 
@@ -147,6 +148,73 @@ describe('drizzleGalleryRepository', () => {
         .returning()
       await w.capture({ userId: banned!.id })
       expect(await drizzleGalleryRepository(tx).grid({ ...base, gameVersion: w.version })).toHaveLength(1)
+    })
+  })
+
+  it('US-25.1 reads one published capture with its details, version, zone, tags and author', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const id = await w.capture(
+        { description: 'Low sun.', altText: 'A harbour at dawn', likesCount: 12 },
+        { zone: true, time: '06:10' },
+      )
+      await tx
+        .update(photoMetadata)
+        .set({ caption: 'First light.', characterName: 'Ysolde' })
+        .where(eq(photoMetadata.photoId, id))
+      const run = crypto.randomUUID().slice(0, 8)
+      const made = await tx
+        .insert(tags)
+        .values([
+          { slug: `night-${run}`, label: 'night' },
+          { slug: `harbour-${run}`, label: 'harbour' },
+        ])
+        .returning()
+      await tx.insert(photoTags).values(made.map((t) => ({ photoId: id, tagId: t.id })))
+      const avatar = crypto.randomUUID()
+      await tx.update(users).set({ avatarKey: avatar }).where(eq(users.id, w.author.id))
+
+      expect(await drizzleGalleryRepository(tx).photo(id)).toEqual({
+        id,
+        title: 'Capture 1',
+        description: 'Low sun.',
+        altText: 'A harbour at dawn',
+        caption: 'First light.',
+        width: 1920,
+        height: 1080,
+        mime: 'image/jpeg',
+        bytes: 1,
+        version: { slug: w.version, nameEn: 'Test', nameFr: 'Test' },
+        zone: { slug: w.zone.slug, nameEn: 'Stormwind City', nameFr: 'Hurlevent' },
+        inGameTime: '06:10',
+        graphicsSettings: null,
+        characterName: 'Ysolde',
+        tags: [`harbour-${run}`, `night-${run}`],
+        author: { username: w.author.username, avatarUrl: `/avatar/${w.author.id}/${avatar}` },
+        likes: 12,
+        downloads: 0,
+        publishedAt: new Date(T0 + 60_000),
+      })
+    })
+  })
+
+  it('US-25.1 finds no capture that is not public: in review, hidden, archived version, banned author', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const [banned] = await tx
+        .insert(users)
+        .values({ username: `banned_${crypto.randomUUID().slice(0, 8)}`, status: 'banned' })
+        .returning()
+      const repo = drizzleGalleryRepository(tx)
+      for (const more of [
+        { status: 'pending_review' },
+        { status: 'hidden' },
+        { status: 'rejected' },
+        { gameVersionId: w.archivedId },
+        { userId: banned!.id },
+      ])
+        expect(await repo.photo(await w.capture(more)), JSON.stringify(more)).toBeNull()
+      expect(await repo.photo(crypto.randomUUID())).toBeNull()
     })
   })
 })

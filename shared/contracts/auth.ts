@@ -37,7 +37,7 @@ export const SigninBody = z.strictObject({
 export type SigninBody = z.infer<typeof SigninBody>
 
 /** Base address of the avatar shown (US-07.6): append `/64`, `/128` or `/256`; null shows the initial. */
-const AvatarUrl = z
+export const AvatarUrl = z
   .string()
   .regex(/^\/avatar\/[0-9a-f-]{36}\/[0-9a-f-]{36}$/)
   .nullable()

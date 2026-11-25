@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/db/client'
 import { gameVersions, photoMetadata, photos, users, zones } from '../../server/db/schema'
 import { ErrorResponse } from '../../shared/contracts/errors'
-import { PhotosResponse } from '../../shared/contracts/photos'
+import { PhotoResponse, PhotosResponse } from '../../shared/contracts/photos'
 
 // GET /api/photos over HTTP and Postgres (T-30a): a zone of its own keeps the captures of the other tests out.
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
@@ -98,5 +98,27 @@ describe('GET /api/photos', () => {
     }
     expect((await get('sort=random')).status).toBe(400)
     expect((await get('limit=61')).status).toBe(400)
+  })
+})
+
+describe('GET /api/photos/{id}', () => {
+  it('US-25.1 gives a published capture to any visitor, cached at the edge; 404 for one in review', async () => {
+    const published = await fetch(`/api/photos/${ids[2]}`)
+    expect(published.status).toBe(200)
+    expect(published.headers.get('cache-control')).toBe('public, max-age=60, stale-while-revalidate=300')
+    expect(PhotoResponse.parse(await published.json())).toMatchObject({
+      id: ids[2],
+      title: 'Grid 3',
+      version: { slug: 'wow-forever' },
+      zone: { slug: zone },
+      author: { username: `Grid_${run}`, avatarUrl: null },
+      likes: 30,
+      quality: 'rare',
+      tags: [],
+    })
+    const inReview = await fetch(`/api/photos/${ids[3]}`)
+    expect(inReview.status).toBe(404)
+    expect(ErrorResponse.parse(await inReview.json()).error.code).toBe('NOT_FOUND')
+    expect((await fetch('/api/photos/not-an-id')).status).toBe(400)
   })
 })
