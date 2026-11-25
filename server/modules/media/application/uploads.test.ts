@@ -20,7 +20,7 @@ const MIN = 60_000
 function setup() {
   let t = new Date('2026-11-24T10:00:00Z').getTime()
   const clock = { now: () => new Date(t) }
-  const { repo, rows } = inMemoryMediaRepository(clock)
+  const { repo, rows, captureDetails } = inMemoryMediaRepository(clock)
   const { storage, objects } = inMemoryObjectStorage()
   const { uow, sent } = inMemoryUnitOfWork(repo)
   let n = 0
@@ -31,13 +31,15 @@ function setup() {
     uow,
     storage,
     gameVersions: async () => [{ slug: 'wow-forever' }],
+    zoneOf: async (slug) => (slug === 'stormwind-city' ? 'zone-1' : null),
+    tagIdsOf: async (slugs) => slugs.map((slug) => 'tag-' + slug),
     clock,
   })
   // The browser's PUT through the presigned URL
   const put = (photoId: string, object = { bytes: file.bytes, contentType: file.contentType }) =>
     objects.set(`incoming/${photoId}`, object)
   const advance = (ms: number) => (t += ms)
-  return { request, complete, put, advance, rows, objects, sent, repo, storage, clock }
+  return { request, complete, put, advance, rows, objects, sent, repo, storage, clock, captureDetails }
 }
 
 const upload = async (s: ReturnType<typeof setup>, actor = ash) => {
@@ -176,6 +178,60 @@ describe('upload completion', () => {
     expect(
       await s.complete({ actor: { ...ash, emailVerified: false }, photoId, title: 'Dusk', gameVersion: 'wow-forever' }),
     ).toMatchObject({ ok: false, error: { reason: 'email_unverified' } })
+  })
+})
+
+describe('upload details', () => {
+  const completed = async (body: Record<string, unknown>) => {
+    const s = setup()
+    const photoId = await upload(s)
+    s.put(photoId)
+    const result = await s.complete({ actor: ash, photoId, title: 'Dusk', gameVersion: 'wow-forever', ...body })
+    return { s, photoId, result }
+  }
+
+  it('US-11.1 US-11.2 stores the details with the completion, zone and normalised tags resolved', async () => {
+    const { s, photoId, result } = await completed({
+      description: ' Long story ',
+      altText: 'The canals of Suramar at night',
+      caption: 'The canals glow brighter tonight.',
+      zone: 'stormwind-city',
+      inGameTime: '23:40',
+      graphicsSettings: 'Ultra, ray tracing',
+      characterName: 'Lunelame',
+      tags: ['Nuit', 'NUIT', 'Ciel étoilé'],
+    })
+    expect(result.ok).toBe(true)
+    expect(s.captureDetails.get(photoId)).toEqual({
+      description: 'Long story',
+      altText: 'The canals of Suramar at night',
+      caption: 'The canals glow brighter tonight.',
+      zoneId: 'zone-1',
+      zoneCustom: undefined,
+      inGameTime: '23:40',
+      graphicsSettings: 'Ultra, ray tracing',
+      characterName: 'Lunelame',
+      tagIds: ['tag-nuit', 'tag-ciel etoile'],
+    })
+  })
+
+  it('US-11.3 keeps a zone typed freely, out of the dictionary', async () => {
+    const { s, photoId } = await completed({ zoneCustom: 'Hidden Glade' })
+    expect(s.captureDetails.get(photoId)).toMatchObject({ zoneId: undefined, zoneCustom: 'Hidden Glade', tagIds: [] })
+  })
+
+  it('US-11.5 US-11.1 US-11.2 refuses an insult, a bad tag or an unknown zone, before completing', async () => {
+    for (const [body, error] of [
+      [{ title: 'Quel connard' }, { field: 'title', reason: 'insult' }],
+      [{ caption: 'salope' }, { field: 'caption', reason: 'insult' }],
+      [{ tags: ['x'] }, { field: 'tags', reason: 'length' }],
+      [{ zone: 'atlantis' }, { field: 'zone', reason: 'unknown' }],
+    ] as const) {
+      const { s, photoId, result } = await completed(body)
+      expect(result).toEqual({ ok: false, error: { kind: 'invalid', ...error } })
+      expect(s.rows.get(photoId)?.uploadedAt).toBeNull()
+      expect(s.sent()).toEqual([])
+    }
   })
 })
 

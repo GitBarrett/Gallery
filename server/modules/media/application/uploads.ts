@@ -5,6 +5,7 @@ import type { IdGenerator } from '../../../platform/ids'
 import type { RateLimiter, RateLimitRule } from '../../../platform/rate-limiter'
 import type { UnitOfWork } from '../../../platform/unit-of-work'
 import { notSanctioned, requireVerified, type Actor, type PolicyDenial } from '../../identity'
+import { checkDetails, textOrNone, type DetailsInput } from '../domain/capture-details'
 import { incomingKey, type MediaRepository, type ObjectStorage, type Upload } from './ports'
 
 // 08-securite.md § 8: 20 uploads per 24 h per account (exact counters), 3 at the same time
@@ -66,7 +67,7 @@ export const requestUploadUrl =
 const invalid = (reason: string): MediaError => ({ kind: 'invalid', field: 'file', reason })
 
 /**
- * End of an upload (US-10.1, US-10.6): the author's capture still incomplete gets its title and version once the
+ * End of an upload (US-10.1, US-10.6, US-11): the author's capture still incomplete gets its title, version and details once the
  * object is in the bucket with the declared size and type; otherwise the object is deleted (422). Then the capture
  * goes to processing (`photo-process`). Idempotent: a capture already completed answers the same, sent once.
  */
@@ -76,14 +77,20 @@ export const completeUpload =
     uow: UnitOfWork<MediaRepository>
     storage: ObjectStorage
     gameVersions: () => Promise<{ slug: string }[]>
+    /** Catalogue (US-11.2, US-11.1): id of an active zone, ids of tags created when new. */
+    zoneOf: (slug: string) => Promise<string | null>
+    tagIdsOf: (slugs: string[]) => Promise<string[]>
     clock: Clock
   }) =>
-  async (cmd: {
-    actor: Actor
-    photoId: string
-    title: string
-    gameVersion: string
-  }): Promise<Result<{ photoId: string; status: 'processing' }, MediaError>> => {
+  async (
+    cmd: DetailsInput & {
+      actor: Actor
+      photoId: string
+      gameVersion: string
+      zone?: string
+      inGameTime?: string
+    },
+  ): Promise<Result<{ photoId: string; status: 'processing' }, MediaError>> => {
     const allowed = mayPost(cmd.actor)
     if (!allowed.ok) return allowed
     const upload = await deps.repo.findUpload(cmd.photoId)
@@ -91,17 +98,33 @@ export const completeUpload =
     if (!upload || upload.userId !== cmd.actor.id) return err({ kind: 'not_found' })
     const done = ok({ photoId: upload.id, status: 'processing' as const })
     if (upload.uploadedAt) return done
+    const checked = checkDetails(cmd)
+    if (!checked.ok) return err({ kind: 'invalid', ...checked.error })
     if (!(await deps.gameVersions()).some((v) => v.slug === cmd.gameVersion))
       return err({ kind: 'invalid', field: 'gameVersion', reason: 'unknown' })
+    const zoneId = cmd.zone ? await deps.zoneOf(cmd.zone) : undefined
+    if (zoneId === null) return err({ kind: 'invalid', field: 'zone', reason: 'unknown' })
     const reason = await checkStored(deps.storage, upload)
     if (reason) return err({ kind: 'mismatch', reason })
+    // Before the transaction, in the catalogue: a tag created for a completion that then fails stays, unused
+    const details = { ...detailsOf(cmd), zoneId, tagIds: await deps.tagIdsOf(checked.value.tags) }
     await deps.uow.run(async (repo, publish) => {
       const { title, gameVersion } = cmd
-      const completed = await repo.complete(upload.id, { title, gameVersion, at: deps.clock.now() })
+      const completed = await repo.complete(upload.id, { title, gameVersion, at: deps.clock.now(), details })
       if (completed) publish({ topic: 'photo-process', payload: { kind: 'capture', photoId: upload.id } })
     })
     return done
   }
+
+const detailsOf = (cmd: DetailsInput & { inGameTime?: string }) => ({
+  description: textOrNone(cmd.description),
+  altText: textOrNone(cmd.altText),
+  caption: textOrNone(cmd.caption),
+  zoneCustom: textOrNone(cmd.zoneCustom),
+  inGameTime: cmd.inGameTime,
+  graphicsSettings: textOrNone(cmd.graphicsSettings),
+  characterName: textOrNone(cmd.characterName),
+})
 
 /**
  * Defence in depth (03 § Pipeline image 4): the signature of Content-Length is not relied upon alone. An object of

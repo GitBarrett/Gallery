@@ -48,5 +48,24 @@ export function catalogRepositoryContract(
       const zones = [1, 2, 3].map((n) => zone(`${n}`, `Limit ${p} ${n}`, `Limite ${p} ${n}`))
       await run({ zones }, async (repo) => expect(await repo.suggestZones(`limit ${p}`, 2)).toHaveLength(2))
     })
+
+    it('US-11.2 finds an active zone by its slug, not a pending or unknown one', async () => {
+      const zones = [zone('active', 'Active', 'Active'), zone('pending', 'Pending', 'En attente', [], 'pending')]
+      await run({ zones }, async (repo) => {
+        expect(await repo.zoneId(`${p}-active`)).toEqual(expect.any(String))
+        expect(await repo.zoneId(`${p}-pending`)).toBeNull()
+        expect(await repo.zoneId(`${p}-none`)).toBeNull()
+      })
+    })
+
+    it('US-11.1 gives the ids of tags, created when new, the same id for an existing one', async () => {
+      await run({ tags: [`${p} old`] }, async (repo) => {
+        const [old, fresh] = await repo.ensureTags([`${p} old`, `${p} new`])
+        expect(old).not.toBe(fresh)
+        expect(await repo.ensureTags([`${p} new`, `${p} old`])).toEqual([fresh, old])
+        expect(await repo.suggestTags(p, 10)).toEqual([`${p} new`, `${p} old`])
+        expect(await repo.ensureTags([])).toEqual([])
+      })
+    })
   })
 }

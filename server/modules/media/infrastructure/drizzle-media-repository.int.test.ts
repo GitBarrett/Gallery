@@ -6,7 +6,8 @@ import { fakeImageService } from '../../../../tests/fakes/fake-image-service'
 import { inMemoryObjectStorage } from '../../../../tests/fakes/in-memory-object-storage'
 import { inMemoryUnitOfWork } from '../../../../tests/fakes/in-memory-unit-of-work'
 import { photoProcessConsumer } from '../interface/photo-process-consumer'
-import { gameVersions, photos, users } from '../../../db/schema'
+import { gameVersions, photoMetadata, photos, photoTags, users } from '../../../db/schema'
+import { drizzleCatalogRepository } from '../../catalog'
 import { drizzleMediaRepository } from './drizzle-media-repository'
 
 const HOUR = 3_600_000
@@ -53,6 +54,30 @@ describe('drizzleMediaRepository', () => {
         .where(eq(photos.id, ids[0]!))
       expect(row).toEqual({ title: 'Dusk', status: 'processing', version: 'wow-forever' })
       expect(await repo.findUpload(ids[1]!)).toBeNull()
+    })
+  })
+
+  it('US-11.1 US-11.2 US-11.3 writes the details with the completion, not on a second one', async () => {
+    await withRollback(async (tx) => {
+      const repo = drizzleMediaRepository(tx)
+      const catalog = drizzleCatalogRepository(tx)
+      const userId = await member(tx)
+      await repo.createUpload(upload(ids[0]!, userId))
+      const zoneId = (await catalog.zoneId('stormwind'))!
+      const tagIds = await catalog.ensureTags([`t26d ${userId.slice(0, 6)}`, `night ${userId.slice(0, 6)}`])
+      const details = { description: 'Long story', altText: 'Canals at night', caption: 'Glow', zoneId, tagIds }
+      const at = new Date()
+      expect(await repo.complete(ids[0]!, { title: 'Dusk', gameVersion: 'wow-forever', at, details })).toBe(true)
+      expect(await repo.complete(ids[0]!, { title: 'Again', gameVersion: 'wow-forever', at, details })).toBe(false)
+      const [row] = await tx
+        .select({ description: photos.description, altText: photos.altText })
+        .from(photos)
+        .where(eq(photos.id, ids[0]!))
+      expect(row).toEqual({ description: 'Long story', altText: 'Canals at night' })
+      const metadata = await tx.select().from(photoMetadata).where(eq(photoMetadata.photoId, ids[0]!))
+      expect(metadata).toEqual([expect.objectContaining({ zoneId, zoneCustom: null, caption: 'Glow' })])
+      const tagged = await tx.select().from(photoTags).where(eq(photoTags.photoId, ids[0]!))
+      expect(tagged.map((t) => t.tagId).sort()).toEqual([...tagIds].sort())
     })
   })
 

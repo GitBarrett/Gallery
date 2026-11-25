@@ -1,5 +1,6 @@
 // media module (03-architecture.md § Modules): upload, private storage, processing (T-22b), serving (T-25a).
 export type {
+  CaptureDetails,
   ImageInfo,
   ImageService,
   MediaRepository,

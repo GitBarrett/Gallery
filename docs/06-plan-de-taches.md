@@ -315,7 +315,13 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   `WowImage` branché sur `/img` (`srcset`, `sizes`, dimensions, texte alternatif), règles du service worker pour `/img`, page « My captures » avec statuts.
   Stories : US-64.1, US-64.5–6, US-75.3. Tests : E.
 
-- [ ] **T-26a Formulaire d'upload** (dép. T-21, T-24, T-25b, T-20b)
+T-26a (formulaire d'upload) est découpée le 25/11/2026 : le serveur des détails passe dans T-26d, faite avant ; T-26a garde le formulaire et son numéro.
+
+- [x] **T-26d Détails d'une capture côté serveur** (dép. T-21, T-20b)
+  Contrat de `complete` étendu (description, texte alternatif, légende, zone ou zone libre, heure en jeu, réglages, personnage, tags), filtre d'insultes sur tous les textes, tags normalisés et créés par le catalogue, zone résolue ; tables `photo_metadata` et `photo_tags`, colonnes `photos.description` et `alt_text`.
+  Stories : US-11.1–3, US-11.5. Tests : U, I.
+
+- [ ] **T-26a Formulaire d'upload** (dép. T-21, T-24, T-25b, T-20b, T-26d)
   Page `/upload` conforme à la maquette : sélection, validation client (règles `shared/domain`), progression et reprise, champs, zone et tags en autocomplétion, légende, texte alternatif, case de consentement (JPEG, PNG, WebP).
   Stories : US-10 (parcours), US-11. Tests : composants, E (JPEG de bout en bout ; aucune violation CSP).
 

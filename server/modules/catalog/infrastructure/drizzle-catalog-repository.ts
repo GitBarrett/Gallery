@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, like, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, inArray, like, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import { gameVersions, tags, zones } from '../../../db/schema'
 import type { CatalogRepository } from '../application/catalog'
@@ -39,5 +39,23 @@ export const drizzleCatalogRepository = (db: Db | Transaction): CatalogRepositor
       )
       .orderBy(desc(sql`word_similarity(${text}, ${names})`), asc(zones.nameEn))
       .limit(limit)
+  },
+  async zoneId(slug) {
+    const [row] = await db
+      .select({ id: zones.id })
+      .from(zones)
+      .where(and(eq(zones.slug, slug), eq(zones.status, 'active')))
+    return row?.id ?? null
+  },
+  async ensureTags(slugs) {
+    if (!slugs.length) return []
+    // Concurrent uploads may create the same tag: the unique slug keeps one, then both read it
+    await db
+      .insert(tags)
+      .values(slugs.map((slug) => ({ slug, label: slug })))
+      .onConflictDoNothing()
+    const rows = await db.select({ id: tags.id, slug: tags.slug }).from(tags).where(inArray(tags.slug, slugs))
+    const ids = new Map(rows.map((r) => [r.slug, r.id]))
+    return slugs.map((slug) => ids.get(slug)!)
   },
 })

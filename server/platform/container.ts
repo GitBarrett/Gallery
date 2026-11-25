@@ -43,7 +43,14 @@ import {
   turnstileVerifier,
   verifyEmail,
 } from '../modules/identity'
-import { drizzleCatalogRepository, listGameVersions, suggestTags, suggestZones } from '../modules/catalog'
+import {
+  drizzleCatalogRepository,
+  ensureTags,
+  findZone,
+  listGameVersions,
+  suggestTags,
+  suggestZones,
+} from '../modules/catalog'
 import {
   completeUpload,
   drizzleMediaRepository,
@@ -243,6 +250,8 @@ export function createContainer({
           uow: drizzleUnitOfWork(db(), drizzleMediaRepository, outboxRelay(db(), queues, clock), logger),
           storage: storage(),
           gameVersions: listGameVersions({ repo: drizzleCatalogRepository(db()) }),
+          zoneOf: findZone({ repo: drizzleCatalogRepository(db()) }),
+          tagIdsOf: ensureTags({ repo: drizzleCatalogRepository(db()) }),
           clock,
         })(cmd),
     },
