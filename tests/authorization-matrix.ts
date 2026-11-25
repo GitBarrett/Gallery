@@ -52,6 +52,8 @@ export const ROUTES: Record<string, { access: Access; row: string }> = {
   // requireVerified + notSanctioned in the use cases (403 unverified or suspended), the owner's capture only (404)
   'POST /api/photos/upload-url': { access: 'member', row: '`POST /api/photos/upload-url`, `/complete`' },
   'POST /api/photos/[id]/complete': { access: 'member', row: '`POST /api/photos/upload-url`, `/complete`' },
+  'PATCH /api/photos/[id]': { access: 'member', row: '`PATCH /api/photos/{id}`' },
+  'DELETE /api/photos/[id]': { access: 'member', row: '`DELETE /api/photos/{id}`' },
 }
 
 /** `server/api/me/sessions/[id].delete.ts` → `DELETE /api/me/sessions/[id]` (Nitro file routing). */

@@ -10,6 +10,7 @@ export function orThrow<R extends Result<unknown, MediaError>>(result: R): Extra
     throw new AppError('RATE_LIMITED', 'Too many uploads', { retryAfterSeconds: error.retryAfterSeconds })
   if (error.kind === 'forbidden') throw new AppError('FORBIDDEN', 'Forbidden', { reason: error.reason })
   if (error.kind === 'not_found') throw new AppError('NOT_FOUND', 'Not found')
+  if (error.kind === 'busy') throw new AppError('CONFLICT', 'The capture is still processing')
   if (error.kind === 'too_large') throw new AppError('PAYLOAD_TOO_LARGE', 'File too large', { field: 'file' })
   if (error.kind === 'mismatch')
     throw new AppError('UNPROCESSABLE', 'The uploaded file differs from the declared one', { reason: error.reason })

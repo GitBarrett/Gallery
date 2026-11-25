@@ -52,6 +52,36 @@ export type CompleteUploadBody = z.infer<typeof CompleteUploadBody>
 export const CompleteUploadResponse = z.strictObject({ photoId: z.uuid(), status: z.literal('processing') })
 export type CompleteUploadResponse = z.infer<typeof CompleteUploadResponse>
 
+/**
+ * PATCH /api/photos/{id} (US-12.1, US-13.1): only the fields sent change; an empty text, a `null` zone or focal point
+ * clears it; `tags` replaces the list. The game version and the image stay as they are. At least one field.
+ */
+export const UpdatePhotoBody = z
+  .strictObject({
+    title: z.string().trim().min(1).max(100).optional(),
+    description: optionalText(1000),
+    altText: optionalText(150),
+    caption: optionalText(140),
+    zone: z.string().min(1).max(64).nullable().optional(),
+    zoneCustom: z.string().trim().min(2).max(100).nullable().optional(),
+    inGameTime: z
+      .string()
+      .regex(/^(([01]\d|2[0-3]):[0-5]\d)?$/)
+      .optional(),
+    graphicsSettings: optionalText(100),
+    characterName: optionalText(100),
+    tags: z.array(z.string().max(64)).max(10).optional(),
+    focalX: z.number().min(0).max(1).nullable().optional(),
+    focalY: z.number().min(0).max(1).nullable().optional(),
+  })
+  .refine((body) => Object.keys(body).length > 0, 'Nothing to update')
+  .refine((body) => !(body.zone && body.zoneCustom), { path: ['zoneCustom'], message: 'A zone or a free zone' })
+  .refine((body) => (body.focalX === undefined) === (body.focalY === undefined), {
+    path: ['focalY'],
+    message: 'Both coordinates of the focal point',
+  })
+export type UpdatePhotoBody = z.infer<typeof UpdatePhotoBody>
+
 /** `{id}` of the /api/photos/{id}/… routes. */
 export const PhotoParams = z.strictObject({ id: z.uuid() })
 

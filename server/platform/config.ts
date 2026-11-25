@@ -27,6 +27,9 @@ const schema = z
     RESEND_API_KEY: z.string().min(1).optional(),
     SIGHTENGINE_API_USER: z.string().trim().min(1).optional(),
     SIGHTENGINE_API_SECRET: z.string().trim().min(1).optional(),
+    // Purge by URL of the edge cache (03 § Configuration): Cache Purge permission only; absent on previews
+    CF_API_TOKEN_PURGE: z.string().trim().min(1).optional(),
+    CF_ZONE_ID: z.string().trim().min(1).optional(),
     IP_HASH_KEY_CURRENT: z.string().min(32).optional(),
     MFA_ENCRYPTION_KEY: z.string().min(32).optional(),
     NUXT_OAUTH_GOOGLE_CLIENT_ID: z.string().min(1).optional(),
@@ -59,6 +62,8 @@ export interface Config {
   resendApiKey?: string
   sightengineApiUser?: string
   sightengineApiSecret?: string
+  cfApiTokenPurge?: string
+  cfZoneId?: string
   ipHashKey?: string
   mfaKey?: string
   googleClientId?: string
@@ -88,6 +93,8 @@ export function loadConfig(env: Record<string, string | undefined>): Config {
     resendApiKey: parsed.data.RESEND_API_KEY,
     sightengineApiUser: parsed.data.SIGHTENGINE_API_USER,
     sightengineApiSecret: parsed.data.SIGHTENGINE_API_SECRET,
+    cfApiTokenPurge: parsed.data.CF_API_TOKEN_PURGE,
+    cfZoneId: parsed.data.CF_ZONE_ID,
     ipHashKey: parsed.data.IP_HASH_KEY_CURRENT,
     mfaKey: parsed.data.MFA_ENCRYPTION_KEY,
     googleClientId: parsed.data.NUXT_OAUTH_GOOGLE_CLIENT_ID,
