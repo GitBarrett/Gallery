@@ -59,6 +59,9 @@ import {
   requestUploadUrl,
   serveImage,
   listMyCaptures,
+  editCapture,
+  deleteCapture,
+  cloudflareCachePurger,
   type R2Bucket,
 } from '../modules/media'
 import {
@@ -92,6 +95,8 @@ export interface Container {
     completeUpload: UseCase<typeof completeUpload>
     serveImage: UseCase<typeof serveImage>
     listMyCaptures: UseCase<typeof listMyCaptures>
+    editCapture: UseCase<typeof editCapture>
+    deleteCapture: UseCase<typeof deleteCapture>
   }
   notifications: {
     list: UseCase<typeof listNotifications>
@@ -236,6 +241,19 @@ export function createContainer({
     media: {
       serveImage: (cmd) => serveImage({ repo: drizzleMediaRepository(db()), storage: storage() })(cmd),
       listMyCaptures: (cmd) => listMyCaptures({ repo: drizzleMediaRepository(db()) })(cmd),
+      editCapture: (cmd) =>
+        editCapture({
+          repo: drizzleMediaRepository(db()),
+          zoneOf: findZone({ repo: drizzleCatalogRepository(db()) }),
+          tagIdsOf: ensureTags({ repo: drizzleCatalogRepository(db()) }),
+        })(cmd),
+      deleteCapture: (cmd) =>
+        deleteCapture({
+          repo: drizzleMediaRepository(db()),
+          storage: storage(),
+          purger: cloudflareCachePurger({ token: config.cfApiTokenPurge, zoneId: config.cfZoneId, fetch: fetcher }),
+          siteUrl: config.siteUrl,
+        })(cmd),
       requestUploadUrl: (cmd) =>
         requestUploadUrl({
           repo: drizzleMediaRepository(db()),

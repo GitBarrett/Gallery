@@ -23,6 +23,8 @@ export type MediaError =
   | { kind: 'invalid'; field: string; reason: string }
   /** The object in the bucket is missing or differs from what was declared (US-10.6). */
   | { kind: 'mismatch'; reason: 'missing' | 'size' | 'type' }
+  /** The capture is still processing (US-12.2: deleted once processed). */
+  | { kind: 'busy' }
 
 const mayPost = (actor: Actor): Result<void, PolicyDenial> => {
   const verified = requireVerified(actor)

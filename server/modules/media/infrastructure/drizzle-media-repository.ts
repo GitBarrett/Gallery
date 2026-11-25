@@ -101,4 +101,22 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
       .limit(limit)
     return rows.map((r) => ({ ...r, uploadedAt: r.uploadedAt! }))
   },
+  async updateDetails(id, { metadata, tagIds, ...fields }) {
+    await db.transaction(async (tx) => {
+      if (Object.keys(fields).length) await tx.update(photos).set(fields).where(eq(photos.id, id))
+      if (metadata && Object.keys(metadata).length)
+        await tx
+          .insert(photoMetadata)
+          .values({ photoId: id, ...metadata })
+          .onConflictDoUpdate({ target: photoMetadata.photoId, set: metadata })
+      if (tagIds) {
+        await tx.delete(photoTags).where(eq(photoTags.photoId, id))
+        if (tagIds.length) await tx.insert(photoTags).values(tagIds.map((tagId) => ({ photoId: id, tagId })))
+      }
+    })
+  },
+  async deleteCapture(id) {
+    const rows = await db.delete(photos).where(eq(photos.id, id)).returning({ id: photos.id })
+    return rows.length > 0
+  },
 })

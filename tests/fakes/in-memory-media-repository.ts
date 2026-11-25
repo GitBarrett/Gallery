@@ -1,5 +1,5 @@
 import type { Clock } from '../../server/platform/clock'
-import type { CaptureDetails, MediaRepository, Processed } from '../../server/modules/media'
+import type { CaptureDetails, DetailsChanges, MediaRepository, Processed } from '../../server/modules/media'
 
 type Row = {
   id: string
@@ -19,6 +19,7 @@ export function inMemoryMediaRepository(clock: Clock) {
   const rows = new Map<string, Row>()
   const sizes = new Map<string, { width: number; height: number }>() // apart: the rows compare as before
   const captureDetails = new Map<string, CaptureDetails>()
+  const edits = new Map<string, DetailsChanges>() // the changes of the edits, merged (US-12.1)
   const repo: MediaRepository = {
     async createUpload({ id, userId, mime, bytes, width, height }) {
       sizes.set(id, { width, height })
@@ -89,6 +90,19 @@ export function inMemoryMediaRepository(clock: Clock) {
       row.status = 'failed'
       return true
     },
+    async updateDetails(id, { metadata, tagIds, ...fields }) {
+      const current = edits.get(id) ?? {}
+      edits.set(id, {
+        ...current,
+        ...fields,
+        metadata: { ...current.metadata, ...metadata },
+        ...(tagIds && { tagIds }),
+      })
+      if (fields.title) rows.get(id)!.title = fields.title
+    },
+    async deleteCapture(id) {
+      return rows.delete(id)
+    },
   }
-  return { repo, rows, captureDetails }
+  return { repo, rows, captureDetails, edits }
 }

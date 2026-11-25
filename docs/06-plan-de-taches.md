@@ -333,8 +333,15 @@ T-26a (formulaire d'upload) est découpée le 25/11/2026 : le serveur des détai
   Point focal, aperçu en direct du recadrage.
   Stories : US-13. Tests : composants, E.
 
-- [ ] **T-27 Modifier et supprimer une capture** (dép. T-26a)
-  Stories : US-12. Tests : U (propriété), I (IDOR), E.
+T-27 (modifier et supprimer une capture) est découpée le 25/11/2026 en T-27a (serveur) et T-27b (écran) ; le retrait d'une capture supprimée d'un concours passe dans T-64b, et des collections dans T-61.
+
+- [x] **T-27a Modifier et supprimer une capture : serveur** (dép. T-26a)
+  `PATCH` et `DELETE /api/photos/{id}` : champs envoyés seuls modifiés, filtre d'insultes, point focal, zone et tags ; suppression : original et variantes dans `trash/`, purge des adresses `/img`, ligne supprimée ; l'auteur seul (403 publiée, 404 sinon), suspendu : suppression permise, modification refusée.
+  Stories : US-12.1–3, US-13.1. Tests : U (propriété), I (IDOR).
+
+- [ ] **T-27b Modifier et supprimer une capture : écran** (dép. T-27a, T-25b)
+  Actions « Edit » et « Delete » (confirmation) dans « My captures », formulaire de modification (champs et point focal de l'upload).
+  Stories : US-12.1–2. Tests : composants, E.
 
 - [ ] **T-28 Avatar** (dép. T-17a, T-24, T-25a)
   Upload présigné dédié (2 Mo), recadrage carré, message `avatar-process`, variantes WebP 64/128/256 écrites une fois, modération automatique, ancien avatar conservé jusqu'à validation, route `/avatar/{userId}/{version}/{size}`.
@@ -466,11 +473,11 @@ T-26a (formulaire d'upload) est découpée le 25/11/2026 : le serveur des détai
 ## Phase 6 — v1.x (chaque tâche livrée derrière son flag)
 
 - [ ] **T-60 Abonnements et fil** (dép. T-58) — US-33. Tests : U, I, E.
-- [ ] **T-61 Collections** (dép. T-58) — US-34. Tests : U, I, E.
+- [ ] **T-61 Collections** (dép. T-58) — US-34 ; une capture supprimée quitte les collections (US-12.2). Tests : U, I, E.
 - [ ] **T-62 Récap email hebdomadaire** (dép. T-58) — US-36. Tests : U, I.
 - [ ] **T-63 Classement** (dép. T-58) — `leaderboard_snapshots`, cron 5 min, « Your best ». US-22, US-70.3. Tests : U, I, E.
 - [ ] **T-64a Concours : modèle et cycle de vie** (dép. T-63) — machine à états, cron idempotent, back-office. US-40, US-44, US-46. Tests : U (horloge simulée), I.
-- [ ] **T-64b Concours : participation** (dép. T-64a) — US-41. Tests : U, I, E.
+- [ ] **T-64b Concours : participation** (dép. T-64a) — US-41, US-12.4 (capture supprimée : participation retirée, mention « capture removed »). Tests : U, I, E.
 - [ ] **T-64c Concours : score et anti-triche** (dép. T-64b) — table `contest_like_signals` alimentée seulement pour les likes sur une participation d'un concours ouvert, `ip_hash` = HMAC par concours (clé dérivée de `CONTEST_IP_KEY` et de l'id du concours), préfixe `/64` en IPv6, alerte seulement au-delà de 10 likes comptés, purge 30 jours après `closed`. US-42, US-43. Tests : U, I.
 - [ ] **T-64d Concours : résultats et archives** (dép. T-64c) — badges, hero, bandeau de quête. US-45, US-47. Tests : U, I, E.
 - [ ] **T-65 Export de données** (dép. T-58) — US-06. Tests : U, I.

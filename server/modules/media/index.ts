@@ -1,6 +1,7 @@
 // media module (03-architecture.md § Modules): upload, private storage, processing (T-22b), serving (T-25a).
 export type {
   CaptureDetails,
+  DetailsChanges,
   ImageInfo,
   ImageService,
   MediaRepository,
@@ -29,3 +30,4 @@ export { IMAGE_SIZES, removeImages, serveImage, type ServedImage } from './appli
 export { cloudflareCachePurger } from './infrastructure/cloudflare-cache-purger'
 export type { OwnCapture } from './application/ports'
 export { listMyCaptures, MY_CAPTURES_PAGE } from './application/my-captures'
+export { deleteCapture, editCapture } from './application/edit-capture'

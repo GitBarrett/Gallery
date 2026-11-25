@@ -117,6 +117,10 @@ export interface MediaRepository {
   titles(ids: string[]): Promise<Map<string, string | null>>
   /** Completed captures of `userId`, latest first, `limit` at most, after the id `before` when given (UUID v7: by time). */
   listOwn(userId: string, page: { before?: string; limit: number }): Promise<OwnCapture[]>
+  /** Applies the changes of an edit at once (one transaction). */
+  updateDetails(id: string, changes: DetailsChanges): Promise<void>
+  /** Deletes the capture and, by cascade, its details and tags; false if it was already gone. */
+  deleteCapture(id: string): Promise<boolean>
 }
 
 /** Key where the browser puts the file (03 § Pipeline image 2): server-made, no extension, never served. */
@@ -155,4 +159,25 @@ export interface CaptureDetails {
   focalX?: number
   focalY?: number
   tagIds: string[]
+}
+
+/**
+ * Changes of an edit (US-12.1, US-13.1): only the keys present change, `null` clears; `tagIds` replaces the tags.
+ * Free texts already checked, zone and tags resolved by the catalogue.
+ */
+export interface DetailsChanges {
+  title?: string
+  description?: string | null
+  altText?: string | null
+  focalX?: number | null
+  focalY?: number | null
+  metadata?: {
+    zoneId?: string | null
+    zoneCustom?: string | null
+    inGameTime?: string | null
+    graphicsSettings?: string | null
+    characterName?: string | null
+    caption?: string | null
+  }
+  tagIds?: string[]
 }

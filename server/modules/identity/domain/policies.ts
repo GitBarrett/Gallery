@@ -5,7 +5,8 @@ import { err, ok, type Result } from '../../../../shared/domain/result'
 // call are listed in tests/authorization-matrix.ts, checked by the architecture and the matrix tests.
 
 export type PolicyDenial =
-  { kind: 'forbidden'; reason: 'email_unverified' | 'suspended' | 'role' | 'mfa_required' } | { kind: 'not_found' }
+  | { kind: 'forbidden'; reason: 'email_unverified' | 'suspended' | 'role' | 'mfa_required' | 'owner' }
+  | { kind: 'not_found' }
 
 /**
  * Publishing, commenting and taking part in a contest need a verified email (US-08.1); liking and following do

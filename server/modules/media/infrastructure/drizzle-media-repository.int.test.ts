@@ -57,6 +57,42 @@ describe('drizzleMediaRepository', () => {
     })
   })
 
+  it('US-12.1 changes only the given details, replaces the tags; US-12.2 deletes the capture with them', async () => {
+    await withRollback(async (tx) => {
+      const repo = drizzleMediaRepository(tx)
+      const catalog = drizzleCatalogRepository(tx)
+      const userId = await member(tx)
+      await repo.createUpload(upload(ids[0]!, userId))
+      const [old, fresh] = await catalog.ensureTags([`old ${userId.slice(0, 6)}`, `new ${userId.slice(0, 6)}`])
+      const at = new Date()
+      const details = { description: 'Long story', caption: 'Glow', characterName: 'Ash', tagIds: [old!] }
+      await repo.complete(ids[0]!, { title: 'Dusk', gameVersion: 'wow-forever', at, details })
+      await repo.updateDetails(ids[0]!, {
+        title: 'Dawn',
+        description: null,
+        focalX: 0.4,
+        focalY: 0.6,
+        metadata: { caption: 'First light' },
+        tagIds: [fresh!],
+      })
+      const [row] = await tx
+        .select({ title: photos.title, description: photos.description, focalX: photos.focalX, status: photos.status })
+        .from(photos)
+        .where(eq(photos.id, ids[0]!))
+      expect(row).toEqual({ title: 'Dawn', description: null, focalX: 0.4, status: 'processing' })
+      const [metadata] = await tx.select().from(photoMetadata).where(eq(photoMetadata.photoId, ids[0]!))
+      expect(metadata).toMatchObject({ caption: 'First light', characterName: 'Ash' }) // the rest kept
+      expect((await tx.select().from(photoTags).where(eq(photoTags.photoId, ids[0]!))).map((t) => t.tagId)).toEqual([
+        fresh,
+      ])
+
+      expect(await repo.deleteCapture(ids[0]!)).toBe(true)
+      expect(await repo.deleteCapture(ids[0]!)).toBe(false)
+      expect(await tx.select().from(photoMetadata).where(eq(photoMetadata.photoId, ids[0]!))).toEqual([])
+      expect(await tx.select().from(photoTags).where(eq(photoTags.photoId, ids[0]!))).toEqual([])
+    })
+  })
+
   it('US-11.1 US-11.2 US-11.3 writes the details with the completion, not on a second one', async () => {
     await withRollback(async (tx) => {
       const repo = drizzleMediaRepository(tx)
