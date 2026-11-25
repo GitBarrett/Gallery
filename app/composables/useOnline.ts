@@ -15,7 +15,6 @@ export function useOnline() {
 }
 
 /**
- * True while a capture is being uploaded: the update toast waits for the end (US-65.2).
- * shortcut: never set until the upload form exists (T-26a sets it).
+ * True while a capture is being uploaded (set by the upload form): the update toast waits for the end (US-65.2).
  */
 export const useUploadInProgress = () => useState('upload-in-progress', () => false)

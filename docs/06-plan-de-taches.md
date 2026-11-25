@@ -321,7 +321,7 @@ T-26a (formulaire d'upload) est découpée le 25/11/2026 : le serveur des détai
   Contrat de `complete` étendu (description, texte alternatif, légende, zone ou zone libre, heure en jeu, réglages, personnage, tags), filtre d'insultes sur tous les textes, tags normalisés et créés par le catalogue, zone résolue ; tables `photo_metadata` et `photo_tags`, colonnes `photos.description` et `alt_text`.
   Stories : US-11.1–3, US-11.5. Tests : U, I.
 
-- [ ] **T-26a Formulaire d'upload** (dép. T-21, T-24, T-25b, T-20b, T-26d)
+- [x] **T-26a Formulaire d'upload** (dép. T-21, T-24, T-25b, T-20b, T-26d)
   Page `/upload` conforme à la maquette : sélection, validation client (règles `shared/domain`), progression et reprise, champs, zone et tags en autocomplétion, légende, texte alternatif, case de consentement (JPEG, PNG, WebP).
   Stories : US-10 (parcours), US-11. Tests : composants, E (JPEG de bout en bout ; aucune violation CSP).
 
