@@ -100,6 +100,25 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect(await repo.usernames([])).toEqual(new Map())
     })
 
+    it('US-07.6 keeps the avatar shown until the pending one is promoted, and forgets a dropped one', async () => {
+      const repo = await make()
+      const ash = user()
+      await repo.createUser(ash)
+      const [first, second, third] = [crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID()]
+      expect(await repo.findAvatar(ash.id)).toEqual({ current: null, pending: null })
+      await repo.setPendingAvatar(ash.id, first)
+      expect(await repo.promoteAvatar(ash.id, second)).toBe(false) // not the pending one
+      expect(await repo.promoteAvatar(ash.id, first)).toEqual({ previous: null })
+      await repo.setPendingAvatar(ash.id, second)
+      expect(await repo.findAvatar(ash.id)).toEqual({ current: first, pending: second })
+      expect(await repo.promoteAvatar(ash.id, second)).toEqual({ previous: first })
+      await repo.setPendingAvatar(ash.id, third)
+      expect(await repo.dropPendingAvatar(ash.id, third)).toBe(true)
+      expect(await repo.dropPendingAvatar(ash.id, third)).toBe(false)
+      expect(await repo.findAvatar(ash.id)).toEqual({ current: second, pending: null })
+      expect(await repo.findAvatar(crypto.randomUUID())).toBeNull()
+    })
+
     it('US-04.3 replaces the password hash of an account', async () => {
       const repo = await make()
       const ash = user()

@@ -15,6 +15,8 @@ export interface ModerationProvider {
 }
 
 export interface AutoDecision {
+  /** A capture, or an avatar version (US-07.6); a capture when absent. */
+  targetType?: 'photo' | 'avatar'
   targetId: string
   decision: ModerationOutcome
   /** Raw answer, null when the provider did not answer. */

@@ -31,3 +31,11 @@ export { cloudflareCachePurger } from './infrastructure/cloudflare-cache-purger'
 export type { OwnCapture } from './application/ports'
 export { getMyCapture, listMyCaptures, MY_CAPTURES_PAGE } from './application/my-captures'
 export { deleteCapture, editCapture } from './application/edit-capture'
+export {
+  AVATARS_PER_DAY,
+  completeAvatarUpload,
+  processAvatar,
+  requestAvatarUpload,
+  serveAvatar,
+  type AvatarAccounts,
+} from './application/avatars'

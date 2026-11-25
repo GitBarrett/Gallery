@@ -423,7 +423,7 @@ export const moderationDecisions = pgTable(
     createdAt: createdAt(),
   },
   (t) => [
-    check('moderation_decisions_target_check', sql`${t.targetType} in ('photo')`),
+    check('moderation_decisions_target_check', sql`${t.targetType} in ('photo', 'avatar')`),
     check('moderation_decisions_decision_check', sql`${t.decision} in ('published', 'pending_review', 'rejected')`),
     check('moderation_decisions_source_check', sql`${t.source} in ('auto', 'manual')`),
     // One automatic decision per target: a replayed message records nothing more (US-14.2)

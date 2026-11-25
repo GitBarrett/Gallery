@@ -1,0 +1,2 @@
+ALTER TABLE "moderation_decisions" DROP CONSTRAINT "moderation_decisions_target_check";--> statement-breakpoint
+ALTER TABLE "moderation_decisions" ADD CONSTRAINT "moderation_decisions_target_check" CHECK ("moderation_decisions"."target_type" in ('photo', 'avatar'));

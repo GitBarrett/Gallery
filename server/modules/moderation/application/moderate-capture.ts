@@ -23,10 +23,13 @@ export const moderateCapture =
     photoId: string
     title: string | null
     image: Uint8Array
+    /** An avatar version as `photoId` (US-07.6). */
+    target?: 'photo' | 'avatar'
   }): Promise<{ outcome: ModerationOutcome; score: number | null }> => {
     const found = await scoresOf(deps, capture)
     const outcome = decide(found?.score ?? null, await deps.thresholds())
     await deps.decisions.recordAuto({
+      ...(capture.target && { targetType: capture.target }),
       targetId: capture.photoId,
       decision: outcome,
       scores: found?.raw ?? null,
