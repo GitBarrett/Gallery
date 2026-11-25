@@ -50,7 +50,9 @@ function link(n: NotificationItem): { to: string; label: string } {
   if (n.type === 'follow') return { to: `/u/${n.actor}`, label: t('notifications.cta.profile') }
   if (n.type === 'contest') return { to: '/contests', label: t('notifications.cta.contests') }
   if (n.type === 'moderation' && !n.photoId) return { to: '/settings', label: t('notifications.cta.settings') }
+  // A failed capture is uploaded again (Q68); a rejected one can be appealed by email (US-50.1, Terms)
   if (n.type === 'moderation' && n.detail === 'failed') return { to: '/upload', label: t('notifications.cta.upload') }
+  if (n.type === 'moderation' && n.detail === 'rejected') return { to: '/terms', label: t('notifications.cta.appeal') }
   return { to: `/p/${n.photoId}`, label: t('notifications.cta.view') }
 }
 

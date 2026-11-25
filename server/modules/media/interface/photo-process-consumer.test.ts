@@ -1,8 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { baseJpeg } from '../../../../tests/builders/images'
 import { fakeImageService } from '../../../../tests/fakes/fake-image-service'
 import { inMemoryMediaRepository } from '../../../../tests/fakes/in-memory-media-repository'
 import { inMemoryObjectStorage } from '../../../../tests/fakes/in-memory-object-storage'
+import { inMemoryUnitOfWork } from '../../../../tests/fakes/in-memory-unit-of-work'
 import type { QueueMessage } from '../../../platform/jobs'
 import { photoProcessConsumer } from './photo-process-consumer'
 
@@ -24,7 +25,9 @@ async function setup() {
   })
   await repo.complete(ID, { title: 'Dusk', gameVersion: 'wow-forever', at: clock.now() })
   objects.set(`incoming/${ID}`, { bytes: file.length, contentType: 'image/jpeg', data: file })
-  return { deps: { repo, storage, images }, rows, objects, state }
+  const { uow, sent } = inMemoryUnitOfWork(repo)
+  const moderate = vi.fn(async () => ({ outcome: 'pending_review' as const, score: 0.6 }))
+  return { deps: { repo, uow, storage, images, moderate, clock }, rows, objects, state, sent }
 }
 
 describe('photo-process consumer', () => {
@@ -42,6 +45,10 @@ describe('photo-process consumer', () => {
     await expect(consume(body, message(4))).rejects.toThrow('Images unavailable') // then the DLQ (alert)
     expect(s.rows.get(ID)?.status).toBe('failed')
     expect([...s.objects.keys()]).toEqual([])
+    // Q68: the author is invited to start again
+    expect(s.sent()).toEqual([
+      { topic: 'notifications', payload: { type: 'moderation', userId: 'u-ash', photoId: ID, outcome: 'failed' } },
+    ])
   })
 
   it('US-14.2 processes the capture of the message, and refuses a message of another shape', async () => {

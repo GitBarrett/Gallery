@@ -25,6 +25,8 @@ const schema = z
     // breaks its feature (Q42): the code that needs it fails without it.
     TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
     RESEND_API_KEY: z.string().min(1).optional(),
+    SIGHTENGINE_API_USER: z.string().trim().min(1).optional(),
+    SIGHTENGINE_API_SECRET: z.string().trim().min(1).optional(),
     IP_HASH_KEY_CURRENT: z.string().min(32).optional(),
     MFA_ENCRYPTION_KEY: z.string().min(32).optional(),
     NUXT_OAUTH_GOOGLE_CLIENT_ID: z.string().min(1).optional(),
@@ -55,6 +57,8 @@ export interface Config {
   r2Prefix: string
   turnstileSecret?: string
   resendApiKey?: string
+  sightengineApiUser?: string
+  sightengineApiSecret?: string
   ipHashKey?: string
   mfaKey?: string
   googleClientId?: string
@@ -82,6 +86,8 @@ export function loadConfig(env: Record<string, string | undefined>): Config {
     r2Prefix: parsed.data.NUXT_R2_PREFIX,
     turnstileSecret: parsed.data.TURNSTILE_SECRET_KEY,
     resendApiKey: parsed.data.RESEND_API_KEY,
+    sightengineApiUser: parsed.data.SIGHTENGINE_API_USER,
+    sightengineApiSecret: parsed.data.SIGHTENGINE_API_SECRET,
     ipHashKey: parsed.data.IP_HASH_KEY_CURRENT,
     mfaKey: parsed.data.MFA_ENCRYPTION_KEY,
     googleClientId: parsed.data.NUXT_OAUTH_GOOGLE_CLIENT_ID,

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   baseJpeg,
   concat,
@@ -14,7 +14,8 @@ import {
 import { fakeImageService } from '../../../../tests/fakes/fake-image-service'
 import { inMemoryMediaRepository } from '../../../../tests/fakes/in-memory-media-repository'
 import { inMemoryObjectStorage } from '../../../../tests/fakes/in-memory-object-storage'
-import type { ImageInfo } from './ports'
+import { inMemoryUnitOfWork } from '../../../../tests/fakes/in-memory-unit-of-work'
+import type { ImageInfo, ModerationGateway } from './ports'
 import { failCapture, processCapture } from './process-capture'
 
 const ID = '0193a000-0000-7000-8000-0000000000aa'
@@ -26,18 +27,31 @@ const brightCorner = (x: number, y: number): [number, number, number] =>
 
 async function setup(
   file: Uint8Array,
-  { mime = 'image/jpeg', info }: { mime?: 'image/jpeg' | 'image/png'; info?: Partial<ImageInfo> } = {},
+  {
+    mime = 'image/jpeg',
+    info,
+    decision = { outcome: 'pending_review', score: 0.6 },
+  }: {
+    mime?: 'image/jpeg' | 'image/png'
+    info?: Partial<ImageInfo>
+    decision?: Awaited<ReturnType<ModerationGateway>>
+  } = {},
 ) {
   const clock = { now: () => new Date('2026-11-24T10:00:00Z') }
   const { repo, rows } = inMemoryMediaRepository(clock)
+  const { uow, sent } = inMemoryUnitOfWork(repo)
   const { storage, objects } = inMemoryObjectStorage()
   const fake = fakeImageService({ format: mime, width: 1920, height: 1080, ...info }, brightCorner)
+  const moderate = vi.fn<ModerationGateway>(async () => decision)
   await repo.createUpload({ id: ID, userId: 'u-ash', mime, bytes: file.length, width: 1920, height: 1080 })
   await repo.complete(ID, { title: 'Dusk', gameVersion: 'wow-forever', at: clock.now() })
   objects.set(`incoming/${ID}`, { bytes: file.length, contentType: mime, data: file })
-  const deps = { repo, storage, images: fake.images }
-  return { ...fake, deps, process: () => processCapture(deps)(ID), rows, objects }
+  const deps = { repo, uow, storage, images: fake.images, moderate, clock }
+  return { ...fake, deps, moderate, sent, process: () => processCapture(deps)(ID), rows, objects }
 }
+const notified = (outcome: string) => [
+  { topic: 'notifications', payload: { type: 'moderation', userId: 'u-ash', photoId: ID, outcome } },
+]
 
 describe('capture processing', () => {
   it('US-14.1 US-10.4 strips the metadata without re-encoding, writes the variants and records the measures', async () => {
@@ -140,5 +154,63 @@ describe('capture processing', () => {
     await failCapture(s.deps)(ID)
     expect(s.rows.get(ID)?.status).toBe('pending_review')
     expect(s.objects.has(`originals/${ID}`)).toBe(true)
+  })
+})
+
+describe('automatic moderation of a processed capture', () => {
+  it('US-14.1 sends the 1200 px JPEG, once the variants are written, with the title', async () => {
+    const s = await setup(baseJpeg())
+    await s.process()
+    expect(s.moderate).toHaveBeenCalledWith({
+      photoId: ID,
+      title: 'Dusk',
+      image: s.objects.get(`variants/${ID}/1200.jpg`)?.data,
+    })
+  })
+
+  it('US-50.3 US-14.3 publishes under the low threshold and notifies the author', async () => {
+    const s = await setup(baseJpeg(), { decision: { outcome: 'published', score: 0.02 } })
+    expect(await s.process()).toBe('processed')
+    expect(s.rows.get(ID)).toMatchObject({
+      status: 'published',
+      processed: { moderationScore: 0.02, publishedAt: new Date('2026-11-24T10:00:00Z') },
+    })
+    expect(s.sent()).toEqual(notified('published'))
+  })
+
+  it('US-50.2 US-50.4 US-14.3 sends to review, the score null when the provider did not answer', async () => {
+    const s = await setup(baseJpeg(), { decision: { outcome: 'pending_review', score: null } })
+    await s.process()
+    expect(s.rows.get(ID)).toMatchObject({
+      status: 'pending_review',
+      processed: { moderationScore: null, publishedAt: null },
+    })
+    expect(s.objects.has(`variants/${ID}/800.webp`)).toBe(true)
+    expect(s.sent()).toEqual(notified('pending_review'))
+  })
+
+  it('US-50.1 rejects from the high threshold: the original goes to trash/, the variants go, the author is told', async () => {
+    const s = await setup(baseJpeg(), { decision: { outcome: 'rejected', score: 0.95 } })
+    await s.process()
+    expect(s.rows.get(ID)).toMatchObject({ status: 'rejected', processed: { moderationScore: 0.95 } })
+    expect([...s.objects.keys()]).toEqual([`trash/originals/${ID}`])
+    expect(s.objects.get(`trash/originals/${ID}`)).toMatchObject({ contentType: 'image/jpeg', data: baseJpeg() })
+    expect(s.sent()).toEqual(notified('rejected'))
+  })
+
+  it('US-14.2 a replayed message calls the moderation no more and notifies once', async () => {
+    const s = await setup(baseJpeg(), { decision: { outcome: 'published', score: 0.02 } })
+    await s.process()
+    await s.process()
+    expect(s.moderate).toHaveBeenCalledTimes(1)
+    expect(s.sent()).toHaveLength(1)
+  })
+
+  it('US-10.3 US-10.8 tells the author when the capture ends failed, once', async () => {
+    const s = await setup(HTML)
+    expect(await s.process()).toBe('rejected')
+    await failCapture(s.deps)(ID) // late failure of a replay
+    expect(s.moderate).not.toHaveBeenCalled()
+    expect(s.sent()).toEqual(notified('failed'))
   })
 })

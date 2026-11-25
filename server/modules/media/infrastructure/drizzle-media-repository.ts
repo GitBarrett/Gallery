@@ -24,6 +24,7 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
         bytes: photos.bytes,
         status: photos.status,
         uploadedAt: photos.uploadedAt,
+        title: photos.title,
       })
       .from(photos)
       .where(eq(photos.id, id))

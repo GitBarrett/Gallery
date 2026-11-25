@@ -301,6 +301,9 @@ export const photos = pgTable(
     height: integer('height').notNull(),
     lumaBl: real('luma_bl'),
     lumaTr: real('luma_tr'),
+    /** Max score of the automatic moderation (US-50), null when the provider did not answer. */
+    moderationScore: real('moderation_score'),
+    publishedAt: at('published_at'),
     uploadedAt: at('uploaded_at'),
     createdAt: createdAt(),
   },
@@ -394,5 +397,36 @@ export const donations = pgTable(
     check('donations_status_check', sql`${t.status} in ('pending', 'succeeded', 'failed', 'canceled')`),
     check('donations_amount_check', sql`${t.amountCents} > 0`),
     check('donations_currency_check', sql`${t.currency} ~ '^[A-Z]{3}$'`),
+  ],
+)
+
+/**
+ * Moderation decisions (US-50.6, US-52): the automatic one of each capture (source `auto`, raw scores, once per
+ * target), then the moderators' (T-58). Kept 1 year; the moderator's id is pseudonymised at account deletion (US-09.2).
+ */
+export const moderationDecisions = pgTable(
+  'moderation_decisions',
+  {
+    id: id(),
+    targetType: text('target_type').notNull(),
+    targetId: uuid('target_id').notNull(), // no foreign key: the decision outlives a deleted capture
+    decision: text('decision').notNull(),
+    source: text('source').notNull(),
+    moderatorId: uuid('moderator_id').references(() => users.id, { onDelete: 'set null' }),
+    reason: text('reason'),
+    scores: jsonb('scores'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check('moderation_decisions_target_check', sql`${t.targetType} in ('photo')`),
+    check('moderation_decisions_decision_check', sql`${t.decision} in ('published', 'pending_review', 'rejected')`),
+    check('moderation_decisions_source_check', sql`${t.source} in ('auto', 'manual')`),
+    // One automatic decision per target: a replayed message records nothing more (US-14.2)
+    uniqueIndex('moderation_decisions_auto_idx')
+      .on(t.targetType, t.targetId)
+      .where(sql`${t.source} = 'auto'`),
+    index('moderation_decisions_target_idx').on(t.targetId),
+    index('moderation_decisions_moderator_idx').on(t.moderatorId),
+    index('moderation_decisions_created_idx').on(t.createdAt), // yearly purge
   ],
 )

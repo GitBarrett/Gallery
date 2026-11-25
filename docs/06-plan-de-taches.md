@@ -303,7 +303,7 @@ T-18d, T-18e et T-18c : en tête de la phase 5 (règle 1).
   Compteur de non-lus, page « Quest log », lecture unitaire et globale.
   Stories : US-35.3. Tests : E.
 
-- [ ] **T-24 Modération automatique** (dép. T-22b, T-23a, T-08)
+- [x] **T-24 Modération automatique** (dép. T-22b, T-23a, T-08)
   Port `ModerationProvider` (Sightengine + fake), appelé par `photo-process` avec le JPEG 1200 après les variantes, seuils depuis `site_settings`, retries, historique `moderation_decisions`, notification de l'auteur (capture publiée, en revue, refusée ou en échec de traitement).
   Stories : US-50, US-14.1 (appel de la modération), US-14.3, US-10.3 (notification) (Q68). Tests : U (seuils), I (pannes), E (fichier NSFW de fixture refusé).
 

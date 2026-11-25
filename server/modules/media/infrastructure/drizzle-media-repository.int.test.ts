@@ -4,6 +4,7 @@ import { baseJpeg, jpegExif, jpegWith } from '../../../../tests/builders/images'
 import { withRollback } from '../../../../tests/db'
 import { fakeImageService } from '../../../../tests/fakes/fake-image-service'
 import { inMemoryObjectStorage } from '../../../../tests/fakes/in-memory-object-storage'
+import { inMemoryUnitOfWork } from '../../../../tests/fakes/in-memory-unit-of-work'
 import { photoProcessConsumer } from '../interface/photo-process-consumer'
 import { gameVersions, photos, users } from '../../../db/schema'
 import { drizzleMediaRepository } from './drizzle-media-repository'
@@ -40,6 +41,7 @@ describe('drizzleMediaRepository', () => {
         bytes: 42,
         status: 'processing',
         uploadedAt: null,
+        title: null,
       })
       const at = new Date()
       expect(await repo.complete(ids[0]!, { title: 'Dusk', gameVersion: 'wow-forever', at })).toBe(true)
@@ -116,7 +118,10 @@ describe('drizzleMediaRepository', () => {
       const { storage, objects } = inMemoryObjectStorage()
       objects.set(`incoming/${ids[0]}`, { bytes: file.length, contentType: 'image/jpeg', data: file })
       const { images, renders } = fakeImageService({ format: 'image/jpeg', width: 3840, height: 2160 })
-      const consume = photoProcessConsumer({ repo, storage, images })
+      const { uow, sent } = inMemoryUnitOfWork(repo)
+      const moderate = async () => ({ outcome: 'published' as const, score: 0.02 })
+      const clock = { now: () => new Date('2026-11-25T10:00:00Z') }
+      const consume = photoProcessConsumer({ repo, uow, storage, images, moderate, clock })
       const body = { eventId: ids[1], payload: { kind: 'capture', photoId: ids[0] } }
       const message = { id: 'm1', body, attempts: 1, ack() {}, retry() {} }
       await consume(body, message)
@@ -132,17 +137,22 @@ describe('drizzleMediaRepository', () => {
           height: photos.height,
           lumaBl: photos.lumaBl,
           lumaTr: photos.lumaTr,
+          moderationScore: photos.moderationScore,
+          publishedAt: photos.publishedAt,
         })
         .from(photos)
         .where(eq(photos.id, ids[0]!))
       expect(row).toEqual({
-        status: 'pending_review',
+        status: 'published',
         bytes: baseJpeg().length,
         width: 3840,
         height: 2160,
         lumaBl: 0,
         lumaTr: 0,
+        moderationScore: 0.02,
+        publishedAt: new Date('2026-11-25T10:00:00Z'),
       })
+      expect(sent()).toHaveLength(1) // US-14.3: the author is notified once
     })
   })
 
@@ -151,7 +161,15 @@ describe('drizzleMediaRepository', () => {
       const repo = drizzleMediaRepository(tx)
       const userId = await member(tx)
       for (const id of ids) await repo.createUpload(upload(id, userId))
-      const measures = { bytes: 40, width: 1920, height: 1080, lumaBl: 0.5, lumaTr: 0.25 }
+      const measures = {
+        bytes: 40,
+        width: 1920,
+        height: 1080,
+        lumaBl: 0.5,
+        lumaTr: 0.25,
+        moderationScore: 0.6,
+        publishedAt: null,
+      }
       expect(await repo.finishProcessing(ids[0]!, 'pending_review', measures)).toBe(true)
       expect(await repo.finishProcessing(ids[0]!, 'pending_review', measures)).toBe(false)
       expect(await repo.failProcessing(ids[0]!)).toBe(false)

@@ -1,6 +1,7 @@
 import { createDb, type Db } from '../db/client'
 import { outboxRelay, queuesOf } from '../db/outbox'
 import { purgeRateLimitCounters } from '../db/rate-limiter'
+import { drizzleUnitOfWork } from '../db/unit-of-work'
 import type { Bindings } from '../platform/bindings'
 import { systemClock } from '../platform/clock'
 import {
@@ -28,7 +29,15 @@ import {
   r2ObjectStorage,
   type R2Bucket,
 } from '../modules/media'
+import {
+  drizzleModerationDecisions,
+  fakeModerationProvider,
+  moderateCapture,
+  sightengineProvider,
+  type ModerationProvider,
+} from '../modules/moderation'
 import { drizzleNotificationsRepository, notificationsConsumer, purgeNotifications } from '../modules/notifications'
+import { drizzleSettingsRepository, settingsReader } from '../modules/settings'
 import { loadConfig } from '../platform/config'
 import { uuidV7Generator } from '../platform/ids'
 import { createLogger, type Logger } from '../platform/logger'
@@ -67,10 +76,37 @@ function consumers(db: Db, logger: Logger, env: Bindings): Record<string, Messag
   if (env.R2 && env.IMAGES)
     handlers['photo-process'] = photoProcessConsumer({
       repo: drizzleMediaRepository(db),
+      uow: drizzleUnitOfWork(db, drizzleMediaRepository, relayOf(env, db), logger),
       storage: r2ObjectStorage({ bucket: env.R2, prefix: config.r2Prefix, now: systemClock.now }),
       images: imagesBindingService(env.IMAGES),
+      moderate: autoModeration(db, logger, config, env),
+      clock: systemClock,
     })
   return handlers
+}
+
+// Thresholds read at each capture (60 s cache): an admin change applies without redeploy (US-50.5). Missing
+// Sightengine keys only send the captures to review (US-50.4, Q42).
+function autoModeration(db: Db, logger: Logger, config: ReturnType<typeof loadConfig>, env: Bindings) {
+  const repository = drizzleSettingsRepository(env.HYPERDRIVE?.connectionString)
+  const settings = settingsReader({ repository, clock: systemClock })
+  const provider: ModerationProvider = config.fakeProviders
+    ? fakeModerationProvider()
+    : {
+        check: (image, context) =>
+          sightengineProvider({
+            apiUser: required(config.sightengineApiUser, 'SIGHTENGINE_API_USER'),
+            apiSecret: required(config.sightengineApiSecret, 'SIGHTENGINE_API_SECRET'),
+            fetch: (url, init) => fetch(url, init),
+          }).check(image, context),
+      }
+  return moderateCapture({
+    provider,
+    decisions: drizzleModerationDecisions(db),
+    thresholds: async () => (await settings(logger))['moderation.scores'],
+    sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+    logger,
+  })
 }
 
 /** Runs a job with the database (Hyperdrive), then closes the connection: each cron opens its own. */
