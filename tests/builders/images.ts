@@ -112,13 +112,17 @@ export function pngImage(
   width: number,
   height: number,
   pixel: (x: number, y: number) => [number, number, number],
-  { colorType = 2, filters = [0] }: { colorType?: 0 | 2 | 3 | 4 | 6; filters?: number[] } = {},
+  {
+    colorType = 2,
+    filters = [0],
+    bitDepth = 8,
+  }: { colorType?: 0 | 2 | 3 | 4 | 6; filters?: number[]; bitDepth?: 1 | 2 | 4 | 8 } = {},
 ): Uint8Array<ArrayBuffer> {
   const channels = { 0: 1, 2: 3, 3: 1, 4: 2, 6: 4 }[colorType]
   const palette: number[][] = []
   const samples = (x: number, y: number) => {
     const [r, g, b] = pixel(x, y)
-    if (colorType === 0) return [r]
+    if (colorType === 0) return [Math.round((r * ((1 << bitDepth) - 1)) / 255)]
     if (colorType === 4) return [r, 255]
     if (colorType === 6) return [r, g, b, 255]
     if (colorType === 2) return [r, g, b]
@@ -126,16 +130,28 @@ export function pngImage(
     if (index === -1) index = palette.push([r, g, b]) - 1
     return [index]
   }
-  const stride = width * channels
-  const rows = Array.from({ length: height }, (_, y) => Array.from({ length: width }, (_, x) => samples(x, y)).flat())
+  // Below 8 bits (grey and palette only), the samples of a row are packed, most significant bits first
+  const pack = (values: number[]) =>
+    bitDepth === 8
+      ? values
+      : Array.from({ length: Math.ceil((values.length * bitDepth) / 8) }, (_, i) =>
+          values
+            .slice((i * 8) / bitDepth, ((i + 1) * 8) / bitDepth)
+            .reduce((byte, v, j) => byte | (v << (8 - bitDepth * (j + 1))), 0),
+        )
+  const rows = Array.from({ length: height }, (_, y) =>
+    pack(Array.from({ length: width }, (_, x) => samples(x, y)).flat()),
+  )
+  const stride = rows[0]!.length
+  const bpp = Math.max(1, (channels * bitDepth) / 8)
   const raw: number[] = []
   rows.forEach((row, y) => {
     const filter = filters[y % filters.length]!
     raw.push(filter)
     for (let x = 0; x < stride; x++) {
-      const a = x >= channels ? row[x - channels]! : 0
+      const a = x >= bpp ? row[x - bpp]! : 0
       const b = y > 0 ? rows[y - 1]![x]! : 0
-      const c = x >= channels && y > 0 ? rows[y - 1]![x - channels]! : 0
+      const c = x >= bpp && y > 0 ? rows[y - 1]![x - bpp]! : 0
       const p = a + b - c
       const paeth =
         Math.abs(p - a) <= Math.abs(p - b) && Math.abs(p - a) <= Math.abs(p - c)
@@ -146,7 +162,7 @@ export function pngImage(
       raw.push((row[x]! - [0, a, b, (a + b) >> 1, paeth][filter]! + 256) & 0xff)
     }
   })
-  const ihdr = concat(u32be(width), u32be(height), new Uint8Array([8, colorType, 0, 0, 0]))
+  const ihdr = concat(u32be(width), u32be(height), new Uint8Array([bitDepth, colorType, 0, 0, 0]))
   return new Uint8Array(
     concat(
       PNG_SIGNATURE_BYTES,

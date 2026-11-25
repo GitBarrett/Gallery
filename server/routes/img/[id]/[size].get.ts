@@ -1,7 +1,10 @@
 import { z } from 'zod'
 import { getContext } from '../../../platform/auth-context'
 
-type EdgeCache = { match(url: string): Promise<Response | undefined>; put(url: string, response: Response): Promise<void> }
+type EdgeCache = {
+  match(url: string): Promise<Response | undefined>
+  put(url: string, response: Response): Promise<void>
+}
 // API Cache of the Worker (03 § Pipeline image 6), keyed by the exact URL; absent in Node and inactive on workers.dev
 const edgeCache = () => (globalThis as { caches?: { default?: EdgeCache } }).caches?.default
 const notFound = () => new Response(null, { status: 404, headers: { 'cache-control': 'no-store' } })
@@ -17,7 +20,12 @@ export default defineEventHandler(async (event) => {
   const hit = await cache?.match(url)
   if (hit) return hit
   const { container, actor } = preview ? await getContext(event) : { container: event.context.container, actor: null }
-  const served = await container.media.serveImage({ photoId: id.data, size: getRouterParam(event, 'size')!, preview, viewer: actor })
+  const served = await container.media.serveImage({
+    photoId: id.data,
+    size: getRouterParam(event, 'size')!,
+    preview,
+    viewer: actor,
+  })
   if (!served.ok) return notFound()
   const response = new Response(served.value.body, {
     headers: {

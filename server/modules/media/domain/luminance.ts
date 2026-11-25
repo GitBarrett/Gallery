@@ -22,34 +22,48 @@ async function inflate(data: Uint8Array<ArrayBuffer>): Promise<Uint8Array> {
   return new Uint8Array(await new Response(stream).arrayBuffer())
 }
 
-/** 8-bit, non-interlaced PNG (what the binding writes); throws on anything else. Alpha is ignored: captures are opaque. */
+/**
+ * Non-interlaced PNG, 8 bits per sample, or 1, 2 or 4 for grey and palette (what the binding writes for a flat or
+ * few-colour image); throws on anything else. Alpha is ignored: captures are opaque.
+ */
 export async function decodePng(png: Uint8Array<ArrayBuffer>): Promise<Pixels> {
   const chunks = readChunks(png)
-  const { width, height, colorType, channels } = readHeader(chunks.get('IHDR')?.[0])
+  const { width, height, colorType, channels, depth } = readHeader(chunks.get('IHDR')?.[0])
   const palette = chunks.get('PLTE')?.[0] ?? new Uint8Array()
   const raw = await inflate(new Uint8Array(await new Blob(chunks.get('IDAT') ?? []).arrayBuffer()))
-  const stride = width * channels
-  const pixels = unfilter(raw, stride, height, channels)
+  const stride = Math.ceil((width * channels * depth) / 8)
+  const pixels = unfilter(raw, stride, height, Math.max(1, (channels * depth) / 8))
+  // First sample of the pixel; below 8 bits, unpacked from its byte (most significant bits first)
+  const sample = (x: number, y: number) => {
+    if (depth === 8) return pixels[y * stride + x * channels]!
+    const bit = x * depth
+    return (pixels[y * stride + (bit >> 3)]! >> (8 - depth - (bit & 7))) & ((1 << depth) - 1)
+  }
   return {
     width,
     height,
     rgb(x, y) {
+      const value = sample(x, y)
+      if (colorType === 3) return [palette[value * 3]!, palette[value * 3 + 1]!, palette[value * 3 + 2]!]
+      const grey = Math.round((value * 255) / ((1 << depth) - 1))
+      if (channels <= 2) return [grey, grey, grey]
       const at = y * stride + x * channels
-      if (colorType === 3)
-        return [palette[pixels[at]! * 3]!, palette[pixels[at]! * 3 + 1]!, palette[pixels[at]! * 3 + 2]!]
-      if (channels <= 2) return [pixels[at]!, pixels[at]!, pixels[at]!]
       return [pixels[at]!, pixels[at + 1]!, pixels[at + 2]!]
     },
   }
 }
 
+// 8 bits per sample, or 1, 2 and 4 for grey and palette
+const supportedDepth = (depth: number, colorType: number) =>
+  depth === 8 || ([1, 2, 4].includes(depth) && (colorType === 0 || colorType === 3))
+
 function readHeader(header: Uint8Array | undefined) {
-  if (!header || header.length < 13 || header[8] !== 8 || header[12] !== 0) throw new Error('unsupported PNG')
+  if (!header || header.length < 13 || header[12] !== 0) throw new Error('unsupported PNG')
   const view = new DataView(header.buffer, header.byteOffset, header.length)
-  const [width, height, colorType] = [view.getUint32(0), view.getUint32(4), header[9]!]
+  const [width, height, depth, colorType] = [view.getUint32(0), view.getUint32(4), header[8]!, header[9]!]
   const channels = CHANNELS[colorType]
-  if (!channels || !width || !height) throw new Error('unsupported PNG')
-  return { width, height, colorType, channels }
+  if (!channels || !width || !height || !supportedDepth(depth, colorType)) throw new Error('unsupported PNG')
+  return { width, height, colorType, channels, depth }
 }
 
 /** Data of the chunks by type, in order, up to IEND. */

@@ -19,6 +19,7 @@ export const cloudflareCachePurger = (deps: {
       signal: AbortSignal.timeout(10_000),
     })
     const answer = Answer.safeParse(await response.json().catch(() => null))
-    if (!response.ok || !answer.success || !answer.data.success) throw new Error(`cache purge failed (${response.status})`)
+    if (!response.ok || !answer.success || !answer.data.success)
+      throw new Error(`cache purge failed (${response.status})`)
   },
 })

@@ -8,6 +8,9 @@ export async function moveToTrash(storage: ObjectStorage, key: string): Promise<
   const stored = await storage.head(key)
   const body = stored && (await storage.read(key))
   if (!stored || !body) return
-  await storage.put(trashKey(key), body, { bytes: stored.bytes, contentType: stored.contentType ?? 'application/octet-stream' })
+  await storage.put(trashKey(key), body, {
+    bytes: stored.bytes,
+    contentType: stored.contentType ?? 'application/octet-stream',
+  })
   await storage.delete(key)
 }

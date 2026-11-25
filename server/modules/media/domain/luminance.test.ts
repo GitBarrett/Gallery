@@ -46,6 +46,24 @@ describe('luminance of the text zones', () => {
     }
   })
 
+  it('US-14.1 decodes the 1, 2 and 4-bit palette and grey thumbnails of a flat or few-colour capture', async () => {
+    const two = (x: number): [number, number, number] => (x < 5 ? [58, 90, 120] : [255, 255, 255])
+    for (const bitDepth of [1, 2, 4] as const) {
+      const palette = await decodePng(pngImage(13, 3, two, { colorType: 3, bitDepth, filters: [0, 1, 4] }))
+      expect([palette.rgb(4, 2), palette.rgb(5, 2), palette.rgb(12, 0)]).toEqual([
+        [58, 90, 120],
+        [255, 255, 255],
+        [255, 255, 255],
+      ])
+      const bw = (x: number): [number, number, number] => (x < 5 ? [0, 0, 0] : [255, 255, 255])
+      const grey = await decodePng(pngImage(13, 3, bw, { colorType: 0, bitDepth, filters: [2, 3] }))
+      expect([grey.rgb(4, 1), grey.rgb(5, 2)]).toEqual([
+        [0, 0, 0],
+        [255, 255, 255],
+      ])
+    }
+  })
+
   it('US-14.1 refuses what it cannot read rather than measuring garbage', async () => {
     const png = pngImage(16, 9, white)
     png[8 + 8 + 8] = 16 // IHDR bit depth
