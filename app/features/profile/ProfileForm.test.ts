@@ -8,7 +8,13 @@ registerEndpoint('/api/me', {
   method: 'PATCH',
   handler: async (event) => {
     sent(await readBody(event))
-    return { id: '0190c3a0-0000-7000-8000-000000000001', username: 'Ash_Barrett', role: 'user', emailVerified: true }
+    return {
+      id: '0190c3a0-0000-7000-8000-000000000001',
+      username: 'Ash_Barrett',
+      role: 'user',
+      emailVerified: true,
+      avatarUrl: null,
+    }
   },
 })
 

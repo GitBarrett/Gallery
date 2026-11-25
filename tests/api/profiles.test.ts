@@ -36,6 +36,7 @@ describe('GET /api/users/{username}', () => {
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual({
       username,
+      avatarUrl: null,
       bio: 'Moonwell watcher.',
       memberSince: '2026-11-01T10:00:00.000Z',
       socialLinks: [

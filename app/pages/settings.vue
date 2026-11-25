@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Account settings (/settings, to be designed: 07-design.md). Username (T-16b), bio and language (T-17a), sign-out and
+// Account settings (/settings, to be designed: 07-design.md). Avatar (T-28b), username (T-16b), bio and language (T-17a), sign-out and
 // devices (Q51), social networks (T-17d), email (T-17b), password (T-17c), linked accounts (T-17e), notifications (T-23b, Q69), the other settings with US-07 and US-09. A visitor is sent to sign in and comes back
 // here (Q49).
 import ChangeEmailForm from '~/features/auth/ChangeEmailForm.vue'
@@ -7,6 +7,7 @@ import ChangePasswordForm from '~/features/auth/ChangePasswordForm.vue'
 import LinkedAccounts from '~/features/auth/LinkedAccounts.vue'
 import SessionList from '~/features/auth/SessionList.vue'
 import SignoutButton from '~/features/auth/SignoutButton.vue'
+import AvatarForm from '~/features/profile/AvatarForm.vue'
 import ProfileForm from '~/features/profile/ProfileForm.vue'
 import SocialLinksForm from '~/features/profile/SocialLinksForm.vue'
 import UsernameForm from '~/features/profile/UsernameForm.vue'
@@ -26,6 +27,7 @@ const sessionsVersion = ref(0) // reloads the devices once the other ones are si
 <template>
   <section class="settings" aria-labelledby="settings-title">
     <h1 id="settings-title" class="title">{{ t('settings.title') }}</h1>
+    <AvatarForm v-if="me" :avatar-url="me.avatarUrl" :username="me.username" />
     <UsernameForm v-if="me" :username="me.username" />
     <ProfileForm v-if="me && profile" :username="me.username" :bio="profile.bio" />
     <SocialLinksForm v-if="me" :username="me.username" />

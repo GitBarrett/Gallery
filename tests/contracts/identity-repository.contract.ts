@@ -116,6 +116,7 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
       expect(await repo.dropPendingAvatar(ash.id, third)).toBe(true)
       expect(await repo.dropPendingAvatar(ash.id, third)).toBe(false)
       expect(await repo.findAvatar(ash.id)).toEqual({ current: second, pending: null })
+      expect(await repo.findProfile(ash.username)).toMatchObject({ id: ash.id, avatar: second }) // US-05.3
       expect(await repo.findAvatar(crypto.randomUUID())).toBeNull()
     })
 
@@ -260,7 +261,14 @@ export function identityRepositoryContract(name: string, make: () => Promise<Ide
         userAgentSummary: 'Firefox',
       }
       await repo.createSession(session)
-      const account = { id: ash.id, username: ash.username, role: 'user', status: 'active', emailVerified: false }
+      const account = {
+        id: ash.id,
+        username: ash.username,
+        role: 'user',
+        status: 'active',
+        emailVerified: false,
+        avatar: null,
+      }
       expect(await repo.findSession(session.idHash)).toEqual({
         createdAt: expect.any(Date),
         lastSeenAt: at,

@@ -20,7 +20,7 @@ useUnreadPolling(computed(() => Boolean(me.value)))
   <div class="layout">
     <a href="#content" class="skip-link">{{ $t('layout.skipToContent') }}</a>
     <ConsentPanel />
-    <AppHeader :flags="flags" :username="username" />
+    <AppHeader :flags="flags" :username="username" :avatar-url="me?.avatarUrl ?? null" />
     <OfflineBanner />
     <main id="content" tabindex="-1" class="content"><slot /></main>
     <InstallBanner />

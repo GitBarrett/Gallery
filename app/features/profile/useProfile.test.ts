@@ -5,6 +5,7 @@ import { useProfile } from './useProfile'
 
 registerEndpoint('/api/users/Ash_Barrett', () => ({
   username: 'Ash_Barrett',
+  avatarUrl: null,
   bio: null,
   memberSince: '2026-11-01T10:00:00.000Z',
   socialLinks: [],
@@ -19,6 +20,7 @@ describe('useProfile', () => {
     const { profile } = await useProfile(ref('Ash_Barrett'))
     expect(profile.value).toEqual({
       username: 'Ash_Barrett',
+      avatarUrl: null,
       bio: null,
       memberSince: '2026-11-01T10:00:00.000Z',
       socialLinks: [],

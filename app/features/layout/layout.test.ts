@@ -29,6 +29,14 @@ describe('AppHeader', () => {
     expect(hrefs(member, 'a')).not.toContain('/signin')
   })
 
+  it('US-07.6 shows the avatar of the member in the profile link, the initial without one', async () => {
+    const avatarUrl = '/avatar/0193a000-0000-7000-8000-0000000000a1/0193a000-0000-7000-8000-0000000000b2'
+    const member = await mountSuspended(AppHeader, { props: { flags: off, username: 'jaina', avatarUrl } })
+    expect(member.get('a[href="/u/jaina"] img').attributes('src')).toBe(`${avatarUrl}/64`)
+    const initial = await mountSuspended(AppHeader, { props: { flags: off, username: 'jaina', avatarUrl: null } })
+    expect(initial.get('a[href="/u/jaina"]').text()).toBe('J')
+  })
+
   it('hides while scrolling down and comes back when scrolling up', async () => {
     const wrapper = await mountSuspended(AppHeader, { props: { flags: off } })
     const scrollTo = async (y: number) => {

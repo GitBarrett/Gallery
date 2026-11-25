@@ -181,6 +181,17 @@
   },
   "settings": {
     "title": "Réglages",
+    "avatar": {
+      "title": "Avatar",
+      "choose": "Choisir une image",
+      "hint": "JPEG, PNG ou WebP. Le carré central est conservé, au moins 128 × 128 px.",
+      "preview": "Votre nouvel avatar",
+      "submit": "Utiliser cet avatar",
+      "sent": "Votre nouvel avatar est en cours de vérification : il remplace l’actuel une fois validé, et vous serez notifié.",
+      "small": "Cette image est trop petite : l’avatar demande au moins {min} × {min} px.",
+      "unreadable": "Ce fichier ne peut pas être lu comme une image. Choisissez un JPEG, PNG ou WebP.",
+      "failed": "L’image n’a pas pu être envoyée. Vérifiez votre connexion et réessayez."
+    },
     "username": {
       "title": "Pseudo",
       "hint": "3 à 24 caractères : lettres, chiffres, _ et -. Modifiable une fois tous les 30 jours.",

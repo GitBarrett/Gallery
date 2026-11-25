@@ -98,6 +98,8 @@ export interface Actor {
   emailVerified: boolean
   /** Staff: the session passed the TOTP (08-securite.md § 3). */
   mfaVerified: boolean
+  /** Version of the avatar shown (US-07.6), null for the initial; set from the session only. */
+  avatar?: string | null
 }
 
 /** Port: authenticated encryption of the TOTP secrets (AES-GCM, `MFA_ENCRYPTION_KEY`). */
@@ -156,6 +158,8 @@ export interface IdentityRepository {
   findCredentials(email: string): Promise<{ userId: string; passwordHash: string | null; status: string } | null>
   /** Public fields of the account of `username`, ignoring case; `username` in its display case. */
   findProfile(username: string): Promise<{
+    id: string
+    avatar: string | null
     username: string
     bio: string | null
     createdAt: Date

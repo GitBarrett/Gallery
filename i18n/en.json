@@ -181,6 +181,17 @@
   },
   "settings": {
     "title": "Settings",
+    "avatar": {
+      "title": "Avatar",
+      "choose": "Choose an image",
+      "hint": "JPEG, PNG or WebP. The centred square is kept, at least 128 × 128 px.",
+      "preview": "Your new avatar",
+      "submit": "Use this avatar",
+      "sent": "Your new avatar is being checked: it replaces the current one once approved, and you will be notified.",
+      "small": "This image is too small: the avatar needs at least {min} × {min} px.",
+      "unreadable": "This file cannot be read as an image. Choose a JPEG, PNG or WebP.",
+      "failed": "The image could not be sent. Check your connection and try again."
+    },
     "username": {
       "title": "Username",
       "hint": "3 to 24 characters: letters, digits, _ and -. You can change it once every 30 days.",

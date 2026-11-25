@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Public profile (US-05.3, Profile mockup): avatar, username, bio, membership date, then the captures. The avatar is
-// the initial until avatars come (T-28); statistics and the Follow / Share buttons come with the photos and follows
+// the initial when the member has none; statistics and the Follow / Share buttons come with the photos and follows
 // (every counter is under 10 until then, hidden: US-70). The member's own profile leads to « My captures » and the
 // settings (sign-out).
 import type { ProfileResponse } from '~~/shared/contracts/auth'
@@ -20,7 +20,7 @@ const since = computed(() =>
   <div class="profile">
     <div class="banner" aria-hidden="true"></div>
     <section class="identity" aria-labelledby="profile-name">
-      <div class="avatar" aria-hidden="true">{{ profile.username.charAt(0).toUpperCase() }}</div>
+      <UiAvatar :src="profile.avatarUrl" :name="profile.username" size="lg" />
       <div class="about">
         <h1 id="profile-name" class="name">{{ profile.username }}</h1>
         <p v-if="profile.bio" class="bio">{{ profile.bio }}</p>
@@ -70,22 +70,6 @@ const since = computed(() =>
   align-items: flex-end;
   margin-top: calc(-1 * var(--space-8) - var(--space-6));
   padding: 0 var(--space-4);
-}
-
-.avatar {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 112px;
-  height: 112px;
-  border: 3px solid var(--color-accent);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-raised);
-  color: var(--color-accent);
-  font-family: var(--font-display);
-  font-size: var(--text-3xl);
-  font-weight: var(--weight-bold);
 }
 
 .about {

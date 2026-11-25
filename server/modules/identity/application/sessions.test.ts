@@ -48,6 +48,7 @@ const ash = {
   status: 'active',
   emailVerified: false,
   mfaVerified: false,
+  avatar: null,
 }
 
 describe('sessions', () => {

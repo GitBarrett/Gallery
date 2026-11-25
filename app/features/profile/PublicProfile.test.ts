@@ -4,6 +4,7 @@ import PublicProfile from './PublicProfile.vue'
 
 const profile = {
   username: 'Ash_Barrett',
+  avatarUrl: null,
   bio: '<b>Night elf</b> hunter.',
   memberSince: '2026-11-01T10:00:00.000Z',
   socialLinks: [{ platform: 'twitch' as const, label: 'Ash_Barrett', url: 'https://twitch.tv/Ash_Barrett' }],
@@ -23,6 +24,14 @@ describe('PublicProfile', () => {
   it('US-82.4 shows the social links under the bio', async () => {
     const wrapper = await mountSuspended(PublicProfile, { props: { profile, own: false } })
     expect(wrapper.get('.about a[href="https://twitch.tv/Ash_Barrett"]').text()).toBe('Ash_Barrett')
+  })
+
+  it('US-05.3 shows the avatar of the member, or their initial', async () => {
+    const avatarUrl = '/avatar/0193a000-0000-7000-8000-0000000000a1/0193a000-0000-7000-8000-0000000000b2'
+    const shown = await mountSuspended(PublicProfile, { props: { profile: { ...profile, avatarUrl }, own: false } })
+    expect(shown.get('.identity img').attributes('src')).toBe(`${avatarUrl}/256`)
+    const initial = await mountSuspended(PublicProfile, { props: { profile, own: false } })
+    expect(initial.get('.identity').text()).toMatch(/^A/)
   })
 
   it('leads the member from their own profile to the settings', async () => {

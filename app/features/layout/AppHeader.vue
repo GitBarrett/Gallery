@@ -5,7 +5,7 @@ import type { FeatureFlags } from '~/composables/useFeatureFlags'
 import UnreadBadge from '~/features/notifications/UnreadBadge.vue'
 import NavIcon, { type NavIconName } from './NavIcon.vue'
 
-const props = defineProps<{ flags: FeatureFlags; username?: string }>()
+const props = defineProps<{ flags: FeatureFlags; username?: string; avatarUrl?: string | null }>()
 const { t } = useI18n()
 const localePath = useLocalePath()
 const online = useOnline()
@@ -83,7 +83,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
           <UnreadBadge />
         </NuxtLink>
         <NuxtLink :to="localePath(`/u/${username}`)" class="icon-link" :aria-label="t('layout.myProfile')">
-          <NavIcon name="profile" />
+          <UiAvatar :src="avatarUrl ?? null" :name="username" />
         </NuxtLink>
       </template>
       <UiButton v-else :to="localePath('/signin')" variant="secondary">{{ t('layout.signIn') }}</UiButton>
