@@ -350,7 +350,40 @@
     "emptyText": "No capture of this version yet: share yours to open its gallery.",
     "upload": "Upload a capture",
     "likes": "{count} likes",
-    "new": "New"
+    "new": "New",
+    "filters": {
+      "title": "Filters",
+      "close": "Close the filters",
+      "show": "Show the captures",
+      "zone": "Zone",
+      "allZones": "All zones",
+      "time": "Time of day",
+      "anyTime": "Any",
+      "times": {
+        "dawn": "Dawn",
+        "day": "Day",
+        "dusk": "Dusk",
+        "night": "Night"
+      },
+      "quality": "Minimum quality",
+      "sort": "Sort by",
+      "sorts": {
+        "recent": "Most recent",
+        "popular": "Most liked",
+        "downloads": "Most downloaded"
+      },
+      "noMatch": "No capture matches these filters",
+      "clear": "Clear the filters"
+    },
+    "qualityHelp": {
+      "open": "What is capture quality?",
+      "title": "Capture quality",
+      "text": "Like items in the game, every capture earns a quality from the community's likes. It levels up on its own.",
+      "newCapture": "new capture",
+      "likes": "{count} likes",
+      "note": "Thresholds may change as the community grows.",
+      "link": "How quality works"
+    }
   },
   "captures": {
     "title": "My captures",

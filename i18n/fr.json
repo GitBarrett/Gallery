@@ -350,7 +350,40 @@
     "emptyText": "Aucune capture de cette version pour l'instant : partagez la vôtre pour ouvrir sa galerie.",
     "upload": "Publier une capture",
     "likes": "{count} J'aime",
-    "new": "Nouveau"
+    "new": "Nouveau",
+    "filters": {
+      "title": "Filtres",
+      "close": "Fermer les filtres",
+      "show": "Voir les captures",
+      "zone": "Zone",
+      "allZones": "Toutes les zones",
+      "time": "Moment de la journée",
+      "anyTime": "Tous",
+      "times": {
+        "dawn": "Aube",
+        "day": "Jour",
+        "dusk": "Crépuscule",
+        "night": "Nuit"
+      },
+      "quality": "Qualité minimale",
+      "sort": "Trier par",
+      "sorts": {
+        "recent": "Plus récentes",
+        "popular": "Plus aimées",
+        "downloads": "Plus téléchargées"
+      },
+      "noMatch": "Aucune capture ne correspond à ces filtres",
+      "clear": "Effacer les filtres"
+    },
+    "qualityHelp": {
+      "open": "Qu'est-ce que la qualité d'une capture ?",
+      "title": "Qualité des captures",
+      "text": "Comme les objets du jeu, chaque capture gagne une qualité grâce aux J'aime de la communauté. Elle progresse toute seule.",
+      "newCapture": "nouvelle capture",
+      "likes": "{count} J'aime",
+      "note": "Les seuils peuvent évoluer avec la communauté.",
+      "link": "Comment fonctionne la qualité"
+    }
   },
   "captures": {
     "title": "Mes captures",
