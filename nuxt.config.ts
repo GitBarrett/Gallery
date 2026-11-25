@@ -96,6 +96,8 @@ export default defineNuxtConfig({
     injectManifest: {
       // Shell only (≤ 3 MB): Nuxt bundles, fonts and icons; never Storybook. The offline pages are added below.
       globPatterns: ['_nuxt/**/*.{js,css,woff2}', 'icons/*.png', 'brand/*.svg'],
+      // The conversion worker and its WebAssembly encoders load on demand on /upload only (03 § Pipeline image 1)
+      globIgnores: ['_nuxt/convert-*'],
       additionalManifestEntries: ['/offline', '/fr/offline'].map((url) => ({
         url,
         revision: process.env.GITHUB_SHA ?? String(Date.now()),
@@ -120,6 +122,21 @@ export default defineNuxtConfig({
   // No source map upload (organisation token not needed for the MVP) and no build plugin telemetry
   sentry: { sourcemaps: { disable: true }, telemetry: false },
   // /__test routes (reset, fake mailbox, queue…): only in preview builds (ADR-013) and `nuxt dev` (T-04e)
+  // Browser conversion (T-26b, ADR-020): the worker is an ES module, the encoders keep their wasm next to their glue
+  vite: {
+    worker: {
+      format: 'es',
+      // Every file of the worker build is named convert-*: kept out of the precache below
+      rollupOptions: {
+        output: {
+          entryFileNames: '_nuxt/convert-[name].[hash].js',
+          chunkFileNames: '_nuxt/convert-[name].[hash].js',
+          assetFileNames: '_nuxt/convert-[name].[hash][extname]',
+        },
+      },
+    },
+    optimizeDeps: { exclude: ['@jsquash/png', '@jsquash/webp', '@jsquash/jpeg'] },
+  },
   nitro: {
     ignore:
       process.env.NUXT_DEPLOY_ENV === 'preview' || process.env.NODE_ENV === 'development' ? [] : ['routes/__test/**'],

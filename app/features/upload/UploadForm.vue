@@ -1,14 +1,13 @@
 <script setup lang="ts">
 // Upload form (Upload mockup, US-10, US-11): the file checked in the browser by the shared rules (US-10.2), the
-// details, the consent, then the upload with its progress. Zone and tags are suggested by native lists: a zone typed
-// but not chosen is sent as a free zone (US-11.3). JPEG, PNG and WebP: TGA and conversions come with T-26b.
-import type { CaptureFileProblem } from '~~/shared/domain/capture-file'
+// details, the consent, then the upload with its progress. A TGA or a PNG over 20 MB is converted first (T-26b,
+// US-10.9). Zone and tags are suggested by native lists: a zone typed but not chosen is sent as a free zone (US-11.3).
 import type { GameVersionsResponse, ZoneSuggestResponse } from '~~/shared/contracts/catalog'
 import type { CompleteUploadBody } from '~~/shared/contracts/photos'
 import { api, ApiError, errorMessageKey } from '~/services/api'
 import TagsField from './TagsField.vue'
 import UploadPreview from './UploadPreview.vue'
-import { inspectFile, useUpload, type ChosenFile } from './useUpload'
+import { inspectFile, useUpload, type ChosenFile, type FileProblem } from './useUpload'
 
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
@@ -16,7 +15,8 @@ const online = useOnline()
 const { progress, send } = useUpload()
 
 const chosen = ref<ChosenFile>()
-const fileProblem = ref<CaptureFileProblem>()
+const fileProblem = ref<FileProblem>()
+const converting = ref(false)
 const versions = ref<GameVersionsResponse['versions']>([])
 const zones = ref<ZoneSuggestResponse['zones']>([])
 const form = reactive({
@@ -58,7 +58,9 @@ async function choose(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
   if (chosen.value) URL.revokeObjectURL(chosen.value.preview)
-  const inspected = await inspectFile(file)
+  chosen.value = fileProblem.value = undefined
+  const inspected = await inspectFile(file, () => (converting.value = true))
+  converting.value = false
   chosen.value = inspected.ok ? inspected.value : undefined
   fileProblem.value = inspected.ok ? undefined : inspected.error
 }
@@ -165,13 +167,17 @@ const steps = computed(() => [
                 <input
                   type="file"
                   class="visually-hidden"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/jpeg,image/png,image/webp,image/x-tga,.tga"
                   :aria-invalid="fileProblem ? 'true' : undefined"
+                  :disabled="converting"
                   @change="choose"
                 />
               </label>
+              <p v-if="converting" class="muted" role="status">{{ t('upload.file.converting') }}</p>
               <template v-if="chosen">
                 <p class="file-name">{{ chosen.file.name }}</p>
+                <p v-if="chosen.converted" class="ok">{{ t(`upload.file.converted.${chosen.converted}`) }}</p>
+                <p v-if="chosen.converted === 'jpeg'" class="warning" role="alert">{{ t('upload.file.lossy') }}</p>
                 <p class="ok">{{ t('upload.file.size', { size: megabytes(chosen.file.size) }) }}</p>
                 <p class="ok">{{ t('upload.file.dimensions', { width: chosen.width, height: chosen.height }) }}</p>
                 <p class="muted">{{ t('upload.file.metadata') }}</p>
@@ -443,6 +449,7 @@ const steps = computed(() => [
 
 .file-name,
 .ok,
+.warning,
 .muted,
 .error {
   margin: 0;
@@ -450,6 +457,10 @@ const steps = computed(() => [
 
 .ok {
   color: var(--color-success);
+}
+
+.warning {
+  color: var(--color-accent);
 }
 
 .muted {

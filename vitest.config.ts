@@ -62,6 +62,9 @@ export default defineConfig({
         'scripts/cloud.mjs',
         'scripts/preview.mjs',
         'scripts/lighthouse.mjs',
+        // Web Worker and its bridge (T-26b): WebAssembly encoders in a real browser, checked by upload-conversion.spec.ts;
+        // the chain and the TGA decoder they run are tested separately
+        'app/features/upload/convert/convert*.ts',
       ],
       thresholds: {
         lines: 80,
