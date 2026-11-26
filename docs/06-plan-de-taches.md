@@ -427,9 +427,15 @@ T-34 est découpée le 26/11/2026 en T-34a (serveur) et T-34b (écran).
   Bouton Télécharger de la page photo, reprise après connexion ; Q18.
   Stories : US-23 (parcours). Tests : E.
 
-- [ ] **T-35 SEO** (dép. T-31a)
-  Métadonnées, canonique, `hreflang`, sitemap (cron quotidien), robots, `noindex` des previews, 404/410 des contenus retirés.
-  Stories : US-25.2–4. Tests : I, E.
+T-35 est découpée le 26/11/2026 en T-35a (sitemap, robots, contenus retirés) et T-35b (métadonnées des pages).
+
+- [x] **T-35a SEO : sitemap et robots** (dép. T-31a)
+  Sitemap (index par lots de 10 000, cron quotidien, R2), robots, `noindex` des previews, 404/410 des contenus retirés.
+  Stories : US-25.2–4. Tests : U, I, E.
+
+- [ ] **T-35b SEO : métadonnées des pages** (dép. T-35a)
+  Titre, description, canonique et `hreflang` des pages publiques (accueil, PLP, profils, recherche, pages légales).
+  Stories : US-25 (parcours). Tests : E.
 
 ## Phase 4 — Communauté et qualité
 

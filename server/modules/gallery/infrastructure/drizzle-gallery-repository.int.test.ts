@@ -342,6 +342,29 @@ describe('drizzleGalleryRepository', () => {
     })
   })
 
+  it('US-25.2 US-25.3 lists the versions, the authors and the public captures, nothing retired', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const shown = await w.capture()
+      const hidden = await w.capture({ status: 'hidden' })
+      const rejected = await w.capture({ status: 'rejected' })
+      const archived = await w.capture({ gameVersionId: w.archivedId })
+      const [banned] = await tx
+        .insert(users)
+        .values({ username: `ban_${crypto.randomUUID().slice(0, 8)}`, status: 'banned' })
+        .returning()
+      const ofBanned = await w.capture({ userId: banned!.id })
+      const entries = await drizzleGalleryRepository(tx).sitemapEntries()
+      const paths = entries.map((e) => e.path)
+      expect(paths).toContain(`/v/${w.version}`)
+      expect(paths).not.toContain(`/v/${w.archived.slug}`)
+      expect(entries).toContainEqual({ path: `/p/${shown}`, lastmod: new Date(T0 + 60_000) })
+      expect(entries).toContainEqual({ path: `/u/${w.author.username}`, lastmod: new Date(T0 + 60_000) })
+      for (const id of [hidden, rejected, archived, ofBanned]) expect(paths).not.toContain(`/p/${id}`)
+      expect(paths).not.toContain(`/u/${banned!.username}`)
+    })
+  })
+
   it('US-21.6 gives the tags of the most public captures, most used first, never counting a hidden one', async () => {
     await withRollback(async (tx) => {
       const w = await world(tx)
