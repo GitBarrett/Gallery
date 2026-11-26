@@ -341,4 +341,27 @@ describe('drizzleGalleryRepository', () => {
       expect(await search(`${word('nagrand')} ${word('absent')}`)).toEqual([]) // all the words
     })
   })
+
+  it('US-21.6 gives the tags of the most public captures, most used first, never counting a hidden one', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const run = crypto.randomUUID().slice(0, 6)
+      const [once, twice, hidden] = await tx
+        .insert(tags)
+        .values(['once', 'twice', 'hidden'].map((s) => ({ slug: `${run}${s}`, label: s })))
+        .returning()
+      const [a, b] = [await w.capture(), await w.capture()]
+      const off = await w.capture({ status: 'hidden' })
+      await tx.insert(photoTags).values([
+        { photoId: a, tagId: once!.id },
+        { photoId: a, tagId: twice!.id },
+        { photoId: b, tagId: twice!.id },
+        { photoId: off, tagId: hidden!.id },
+        { photoId: off, tagId: once!.id },
+      ])
+      // Other tests leave tags too: only the order of these ones is checked
+      const mine = (await drizzleGalleryRepository(tx).popularTags(10_000)).filter((s) => s.startsWith(run))
+      expect(mine).toEqual([`${run}twice`, `${run}once`])
+    })
+  })
 })

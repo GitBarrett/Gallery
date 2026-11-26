@@ -40,6 +40,22 @@ export const drizzleCatalogRepository = (db: Db | Transaction): CatalogRepositor
       .orderBy(desc(sql`word_similarity(${text}, ${names})`), asc(zones.nameEn))
       .limit(limit)
   },
+  async closestNames(text, limit) {
+    // `%`: similarity ≥ pg_trgm.similarity_threshold (0.3 by default, ADR-007), served by the trigram indexes
+    const en = sql`public.f_unaccent(lower(${zones.nameEn}))`
+    const fr = sql`public.f_unaccent(lower(${zones.nameFr}))`
+    const rows = await db.execute<{ label: string; score: number }>(sql`
+      select label, score from (
+        select ${zones.nameEn} as label, similarity(${en}, ${text}) as score from ${zones}
+          where ${zones.status} = 'active' and ${en} % ${text}
+        union all
+        select ${zones.nameFr}, similarity(${fr}, ${text}) from ${zones}
+          where ${zones.status} = 'active' and ${fr} % ${text}
+        union all
+        select ${tags.slug}, similarity(${tags.slug}, ${text}) from ${tags} where ${tags.slug} % ${text}
+      ) as close order by score desc, label limit ${limit * 2}`)
+    return [...new Set(Array.from(rows, (r) => r.label))].slice(0, limit)
+  },
   async zoneIdByName(text) {
     // The names as normalizeTag gives the query: lower case, no accents (unaccent also turns œ into oe)
     const same = (column: SQL) => sql`unaccent(lower(${column})) = ${text}`

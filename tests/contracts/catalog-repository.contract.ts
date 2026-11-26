@@ -49,6 +49,19 @@ export function catalogRepositoryContract(
       await run({ zones }, async (repo) => expect(await repo.suggestZones(`limit ${p}`, 2)).toHaveLength(2))
     })
 
+    it('US-21.2 gives the zone and tag names close to a mistyped text, closest first', async () => {
+      const zones = [
+        zone('suramar', `Suramar${p}`, `Suramar${p}`),
+        zone('pending', `Suramor${p}`, `Suramor${p}`, [], 'pending'),
+      ]
+      await run({ zones, tags: [`suramarnight${p}`] }, async (repo) => {
+        const names = await repo.closestNames(`suramr${p}`, 3)
+        expect(names[0]).toBe(`Suramar${p}`) // EN and FR alike: once
+        expect(names).not.toContain(`Suramor${p}`) // a pending zone
+        expect(await repo.closestNames('qqqqqqzzzzzz', 3)).toEqual([])
+      })
+    })
+
     it('US-21.4 finds an active zone by its EN name, FR name or an alias, accents and case ignored', async () => {
       const city = zone('city', `Stormwind City ${p}`, `Hurlevent ${p}`, [`SW ${p}`, `Stormwind ${p}`])
       const zones = [city, zone('pending', `Pending ${p}`, `Attente ${p}`, [], 'pending')]

@@ -16,17 +16,24 @@ const row = (n: number): GridRow => ({
   publishedAt: new Date(Date.UTC(2026, 10, 25, 10, n)),
 })
 
-function setup(rows: GridRow[] = []) {
+function setup(rows: GridRow[] = [], names: string[] = []) {
   const grid = vi.fn<GalleryRepository['grid']>(async (f: GridFilter) => rows.slice(0, f.limit))
   const zoneByName = vi.fn(async (text: string) => (text === 'hurlevent' ? 'zone-stormwind' : null))
+  const closestNames = vi.fn(async (_: string, limit: number) => names.slice(0, limit))
+  const popularTags = vi.fn(async (limit: number) => ['night', 'sunset'].slice(0, limit))
   const search = searchPhotos({
     repo: { grid },
     gameVersions: async () => [{ slug: 'wow-forever' }],
     zoneByName,
+    closestNames,
+    popularTags,
     thresholds: async () => thresholds,
   })
-  return { grid, zoneByName, search }
+  return { grid, zoneByName, closestNames, search }
 }
+// A grid that finds `rows` only for the searched text `text` (and every capture without a search)
+const onlyFor = (text: string, rows: GridRow[]) => async (f: GridFilter) =>
+  !f.match || f.match.text === text ? rows.slice(0, f.limit) : []
 
 describe('searchPhotos', () => {
   it('US-21.4 searches the zone the query names, its words and the tags it names', async () => {
@@ -49,9 +56,58 @@ describe('searchPhotos', () => {
     grid.mockClear()
     expect(await search({ q: ' a ', sort: 'relevance' })).toEqual({
       ok: true,
-      value: { query: 'a', items: [], nextCursor: null },
+      value: { query: 'a', corrected: null, items: [], nextCursor: null, empty: null },
     })
     expect(grid).not.toHaveBeenCalled()
+  })
+
+  it('US-21.2 searches the closest zone or tag name when a mistyped query finds nothing, and says so', async () => {
+    const { grid, closestNames, search } = setup([], ['Hurlevent', 'Hurlement'])
+    grid.mockImplementation(onlyFor('hurlevent', [row(1)]))
+    const result = await search({ q: 'hurlvent', sort: 'relevance' })
+    expect(closestNames).toHaveBeenCalledWith('hurlvent', 3)
+    expect(result).toMatchObject({
+      ok: true,
+      value: { query: 'hurlvent', corrected: 'Hurlevent', items: [{ id: row(1).id }], empty: null },
+    })
+    expect(grid.mock.lastCall?.[0].match).toEqual({ text: 'hurlevent', zoneId: 'zone-stormwind', tags: ['hurlevent'] })
+  })
+
+  it('US-21.2 does not correct a query that finds captures, nor a next page', async () => {
+    const { closestNames, search } = setup([row(1)], ['Hurlevent'])
+    await search({ q: 'hurlvent', sort: 'relevance' })
+    const { grid, search: next } = setup([], ['Hurlevent'])
+    grid.mockImplementation(onlyFor('hurlevent', [row(1)]))
+    const later = await next({ q: 'hurlvent', sort: 'relevance', cursor: encodeOffset(30) })
+    expect(closestNames).not.toHaveBeenCalled()
+    expect(later).toMatchObject({ ok: true, value: { corrected: null, items: [], empty: null } })
+  })
+
+  it('US-21.6 offers the close names, popular tags and latest captures when nothing is found', async () => {
+    const { grid, search } = setup([], ['Hurlevent', 'Hurlement'])
+    grid.mockImplementation(onlyFor('none', [row(2), row(1)]))
+    const result = await search({ q: 'hurlvent', sort: 'recent' })
+    expect(result).toMatchObject({
+      ok: true,
+      value: {
+        corrected: null,
+        items: [],
+        nextCursor: null,
+        empty: {
+          suggestions: ['Hurlevent', 'Hurlement'],
+          popularTags: ['night', 'sunset'],
+          latest: [{ id: row(2).id }, { id: row(1).id }],
+        },
+      },
+    })
+    expect(grid.mock.lastCall?.[0]).toEqual({ sort: 'recent', minLikes: 0, limit: 12 })
+  })
+
+  it('US-21.6 does not retry the query itself as its own correction', async () => {
+    const { grid, search } = setup([], ['Hurlvent'])
+    const result = await search({ q: 'hurlvent', sort: 'recent' })
+    expect(grid).toHaveBeenCalledTimes(2) // the query, then the latest captures
+    expect(result.ok && result.value.empty?.suggestions).toEqual(['Hurlvent'])
   })
 
   it('US-21.1 sorts by relevance, recency or popularity, each with the cursor of its pages', async () => {

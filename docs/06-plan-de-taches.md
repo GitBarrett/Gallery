@@ -409,7 +409,7 @@ T-33a (moteur de recherche) est découpée le 26/11/2026 en T-33a (moteur) et T-
   ADR-007 : `search_vector`, résolution des zones par nom et alias, tags, score, tris pertinence / récence / popularité, `GET /api/search`.
   Stories : US-21.1, US-21.4, US-21.7. Tests : U, I (jeu de données de recherche).
 
-- [ ] **T-33c Recherche : fautes de frappe et sans résultat** (dép. T-33a)
+- [x] **T-33c Recherche : fautes de frappe et sans résultat** (dép. T-33a)
   Tolérance aux fautes (trigrammes, « Showing results for … »), index trigrammes, suggestions orthographiques, tags populaires et dernières captures pour une recherche sans résultat.
   Stories : US-21.2, US-21.6. Tests : U, I.
 

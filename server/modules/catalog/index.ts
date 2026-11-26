@@ -1,5 +1,6 @@
 // catalog module (03-architecture.md § Modules): game versions, zones dictionary and tags.
 export {
+  closestNames,
   ensureTags,
   findZone,
   listGameVersions,

@@ -263,7 +263,11 @@ export const tags = pgTable(
     label: text('label').notNull(),
     createdAt: createdAt(),
   },
-  (t) => [index('tags_slug_prefix_idx').on(t.slug.op('text_pattern_ops'))],
+  (t) => [
+    index('tags_slug_prefix_idx').on(t.slug.op('text_pattern_ops')),
+    // Typos of a search (ADR-007): the `%` operator of pg_trgm, similarity ≥ 0.3
+    index('tags_slug_trgm_idx').using('gin', t.slug.op('gin_trgm_ops')),
+  ],
 )
 
 /**
@@ -284,7 +288,12 @@ export const zones = pgTable(
     status: text('status').notNull().default('active'),
     createdAt: createdAt(),
   },
-  (t) => [check('zones_status_check', sql`${t.status} in ('active', 'pending')`)],
+  (t) => [
+    check('zones_status_check', sql`${t.status} in ('active', 'pending')`),
+    // Typos of a search (ADR-007): each name as searched (lower case, no accents), for the `%` operator of pg_trgm
+    index('zones_name_en_trgm_idx').using('gin', sql`public.f_unaccent(lower(${t.nameEn})) gin_trgm_ops`),
+    index('zones_name_fr_trgm_idx').using('gin', sql`public.f_unaccent(lower(${t.nameFr})) gin_trgm_ops`),
+  ],
 )
 
 /**

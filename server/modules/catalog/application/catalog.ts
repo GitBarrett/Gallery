@@ -26,6 +26,11 @@ export interface CatalogRepository {
   zoneId(slug: string): Promise<string | null>
   /** Id of the active zone whose EN name, FR name or one alias is `text` (normalised), null otherwise. */
   zoneIdByName(text: string): Promise<string | null>
+  /**
+   * Names of active zones (EN or FR) and tags close to `text` (normalised): pg_trgm similarity ≥ 0.3 (ADR-007),
+   * closest first, `limit` at most, each name once.
+   */
+  closestNames(text: string, limit: number): Promise<string[]>
   /** Ids of the normalised tags `slugs`, in their order, the missing ones created. */
   ensureTags(slugs: string[]): Promise<string[]>
   /** The zone of this id, whatever its status; null if gone. */
@@ -65,6 +70,10 @@ export const findZone = (deps: { repo: CatalogRepository }) => (slug: string) =>
  * name, FR name or an alias; `text` is normalised (shared/domain/search). Typos come with T-33c.
  */
 export const zoneByName = (deps: { repo: CatalogRepository }) => (text: string) => deps.repo.zoneIdByName(text)
+
+/** Names a mistyped search may have meant (US-21.2, US-21.6): zones and tags, closest first. */
+export const closestNames = (deps: { repo: CatalogRepository }) => (text: string, limit: number) =>
+  deps.repo.closestNames(text, limit)
 
 /** Tags of a capture (US-11.1), already validated by shared/domain/tags: their ids, new ones created. */
 export const ensureTags = (deps: { repo: CatalogRepository }) => (slugs: string[]) => deps.repo.ensureTags(slugs)
