@@ -14,6 +14,8 @@ export interface GridZone {
 export interface GridFilter {
   gameVersion?: string // slug, not archived
   zoneId?: string
+  authorId?: string
+  exclude?: string[] // capture ids left out (the page shown, those already picked)
   timeOfDay?: TimeOfDay
   minLikes: number
   sort: GridSort
@@ -49,6 +51,15 @@ export const GRID_PAGE = 30
 
 const keyOf = (sort: GridSort, row: GridRow) =>
   sort === 'popular' ? row.likes : sort === 'downloads' ? row.downloads : 0
+
+/** A row of the read view as a capture of a grid: its author, its quality from its likes; its downloads stay out. */
+export const toGridCapture =
+  (thresholds: QualityThresholds) =>
+  ({ downloads: _, username, ...row }: GridRow): GridCapture => ({
+    ...row,
+    author: { username },
+    quality: qualityFromLikes(row.likes, thresholds),
+  })
 
 /**
  * A page of a grid (US-20.1, US-20.3; open to every visitor, annexe B): the published captures of a version that is
@@ -90,11 +101,7 @@ export const browseGrid =
     })
     const page = rows.slice(0, limit)
     return ok({
-      items: page.map(({ downloads: _, username, ...row }) => ({
-        ...row,
-        author: { username },
-        quality: qualityFromLikes(row.likes, thresholds),
-      })),
+      items: page.map(toGridCapture(thresholds)),
       nextCursor: rows.length > limit ? cursorAfter(query.sort, page.at(-1)!) : null,
     })
   }

@@ -14,6 +14,7 @@ export const ROUTES: Record<string, { access: Access; row: string }> = {
   'GET /api/game-versions': { access: 'public', row: 'Lectures publiques' },
   'GET /api/photos': { access: 'public', row: 'Lectures publiques' },
   'GET /api/photos/[id]': { access: 'public', row: 'Lectures publiques' },
+  'GET /api/photos/[id]/related': { access: 'public', row: 'Lectures publiques' },
   'GET /api/tags/suggest': { access: 'public', row: 'Lectures publiques' },
   'GET /api/zones/suggest': { access: 'public', row: 'Lectures publiques' },
   'POST /api/waitlist': { access: 'public', row: 'Auth sans session' },

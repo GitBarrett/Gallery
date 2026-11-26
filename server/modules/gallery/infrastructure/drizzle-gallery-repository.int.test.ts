@@ -217,4 +217,44 @@ describe('drizzleGalleryRepository', () => {
       expect(await repo.photo(crypto.randomUUID())).toBeNull()
     })
   })
+
+  it('US-70.1 filters the grid by author and leaves out the captures given', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const [jaina] = await tx
+        .insert(users)
+        .values({ username: `jaina_${crypto.randomUUID().slice(0, 8)}` })
+        .returning()
+      const shown = await w.capture()
+      const mine = await w.capture()
+      await w.capture({ userId: jaina!.id })
+      const repo = drizzleGalleryRepository(tx)
+      const ids = async (filter: Partial<GridFilter>) =>
+        (await repo.grid({ ...base, gameVersion: w.version, ...filter })).map((r) => r.id)
+      expect(await ids({ authorId: w.author.id, exclude: [shown] })).toEqual([mine])
+    })
+  })
+
+  it('US-67.2 gives the context of a public capture and its neighbours in its version, newest first', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const oldest = await w.capture({}, { zone: true })
+      await w.capture({ status: 'hidden' }) // never a neighbour
+      const middle = await w.capture()
+      const newest = await w.capture()
+      const repo = drizzleGalleryRepository(tx)
+      const context = (await repo.context(oldest))!
+      expect(context).toEqual({
+        id: oldest,
+        userId: w.author.id,
+        zoneId: w.zone.id,
+        gameVersion: w.version,
+        publishedAt: new Date(T0 + 60_000),
+      })
+      expect(await repo.neighbours(context)).toEqual({ prev: middle, next: null }) // the oldest: no next
+      expect(await repo.neighbours((await repo.context(middle))!)).toEqual({ prev: newest, next: oldest })
+      expect(await repo.neighbours((await repo.context(newest))!)).toEqual({ prev: null, next: middle })
+      expect(await repo.context(await w.capture({ status: 'pending_review' }))).toBeNull()
+    })
+  })
 })

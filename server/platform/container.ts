@@ -53,7 +53,7 @@ import {
   suggestTags,
   suggestZones,
 } from '../modules/catalog'
-import { browseGrid, drizzleGalleryRepository, viewPhoto } from '../modules/gallery'
+import { browseGrid, drizzleGalleryRepository, relatedPhotos, viewPhoto } from '../modules/gallery'
 import {
   completeUpload,
   drizzleMediaRepository,
@@ -100,6 +100,7 @@ export interface Container {
   gallery: {
     browseGrid: UseCase<typeof browseGrid>
     viewPhoto: UseCase<typeof viewPhoto>
+    relatedPhotos: UseCase<typeof relatedPhotos>
   }
   media: {
     requestUploadUrl: UseCase<typeof requestUploadUrl>
@@ -264,6 +265,12 @@ export function createContainer({
       viewPhoto: (cmd) =>
         viewPhoto({
           photos: drizzleGalleryRepository(db()),
+          thresholds: async () => (await readSettings(logger))['quality.thresholds'],
+        })(cmd),
+      relatedPhotos: (cmd) =>
+        relatedPhotos({
+          repo: drizzleGalleryRepository(db()),
+          related: drizzleGalleryRepository(db()),
           thresholds: async () => (await readSettings(logger))['quality.thresholds'],
         })(cmd),
     },
