@@ -49,11 +49,19 @@ import {
   findZone,
   tagSlugs,
   zoneById,
+  zoneByName,
   listGameVersions,
   suggestTags,
   suggestZones,
 } from '../modules/catalog'
-import { browseGrid, drizzleGalleryRepository, relatedPhotos, viewHome, viewPhoto } from '../modules/gallery'
+import {
+  browseGrid,
+  drizzleGalleryRepository,
+  relatedPhotos,
+  searchPhotos,
+  viewHome,
+  viewPhoto,
+} from '../modules/gallery'
 import {
   completeUpload,
   drizzleMediaRepository,
@@ -99,6 +107,7 @@ export interface Container {
   }
   gallery: {
     browseGrid: UseCase<typeof browseGrid>
+    searchPhotos: UseCase<typeof searchPhotos>
     viewPhoto: UseCase<typeof viewPhoto>
     relatedPhotos: UseCase<typeof relatedPhotos>
     viewHome: UseCase<typeof viewHome>
@@ -261,6 +270,13 @@ export function createContainer({
           repo: drizzleGalleryRepository(db()),
           gameVersions: listGameVersions({ repo: drizzleCatalogRepository(db()) }),
           zoneOf: findZone({ repo: drizzleCatalogRepository(db()) }),
+          thresholds: async () => (await readSettings(logger))['quality.thresholds'],
+        })(cmd),
+      searchPhotos: (cmd) =>
+        searchPhotos({
+          repo: drizzleGalleryRepository(db()),
+          gameVersions: listGameVersions({ repo: drizzleCatalogRepository(db()) }),
+          zoneByName: zoneByName({ repo: drizzleCatalogRepository(db()) }),
           thresholds: async () => (await readSettings(logger))['quality.thresholds'],
         })(cmd),
       viewPhoto: (cmd) =>

@@ -31,6 +31,34 @@ const visible = () =>
 const names = (slug: string | null, nameEn: string | null, nameFr: string | null) =>
   slug ? { slug, nameEn: nameEn!, nameFr: nameFr! } : null
 
+// A search (ADR-007): the words of its text in the title, description, character or free zone (`simple` + unaccent,
+// all the words: websearch_to_tsquery), or the zone of the dictionary it names, or one of the tags it names
+type Match = NonNullable<GridFilter['match']>
+const query = (m: Match) => sql`websearch_to_tsquery('simple', public.f_unaccent(${m.text}))`
+const tagged = (m: Match) =>
+  m.tags.length
+    ? sql`exists (select 1 from ${photoTags} join ${tags} on ${tags.id} = ${photoTags.tagId}
+        where ${photoTags.photoId} = ${photos.id} and ${tags.slug} in (${sql.join(
+          m.tags.map((t) => sql`${t}`),
+          sql`, `,
+        )}))`
+    : sql`false`
+const zoned = (m: Match) => (m.zoneId ? sql`${photoMetadata.zoneId} = ${m.zoneId}::uuid` : sql`false`)
+function matching(m: Match) {
+  const q = query(m)
+  return sql`(${photos.searchVector} @@ ${q} or ${photoMetadata.searchVector} @@ ${q} or ${zoned(m)} or ${tagged(m)})`
+}
+// ADR-007: text rank × 0,6 + likes × 0,3 (log, 1 000 likes = 1) + recency × 0,1 (halves in about 3 weeks); the zone and
+// the tags named weigh like a title word
+function score(m: Match) {
+  const q = query(m)
+  const rank = sql`(ts_rank(${photos.searchVector}, ${q}) + ts_rank(coalesce(${photoMetadata.searchVector}, ''::tsvector), ${q})
+    + case when ${zoned(m)} then 0.6 else 0 end + case when ${tagged(m)} then 0.6 else 0 end)`
+  const likes = sql`least(ln(${photos.likesCount} + 1) / ln(1001), 1)`
+  const recency = sql`exp(-extract(epoch from now() - ${photos.publishedAt}) / 2592000)`
+  return sql`(${rank} * 0.6 + ${likes} * 0.3 + ${recency} * 0.1)`
+}
+
 // The capture just after `c` in the grid of its version, newest first (`older`), or just before it (newer). Its
 // position is read from the table itself: the Date of `c` holds milliseconds, `published_at` microseconds, and a date
 // written by now() would put `c` after its own truncated date (it would be its own neighbour).
@@ -140,11 +168,17 @@ export const drizzleGalleryRepository = (
           filter.publishedSince ? gte(photos.publishedAt, filter.publishedSince) : undefined,
           timeOfDay(filter.timeOfDay),
           filter.minLikes > 0 ? gte(photos.likesCount, filter.minLikes) : undefined,
+          filter.match ? matching(filter.match) : undefined,
           position,
         ),
       )
-      .orderBy(...(key ? [desc(key)] : []), desc(photos.publishedAt), desc(photos.id))
+      .orderBy(
+        ...(filter.match && filter.relevance
+          ? [desc(score(filter.match)), desc(photos.id)]
+          : [...(key ? [desc(key)] : []), desc(photos.publishedAt), desc(photos.id)]),
+      )
       .limit(filter.limit)
+      .offset(filter.relevance?.offset ?? 0)
     return rows.map(({ zoneSlug, zoneNameEn, zoneNameFr, title, publishedAt, ...row }) => ({
       ...row,
       title: title ?? '', // published: a title is required at upload (photos_uploaded_check)

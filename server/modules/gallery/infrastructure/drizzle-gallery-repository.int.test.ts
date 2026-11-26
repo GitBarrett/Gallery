@@ -301,4 +301,44 @@ describe('drizzleGalleryRepository', () => {
       expect((await repo.hero(null, 0.6))?.id).toBe(latest)
     })
   })
+
+  it('US-21.1 US-21.4 searches the title, description, character, free zone, the zone named and the tags', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const run = crypto.randomUUID().slice(0, 6)
+      const word = (s: string) => `${s}${run}` // words of this test only
+      const inTitle = await w.capture({ title: `Dawn over ${word('nagrand')}` })
+      const inDescription = await w.capture({ description: `Low sun on ${word('nagrand')} hills` })
+      const accented = await w.capture({ title: `Éclat ${word('lunaire')}` })
+      const character = await w.capture()
+      await tx.insert(photoMetadata).values({ photoId: character, characterName: word('Ysolde') })
+      const inZone = await w.capture({}, { zone: true })
+      const taggedId = await w.capture()
+      const [tag] = await tx
+        .insert(tags)
+        .values({ slug: word('night'), label: word('night') })
+        .returning()
+      await tx.insert(photoTags).values({ photoId: taggedId, tagId: tag!.id })
+      await w.capture({ title: `Hidden ${word('nagrand')}`, status: 'hidden' })
+      await w.capture({ title: 'Nothing to see' })
+      const repo = drizzleGalleryRepository(tx)
+      const search = async (text: string, zoneId: string | null = null, tagList: string[] = []) =>
+        (
+          await repo.grid({
+            ...base,
+            gameVersion: w.version,
+            match: { text, zoneId, tags: tagList },
+            relevance: { offset: 0 },
+          })
+        ).map((r) => r.id)
+
+      // The title (A) ranks above the description (C); never a capture that is not public
+      expect(await search(word('nagrand'))).toEqual([inTitle, inDescription])
+      expect(await search(`eclat ${word('lunaire')}`)).toEqual([accented]) // accents ignored, every word
+      expect(await search(word('ysolde'))).toEqual([character])
+      expect(await search('anything', w.zone.id)).toEqual([inZone]) // the zone the query names
+      expect(await search('anything', null, [word('night')])).toEqual([taggedId])
+      expect(await search(`${word('nagrand')} ${word('absent')}`)).toEqual([]) // all the words
+    })
+  })
 })

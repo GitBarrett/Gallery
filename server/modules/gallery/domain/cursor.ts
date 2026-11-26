@@ -19,6 +19,20 @@ const fromBase64Url = (text: string) => atob(text.replace(/-/g, '+').replace(/_/
 export const encodeCursor = (sort: GridSort, at: GridPosition) =>
   toBase64Url(JSON.stringify([sort, at.key, at.publishedAt.toISOString(), at.id]))
 
+/**
+ * Cursor of the relevance sort of a search (US-21.1): the number of results already given. shortcut: an offset, as a
+ * score is no stable key; a capture published between two pages may shift one result, acceptable for a search.
+ */
+export const encodeOffset = (offset: number) => toBase64Url(JSON.stringify(['relevance', offset]))
+export function decodeOffset(cursor: string): number | null {
+  try {
+    const [s, offset] = JSON.parse(fromBase64Url(cursor)) as unknown[]
+    return s === 'relevance' && Number.isInteger(offset) && (offset as number) >= 0 ? (offset as number) : null
+  } catch {
+    return null
+  }
+}
+
 /** The position of a cursor given for this sort; null when it was altered or made for another sort. */
 export function decodeCursor(sort: GridSort, cursor: string): GridPosition | null {
   try {

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, like, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, inArray, like, or, sql, type SQL } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
 import { gameVersions, tags, zones } from '../../../db/schema'
 import type { CatalogRepository } from '../application/catalog'
@@ -39,6 +39,26 @@ export const drizzleCatalogRepository = (db: Db | Transaction): CatalogRepositor
       )
       .orderBy(desc(sql`word_similarity(${text}, ${names})`), asc(zones.nameEn))
       .limit(limit)
+  },
+  async zoneIdByName(text) {
+    // The names as normalizeTag gives the query: lower case, no accents (unaccent also turns œ into oe)
+    const same = (column: SQL) => sql`unaccent(lower(${column})) = ${text}`
+    const [row] = await db
+      .select({ id: zones.id })
+      .from(zones)
+      .where(
+        and(
+          eq(zones.status, 'active'),
+          or(
+            same(sql`${zones.nameEn}`),
+            same(sql`${zones.nameFr}`),
+            sql`exists (select 1 from unnest(${zones.aliases}) as alias where unaccent(lower(alias)) = ${text})`,
+          ),
+        ),
+      )
+      .orderBy(asc(zones.slug))
+      .limit(1)
+    return row?.id ?? null
   },
   async zoneId(slug) {
     const [row] = await db

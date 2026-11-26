@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm'
 import {
   boolean,
   check,
+  customType,
   index,
   integer,
   jsonb,
@@ -23,6 +24,13 @@ const id = () =>
     .default(sql`uuidv7()`)
 const createdAt = () => timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 const at = (name: string) => timestamp(name, { withTimezone: true })
+
+// Full-text search (ADR-007): `simple` configuration (no stemming, the proper nouns of both languages) on the text
+// lower-cased without accents. `f_unaccent` is the immutable wrapper of unaccent made by migration 0020: a generated
+// column may only call immutable functions.
+const tsvector = customType<{ data: string }>({ dataType: () => 'tsvector' })
+const words = (column: string, weight: 'A' | 'B' | 'C') =>
+  `setweight(to_tsvector('simple', public.f_unaccent(lower(coalesce(${column}, '')))), '${weight}')`
 
 /** Events written in the transaction of the business data, relayed to the Queues (10-clean-architecture.md § 4). */
 export const outbox = pgTable(
@@ -314,8 +322,13 @@ export const photos = pgTable(
     downloadsCount: integer('downloads_count').notNull().default(0),
     uploadedAt: at('uploaded_at'),
     createdAt: createdAt(),
+    /** Title (A) and description (C), ADR-007; the zone and the character are searched on photo_metadata. */
+    searchVector: tsvector('search_vector').generatedAlwaysAs(
+      sql.raw(`${words('title', 'A')} || ${words('description', 'C')}`),
+    ),
   },
   (t) => [
+    index('photos_search_idx').using('gin', t.searchVector),
     check(
       'photos_status_check',
       sql`${t.status} in ('processing', 'failed', 'pending_review', 'published', 'rejected', 'hidden')`,
@@ -459,8 +472,13 @@ export const photoMetadata = pgTable(
     graphicsSettings: text('graphics_settings'),
     characterName: text('character_name'),
     caption: text('caption'),
+    /** Character and free zone (B), ADR-007: a generated column only reads its own row. */
+    searchVector: tsvector('search_vector').generatedAlwaysAs(
+      sql.raw(`${words('character_name', 'B')} || ${words('zone_custom', 'B')}`),
+    ),
   },
   (t) => [
+    index('photo_metadata_search_idx').using('gin', t.searchVector),
     index('photo_metadata_zone_idx').on(t.zoneId),
     // The free zones to review (US-57)
     index('photo_metadata_zone_custom_idx')

@@ -49,6 +49,18 @@ export function catalogRepositoryContract(
       await run({ zones }, async (repo) => expect(await repo.suggestZones(`limit ${p}`, 2)).toHaveLength(2))
     })
 
+    it('US-21.4 finds an active zone by its EN name, FR name or an alias, accents and case ignored', async () => {
+      const city = zone('city', `Stormwind City ${p}`, `Hurlevent ${p}`, [`SW ${p}`, `Stormwind ${p}`])
+      const zones = [city, zone('pending', `Pending ${p}`, `Attente ${p}`, [], 'pending')]
+      await run({ zones }, async (repo) => {
+        const id = await repo.zoneId(city.slug)
+        for (const name of [`stormwind city ${p}`, `hurlevent ${p}`, `sw ${p}`, `stormwind ${p}`])
+          expect(await repo.zoneIdByName(name), name).toBe(id)
+        expect(await repo.zoneIdByName(`storm ${p}`)).toBeNull() // a part is not the name
+        expect(await repo.zoneIdByName(`pending ${p}`)).toBeNull()
+      })
+    })
+
     it('US-11.2 finds an active zone by its slug, not a pending or unknown one', async () => {
       const zones = [zone('active', 'Active', 'Active'), zone('pending', 'Pending', 'En attente', [], 'pending')]
       await run({ zones }, async (repo) => {
