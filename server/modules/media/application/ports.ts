@@ -13,6 +13,11 @@ export interface StoredObject {
 export interface ObjectStorage {
   /** URL accepting one PUT of exactly `bytes` bytes of `contentType`, for `expiresInSeconds`. */
   presignPut(key: string, file: { contentType: CaptureType; bytes: number; expiresInSeconds: number }): Promise<string>
+  /**
+   * URL of one GET of the object for `expiresInSeconds`, answered as a download (`Content-Disposition: attachment`
+   * named `filename`) of type `contentType`, whatever the bucket holds (08 § 6).
+   */
+  presignGet(key: string, file: { contentType: string; filename: string; expiresInSeconds: number }): Promise<string>
   head(key: string): Promise<StoredObject | null>
   /** The object as a stream, or its first `length` bytes; null for a missing key. */
   read(key: string, length?: number): Promise<ReadableStream<Uint8Array> | null>
@@ -125,6 +130,14 @@ export interface MediaRepository {
   deleteCapture(id: string): Promise<boolean>
   /** A completed capture with its details, for its edit form (US-12.1); null if missing or not completed. */
   findDetails(id: string): Promise<StoredDetails | null>
+}
+
+/** Port: the downloads of the originals (US-23.1), one per member, capture and UTC day (`YYYY-MM-DD`). */
+export interface DownloadLog {
+  /** Records the download and adds one to the counter of the capture; false (nothing changed) if already recorded. */
+  record(userId: string, photoId: string, day: string): Promise<boolean>
+  /** Deletes the downloads of the days before `day`; their number. */
+  purgeBefore(day: string): Promise<number>
 }
 
 /** Key where the browser puts the file (03 § Pipeline image 2): server-made, no extension, never served. */

@@ -24,9 +24,11 @@ import {
 } from '../modules/identity'
 import {
   cloudflareCachePurger,
+  drizzleDownloadLog,
   drizzleMediaRepository,
   imagesBindingService,
   photoProcessConsumer,
+  purgeDownloads,
   purgeOrphanUploads,
   r2ObjectStorage,
   type R2Bucket,
@@ -161,6 +163,7 @@ const crons = (env: Bindings): Record<string, CronHandler[]> => ({
     withDb(env, (db) => relayOf(env, db).purge()),
     withDb(env, (db) => purgeExpiredRedirects(db, systemClock)), // former usernames (T-16b)
     withDb(env, (db) => purgeNotifications({ repo: drizzleNotificationsRepository(db), clock: systemClock })()),
+    withDb(env, (db) => purgeDownloads({ downloads: drizzleDownloadLog(db), clock: systemClock })()), // US-23.1
   ],
 })
 

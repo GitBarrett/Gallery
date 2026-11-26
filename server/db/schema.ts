@@ -3,6 +3,7 @@ import {
   boolean,
   check,
   customType,
+  date,
   index,
   integer,
   jsonb,
@@ -493,6 +494,28 @@ export const photoMetadata = pgTable(
     index('photo_metadata_zone_custom_idx')
       .on(t.zoneCustom)
       .where(sql`${t.zoneCustom} is not null`),
+  ],
+)
+
+/**
+ * Downloads of an original (US-23.1, 03 § Modèle): one row per member, capture and UTC day, so the counter of the
+ * capture goes up once; purged after 30 days (the counter keeps them).
+ */
+export const downloads = pgTable(
+  'downloads',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    photoId: uuid('photo_id')
+      .notNull()
+      .references(() => photos.id, { onDelete: 'cascade' }),
+    day: date('day', { mode: 'string' }).notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.photoId, t.day] }),
+    index('downloads_photo_idx').on(t.photoId),
+    index('downloads_day_idx').on(t.day),
   ],
 )
 

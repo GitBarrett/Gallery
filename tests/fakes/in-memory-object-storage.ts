@@ -20,6 +20,15 @@ export function inMemoryObjectStorage() {
       })
       return `https://r2.test/${key}?${query}`
     },
+    async presignGet(key, { contentType, filename, expiresInSeconds }) {
+      const query = new URLSearchParams({
+        'X-Amz-Expires': String(expiresInSeconds),
+        'X-Amz-Signature': '0'.repeat(64),
+        'response-content-disposition': `attachment; filename="${filename}"`,
+        'response-content-type': contentType,
+      })
+      return `https://r2.test/${key}?${query}`
+    },
     async head(key) {
       const object = objects.get(key)
       return object ? { bytes: object.bytes, contentType: object.contentType } : null

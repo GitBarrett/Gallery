@@ -20,6 +20,10 @@ export type UploadUrlBody = z.infer<typeof UploadUrlBody>
 export const UploadUrlResponse = z.strictObject({ photoId: z.uuid(), url: z.url(), expiresAt: z.iso.datetime() })
 export type UploadUrlResponse = z.infer<typeof UploadUrlResponse>
 
+/** POST /api/photos/{id}/download (US-23.1): open `url` before `expiresAt` (5 min), the browser saves the original. */
+export const DownloadResponse = z.strictObject({ url: z.url(), expiresAt: z.iso.datetime() })
+export type DownloadResponse = z.infer<typeof DownloadResponse>
+
 /**
  * POST /api/photos/{id}/complete, once the PUT succeeded: title and game version of the capture (US-10.1). Accepts
  * an `Idempotency-Key` header; a second call answers the same without processing the capture twice.

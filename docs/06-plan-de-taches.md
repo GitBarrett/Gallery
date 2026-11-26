@@ -417,9 +417,15 @@ T-33a (moteur de recherche) est découpée le 26/11/2026 en T-33a (moteur) et T-
   Autocomplétion, filtres, page sans résultat.
   Stories : US-21 (parcours). Tests : E.
 
-- [ ] **T-34 Téléchargement HD** (dép. T-31a)
-  URL présignée 5 min, déduplication du compteur, limites, reprise après connexion ; Q18.
-  Stories : US-23. Tests : U, I, E.
+T-34 est découpée le 26/11/2026 en T-34a (serveur) et T-34b (écran).
+
+- [x] **T-34a Téléchargement HD : serveur** (dép. T-31a)
+  `POST /api/photos/{id}/download` : URL présignée 5 min (`attachment`), déduplication du compteur (table `downloads`), 100/h/compte, purge des téléchargements de plus de 30 jours.
+  Stories : US-23.1, US-23.3. Tests : U, I.
+
+- [ ] **T-34b Téléchargement HD : écran** (dép. T-34a)
+  Bouton Télécharger de la page photo, reprise après connexion ; Q18.
+  Stories : US-23 (parcours). Tests : E.
 
 - [ ] **T-35 SEO** (dép. T-31a)
   Métadonnées, canonique, `hreflang`, sitemap (cron quotidien), robots, `noindex` des previews, 404/410 des contenus retirés.

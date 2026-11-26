@@ -55,6 +55,25 @@ afterAll(async () => {
   await db.$client.end()
 })
 
+describe('POST /api/photos/{id}/download', () => {
+  const download = (id: string, cookie = '') =>
+    fetch(`/api/photos/${id}/download`, {
+      method: 'POST',
+      headers: { cookie, 'sec-fetch-site': 'same-origin', 'cf-connecting-ip': run },
+    })
+
+  it('US-23.2 asks a visitor to sign in (401)', async () => {
+    expect((await download(ids.published)).status).toBe(401)
+  })
+
+  it('US-23.1 finds no capture that is not published, nor one without its original, for its author too', async () => {
+    expect((await download(ids.review, owner)).status).toBe(404)
+    expect((await download(crypto.randomUUID(), member)).status).toBe(404)
+    expect((await download(ids.published, member)).status).toBe(404) // the Node server's bucket is empty
+    expect((await download('not-a-uuid', member)).status).toBe(400)
+  })
+})
+
 describe('GET /img/{id}/{size}', () => {
   it.each(['640', '1200.jpg', 'original'])('US-68.3 answers 404, not stored, for the size « %s »', async (size) => {
     const response = await get(`/img/${ids.published}/${size}`)
