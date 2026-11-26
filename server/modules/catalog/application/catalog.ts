@@ -24,6 +24,8 @@ export interface CatalogRepository {
   suggestZones(text: string, limit: number): Promise<Zone[]>
   /** Id of the active zone of this slug, null otherwise. */
   zoneId(slug: string): Promise<string | null>
+  /** Id of the active zone whose EN name, FR name or one alias is `text` (normalised), null otherwise. */
+  zoneIdByName(text: string): Promise<string | null>
   /** Ids of the normalised tags `slugs`, in their order, the missing ones created. */
   ensureTags(slugs: string[]): Promise<string[]>
   /** The zone of this id, whatever its status; null if gone. */
@@ -57,6 +59,12 @@ export const suggestZones =
 
 /** Zone chosen in the upload form (US-11.2): its id, null when it is not an active zone of the dictionary. */
 export const findZone = (deps: { repo: CatalogRepository }) => (slug: string) => deps.repo.zoneId(slug)
+
+/**
+ * The zone a search names (US-21.4, ADR-007): « Stormwind », « Hurlevent » and « SW » are the same zone, by its EN
+ * name, FR name or an alias; `text` is normalised (shared/domain/search). Typos come with T-33c.
+ */
+export const zoneByName = (deps: { repo: CatalogRepository }) => (text: string) => deps.repo.zoneIdByName(text)
 
 /** Tags of a capture (US-11.1), already validated by shared/domain/tags: their ids, new ones created. */
 export const ensureTags = (deps: { repo: CatalogRepository }) => (slugs: string[]) => deps.repo.ensureTags(slugs)

@@ -17,6 +17,10 @@ export interface GridFilter {
   authorId?: string
   exclude?: string[] // capture ids left out (the page shown, those already picked)
   publishedSince?: Date
+  /** A search (US-21, ADR-007): the text, the zone it names, the tags it may name. */
+  match?: { text: string; zoneId: string | null; tags: string[] }
+  /** Relevance of a search: by score, `offset` results skipped (no keyset: a score is no stable key). */
+  relevance?: { offset: number }
   timeOfDay?: TimeOfDay
   minLikes: number
   sort: GridSort

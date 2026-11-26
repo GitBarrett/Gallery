@@ -5,6 +5,7 @@ export {
   listGameVersions,
   tagSlugs,
   zoneById,
+  zoneByName,
   suggestTags,
   suggestZones,
   type CatalogRepository,

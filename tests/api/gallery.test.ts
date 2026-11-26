@@ -5,7 +5,13 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/db/client'
 import { gameVersions, photoMetadata, photos, users, zones } from '../../server/db/schema'
 import { ErrorResponse } from '../../shared/contracts/errors'
-import { HomeResponse, PhotoResponse, PhotosResponse, RelatedResponse } from '../../shared/contracts/photos'
+import {
+  HomeResponse,
+  PhotoResponse,
+  PhotosResponse,
+  RelatedResponse,
+  SearchResponse,
+} from '../../shared/contracts/photos'
 
 // GET /api/photos over HTTP and Postgres (T-30a): a zone of its own keeps the captures of the other tests out.
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
@@ -144,5 +150,26 @@ describe('GET /api/home', () => {
     const home = HomeResponse.parse(await response.json())
     expect(home.latest.length).toBeLessThanOrEqual(30)
     expect(home.latest.map((c) => c.id)).not.toContain(ids[3])
+  })
+})
+
+describe('GET /api/search', () => {
+  const search = (query: string) => fetch(`/api/search?${query}`)
+
+  it('US-21.4 finds the published captures of the zone the query names, by its name, cached at the edge', async () => {
+    const response = await search(`q=${encodeURIComponent(`Gridzone ${run}`)}&sort=recent`)
+    expect(response.status).toBe(200)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=60, stale-while-revalidate=300')
+    const page = SearchResponse.parse(await response.json())
+    expect(page.query).toBe(`gridzone ${run}`)
+    expect(page.items.map((c) => c.id)).toEqual([ids[2], ids[1], ids[0]]) // not the one in review
+  })
+
+  it('US-21.7 cleans and cuts a long query with control characters, without a server error', async () => {
+    const response = await search(`q=${encodeURIComponent(`Grid\u0000 ${'x'.repeat(500)}`)}`)
+    expect(response.status).toBe(200)
+    expect(SearchResponse.parse(await response.json()).query).toHaveLength(100)
+    expect((await search('q=nagrand&version=cataclysm')).status).toBe(404)
+    expect((await search('q=nagrand&sort=random')).status).toBe(400)
   })
 })

@@ -40,6 +40,12 @@ export function inMemoryCatalogRepository(seed: { tags?: string[]; zones?: SeedZ
       const zone = (seed.zones ?? []).find((z) => z.slug === slug && z.status === 'active')
       return zone ? `zone-${zone.slug}` : null
     },
+    async zoneIdByName(text) {
+      const zone = (seed.zones ?? []).find(
+        (z) => z.status === 'active' && [z.nameEn, z.nameFr, ...z.aliases].some((n) => normalizeTag(n) === text),
+      )
+      return zone ? `zone-${zone.slug}` : null
+    },
     async ensureTags(slugs) {
       for (const slug of slugs) if (!tags.includes(slug)) tags.push(slug)
       return slugs.map((slug) => `tag-${slug}`)

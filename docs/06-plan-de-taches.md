@@ -403,11 +403,17 @@ T-32 (page d'accueil) est découpée le 26/11/2026 en T-32a (serveur), T-32b (é
   Home et PDP, 2 `narrow` et 2 `wide` (Q35), produites par un script Playwright sur une base garnie de vraies captures.
   Stories : aucune (l'installabilité est couverte par T-09a, Q35). Tests : —.
 
-- [ ] **T-33a Recherche : moteur** (dép. T-30, T-20b)
-  ADR-007 : `search_vector`, résolution des zones, tolérance aux fautes, score, `GET /api/search`.
-  Stories : US-21 (API). Tests : U, I (jeu de données de recherche).
+T-33a (moteur de recherche) est découpée le 26/11/2026 en T-33a (moteur) et T-33c (fautes de frappe et recherche sans résultat) ; T-33b attend les deux.
 
-- [ ] **T-33b Recherche : écran** (dép. T-33a)
+- [x] **T-33a Recherche : moteur** (dép. T-30, T-20b)
+  ADR-007 : `search_vector`, résolution des zones par nom et alias, tags, score, tris pertinence / récence / popularité, `GET /api/search`.
+  Stories : US-21.1, US-21.4, US-21.7. Tests : U, I (jeu de données de recherche).
+
+- [ ] **T-33c Recherche : fautes de frappe et sans résultat** (dép. T-33a)
+  Tolérance aux fautes (trigrammes, « Showing results for … »), index trigrammes, suggestions orthographiques, tags populaires et dernières captures pour une recherche sans résultat.
+  Stories : US-21.2, US-21.6. Tests : U, I.
+
+- [ ] **T-33b Recherche : écran** (dép. T-33a, T-33c)
   Autocomplétion, filtres, page sans résultat.
   Stories : US-21 (parcours). Tests : E.
 

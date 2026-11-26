@@ -178,6 +178,28 @@ export const RelatedResponse = z.strictObject({
 export type RelatedResponse = z.infer<typeof RelatedResponse>
 
 /**
+ * GET /api/search (US-21, ADR-007): `q` cleaned and cut at 100 characters by the server (US-21.7: never refused for
+ * its length up to 2 000, nor for a control character); `version` 404 when unknown or archived; `cursor` the
+ * `nextCursor` of the previous page, for the same query and sort.
+ */
+export const SearchQuery = z.strictObject({
+  q: z.string().max(2000),
+  version: z.string().min(1).max(64).optional(),
+  minQuality: z.enum(QUALITIES).optional(),
+  sort: z.enum(['relevance', 'recent', 'popular']).default('relevance'),
+  cursor: z.string().min(1).max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(60).default(30),
+})
+export type SearchQuery = z.infer<typeof SearchQuery>
+/** The query as searched (`query`, to show it), and a page of captures. */
+export const SearchResponse = z.strictObject({
+  query: z.string(),
+  items: z.array(GridItem),
+  nextCursor: z.string().nullable(),
+})
+export type SearchResponse = z.infer<typeof SearchResponse>
+
+/**
  * GET /api/home (US-24.1, US-24.2, US-70.4): the hero (null: no public capture dark enough, the page shows its
  * gradient), « Capture of the week » with the step that chose it (null: no block), the latest captures of every
  * version. The quest banner comes with the contests (T-64).

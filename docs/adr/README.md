@@ -51,6 +51,14 @@
   - Score final = `ts_rank` × 0,6 + log(likes + 1) normalisé × 0,3 + bonus de récence × 0,1 ; tri « récent » / « populaire » proposé à l'utilisateur.
 - **Alternatives** : Meilisearch ou Typesense (≈ 30–50 $/mois hébergé, meilleure recherche instantanée et facettes) ; Algolia (coût élevé à l'usage). À reconsidérer via un nouvel ADR si p95 > 300 ms ou si des facettes instantanées deviennent nécessaires.
 - **Conséquences** : aucun service supplémentaire ; la synchro d'index est gérée par Postgres ; migration ultérieure possible en alimentant un moteur externe depuis la Queue.
+- **Complément (T-33a, 26/11/2026)** : une colonne générée ne lit que sa propre ligne. Le texte de recherche est donc
+  réparti en deux colonnes générées indexées en GIN : `photos.search_vector` (titre A, description C) et
+  `photo_metadata.search_vector` (personnage et zone libre, B) ; les noms des zones du dictionnaire ne sont pas
+  recopiés dans un vecteur : la zone que nomme la requête (nom EN, FR ou alias, à l'identique) devient un filtre
+  `zone_id` en OR, comme prévu. `unaccent` n'étant que STABLE, la fonction `public.f_unaccent` (IMMUTABLE, dictionnaire
+  nommé) l'enveloppe pour les colonnes générées. Les tags nommés pèsent comme la zone dans le score (rang + 0,6). Le tri
+  par pertinence pagine par décalage (un score n'est pas une clé stable). La tolérance aux fautes (trigrammes ≥ 0,3) et
+  ses index arrivent avec T-33c.
 
 # ADR-008 — PWA : Workbox en injectManifest, cache sélectif
 
