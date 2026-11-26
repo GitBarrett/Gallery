@@ -13,7 +13,8 @@ test.beforeEach(async ({ page }, testInfo) => {
   test.skip(reset.status === 404, 'test routes are only built for previews')
 })
 
-test.describe.configure({ timeout: 180_000 })
+// A sign-up, then two captures through the queue
+test.describe.configure({ timeout: 240_000 })
 
 test('US-25.1 US-71.2 the photo page shows the capture as an item, its quality, and its head for robots', async ({
   page,
@@ -28,6 +29,11 @@ test('US-25.1 US-71.2 the photo page shows the capture as an item, its quality, 
     characterName: 'Ysolde',
     caption: 'First light on the plains.',
     tags: ['dawn', 'plains'],
+  })
+  // A newer capture of the same member: the previous one of the first, and its « More from »
+  const newer = await publishCapture(page, {
+    title: `Neighbour ${crypto.randomUUID().slice(0, 8)}`,
+    gameVersion: 'retail',
   })
 
   // From the grid of its version
@@ -77,6 +83,21 @@ test('US-25.1 US-71.2 the photo page shows the capture as an item, its quality, 
     imageObject: { '@type': 'ImageObject', name: title, license: `${origin}/terms` },
     og: 'image/jpeg',
   })
+
+  // US-67.2: the newer capture of the version is the previous one (a retry leaves older captures: no check of « next »)
+  const nav = page.getByRole('navigation', { name: 'Captures of the version' })
+  await expect(nav.getByRole('link', { name: 'Previous capture' })).toHaveAttribute('href', `/p/${newer}`)
+  // US-70.1: a single other capture of the author, in the block (no similar capture in this fresh version)
+  const block = page.getByRole('region', { name: /^More from / })
+  await expect(block.getByRole('link')).toHaveAttribute('href', `/p/${newer}`)
+  await expectImageLoaded(block.getByRole('img'))
+  // The arrow keys go from one to the other
+  await page.keyboard.press('ArrowLeft')
+  await expect(page).toHaveURL(`/p/${newer}`)
+  await hydrated(page)
+  await expect(nav.getByRole('link', { name: 'Next capture' })).toHaveAttribute('href', `/p/${id}`)
+  await page.keyboard.press('ArrowRight')
+  await expect(page).toHaveURL(`/p/${id}`)
 
   // A capture that is not public, or none, is the 404 page
   expect((await page.goto(`/p/${crypto.randomUUID()}`))?.status()).toBe(404)

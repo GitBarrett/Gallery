@@ -1,22 +1,30 @@
 <script setup lang="ts">
 // Photo page /p/{id} (US-25.1, Photo mockup), rendered by the server: the image, its quality badge (US-71.2), its
-// details as an item of the game, the author and the tags; Open Graph, Twitter Card, canonical, hreflang and
-// ImageObject for robots. A capture that is not public is the 404 page. Likes, download, share, comments and the
-// navigation between captures come with their tasks (T-40, T-34, T-42, T-41, T-31b).
+// details as an item of the game, the author and the tags, the previous / next captures of the version (buttons,
+// swipe, arrow keys: US-67.2) and the « More from » block (US-70.1, US-70.2); Open Graph, Twitter Card, canonical,
+// hreflang and ImageObject for robots. A capture that is not public is the 404 page. Likes, download, share and
+// comments come with their tasks (T-40, T-34, T-42, T-41).
 import PhotoDetails from '~/features/photo/PhotoDetails.vue'
+import PhotoNav from '~/features/photo/PhotoNav.vue'
 import QualityBadgeTip from '~/features/photo/QualityBadgeTip.vue'
+import RelatedBlock from '~/features/photo/RelatedBlock.vue'
 import { usePhoto } from '~/features/photo/usePhoto'
 import { usePhotoHead } from '~/features/photo/usePhotoHead'
+import { usePhotoNavigation } from '~/features/photo/usePhotoNavigation'
+import { useRelated } from '~/features/photo/useRelated'
 import type { PhotoResponse } from '~~/shared/contracts/photos'
 
 definePageMeta({ key: (route) => route.path })
 const route = useRoute()
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
-const found = await usePhoto(String(route.params.id))
+const id = String(route.params.id)
+const [found, related] = await Promise.all([usePhoto(id), useRelated(id)])
 if (!found.value) throw createError({ statusCode: 404, statusMessage: 'Not found', fatal: true })
 const photo = computed(() => found.value as PhotoResponse)
 const alt = usePhotoHead(photo)
+const figure = ref<HTMLElement>()
+usePhotoNavigation(figure, related)
 const version = computed(() => (locale.value === 'fr' ? photo.value.version.nameFr : photo.value.version.nameEn))
 </script>
 
@@ -30,7 +38,7 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
       <span aria-current="page">{{ photo.title }}</span>
     </nav>
     <div class="layout">
-      <figure class="figure" :class="photo.quality">
+      <figure ref="figure" class="figure" :class="photo.quality">
         <UiWowImage
           :photo-id="photo.id"
           :alt="alt"
@@ -40,6 +48,7 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
           sizes="(width >= 1024px) 66vw, 100vw"
         />
         <QualityBadgeTip :quality="photo.quality" :likes="photo.likes" class="badge" />
+        <PhotoNav v-if="related" :prev="related.prev" :next="related.next" class="nav" />
       </figure>
       <aside class="aside">
         <h1 id="pdp-title" class="visually-hidden">{{ photo.title }}</h1>
@@ -52,6 +61,7 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
         <ul v-if="photo.tags.length" class="tags" :aria-label="t('photo.tags')">
           <li v-for="tag in photo.tags" :key="tag" class="tag">#{{ tag }}</li>
         </ul>
+        <RelatedBlock v-if="related?.sections.length" :sections="related.sections" :photo="photo" />
       </aside>
     </div>
   </article>
@@ -95,12 +105,21 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
   }
 }
 
-/* No overflow: hidden, which would cut the tooltip of the badge: the image takes the rounded corners itself */
+/* No overflow: hidden, which would cut the tooltip of the badge: the image takes the rounded corners itself.
+   pan-y: the page still scrolls vertically, a horizontal swipe reaches usePhotoNavigation (US-67.2) */
 .figure {
   position: relative;
   margin: 0;
   border: 2px solid var(--quality-poor);
   border-radius: var(--radius-md);
+  touch-action: pan-y;
+}
+
+.nav {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  left: var(--space-2);
 }
 
 .figure :deep(.wow-image) {

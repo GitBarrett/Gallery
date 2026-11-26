@@ -394,7 +394,19 @@
     "quality": {
       "new": "new capture",
       "from": "{count}+ likes",
-      "missing": "{count} likes to {quality}"
+      "missing": "{count} likes to {quality}",
+      "close": "Close"
+    },
+    "nav": {
+      "label": "Captures of the version",
+      "prev": "Previous capture",
+      "next": "Next capture"
+    },
+    "related": {
+      "author": "More from {author}",
+      "similar": "Similar captures",
+      "zone": "More from {zone}",
+      "latest": "Latest in {version}"
     },
     "details": {
       "tier": "{quality} capture · {version}",

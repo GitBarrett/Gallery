@@ -1,14 +1,18 @@
 <script setup lang="ts">
 // Quality badge of the photo page (US-71.2, 07 § Expliquer la qualité 2): hovered, focused or touched, it tells the
 // tier, its threshold and the likes missing for the next one (« Rare · 15+ likes · 35 likes to Epic »), from the
-// thresholds of site_settings. A button, so a touch toggles it and the keyboard reaches it (no hover-only content).
+// thresholds of site_settings. A button, so the keyboard reaches it (no hover-only content); a touch opens a bottom
+// sheet with the same text (US-67.3), a mouse click toggles the tooltip.
 import { qualityProgress, type Quality } from '~~/shared/domain/quality'
 
 const props = defineProps<{ quality: Quality; likes: number }>()
 const { t, n } = useI18n()
 const settings = usePublicSettings()
 const open = ref(false)
+const sheet = ref(false)
 const id = useId()
+const touch = () => window.matchMedia('(pointer: coarse)').matches
+const press = () => (touch() ? (sheet.value = true) : (open.value = !open.value))
 const text = computed(() => {
   const thresholds = settings.value?.qualityThresholds
   const name = t(`quality.${props.quality}`)
@@ -22,10 +26,13 @@ const text = computed(() => {
 
 <template>
   <span class="quality-tip" @mouseleave="open = false" @keydown.esc="open = false">
-    <button type="button" class="badge" :aria-expanded="open" :aria-describedby="id" @click="open = !open">
+    <button type="button" class="badge" :aria-expanded="open" :aria-describedby="id" @click="press">
       <UiQualityBadge :quality="quality" :label="t(`quality.${quality}`)" />
     </button>
     <span :id="id" role="tooltip" class="tip" :class="{ open }">{{ text }}</span>
+    <UiBottomSheet v-model:open="sheet" :title="t(`quality.${quality}`)" :close-label="t('photo.quality.close')">
+      <p class="sheet-text">{{ text }}</p>
+    </UiBottomSheet>
   </span>
 </template>
 
@@ -68,9 +75,19 @@ const text = computed(() => {
   font-size: var(--text-sm);
 }
 
-.quality-tip:hover .tip,
 .badge:focus-visible + .tip,
 .tip.open {
   display: block;
+}
+
+/* A touch screen keeps :hover after a tap: there, the bottom sheet shows the text */
+@media (hover: hover) {
+  .quality-tip:hover .tip {
+    display: block;
+  }
+}
+
+.sheet-text {
+  margin: 0;
 }
 </style>
