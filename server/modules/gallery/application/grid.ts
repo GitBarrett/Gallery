@@ -16,6 +16,7 @@ export interface GridFilter {
   zoneId?: string
   authorId?: string
   exclude?: string[] // capture ids left out (the page shown, those already picked)
+  publishedSince?: Date
   timeOfDay?: TimeOfDay
   minLikes: number
   sort: GridSort

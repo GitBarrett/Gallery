@@ -53,7 +53,7 @@ import {
   suggestTags,
   suggestZones,
 } from '../modules/catalog'
-import { browseGrid, drizzleGalleryRepository, relatedPhotos, viewPhoto } from '../modules/gallery'
+import { browseGrid, drizzleGalleryRepository, relatedPhotos, viewHome, viewPhoto } from '../modules/gallery'
 import {
   completeUpload,
   drizzleMediaRepository,
@@ -78,7 +78,7 @@ import {
   markRead,
   unreadCount,
 } from '../modules/notifications'
-import type { SiteSettings } from '../modules/settings'
+import { MAX_HERO_LUMINANCE, type SiteSettings } from '../modules/settings'
 import { systemClock, type Clock } from './clock'
 import type { Config } from './config'
 import { uuidV7Generator, type IdGenerator } from './ids'
@@ -101,6 +101,7 @@ export interface Container {
     browseGrid: UseCase<typeof browseGrid>
     viewPhoto: UseCase<typeof viewPhoto>
     relatedPhotos: UseCase<typeof relatedPhotos>
+    viewHome: UseCase<typeof viewHome>
   }
   media: {
     requestUploadUrl: UseCase<typeof requestUploadUrl>
@@ -273,6 +274,25 @@ export function createContainer({
           related: drizzleGalleryRepository(db()),
           thresholds: async () => (await readSettings(logger))['quality.thresholds'],
         })(cmd),
+      viewHome: () => {
+        const gallery = drizzleGalleryRepository(db())
+        return viewHome({
+          repo: gallery,
+          photos: gallery,
+          home: gallery,
+          clock,
+          settings: async () => {
+            const s = await readSettings(logger)
+            return {
+              heroPhotoId: s['home.hero']?.photoId ?? null,
+              editorsPick: s['home.editorsPick'],
+              weekMinLikes: s['display.captureOfWeekMinLikes'],
+              thresholds: s['quality.thresholds'],
+              maxLuminance: MAX_HERO_LUMINANCE,
+            }
+          },
+        })()
+      },
     },
     media: {
       serveImage: (cmd) => serveImage({ repo: drizzleMediaRepository(db()), storage: storage() })(cmd),

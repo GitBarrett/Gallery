@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/db/client'
 import { gameVersions, photoMetadata, photos, users, zones } from '../../server/db/schema'
 import { ErrorResponse } from '../../shared/contracts/errors'
-import { PhotoResponse, PhotosResponse, RelatedResponse } from '../../shared/contracts/photos'
+import { HomeResponse, PhotoResponse, PhotosResponse, RelatedResponse } from '../../shared/contracts/photos'
 
 // GET /api/photos over HTTP and Postgres (T-30a): a zone of its own keeps the captures of the other tests out.
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
@@ -132,5 +132,17 @@ describe('GET /api/photos/{id}/related', () => {
     const body = RelatedResponse.parse(await related.json())
     expect(body.sections.map((s) => [s.kind, s.items.map((c) => c.id)])).toEqual([['author', [ids[1], ids[0]]]])
     expect((await fetch(`/api/photos/${ids[3]}/related`)).status).toBe(404)
+  })
+})
+
+describe('GET /api/home', () => {
+  it('US-24.2 gives the home to any visitor, cached at the edge, published captures only', async () => {
+    const response = await fetch('/api/home')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=60, stale-while-revalidate=300')
+    // The database is shared with the other tests: the form, and no capture in review
+    const home = HomeResponse.parse(await response.json())
+    expect(home.latest.length).toBeLessThanOrEqual(30)
+    expect(home.latest.map((c) => c.id)).not.toContain(ids[3])
   })
 })

@@ -177,6 +177,28 @@ export const RelatedResponse = z.strictObject({
 })
 export type RelatedResponse = z.infer<typeof RelatedResponse>
 
+/**
+ * GET /api/home (US-24.1, US-24.2, US-70.4): the hero (null: no public capture dark enough, the page shows its
+ * gradient), « Capture of the week » with the step that chose it (null: no block), the latest captures of every
+ * version. The quest banner comes with the contests (T-64).
+ */
+export const HomeResponse = z.strictObject({
+  hero: z
+    .strictObject({
+      id: z.uuid(),
+      title: z.string(),
+      width: z.int(),
+      height: z.int(),
+      focalX: z.number().min(0).max(1).nullable(),
+      focalY: z.number().min(0).max(1).nullable(),
+      author: z.strictObject({ username: z.string() }),
+    })
+    .nullable(),
+  week: z.strictObject({ reason: z.enum(['week', 'month', 'all', 'pick']), capture: GridItem }).nullable(),
+  latest: z.array(GridItem),
+})
+export type HomeResponse = z.infer<typeof HomeResponse>
+
 const Names = z.strictObject({ slug: z.string(), nameEn: z.string(), nameFr: z.string() })
 
 /**

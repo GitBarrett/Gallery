@@ -389,9 +389,19 @@ T-31b (navigation entre captures) est découpée le 26/11/2026 en T-31b (serveur
   Boutons précédent / suivant, swipe et flèches du clavier, bloc « More from » de 4 miniatures, bottom sheet au toucher pour le badge de qualité.
   Stories : US-67.2–3, US-70.1–2. Tests : composants, E.
 
-- [ ] **T-32 Page d'accueil** (dép. T-30, T-08, T-31a)
-  Hero administrable avec voile, « Capture of the week » et ses replis, bandeau de quête (masqué tant que `features.contests` est désactivé), captures d'écran du manifest PWA (home et PDP, 2 `narrow` et 2 `wide` ; Q35).
-  Stories : US-24, US-70.4. Tests : U (replis), E.
+T-32 (page d'accueil) est découpée le 26/11/2026 en T-32a (serveur), T-32b (écran) et T-32c (captures d'écran du manifest) ; les tâches qui dépendent de T-32 attendent les trois.
+
+- [x] **T-32a Page d'accueil : serveur** (dép. T-30, T-08, T-31a)
+  `GET /api/home` : hero choisi par l'admin ou repli, « Capture of the week » et ses replis (7 jours, 30 jours, de tous les temps, Editor's pick), dernières captures de toutes les versions.
+  Stories : US-24.1–2, US-70.4. Tests : U (replis), I.
+
+- [ ] **T-32b Page d'accueil : écran** (dép. T-32a)
+  Hero avec voile et header transparent, « Capture of the week », onglets de version, dernières captures, bandeau de quête (masqué tant que `features.contests` est désactivé).
+  Stories : US-24, US-70.4. Tests : composants, E.
+
+- [ ] **T-32c Captures d'écran du manifest PWA** (dép. T-32b) — action humaine (vraies captures du jeu)
+  Home et PDP, 2 `narrow` et 2 `wide` (Q35), produites par un script Playwright sur une base garnie de vraies captures.
+  Stories : aucune (l'installabilité est couverte par T-09a, Q35). Tests : —.
 
 - [ ] **T-33a Recherche : moteur** (dép. T-30, T-20b)
   ADR-007 : `search_vector`, résolution des zones, tolérance aux fautes, score, `GET /api/search`.
