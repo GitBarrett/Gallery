@@ -411,6 +411,32 @@
       "link": "How quality works"
     }
   },
+  "search": {
+    "title": "Search",
+    "titleFor": "{query} — Search",
+    "description": "Search World of Warcraft screenshots by zone, tag, title or character.",
+    "resultsFor": "Results for “{query}”",
+    "hint": "Type a zone, a tag, a character or words of a title.",
+    "submit": "Search",
+    "suggestions": "Suggestions",
+    "kinds": {
+      "zone": "Zone",
+      "tag": "Tag"
+    },
+    "version": "Game version",
+    "allVersions": "All versions",
+    "sorts": {
+      "relevance": "Most relevant",
+      "recent": "Most recent",
+      "popular": "Most liked"
+    },
+    "showingFor": "Showing results for {name}",
+    "noResult": "No capture found for “{query}”",
+    "noResultText": "Check the spelling, or try one of these.",
+    "didYouMean": "Did you mean",
+    "popularTags": "Popular tags",
+    "latest": "Latest captures"
+  },
   "photo": {
     "title": "{title} — {version}",
     "description": "{title}, a {version} screenshot captured by {author} on Legendary Shots.",

@@ -411,6 +411,32 @@
       "link": "Comment fonctionne la qualité"
     }
   },
+  "search": {
+    "title": "Recherche",
+    "titleFor": "{query} — Recherche",
+    "description": "Cherchez des captures d’écran de World of Warcraft par zone, tag, titre ou personnage.",
+    "resultsFor": "Résultats pour « {query} »",
+    "hint": "Tapez une zone, un tag, un personnage ou des mots d’un titre.",
+    "submit": "Rechercher",
+    "suggestions": "Suggestions",
+    "kinds": {
+      "zone": "Zone",
+      "tag": "Tag"
+    },
+    "version": "Version du jeu",
+    "allVersions": "Toutes les versions",
+    "sorts": {
+      "relevance": "Les plus pertinentes",
+      "recent": "Les plus récentes",
+      "popular": "Les plus aimées"
+    },
+    "showingFor": "Résultats affichés pour {name}",
+    "noResult": "Aucune capture pour « {query} »",
+    "noResultText": "Vérifiez l’orthographe, ou essayez l’une de ces pistes.",
+    "didYouMean": "Vouliez-vous dire",
+    "popularTags": "Tags populaires",
+    "latest": "Dernières captures"
+  },
   "photo": {
     "title": "{title} — {version}",
     "description": "{title}, une capture de {version} par {author} sur Legendary Shots.",

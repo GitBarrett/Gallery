@@ -3,11 +3,11 @@
 // of day, minimum quality with its « ? » (US-71.1), sort. Each change is emitted at once; the page writes it to the
 // URL. Ids from useId(): the bar and the mobile sheet may both be in the page.
 import { GRID_SORTS } from '~~/shared/domain/grid-sort'
-import { QUALITIES, type QualityThresholds } from '~~/shared/domain/quality'
+import type { QualityThresholds } from '~~/shared/domain/quality'
 import { TIMES_OF_DAY } from '~~/shared/domain/time-of-day'
 import { useZoneSuggestions } from '~/features/upload/useZoneSuggestions'
 import type { GalleryFilters } from './filters'
-import QualityHelp from './QualityHelp.vue'
+import QualityTiers from './QualityTiers.vue'
 
 const props = defineProps<{ filters: GalleryFilters; zoneName?: string; thresholds: QualityThresholds | null }>()
 const emit = defineEmits<{ change: [filters: GalleryFilters] }>()
@@ -53,25 +53,7 @@ const minQuality = computed(() => props.filters.minQuality ?? 'poor')
         <option v-for="time in TIMES_OF_DAY" :key="time" :value="time">{{ t(`gallery.filters.times.${time}`) }}</option>
       </select>
     </div>
-    <fieldset class="field quality">
-      <legend class="label">
-        {{ t('gallery.filters.quality') }}
-        <QualityHelp :thresholds="thresholds" />
-      </legend>
-      <div class="tiers">
-        <button
-          v-for="quality in QUALITIES"
-          :key="quality"
-          type="button"
-          class="tier"
-          :class="quality"
-          :aria-pressed="minQuality === quality"
-          @click="set({ minQuality: quality })"
-        >
-          {{ t(`quality.${quality}`) }}
-        </button>
-      </div>
-    </fieldset>
+    <QualityTiers :quality="minQuality" :thresholds="thresholds" @select="set({ minQuality: $event })" />
     <div class="field">
       <label :for="`${id}-sort`" class="label">{{ t('gallery.filters.sort') }}</label>
       <select
@@ -124,51 +106,5 @@ const minQuality = computed(() => props.filters.minQuality ?? 'poor')
 
 .control:focus-visible {
   box-shadow: var(--focus-ring);
-}
-
-.tiers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-}
-
-.tier {
-  min-width: var(--control-md);
-  min-height: var(--control-md);
-  padding: 0 var(--space-3);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  font-size: var(--text-sm);
-  cursor: pointer;
-}
-
-.tier:focus-visible {
-  box-shadow: var(--focus-ring);
-}
-
-.tier[aria-pressed='true'] {
-  border-color: currentcolor;
-  background: var(--color-surface-raised);
-}
-
-.tier.poor {
-  color: var(--quality-poor);
-}
-
-.tier.uncommon {
-  color: var(--quality-uncommon);
-}
-
-.tier.rare {
-  color: var(--quality-rare);
-}
-
-.tier.epic {
-  color: var(--quality-epic);
-}
-
-.tier.legendary {
-  color: var(--quality-legendary);
 }
 </style>

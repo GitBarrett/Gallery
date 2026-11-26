@@ -17,6 +17,8 @@ import {
   type PhotosQuery,
   PhotosResponse,
   RelatedResponse,
+  type SearchQuery,
+  SearchResponse,
   type UpdatePhotoBody,
   type UploadUrlBody,
   UploadUrlResponse,
@@ -149,6 +151,8 @@ export const api = {
   photo: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}`, PhotoResponse, {}, fetch),
   // Previous / next and the « More from » block of a photo page (US-67.2, US-70.1, US-70.2)
   related: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}/related`, RelatedResponse, {}, fetch),
+  // Search (US-21): a page of captures, the corrected query (a typo) or what to offer when nothing is found
+  search: (query: Partial<SearchQuery>, fetch?: typeof $fetch) => call('/api/search', SearchResponse, { query }, fetch),
   // The home (US-24, US-70.4): hero, capture of the week, latest captures
   home: (fetch?: typeof $fetch) => call('/api/home', HomeResponse, {}, fetch),
   // Upload form (US-10, US-11): catalogue reads, then the presigned URL and the completion (03 § Pipeline image)

@@ -413,7 +413,7 @@ T-33a (moteur de recherche) est découpée le 26/11/2026 en T-33a (moteur) et T-
   Tolérance aux fautes (trigrammes, « Showing results for … »), index trigrammes, suggestions orthographiques, tags populaires et dernières captures pour une recherche sans résultat.
   Stories : US-21.2, US-21.6. Tests : U, I.
 
-- [ ] **T-33b Recherche : écran** (dép. T-33a, T-33c)
+- [x] **T-33b Recherche : écran** (dép. T-33a, T-33c)
   Autocomplétion, filtres, page sans résultat.
   Stories : US-21 (parcours). Tests : E.
 

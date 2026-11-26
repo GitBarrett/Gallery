@@ -1,11 +1,7 @@
 <script setup lang="ts">
-// Filters of the PLP (07-design.md § Responsive): a bar from 768 px; below, a « Filters » button that opens them in a
-// full-screen bottom sheet, each change applied at once behind it. The quality thresholds come from site_settings.
-import type { GalleryFilters } from './filters'
-import GalleryFilterFields from './GalleryFilterFields.vue'
-
-defineProps<{ filters: GalleryFilters; zoneName?: string }>()
-const emit = defineEmits<{ change: [filters: GalleryFilters] }>()
+// Filters of the PLP and of the search (07-design.md § Responsive): a bar from 768 px; below, a « Filters » button
+// that opens them in a full-screen bottom sheet, each change applied at once behind it. The fields come from the slot,
+// given the quality thresholds of site_settings.
 const { t } = useI18n()
 const settings = usePublicSettings()
 const thresholds = computed(() => settings.value?.qualityThresholds ?? null)
@@ -15,12 +11,7 @@ const open = ref(false)
 <template>
   <section class="filters" :aria-label="t('gallery.filters.title')">
     <div class="bar">
-      <GalleryFilterFields
-        :filters="filters"
-        :zone-name="zoneName"
-        :thresholds="thresholds"
-        @change="emit('change', $event)"
-      />
+      <slot :thresholds="thresholds" />
     </div>
     <UiButton variant="secondary" class="open" @click="open = true">{{ t('gallery.filters.title') }}</UiButton>
     <UiBottomSheet
@@ -29,13 +20,7 @@ const open = ref(false)
       :title="t('gallery.filters.title')"
       :close-label="t('gallery.filters.close')"
     >
-      <GalleryFilterFields
-        v-if="open"
-        :filters="filters"
-        :zone-name="zoneName"
-        :thresholds="thresholds"
-        @change="emit('change', $event)"
-      />
+      <slot v-if="open" :thresholds="thresholds" />
       <template #actions>
         <UiButton block @click="open = false">{{ t('gallery.filters.show') }}</UiButton>
       </template>

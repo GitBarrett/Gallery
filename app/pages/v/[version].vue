@@ -4,6 +4,7 @@
 // version is the 404 page (US-20.4); a version without capture invites to upload (US-70.5). The counts of the banner
 // and the popular tags of the mockup are left out (Q83).
 import { readFilters, writeFilters, type GalleryFilters as Filters } from '~/features/gallery/filters'
+import GalleryFilterFields from '~/features/gallery/GalleryFilterFields.vue'
 import GalleryFilters from '~/features/gallery/GalleryFilters.vue'
 import GalleryGrid from '~/features/gallery/GalleryGrid.vue'
 import { useGalleryFeed } from '~/features/gallery/useGalleryFeed'
@@ -52,7 +53,9 @@ useHead({
       <h1 id="plp-title" class="title">{{ name }}</h1>
       <VersionNav :versions="versions" :current="slug" />
     </section>
-    <GalleryFilters :filters="filters" :zone-name="zoneName" @change="change" />
+    <GalleryFilters v-slot="{ thresholds }">
+      <GalleryFilterFields :filters="filters" :zone-name="zoneName" :thresholds="thresholds" @change="change" />
+    </GalleryFilters>
     <p v-if="feed.failed.value" class="error" role="alert">{{ t('errors.INTERNAL') }}</p>
     <GalleryGrid
       v-else-if="feed.captures.value.length"
