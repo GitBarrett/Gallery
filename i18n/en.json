@@ -338,6 +338,32 @@
     "epic": "Epic",
     "legendary": "Legendary"
   },
+  "home": {
+    "description": "World of Warcraft screenshots shared by their players: browse them by version, find the captures of the week, share yours.",
+    "hero": {
+      "title": "Azeroth, seen by its players.",
+      "lead": "Share your best captures, discover the community's, download them in full resolution.",
+      "upload": "Upload a capture",
+      "explore": "Explore the gallery",
+      "credit": "Background: “{title}” by"
+    },
+    "week": {
+      "title": "Capture of the week",
+      "week": "Most liked this week",
+      "month": "Most liked this month",
+      "all": "All-time favourite",
+      "pick": "Editor's pick"
+    },
+    "latest": {
+      "title": "Latest captures",
+      "all": "Browse all"
+    },
+    "quest": {
+      "label": "Contest",
+      "new": "New contest: {title}.",
+      "accept": "Accept quest"
+    }
+  },
   "gallery": {
     "breadcrumb": "Breadcrumb",
     "home": "Home",

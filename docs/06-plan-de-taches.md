@@ -395,7 +395,7 @@ T-32 (page d'accueil) est découpée le 26/11/2026 en T-32a (serveur), T-32b (é
   `GET /api/home` : hero choisi par l'admin ou repli, « Capture of the week » et ses replis (7 jours, 30 jours, de tous les temps, Editor's pick), dernières captures de toutes les versions.
   Stories : US-24.1–2, US-70.4. Tests : U (replis), I.
 
-- [ ] **T-32b Page d'accueil : écran** (dép. T-32a)
+- [x] **T-32b Page d'accueil : écran** (dép. T-32a)
   Hero avec voile et header transparent, « Capture of the week », onglets de version, dernières captures, bandeau de quête (masqué tant que `features.contests` est désactivé).
   Stories : US-24, US-70.4. Tests : composants, E.
 

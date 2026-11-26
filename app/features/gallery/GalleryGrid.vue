@@ -1,8 +1,8 @@
 <script setup lang="ts">
-// Masonry grid of the PLP (07-design.md § Responsive: 2 columns and an 8 px gutter below 768 px, then 3, 4 and 5).
-// Infinite scroll (US-20.2): the next page loads when the end of the grid comes near; the « Load more » button does
-// the same from the keyboard or without IntersectionObserver. After the last page: « You've seen everything ».
-import GalleryTile from './GalleryTile.vue'
+// Grid of the PLP: the masonry of tiles, then infinite scroll (US-20.2): the next page loads when the end of the grid
+// comes near; the « Load more » button does the same from the keyboard or without IntersectionObserver. After the
+// last page: « You've seen everything ».
+import GalleryMasonry from './GalleryMasonry.vue'
 import type { GridCapture } from './useGalleryFeed'
 
 const props = defineProps<{
@@ -41,9 +41,7 @@ onBeforeUnmount(() => observer?.disconnect())
 
 <template>
   <div class="gallery">
-    <ul class="grid" :aria-label="label">
-      <li v-for="capture in captures" :key="capture.id" class="cell"><GalleryTile :capture="capture" /></li>
-    </ul>
+    <GalleryMasonry :captures="captures" :label="label" />
     <div ref="end" class="end">
       <p v-if="error" class="error" role="alert">{{ error }}</p>
       <p v-if="done" class="done">{{ t('gallery.end') }}</p>
@@ -55,42 +53,6 @@ onBeforeUnmount(() => observer?.disconnect())
 </template>
 
 <style scoped>
-.grid {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  column-count: 2;
-  column-gap: var(--space-2);
-}
-
-.cell {
-  margin-bottom: var(--space-2);
-  break-inside: avoid;
-}
-
-@media (width >= 768px) {
-  .grid {
-    column-count: 3;
-    column-gap: var(--space-4);
-  }
-
-  .cell {
-    margin-bottom: var(--space-4);
-  }
-}
-
-@media (width >= 1024px) {
-  .grid {
-    column-count: 4;
-  }
-}
-
-@media (width >= 1280px) {
-  .grid {
-    column-count: 5;
-  }
-}
-
 .end {
   display: flex;
   flex-direction: column;
