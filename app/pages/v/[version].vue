@@ -8,6 +8,7 @@ import GalleryFilters from '~/features/gallery/GalleryFilters.vue'
 import GalleryGrid from '~/features/gallery/GalleryGrid.vue'
 import { useGalleryFeed } from '~/features/gallery/useGalleryFeed'
 import { useGameVersions } from '~/features/gallery/useGameVersions'
+import VersionNav from '~/features/gallery/VersionNav.vue'
 
 // A new instance per version: the version read once below must follow a client navigation between versions
 definePageMeta({ key: (route) => route.path })
@@ -49,19 +50,7 @@ useHead({
         <span aria-current="page">{{ name }}</span>
       </nav>
       <h1 id="plp-title" class="title">{{ name }}</h1>
-      <nav :aria-label="t('gallery.versions')">
-        <ul class="versions">
-          <li v-for="v in versions" :key="v.slug">
-            <NuxtLink
-              :to="localePath(`/v/${v.slug}`)"
-              class="version"
-              :aria-current="v.slug === slug ? 'page' : undefined"
-            >
-              {{ nameOf(v) }}
-            </NuxtLink>
-          </li>
-        </ul>
-      </nav>
+      <VersionNav :versions="versions" :current="slug" />
     </section>
     <GalleryFilters :filters="filters" :zone-name="zoneName" @change="change" />
     <p v-if="feed.failed.value" class="error" role="alert">{{ t('errors.INTERNAL') }}</p>
@@ -123,31 +112,6 @@ useHead({
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--text-3xl);
-}
-
-.versions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.version {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--control-md);
-  padding: 0 var(--space-4);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-pill);
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.version[aria-current='page'] {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
 }
 
 .error {

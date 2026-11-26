@@ -338,6 +338,32 @@
     "epic": "Épique",
     "legendary": "Légendaire"
   },
+  "home": {
+    "description": "Des captures d'écran de World of Warcraft partagées par leurs joueurs : parcourez-les par version, découvrez les captures de la semaine, partagez les vôtres.",
+    "hero": {
+      "title": "Azeroth, vu par ses joueurs.",
+      "lead": "Partagez vos plus belles captures, découvrez celles de la communauté, téléchargez-les en pleine résolution.",
+      "upload": "Publier une capture",
+      "explore": "Explorer la galerie",
+      "credit": "Fond : « {title} » par"
+    },
+    "week": {
+      "title": "Capture de la semaine",
+      "week": "La plus aimée de la semaine",
+      "month": "La plus aimée du mois",
+      "all": "La préférée de tous les temps",
+      "pick": "Le choix de la rédaction"
+    },
+    "latest": {
+      "title": "Dernières captures",
+      "all": "Tout voir"
+    },
+    "quest": {
+      "label": "Concours",
+      "new": "Nouveau concours : {title}.",
+      "accept": "Relever la quête"
+    }
+  },
   "gallery": {
     "breadcrumb": "Fil d'Ariane",
     "home": "Accueil",

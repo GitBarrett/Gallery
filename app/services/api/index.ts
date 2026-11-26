@@ -8,6 +8,7 @@ import { NotificationsResponse, UnreadCountResponse } from '~~/shared/contracts/
 import { GameVersionsResponse, TagSuggestResponse, ZoneSuggestResponse } from '~~/shared/contracts/catalog'
 import {
   AvatarUploadUrlResponse,
+  HomeResponse,
   type CompleteUploadBody,
   CompleteUploadResponse,
   MyPhotoResponse,
@@ -148,6 +149,8 @@ export const api = {
   photo: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}`, PhotoResponse, {}, fetch),
   // Previous / next and the « More from » block of a photo page (US-67.2, US-70.1, US-70.2)
   related: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}/related`, RelatedResponse, {}, fetch),
+  // The home (US-24, US-70.4): hero, capture of the week, latest captures
+  home: (fetch?: typeof $fetch) => call('/api/home', HomeResponse, {}, fetch),
   // Upload form (US-10, US-11): catalogue reads, then the presigned URL and the completion (03 § Pipeline image)
   gameVersions: (fetch?: typeof $fetch) => call('/api/game-versions', GameVersionsResponse, {}, fetch),
   suggestTags: (q: string) => call('/api/tags/suggest', TagSuggestResponse, { query: { q } }),

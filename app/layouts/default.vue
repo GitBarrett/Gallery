@@ -11,6 +11,10 @@ import UpdateToast from '~/features/pwa/UpdateToast.vue'
 import { useUnreadPolling } from '~/features/notifications/useUnread'
 
 const flags = useFeatureFlags()
+// 07 § Header: on the home, the header is transparent over the hero
+const route = useRoute()
+const localePath = useLocalePath()
+const overHero = computed(() => route.path === localePath('/'))
 const { me } = await useMe()
 const username = computed(() => me.value?.username)
 useUnreadPolling(computed(() => Boolean(me.value)))
@@ -20,7 +24,7 @@ useUnreadPolling(computed(() => Boolean(me.value)))
   <div class="layout">
     <a href="#content" class="skip-link">{{ $t('layout.skipToContent') }}</a>
     <ConsentPanel />
-    <AppHeader :flags="flags" :username="username" :avatar-url="me?.avatarUrl ?? null" />
+    <AppHeader :flags="flags" :username="username" :avatar-url="me?.avatarUrl ?? null" :over-hero="overHero" />
     <OfflineBanner />
     <main id="content" tabindex="-1" class="content"><slot /></main>
     <InstallBanner />
@@ -31,10 +35,12 @@ useUnreadPolling(computed(() => Boolean(me.value)))
 </template>
 
 <style scoped>
+/* clip, not hidden: the header stays sticky; the hero of the home spans 100vw, scrollbar included */
 .layout {
   display: flex;
   flex-direction: column;
   min-height: 100svh;
+  overflow-x: clip;
 }
 
 .skip-link {

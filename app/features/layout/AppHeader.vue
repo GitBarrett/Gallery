@@ -5,7 +5,8 @@ import type { FeatureFlags } from '~/composables/useFeatureFlags'
 import UnreadBadge from '~/features/notifications/UnreadBadge.vue'
 import NavIcon, { type NavIconName } from './NavIcon.vue'
 
-const props = defineProps<{ flags: FeatureFlags; username?: string; avatarUrl?: string | null }>()
+// overHero: the home, where the header lies transparent over the hero (07 § Header) and scrolls away with it
+const props = defineProps<{ flags: FeatureFlags; username?: string; avatarUrl?: string | null; overHero?: boolean }>()
 const { t } = useI18n()
 const localePath = useLocalePath()
 const online = useOnline()
@@ -42,7 +43,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
 </script>
 
 <template>
-  <header class="header" :class="{ hidden }">
+  <header class="header" :class="{ hidden, 'over-hero': overHero }">
     <div class="bar">
       <NuxtLink :to="localePath('/')" class="home">
         <UiLogoMark class="logo-full" />
@@ -100,6 +101,15 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
   border-bottom: var(--border-width) solid var(--color-border-subtle);
   background: var(--color-surface);
   transition: transform var(--duration-normal) var(--ease-out);
+}
+
+/* Out of the flow, over the hero, whose top scrim keeps it readable */
+.header.over-hero {
+  position: absolute;
+  right: 0;
+  left: 0;
+  border-bottom-color: transparent;
+  background: transparent;
 }
 
 .bar {
