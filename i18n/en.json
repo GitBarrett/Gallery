@@ -443,6 +443,9 @@
     "alt": "{title} — {zone}, captured by {author}",
     "by": "Captured by {author}",
     "tags": "Tags",
+    "download": {
+      "label": "Download original · {size} MB"
+    },
     "quality": {
       "new": "new capture",
       "from": "{count}+ likes",

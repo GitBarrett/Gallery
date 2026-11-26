@@ -443,6 +443,9 @@
     "alt": "{title} — {zone}, capturée par {author}",
     "by": "Capturée par {author}",
     "tags": "Tags",
+    "download": {
+      "label": "Télécharger l’original · {size} Mo"
+    },
     "quality": {
       "new": "nouvelle capture",
       "from": "{count} J'aime et plus",
