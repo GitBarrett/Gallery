@@ -40,6 +40,7 @@ import {
   sightengineProvider,
   type ModerationProvider,
 } from '../modules/moderation'
+import { drizzleGalleryRepository, objectSitemapStore, publishSitemap } from '../modules/gallery'
 import { drizzleNotificationsRepository, notificationsConsumer, purgeNotifications } from '../modules/notifications'
 import { drizzleSettingsRepository, settingsReader } from '../modules/settings'
 import { loadConfig } from '../platform/config'
@@ -141,6 +142,16 @@ const withDb =
   }
 const relayOf = (env: Bindings, db: ReturnType<typeof createDb>) => outboxRelay(db, queuesOf(env), systemClock)
 
+// Writes through the binding only, as the purge of the orphans
+const sitemapOf = (db: Db, bucket: R2Bucket) => {
+  const config = loadConfig(process.env)
+  return publishSitemap({
+    repo: drizzleGalleryRepository(db),
+    store: objectSitemapStore(r2ObjectStorage({ bucket, prefix: config.r2Prefix, now: systemClock.now })),
+    siteUrl: config.siteUrl,
+  })()
+}
+
 // Deletes through the binding only: the S3 token, which signs uploads, is not needed
 const purgeOrphans = (db: Db, bucket: R2Bucket) =>
   purgeOrphanUploads({
@@ -164,6 +175,7 @@ const crons = (env: Bindings): Record<string, CronHandler[]> => ({
     withDb(env, (db) => purgeExpiredRedirects(db, systemClock)), // former usernames (T-16b)
     withDb(env, (db) => purgeNotifications({ repo: drizzleNotificationsRepository(db), clock: systemClock })()),
     withDb(env, (db) => purgeDownloads({ downloads: drizzleDownloadLog(db), clock: systemClock })()), // US-23.1
+    ...(env.R2 ? [withDb(env, (db) => sitemapOf(db, env.R2!))] : []), // US-25.2
   ],
 })
 

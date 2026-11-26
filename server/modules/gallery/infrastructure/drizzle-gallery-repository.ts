@@ -8,6 +8,7 @@ import type { GalleryPhotos } from '../application/photo'
 import type { GalleryHome } from '../application/home'
 import type { GalleryRelated, PhotoContext } from '../application/related'
 import type { GallerySearch } from '../application/search'
+import type { GallerySitemap } from '../application/sitemap'
 
 // Read view of the grids (10 § Règles, "vue de lecture documentée"): the published captures with their author
 // (media → identity), version and zone (catalogue); the accounts banned or being deleted are left out (US-03.5).
@@ -84,7 +85,31 @@ async function neighbour(db: Db | Transaction, c: PhotoContext, older: boolean) 
 
 export const drizzleGalleryRepository = (
   db: Db | Transaction,
-): GalleryRepository & GalleryPhotos & GalleryRelated & GalleryHome & GallerySearch => ({
+): GalleryRepository & GalleryPhotos & GalleryRelated & GalleryHome & GallerySearch & GallerySitemap => ({
+  // shortcut: every URL in memory at once; fine up to some 100 000 captures, page by id beyond
+  async sitemapEntries() {
+    const versions = await db
+      .select({ slug: gameVersions.slug })
+      .from(gameVersions)
+      .where(eq(gameVersions.archived, false))
+      .orderBy(asc(gameVersions.position))
+    const captures = await db
+      .select({ id: photos.id, username: users.username, publishedAt: photos.publishedAt })
+      .from(photos)
+      .innerJoin(users, eq(users.id, photos.userId))
+      .innerJoin(gameVersions, eq(gameVersions.id, photos.gameVersionId))
+      .where(visible())
+      .orderBy(desc(photos.publishedAt), desc(photos.id))
+    // A profile: its latest public capture as its last change
+    const authors = new Map<string, Date>()
+    for (const c of captures) if (!authors.has(c.username)) authors.set(c.username, c.publishedAt!)
+    return [
+      ...versions.map((v) => ({ path: `/v/${v.slug}` })),
+      ...[...authors].map(([username, lastmod]) => ({ path: `/u/${encodeURIComponent(username)}`, lastmod })),
+      ...captures.map((c) => ({ path: `/p/${c.id}`, lastmod: c.publishedAt! })),
+    ]
+  },
+
   async popularTags(limit) {
     // shortcut: counts every public tagged capture on each empty search; fine for tens of thousands, cache it beyond
     const rows = await db

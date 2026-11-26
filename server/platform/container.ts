@@ -60,6 +60,8 @@ import {
   drizzleGalleryRepository,
   relatedPhotos,
   searchPhotos,
+  readSitemap,
+  objectSitemapStore,
   viewHome,
   viewPhoto,
 } from '../modules/gallery'
@@ -111,6 +113,7 @@ export interface Container {
   gallery: {
     browseGrid: UseCase<typeof browseGrid>
     searchPhotos: UseCase<typeof searchPhotos>
+    readSitemap: UseCase<typeof readSitemap>
     viewPhoto: UseCase<typeof viewPhoto>
     relatedPhotos: UseCase<typeof relatedPhotos>
     viewHome: UseCase<typeof viewHome>
@@ -276,6 +279,12 @@ export function createContainer({
           zoneOf: findZone({ repo: drizzleCatalogRepository(db()) }),
           thresholds: async () => (await readSettings(logger))['quality.thresholds'],
         })(cmd),
+      readSitemap: (name) =>
+        readSitemap({
+          repo: drizzleGalleryRepository(db()),
+          store: objectSitemapStore(storage()),
+          siteUrl: config.siteUrl,
+        })(name),
       searchPhotos: (cmd) =>
         searchPhotos({
           repo: drizzleGalleryRepository(db()),
