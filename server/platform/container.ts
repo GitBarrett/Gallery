@@ -69,6 +69,8 @@ import {
   memoryBucket,
   r2ObjectStorage,
   requestUploadUrl,
+  requestDownload,
+  drizzleDownloadLog,
   serveImage,
   listMyCaptures,
   getMyCapture,
@@ -115,6 +117,7 @@ export interface Container {
   }
   media: {
     requestUploadUrl: UseCase<typeof requestUploadUrl>
+    requestDownload: UseCase<typeof requestDownload>
     completeUpload: UseCase<typeof completeUpload>
     serveImage: UseCase<typeof serveImage>
     listMyCaptures: UseCase<typeof listMyCaptures>
@@ -350,6 +353,14 @@ export function createContainer({
           storage: storage(),
           purger: cloudflareCachePurger({ token: config.cfApiTokenPurge, zoneId: config.cfZoneId, fetch: fetcher }),
           siteUrl: config.siteUrl,
+        })(cmd),
+      requestDownload: (cmd) =>
+        requestDownload({
+          repo: drizzleMediaRepository(db()),
+          storage: storage(),
+          downloads: drizzleDownloadLog(db()),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
+          clock,
         })(cmd),
       requestUploadUrl: (cmd) =>
         requestUploadUrl({

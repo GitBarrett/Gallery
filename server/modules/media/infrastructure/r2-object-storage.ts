@@ -47,6 +47,8 @@ export async function presignUrl(options: {
   host: string
   path: string
   headers: Record<string, string>
+  /** More signed query parameters (`response-content-disposition`…). */
+  query?: Record<string, string>
   region: string
   service: string
   date: Date
@@ -67,6 +69,7 @@ export async function presignUrl(options: {
     'X-Amz-Date': amzDate,
     'X-Amz-Expires': String(options.expiresInSeconds),
     'X-Amz-SignedHeaders': signedHeaders,
+    ...options.query,
   })
     .map(([name, value]) => `${encode(name)}=${encode(value)}`)
     .sort()
@@ -97,22 +100,41 @@ export function r2ObjectStorage(deps: {
   now: () => Date
 }): ObjectStorage {
   const { bucket, prefix, credentials } = deps
+  const presign = (
+    method: 'GET' | 'PUT',
+    key: string,
+    signed: { headers?: Record<string, string>; query?: Record<string, string>; expiresInSeconds: number },
+  ) => {
+    if (!credentials) throw new Error('R2_ACCESS_KEY_ID is not configured')
+    return presignUrl({
+      method,
+      host: `${credentials.accountId}.r2.cloudflarestorage.com`,
+      path: `/${encode(credentials.bucket)}/${`${prefix}${key}`.split('/').map(encode).join('/')}`,
+      headers: signed.headers ?? {},
+      query: signed.query,
+      region: 'auto',
+      service: 's3',
+      date: deps.now(),
+      expiresInSeconds: signed.expiresInSeconds,
+      accessKeyId: credentials.accessKeyId,
+      secretAccessKey: credentials.secretAccessKey,
+    })
+  }
   return {
-    async presignPut(key, file) {
-      if (!credentials) throw new Error('R2_ACCESS_KEY_ID is not configured')
-      return presignUrl({
-        method: 'PUT',
-        host: `${credentials.accountId}.r2.cloudflarestorage.com`,
-        path: `/${encode(credentials.bucket)}/${`${prefix}${key}`.split('/').map(encode).join('/')}`,
+    presignPut: (key, file) =>
+      presign('PUT', key, {
         headers: { 'content-length': String(file.bytes), 'content-type': file.contentType },
-        region: 'auto',
-        service: 's3',
-        date: deps.now(),
         expiresInSeconds: file.expiresInSeconds,
-        accessKeyId: credentials.accessKeyId,
-        secretAccessKey: credentials.secretAccessKey,
-      })
-    },
+      }),
+    // The download is a navigation, not a fetch: no CORS nor `connect-src` (03 § Pipeline image 7)
+    presignGet: (key, file) =>
+      presign('GET', key, {
+        query: {
+          'response-content-disposition': `attachment; filename="${file.filename}"`,
+          'response-content-type': file.contentType,
+        },
+        expiresInSeconds: file.expiresInSeconds,
+      }),
     async head(key): Promise<StoredObject | null> {
       const object = await bucket.head(`${prefix}${key}`)
       return object && { bytes: object.size, contentType: object.httpMetadata?.contentType }

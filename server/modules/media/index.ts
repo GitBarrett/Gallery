@@ -21,6 +21,9 @@ export {
   UPLOADS_PER_DAY,
 } from './application/uploads'
 export { drizzleMediaRepository } from './infrastructure/drizzle-media-repository'
+export { DOWNLOAD_URL_SECONDS, DOWNLOADS_PER_HOUR, purgeDownloads, requestDownload } from './application/downloads'
+export type { DownloadLog } from './application/ports'
+export { drizzleDownloadLog } from './infrastructure/drizzle-download-log'
 export { imagesBindingService, type ImagesBinding } from './infrastructure/images-binding'
 export { memoryBucket, r2ObjectStorage, type R2Bucket } from './infrastructure/r2-object-storage'
 export { orThrow } from './interface/media-http'

@@ -7,7 +7,7 @@ export function orThrow<R extends Result<unknown, MediaError>>(result: R): Extra
   if (result.ok) return result.value as Extract<R, { ok: true }>['value']
   const error = result.error
   if (error.kind === 'rate_limited')
-    throw new AppError('RATE_LIMITED', 'Too many uploads', { retryAfterSeconds: error.retryAfterSeconds })
+    throw new AppError('RATE_LIMITED', 'Too many requests', { retryAfterSeconds: error.retryAfterSeconds })
   if (error.kind === 'forbidden') throw new AppError('FORBIDDEN', 'Forbidden', { reason: error.reason })
   if (error.kind === 'not_found') throw new AppError('NOT_FOUND', 'Not found')
   if (error.kind === 'busy') throw new AppError('CONFLICT', 'The capture is still processing')

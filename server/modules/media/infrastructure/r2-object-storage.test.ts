@@ -50,4 +50,20 @@ describe('R2 presigned URLs', () => {
     })
     expect(new URL(other).searchParams.get('X-Amz-Signature')).not.toBe(url.searchParams.get('X-Amz-Signature'))
   })
+
+  it('US-23.1 gets the original as an attachment of a fixed type, the answer headers signed in the query', async () => {
+    const storage = r2ObjectStorage({ bucket: memoryBucket(), prefix: 'pr-7/', credentials, now })
+    const file = { contentType: 'image/webp', filename: 'legendary-shots-0193.webp', expiresInSeconds: 300 }
+    const url = new URL(await storage.presignGet('originals/0193', file))
+    expect(`${url.origin}${url.pathname}`).toBe('https://acc0.r2.cloudflarestorage.com/ls-preview/pr-7/originals/0193')
+    expect(url.searchParams.get('response-content-disposition')).toBe(
+      'attachment; filename="legendary-shots-0193.webp"',
+    )
+    expect(url.searchParams.get('response-content-type')).toBe('image/webp')
+    expect(url.searchParams.get('X-Amz-Expires')).toBe('300')
+    expect(url.searchParams.get('X-Amz-SignedHeaders')).toBe('host')
+    // The query is signed: another type gives another signature
+    const other = new URL(await storage.presignGet('originals/0193', { ...file, contentType: 'image/png' }))
+    expect(other.searchParams.get('X-Amz-Signature')).not.toBe(url.searchParams.get('X-Amz-Signature'))
+  })
 })
