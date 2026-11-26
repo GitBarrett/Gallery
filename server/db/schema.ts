@@ -327,9 +327,11 @@ export const photos = pgTable(
     /** Focal point chosen by the author (US-13.1), 0–1 from the left and the top; null: the centre (US-13.2). */
     focalX: real('focal_x'),
     focalY: real('focal_y'),
-    // shortcut: written by the likes (T-40) and the HD downloads (T-34), 0 until then; the grids sort on them (US-20.3)
+    // Written by the likes (T-40a) and the HD downloads (T-34a); the grids sort on them (US-20.3)
     likesCount: integer('likes_count').notNull().default(0),
     downloadsCount: integer('downloads_count').notNull().default(0),
+    /** Highest quality tier the author was told of (US-71.4: once per tier), 0 (Poor) to 4 (Legendary); never lowered. */
+    qualityTierNotified: integer('quality_tier_notified').notNull().default(0),
     uploadedAt: at('uploaded_at'),
     createdAt: createdAt(),
     /** Title (A) and description (C), ADR-007; the zone and the character are searched on photo_metadata. */
@@ -495,6 +497,21 @@ export const photoMetadata = pgTable(
       .on(t.zoneCustom)
       .where(sql`${t.zoneCustom} is not null`),
   ],
+)
+
+/** Likes (US-30): one per member and capture, the counter of photos follows them in the same statement. */
+export const likes = pgTable(
+  'likes',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    photoId: uuid('photo_id')
+      .notNull()
+      .references(() => photos.id, { onDelete: 'cascade' }),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.photoId] }), index('likes_photo_idx').on(t.photoId)],
 )
 
 /**

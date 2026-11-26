@@ -20,6 +20,10 @@ export type UploadUrlBody = z.infer<typeof UploadUrlBody>
 export const UploadUrlResponse = z.strictObject({ photoId: z.uuid(), url: z.url(), expiresAt: z.iso.datetime() })
 export type UploadUrlResponse = z.infer<typeof UploadUrlResponse>
 
+/** PUT / DELETE /api/photos/{id}/like (US-30.1): whether the member likes it now, and its counter. */
+export const LikeResponse = z.strictObject({ liked: z.boolean(), likes: z.int().min(0) })
+export type LikeResponse = z.infer<typeof LikeResponse>
+
 /** POST /api/photos/{id}/download (US-23.1): open `url` before `expiresAt` (5 min), the browser saves the original. */
 export const DownloadResponse = z.strictObject({ url: z.url(), expiresAt: z.iso.datetime() })
 export type DownloadResponse = z.infer<typeof DownloadResponse>
