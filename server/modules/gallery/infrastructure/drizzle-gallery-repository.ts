@@ -30,9 +30,11 @@ const visible = () =>
 const names = (slug: string | null, nameEn: string | null, nameFr: string | null) =>
   slug ? { slug, nameEn: nameEn!, nameFr: nameFr! } : null
 
-// The capture just after `c` in the grid of its version, newest first (`older`), or just before it (newer)
+// The capture just after `c` in the grid of its version, newest first (`older`), or just before it (newer). Its
+// position is read from the table itself: the Date of `c` holds milliseconds, `published_at` microseconds, and a date
+// written by now() would put `c` after its own truncated date (it would be its own neighbour).
 async function neighbour(db: Db | Transaction, c: PhotoContext, older: boolean) {
-  const at = sql`(${c.publishedAt.toISOString()}::timestamptz, ${c.id}::uuid)`
+  const at = sql`(select p.published_at, p.id from photos p where p.id = ${c.id}::uuid)`
   const [row] = await db
     .select({ id: photos.id })
     .from(photos)

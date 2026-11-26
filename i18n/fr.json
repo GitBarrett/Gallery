@@ -394,7 +394,19 @@
     "quality": {
       "new": "nouvelle capture",
       "from": "{count} J'aime et plus",
-      "missing": "{count} J'aime avant {quality}"
+      "missing": "{count} J'aime avant {quality}",
+      "close": "Fermer"
+    },
+    "nav": {
+      "label": "Captures de la version",
+      "prev": "Capture précédente",
+      "next": "Capture suivante"
+    },
+    "related": {
+      "author": "Plus de {author}",
+      "similar": "Captures similaires",
+      "zone": "Plus de {zone}",
+      "latest": "Les dernières de {version}"
     },
     "details": {
       "tier": "Capture {quality} · {version}",

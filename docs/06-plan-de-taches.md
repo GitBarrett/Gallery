@@ -385,7 +385,7 @@ T-31b (navigation entre captures) est découpée le 26/11/2026 en T-31b (serveur
   `GET /api/photos/{id}/related` : capture précédente et suivante de sa version, bloc « More from » avec replis (« Similar captures », même zone, « Latest in {version} »).
   Stories : US-67.2, US-70.1–2. Tests : U, I.
 
-- [ ] **T-31d Navigation entre captures : écran** (dép. T-31b)
+- [x] **T-31d Navigation entre captures : écran** (dép. T-31b)
   Boutons précédent / suivant, swipe et flèches du clavier, bloc « More from » de 4 miniatures, bottom sheet au toucher pour le badge de qualité.
   Stories : US-67.2–3, US-70.1–2. Tests : composants, E.
 

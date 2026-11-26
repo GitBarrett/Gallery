@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
 import { withRollback } from '../../../../tests/db'
 import { gameVersions, photoMetadata, photos, photoTags, tags, users, zones } from '../../../db/schema'
@@ -253,6 +253,12 @@ describe('drizzleGalleryRepository', () => {
       })
       expect(await repo.neighbours(context)).toEqual({ prev: middle, next: null }) // the oldest: no next
       expect(await repo.neighbours((await repo.context(middle))!)).toEqual({ prev: newest, next: oldest })
+      expect(await repo.neighbours((await repo.context(newest))!)).toEqual({ prev: null, next: middle })
+      // A date with microseconds (written by now()) is not after itself: never its own neighbour
+      await tx
+        .update(photos)
+        .set({ publishedAt: sql`${photos.publishedAt} + interval '400 microseconds'` })
+        .where(eq(photos.id, newest))
       expect(await repo.neighbours((await repo.context(newest))!)).toEqual({ prev: null, next: middle })
       expect(await repo.context(await w.capture({ status: 'pending_review' }))).toBeNull()
     })

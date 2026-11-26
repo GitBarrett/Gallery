@@ -15,6 +15,7 @@ import {
   PhotoResponse,
   type PhotosQuery,
   PhotosResponse,
+  RelatedResponse,
   type UpdatePhotoBody,
   type UploadUrlBody,
   UploadUrlResponse,
@@ -145,6 +146,8 @@ export const api = {
   photos: (query: Partial<PhotosQuery>, fetch?: typeof $fetch) => call('/api/photos', PhotosResponse, { query }, fetch),
   // Photo page (US-25.1): 404 NOT_FOUND for a capture that is not published
   photo: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}`, PhotoResponse, {}, fetch),
+  // Previous / next and the « More from » block of a photo page (US-67.2, US-70.1, US-70.2)
+  related: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}/related`, RelatedResponse, {}, fetch),
   // Upload form (US-10, US-11): catalogue reads, then the presigned URL and the completion (03 § Pipeline image)
   gameVersions: (fetch?: typeof $fetch) => call('/api/game-versions', GameVersionsResponse, {}, fetch),
   suggestTags: (q: string) => call('/api/tags/suggest', TagSuggestResponse, { query: { q } }),
