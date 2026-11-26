@@ -5,6 +5,7 @@ import type { Db, Transaction } from '../../../db/client'
 import { gameVersions, photoMetadata, photos, photoTags, tags, users, zones } from '../../../db/schema'
 import type { GalleryRepository, GridFilter } from '../application/grid'
 import type { GalleryPhotos } from '../application/photo'
+import type { GalleryRelated, PhotoContext } from '../application/related'
 
 // Read view of the grids (10 § Règles, "vue de lecture documentée"): the published captures with their author
 // (media → identity), version and zone (catalogue); the accounts banned or being deleted are left out (US-03.5).
@@ -29,7 +30,48 @@ const visible = () =>
 const names = (slug: string | null, nameEn: string | null, nameFr: string | null) =>
   slug ? { slug, nameEn: nameEn!, nameFr: nameFr! } : null
 
-export const drizzleGalleryRepository = (db: Db | Transaction): GalleryRepository & GalleryPhotos => ({
+// The capture just after `c` in the grid of its version, newest first (`older`), or just before it (newer)
+async function neighbour(db: Db | Transaction, c: PhotoContext, older: boolean) {
+  const at = sql`(${c.publishedAt.toISOString()}::timestamptz, ${c.id}::uuid)`
+  const [row] = await db
+    .select({ id: photos.id })
+    .from(photos)
+    .innerJoin(users, eq(users.id, photos.userId))
+    .innerJoin(gameVersions, eq(gameVersions.id, photos.gameVersionId))
+    .where(
+      and(
+        visible(),
+        eq(gameVersions.slug, c.gameVersion),
+        older ? sql`(${photos.publishedAt}, ${photos.id}) < ${at}` : sql`(${photos.publishedAt}, ${photos.id}) > ${at}`,
+      ),
+    )
+    .orderBy(...(older ? [desc(photos.publishedAt), desc(photos.id)] : [asc(photos.publishedAt), asc(photos.id)]))
+    .limit(1)
+  return row?.id ?? null
+}
+
+export const drizzleGalleryRepository = (db: Db | Transaction): GalleryRepository & GalleryPhotos & GalleryRelated => ({
+  async context(id) {
+    const [row] = await db
+      .select({
+        id: photos.id,
+        userId: photos.userId,
+        zoneId: photoMetadata.zoneId,
+        gameVersion: gameVersions.slug,
+        publishedAt: photos.publishedAt,
+      })
+      .from(photos)
+      .innerJoin(users, eq(users.id, photos.userId))
+      .innerJoin(gameVersions, eq(gameVersions.id, photos.gameVersionId))
+      .leftJoin(photoMetadata, eq(photoMetadata.photoId, photos.id))
+      .where(and(eq(photos.id, id), visible()))
+    return row ? { ...row, zoneId: row.zoneId ?? null, publishedAt: row.publishedAt! } : null
+  },
+
+  async neighbours(c) {
+    return { prev: await neighbour(db, c, false), next: await neighbour(db, c, true) }
+  },
+
   async grid(filter) {
     const key = sortKey(filter.sort)
     const after = filter.after
@@ -62,6 +104,8 @@ export const drizzleGalleryRepository = (db: Db | Transaction): GalleryRepositor
           visible(),
           filter.gameVersion ? eq(gameVersions.slug, filter.gameVersion) : undefined,
           filter.zoneId ? eq(photoMetadata.zoneId, filter.zoneId) : undefined,
+          filter.authorId ? eq(photos.userId, filter.authorId) : undefined,
+          filter.exclude?.length ? notInArray(photos.id, filter.exclude) : undefined,
           timeOfDay(filter.timeOfDay),
           filter.minLikes > 0 ? gte(photos.likesCount, filter.minLikes) : undefined,
           position,

@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/db/client'
 import { gameVersions, photoMetadata, photos, users, zones } from '../../server/db/schema'
 import { ErrorResponse } from '../../shared/contracts/errors'
-import { PhotoResponse, PhotosResponse } from '../../shared/contracts/photos'
+import { PhotoResponse, PhotosResponse, RelatedResponse } from '../../shared/contracts/photos'
 
 // GET /api/photos over HTTP and Postgres (T-30a): a zone of its own keeps the captures of the other tests out.
 process.env.NUXT_PUBLIC_SITE_URL = 'http://localhost:3000'
@@ -120,5 +120,17 @@ describe('GET /api/photos/{id}', () => {
     expect(inReview.status).toBe(404)
     expect(ErrorResponse.parse(await inReview.json()).error.code).toBe('NOT_FOUND')
     expect((await fetch('/api/photos/not-an-id')).status).toBe(400)
+  })
+})
+
+describe('GET /api/photos/{id}/related', () => {
+  it('US-70.1 gives the other captures of the author, newest first; 404 for a capture in review', async () => {
+    const related = await fetch(`/api/photos/${ids[2]}/related`)
+    expect(related.status).toBe(200)
+    expect(related.headers.get('cache-control')).toBe('public, max-age=60, stale-while-revalidate=300')
+    // prev and next run through the whole version, shared with the other tests: only their form is checked
+    const body = RelatedResponse.parse(await related.json())
+    expect(body.sections.map((s) => [s.kind, s.items.map((c) => c.id)])).toEqual([['author', [ids[1], ids[0]]]])
+    expect((await fetch(`/api/photos/${ids[3]}/related`)).status).toBe(404)
   })
 })

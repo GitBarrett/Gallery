@@ -148,23 +148,34 @@ export const PhotosQuery = z.strictObject({
   limit: z.coerce.number().int().min(1).max(60).default(30),
 })
 export type PhotosQuery = z.infer<typeof PhotosQuery>
-export const PhotosResponse = z.strictObject({
-  items: z.array(
-    z.strictObject({
-      id: z.uuid(),
-      title: z.string(),
-      width: z.int(),
-      height: z.int(),
-      author: z.strictObject({ username: z.string() }),
-      zone: z.strictObject({ slug: z.string(), nameEn: z.string(), nameFr: z.string() }).nullable(),
-      likes: z.int(),
-      quality: z.enum(QUALITIES),
-      publishedAt: z.iso.datetime(),
-    }),
-  ),
-  nextCursor: z.string().nullable(),
+/** A capture of a grid or of the « More from » block. */
+const GridItem = z.strictObject({
+  id: z.uuid(),
+  title: z.string(),
+  width: z.int(),
+  height: z.int(),
+  author: z.strictObject({ username: z.string() }),
+  zone: z.strictObject({ slug: z.string(), nameEn: z.string(), nameFr: z.string() }).nullable(),
+  likes: z.int(),
+  quality: z.enum(QUALITIES),
+  publishedAt: z.iso.datetime(),
 })
+export const PhotosResponse = z.strictObject({ items: z.array(GridItem), nextCursor: z.string().nullable() })
 export type PhotosResponse = z.infer<typeof PhotosResponse>
+
+/**
+ * GET /api/photos/{id}/related (US-67.2, US-70.1, US-70.2): the previous (newer) and next (older) captures of its
+ * version, and the sections of the « More from » block (4 thumbnails at most, none empty; no section: no block).
+ * 404 for a capture that is not public.
+ */
+export const RelatedResponse = z.strictObject({
+  prev: z.uuid().nullable(),
+  next: z.uuid().nullable(),
+  sections: z.array(
+    z.strictObject({ kind: z.enum(['author', 'similar', 'zone', 'latest']), items: z.array(GridItem) }),
+  ),
+})
+export type RelatedResponse = z.infer<typeof RelatedResponse>
 
 const Names = z.strictObject({ slug: z.string(), nameEn: z.string(), nameFr: z.string() })
 

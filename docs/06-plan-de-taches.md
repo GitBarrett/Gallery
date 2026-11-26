@@ -379,9 +379,15 @@ T-31a (page photo) est découpée le 26/11/2026 en T-31a (serveur) et T-31c (éc
   PDP `/p/{id}`, infobulle façon objet, badge de qualité avec son seuil et les likes manquants, Open Graph, Twitter Card, `ImageObject` ; les tuiles de la grille mènent à la PDP.
   Stories : US-25.1, US-71.2. Tests : U, composants, E.
 
-- [ ] **T-31b Navigation entre captures** (dép. T-31c)
-  Précédent/suivant, swipe, « More from » avec replis.
-  Stories : US-67.2–3, US-70.1–2. Tests : E.
+T-31b (navigation entre captures) est découpée le 26/11/2026 en T-31b (serveur) et T-31d (écran) ; les tâches qui dépendent de T-31b attendent les deux.
+
+- [x] **T-31b Navigation entre captures : serveur** (dép. T-31c)
+  `GET /api/photos/{id}/related` : capture précédente et suivante de sa version, bloc « More from » avec replis (« Similar captures », même zone, « Latest in {version} »).
+  Stories : US-67.2, US-70.1–2. Tests : U, I.
+
+- [ ] **T-31d Navigation entre captures : écran** (dép. T-31b)
+  Boutons précédent / suivant, swipe et flèches du clavier, bloc « More from » de 4 miniatures, bottom sheet au toucher pour le badge de qualité.
+  Stories : US-67.2–3, US-70.1–2. Tests : composants, E.
 
 - [ ] **T-32 Page d'accueil** (dép. T-30, T-08, T-31a)
   Hero administrable avec voile, « Capture of the week » et ses replis, bandeau de quête (masqué tant que `features.contests` est désactivé), captures d'écran du manifest PWA (home et PDP, 2 `narrow` et 2 `wide` ; Q35).
