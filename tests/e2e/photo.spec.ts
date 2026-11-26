@@ -120,7 +120,7 @@ test('US-23.1 US-23.2 a visitor signs in to download the original, counted once 
   const saved = page.waitForEvent('download')
   await page.getByRole('main').getByRole('button', { name: 'Sign in' }).click()
   const file = await saved
-  expect(file.suggestedFilename()).toMatch(new RegExp(`^legendary-shots-${id}\\.(jpg|webp|png)$`))
+  expect(['jpg', 'webp', 'png'].map((ext) => `legendary-shots-${id}.${ext}`)).toContain(file.suggestedFilename())
   expect(await file.failure()).toBeNull()
   await expect(page).toHaveURL(`/p/${id}`) // the URL forgets the download: a reload does not start it again
   expect((await testRoute(page, `/__test/photos/${id}`, 'GET')).body.downloads).toBe(1)
