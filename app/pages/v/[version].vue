@@ -34,9 +34,11 @@ const zoneName = computed(() => {
 if (!current || !feed.found.value) throw createError({ statusCode: 404, statusMessage: 'Not found', fatal: true })
 if (feed.failed.value) throw createError({ statusCode: 500, statusMessage: 'Gallery unavailable', fatal: true })
 const name = computed(() => nameOf(current))
-useHead({
+// The canonical URL leaves the filters out: one page per version for robots
+usePageHead({
   title: () => t('gallery.title', { version: name.value }),
-  meta: [{ name: 'description', content: () => t('gallery.description', { version: name.value }) }],
+  description: () => t('gallery.description', { version: name.value }),
+  path: () => `/v/${slug}`,
 })
 </script>
 

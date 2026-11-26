@@ -100,4 +100,42 @@ describe('GET /robots.txt', () => {
     )
     expect(response.headers.get('x-robots-tag')).toBeNull() // not a preview
   })
+
+  it('US-25 asks robots not to index the private pages of a member, in both languages', async () => {
+    for (const path of ['/settings', '/fr/upload', '/my-captures/0193', '/signin', '/notifications'])
+      expect((await fetch(path, { redirect: 'manual' })).headers.get('x-robots-tag'), path).toBe('noindex')
+    for (const path of ['/', '/fr', '/v/wow-forever', '/search', '/terms', '/signing'])
+      expect((await fetch(path, { redirect: 'manual' })).headers.get('x-robots-tag'), path).toBeNull()
+  })
+})
+
+// The canonical and alternate links of a page, by rel or hreflang, as paths (the origin is the request's)
+async function links(path: string) {
+  const html = await (await fetch(path)).text()
+  const found: Record<string, string> = {}
+  for (const [, rel, lang, href] of html.matchAll(
+    /rel="(canonical|alternate)"(?: hreflang="([\w-]+)")? href="([^"]+)"/g,
+  ))
+    found[lang ?? rel!] = new URL(href!).pathname + new URL(href!).search
+  return { html, found }
+}
+
+describe('page heads', () => {
+  it('US-25 gives the public pages their description, canonical URL without filters and hreflang', async () => {
+    const plp = await links('/fr/v/wow-forever?sort=popular')
+    expect(plp.found).toEqual({
+      canonical: '/fr/v/wow-forever',
+      en: '/v/wow-forever',
+      fr: '/fr/v/wow-forever',
+      'x-default': '/v/wow-forever',
+    })
+    expect(plp.html).toMatch(/<meta name="description" content="Captures d.{1,5}écran de WoW Forever/)
+    const profile = await links(`/u/${names.author}`)
+    expect(profile.found.canonical).toBe(`/u/${names.author}`)
+    expect(profile.html).toContain(`World of Warcraft screenshots captured by ${names.author} on Legendary Shots.`)
+    expect((await links('/terms')).found.fr).toBe('/fr/terms')
+    expect((await links('/legal')).found.canonical).toBe('/legal')
+    expect((await links('/search?q=Nagrand&sort=recent')).found.canonical).toBe('/search?q=nagrand')
+    expect((await links('/')).found['x-default']).toBe('/')
+  })
 })

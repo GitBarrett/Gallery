@@ -21,9 +21,11 @@ if (results.failed.value) throw createError({ statusCode: 500, statusMessage: 'S
 // Each change is a new entry of the history, so the back button returns to the previous search
 const change = (next: Search) => navigateTo({ query: writeSearch(next) })
 const query = computed(() => results.page.value?.query ?? '')
-useHead({
+// The canonical URL keeps the text, not the filters nor the sort
+usePageHead({
   title: () => (query.value ? t('search.titleFor', { query: query.value }) : t('search.title')),
-  meta: [{ name: 'description', content: () => t('search.description') }],
+  description: () => t('search.description'),
+  path: () => (query.value ? `/search?q=${encodeURIComponent(query.value)}` : '/search'),
 })
 </script>
 

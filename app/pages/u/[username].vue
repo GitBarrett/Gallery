@@ -11,7 +11,13 @@ if (!profile.value) throw createError({ statusCode: 404, statusMessage: 'Not fou
 if (profile.value.username.toLowerCase() !== String(route.params.username).toLowerCase())
   await navigateTo(useLocalePath()(`/u/${profile.value.username}`), { redirectCode: 301, replace: true })
 const own = computed(() => me.value?.username.toLowerCase() === profile.value?.username.toLowerCase())
-useHead({ title: () => profile.value?.username ?? '' })
+const { t } = useI18n()
+const username = () => profile.value?.username ?? ''
+usePageHead({
+  title: username,
+  description: () => t('profile.description', { username: username() }),
+  path: () => `/u/${username()}`,
+})
 </script>
 
 <template>

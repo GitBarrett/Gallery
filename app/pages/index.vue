@@ -14,7 +14,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const [home, versions] = await Promise.all([useHome(), useGameVersions()])
 const flags = useFeatureFlags()
-useSeoMeta({ title: 'Legendary Shots', description: () => t('home.description') })
+usePageHead({ title: () => 'Legendary Shots', description: () => t('home.description'), path: () => '/' })
 </script>
 
 <template>

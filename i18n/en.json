@@ -73,6 +73,7 @@
     "policy": "Read the cookie policy"
   },
   "legal": {
+    "description": "{title} of Legendary Shots, the World of Warcraft screenshot gallery.",
     "table": "Scrollable table"
   },
   "auth": {
@@ -262,6 +263,7 @@
     }
   },
   "profile": {
+    "description": "World of Warcraft screenshots captured by {username} on Legendary Shots.",
     "memberSince": "Member since {date}",
     "settings": "Settings",
     "captures": "Captures",
