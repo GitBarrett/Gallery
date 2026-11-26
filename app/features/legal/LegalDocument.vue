@@ -7,7 +7,11 @@ import LegalText from './LegalText.vue'
 const props = defineProps<{ page: LegalPage }>()
 const { t, locale } = useI18n()
 const doc = computed(() => legalDocument(props.page, locale.value))
-useHead({ title: () => doc.value.title })
+usePageHead({
+  title: () => doc.value.title,
+  description: () => t('legal.description', { title: doc.value.title }),
+  path: () => (props.page === 'legal-notice' ? '/legal' : `/${props.page}`), // app/pages/legal.vue
+})
 </script>
 
 <template>

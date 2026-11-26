@@ -20,7 +20,6 @@ export function usePhotoHead(photo: Ref<PhotoResponse>) {
       ? t('photo.alt', { title: p().title, zone: named(zone), author: author() })
       : t('captures.alt', { title: p().title, author: author() })
   })
-  const path = (code: 'en' | 'fr') => `${origin}${localePath(`/p/${p().id}`, code)}`
   const url = () => `${origin}${localePath(`/p/${p().id}`)}`
   const image = () => `${origin}/img/${p().id}/og.jpg`
   const title = () => t('photo.title', { title: p().title, version: named(p().version) })
@@ -58,14 +57,7 @@ export function usePhotoHead(photo: Ref<PhotoResponse>) {
       creator: { '@type': 'Person', name: author(), url: `${origin}${localePath(`/u/${author()}`)}` },
       license: `${origin}${localePath('/terms')}`,
     }).replace(/</g, '\\u003c')
-  useHead({
-    link: [
-      { rel: 'canonical', href: url },
-      { rel: 'alternate', hreflang: 'en', href: () => path('en') },
-      { rel: 'alternate', hreflang: 'fr', href: () => path('fr') },
-      { rel: 'alternate', hreflang: 'x-default', href: () => path('en') },
-    ],
-    script: [{ type: 'application/ld+json', innerHTML: imageObject }],
-  })
+  useCanonical(() => `/p/${p().id}`)
+  useHead({ script: [{ type: 'application/ld+json', innerHTML: imageObject }] })
   return alt
 }

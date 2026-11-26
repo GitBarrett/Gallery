@@ -16,6 +16,14 @@ test('US-25.4 a preview refuses every robot and asks not to index it', async ({ 
   expect(home!.headers()['x-robots-tag']).toBe('noindex, nofollow')
 })
 
+test('US-25 a public page gives its canonical URL without filters and its French version', async ({ page }) => {
+  await page.goto('/v/wow-forever?sort=popular')
+  const origin = new URL(page.url()).origin
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${origin}/v/wow-forever`)
+  await expect(page.locator('link[hreflang="fr"]')).toHaveAttribute('href', `${origin}/fr/v/wow-forever`)
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /^Screenshots of WoW Forever/)
+})
+
 test('US-25.2 serves the sitemap index and its first batch', async ({ page }) => {
   const index = await page.goto('/sitemap.xml')
   expect(index!.status()).toBe(200)

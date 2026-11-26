@@ -73,6 +73,7 @@
     "policy": "Lire la politique de cookies"
   },
   "legal": {
+    "description": "{title} de Legendary Shots, la galerie de captures d’écran de World of Warcraft.",
     "table": "Tableau défilant"
   },
   "auth": {
@@ -262,6 +263,7 @@
     }
   },
   "profile": {
+    "description": "Captures d’écran de World of Warcraft par {username} sur Legendary Shots.",
     "memberSince": "Membre depuis {date}",
     "settings": "Réglages",
     "captures": "Captures",

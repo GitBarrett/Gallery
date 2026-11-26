@@ -433,7 +433,7 @@ T-35 est découpée le 26/11/2026 en T-35a (sitemap, robots, contenus retirés) 
   Sitemap (index par lots de 10 000, cron quotidien, R2), robots, `noindex` des previews, 404/410 des contenus retirés.
   Stories : US-25.2–4. Tests : U, I, E.
 
-- [ ] **T-35b SEO : métadonnées des pages** (dép. T-35a)
+- [x] **T-35b SEO : métadonnées des pages** (dép. T-35a)
   Titre, description, canonique et `hreflang` des pages publiques (accueil, PLP, profils, recherche, pages légales).
   Stories : US-25 (parcours). Tests : E.
 
