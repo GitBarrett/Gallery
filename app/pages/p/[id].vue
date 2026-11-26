@@ -2,8 +2,10 @@
 // Photo page /p/{id} (US-25.1, Photo mockup), rendered by the server: the image, its quality badge (US-71.2), its
 // details as an item of the game, the author and the tags, the previous / next captures of the version (buttons,
 // swipe, arrow keys: US-67.2) and the « More from » block (US-70.1, US-70.2); Open Graph, Twitter Card, canonical,
-// hreflang and ImageObject for robots. A capture that is not public is the 404 page. Likes, download, share and
-// comments come with their tasks (T-40, T-34, T-42, T-41).
+// hreflang and ImageObject for robots. A capture that is not public is the 404 page. The actions (the download,
+// US-23), sticky at the bottom below 768 px (07 § Responsive); likes, share and comments come with their tasks
+// (T-40, T-42, T-41).
+import DownloadButton from '~/features/photo/DownloadButton.vue'
 import PhotoDetails from '~/features/photo/PhotoDetails.vue'
 import PhotoNav from '~/features/photo/PhotoNav.vue'
 import QualityBadgeTip from '~/features/photo/QualityBadgeTip.vue'
@@ -52,6 +54,9 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
       </figure>
       <aside class="aside">
         <h1 id="pdp-title" class="visually-hidden">{{ photo.title }}</h1>
+        <div class="actions">
+          <DownloadButton :photo-id="photo.id" :bytes="photo.bytes" />
+        </div>
         <PhotoDetails :photo="photo" />
         <p v-if="photo.description" class="description">{{ photo.description }}</p>
         <NuxtLink :to="localePath(`/u/${photo.author.username}`)" class="author">
@@ -153,6 +158,17 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
   flex-direction: column;
   gap: var(--space-4);
   min-width: 0;
+}
+
+/* Above the tab bar on a phone, so the download stays at hand while reading the details */
+@media (width < 768px) {
+  .actions {
+    position: sticky;
+    z-index: var(--z-dropdown);
+    bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom));
+    padding: var(--space-2) 0;
+    background: var(--color-bg);
+  }
 }
 
 .description {

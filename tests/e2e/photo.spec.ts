@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures'
 import { expectImageLoaded, hydrated } from './helpers'
-import { publishCapture, testRoute, verifiedMember } from './members'
+import { post, publishCapture, testRoute, verifiedMember } from './members'
 
 // Photo page (T-31c) on the preview: a capture published through the real pipeline, reached from its grid. It uses
 // Retail: the grids of Classic Era (gallery.spec.ts) must not get a capture at dawn. Desktop Chromium only (sign-up
@@ -101,4 +101,34 @@ test('US-25.1 US-71.2 the photo page shows the capture as an item, its quality, 
 
   // A capture that is not public, or none, is the 404 page
   expect((await page.goto(`/p/${crypto.randomUUID()}`))?.status()).toBe(404)
+})
+
+test('US-23.1 US-23.2 a visitor signs in to download the original, counted once a day', async ({ page }) => {
+  const member = await verifiedMember(page)
+  const id = await publishCapture(page, { title: `Download ${crypto.randomUUID().slice(0, 8)}`, gameVersion: 'retail' })
+  expect((await post(page, '/api/auth/signout', {})).status).toBe(204)
+
+  // A visitor is asked to sign in, then the download resumes on the page
+  await page.goto(`/p/${id}`)
+  await hydrated(page)
+  await page.getByRole('button', { name: /^Download original · [\d.]+ MB$/ }).click()
+  await page.waitForURL(/\/signin\?/)
+  expect(new URL(page.url()).searchParams.get('redirect')).toBe(`/p/${id}?download=1`)
+  await hydrated(page)
+  await page.getByLabel('Email').fill(member.email)
+  await page.getByLabel('Password').fill(member.password)
+  const saved = page.waitForEvent('download')
+  await page.getByRole('main').getByRole('button', { name: 'Sign in' }).click()
+  const file = await saved
+  expect(['jpg', 'webp', 'png'].map((ext) => `legendary-shots-${id}.${ext}`)).toContain(file.suggestedFilename())
+  expect(await file.failure()).toBeNull()
+  await expect(page).toHaveURL(`/p/${id}`) // the URL forgets the download: a reload does not start it again
+  expect((await testRoute(page, `/__test/photos/${id}`, 'GET')).body.downloads).toBe(1)
+
+  // The same member the same day: saved again, not counted again
+  await hydrated(page)
+  const again = page.waitForEvent('download')
+  await page.getByRole('button', { name: /^Download original/ }).click()
+  expect(await (await again).failure()).toBeNull()
+  expect((await testRoute(page, `/__test/photos/${id}`, 'GET')).body.downloads).toBe(1)
 })

@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
       moderationScore: photos.moderationScore,
       focalX: photos.focalX,
       focalY: photos.focalY,
+      downloads: photos.downloadsCount, // US-23.1, not cached at the edge as the photo page is
     })
     .from(photos)
     .where(eq(photos.id, id))

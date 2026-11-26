@@ -423,7 +423,7 @@ T-34 est découpée le 26/11/2026 en T-34a (serveur) et T-34b (écran).
   `POST /api/photos/{id}/download` : URL présignée 5 min (`attachment`), déduplication du compteur (table `downloads`), 100/h/compte, purge des téléchargements de plus de 30 jours.
   Stories : US-23.1, US-23.3. Tests : U, I.
 
-- [ ] **T-34b Téléchargement HD : écran** (dép. T-34a)
+- [x] **T-34b Téléchargement HD : écran** (dép. T-34a)
   Bouton Télécharger de la page photo, reprise après connexion ; Q18.
   Stories : US-23 (parcours). Tests : E.
 

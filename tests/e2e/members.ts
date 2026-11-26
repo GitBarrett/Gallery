@@ -21,15 +21,16 @@ export const post = (page: Page, path: string, body: unknown) =>
     [path, JSON.stringify(body)],
   )
 
-// Signs up a member through the API, then opens the mailed link: verified and signed in
+// Signs up a member through the API, then opens the mailed link: verified and signed in; its credentials returned
 export async function verifiedMember(page: Page) {
   const run = crypto.randomUUID().slice(0, 8)
   const email = `e2e.${run}@example.com`
+  const password = `a long passphrase ${run}`
   const { body: invite } = await testRoute(page, '/__test/invite', 'POST')
   const signup = await post(page, '/api/auth/signup', {
     email,
     username: `e2e_${run}`,
-    password: `a long passphrase ${run}`,
+    password,
     termsAccepted: true,
     turnstileToken: 'XXXX.DUMMY.TOKEN.XXXX',
     inviteToken: invite.token,
@@ -47,6 +48,7 @@ export async function verifiedMember(page: Page) {
     )
     .toBeTruthy()
   expect((await post(page, '/api/auth/verify-email', { token })).status).toBe(204)
+  return { email, password }
 }
 
 /**
