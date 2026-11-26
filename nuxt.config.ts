@@ -1,5 +1,19 @@
+import { existsSync } from 'node:fs'
+
 // R2 host of direct uploads (presigned URLs), known at build time; absent locally until R2 is configured (T-21)
 const r2Host = process.env.R2_ACCOUNT_ID ? [`https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`] : []
+
+// Screenshots of the manifest (T-32c, Q35), made by scripts/pwa-screenshots.mjs on real captures: declared once
+// committed, never pointing at a missing file
+const SHOTS = [
+  { file: 'home-narrow', form_factor: 'narrow', sizes: '1080x1920', label: 'Home' },
+  { file: 'photo-narrow', form_factor: 'narrow', sizes: '1080x1920', label: 'Photo page' },
+  { file: 'home-wide', form_factor: 'wide', sizes: '1920x1080', label: 'Home' },
+  { file: 'photo-wide', form_factor: 'wide', sizes: '1920x1080', label: 'Photo page' },
+] as const
+const screenshots = SHOTS.every((s) => existsSync(`public/screenshots/${s.file}.jpg`))
+  ? SHOTS.map(({ file, ...s }) => ({ src: `/screenshots/${file}.jpg`, type: 'image/jpeg', ...s }))
+  : undefined
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-11-01',
@@ -86,7 +100,7 @@ export default defineNuxtConfig({
         { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         { src: '/icons/monochrome-512.png', sizes: '512x512', type: 'image/png', purpose: 'monochrome' },
       ],
-      // Screenshots come with the home page (T-32, Q35)
+      screenshots,
       shortcuts: [
         { name: 'Upload', url: '/upload', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
         { name: 'Search', url: '/search', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
