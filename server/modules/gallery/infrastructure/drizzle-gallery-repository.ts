@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, lt, lte, notInArray, or, sql, type SQL } from 'drizzle-orm'
+import { and, asc, count, desc, eq, gte, lt, lte, notInArray, or, sql, type SQL } from 'drizzle-orm'
 import { avatarPath } from '../../../../shared/domain/avatar-file'
 import { TIME_OF_DAY_RANGES } from '../../../../shared/domain/time-of-day'
 import type { Db, Transaction } from '../../../db/client'
@@ -7,6 +7,7 @@ import type { GalleryRepository, GridFilter } from '../application/grid'
 import type { GalleryPhotos } from '../application/photo'
 import type { GalleryHome } from '../application/home'
 import type { GalleryRelated, PhotoContext } from '../application/related'
+import type { GallerySearch } from '../application/search'
 
 // Read view of the grids (10 § Règles, "vue de lecture documentée"): the published captures with their author
 // (media → identity), version and zone (catalogue); the accounts banned or being deleted are left out (US-03.5).
@@ -83,7 +84,23 @@ async function neighbour(db: Db | Transaction, c: PhotoContext, older: boolean) 
 
 export const drizzleGalleryRepository = (
   db: Db | Transaction,
-): GalleryRepository & GalleryPhotos & GalleryRelated & GalleryHome => ({
+): GalleryRepository & GalleryPhotos & GalleryRelated & GalleryHome & GallerySearch => ({
+  async popularTags(limit) {
+    // shortcut: counts every public tagged capture on each empty search; fine for tens of thousands, cache it beyond
+    const rows = await db
+      .select({ slug: tags.slug })
+      .from(photoTags)
+      .innerJoin(tags, eq(tags.id, photoTags.tagId))
+      .innerJoin(photos, eq(photos.id, photoTags.photoId))
+      .innerJoin(users, eq(users.id, photos.userId))
+      .innerJoin(gameVersions, eq(gameVersions.id, photos.gameVersionId))
+      .where(visible())
+      .groupBy(tags.slug)
+      .orderBy(desc(count()), sql`${tags.slug} collate "C"`)
+      .limit(limit)
+    return rows.map((r) => r.slug)
+  },
+
   async context(id) {
     const [row] = await db
       .select({

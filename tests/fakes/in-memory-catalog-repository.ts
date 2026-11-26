@@ -10,6 +10,23 @@ export const LAUNCH_GAME_VERSIONS: GameVersion[] = [
   { slug: 'other', nameEn: 'Other', nameFr: 'Autre' },
 ]
 
+// pg_trgm's similarity: trigrams of each word padded with two spaces before and one after, shared / all
+const trigrams = (text: string) =>
+  new Set(
+    text
+      .split(/[^\p{L}\p{N}]+/u)
+      .filter(Boolean)
+      .flatMap((word) => {
+        const padded = `  ${word} `
+        return Array.from({ length: padded.length - 2 }, (_, i) => padded.slice(i, i + 3))
+      }),
+  )
+export function trigramSimilarity(a: string, b: string) {
+  const [x, y] = [trigrams(a), trigrams(b)]
+  const shared = [...x].filter((t) => y.has(t)).length
+  return shared / (x.size + y.size - shared || 1)
+}
+
 /** A row of the zones table. */
 export type SeedZone = Zone & { aliases: string[]; status: 'active' | 'pending' }
 
@@ -39,6 +56,21 @@ export function inMemoryCatalogRepository(seed: { tags?: string[]; zones?: SeedZ
     async zoneId(slug) {
       const zone = (seed.zones ?? []).find((z) => z.slug === slug && z.status === 'active')
       return zone ? `zone-${zone.slug}` : null
+    },
+    async closestNames(text, limit) {
+      const names = [
+        ...(seed.zones ?? []).filter((z) => z.status === 'active').flatMap((z) => [z.nameEn, z.nameFr]),
+        ...tags,
+      ]
+      return [
+        ...new Set(
+          names
+            .map((label) => ({ label, score: trigramSimilarity(normalizeTag(label), text) }))
+            .filter((n) => n.score >= 0.3)
+            .sort((a, b) => b.score - a.score || a.label.localeCompare(b.label))
+            .map((n) => n.label),
+        ),
+      ].slice(0, limit)
     },
     async zoneIdByName(text) {
       const zone = (seed.zones ?? []).find(

@@ -165,6 +165,18 @@ describe('GET /api/search', () => {
     expect(page.items.map((c) => c.id)).toEqual([ids[2], ids[1], ids[0]]) // not the one in review
   })
 
+  it('US-21.2 searches the zone name closest to a mistyped query and says so', async () => {
+    const page = SearchResponse.parse(await (await search(`q=${encodeURIComponent(`Gridzon ${run}`)}`)).json())
+    expect(page).toMatchObject({ query: `gridzon ${run}`, corrected: `Gridzone ${run}`, empty: null })
+    expect(page.items.map((c) => c.id).sort()).toEqual(ids.slice(0, 3).sort())
+  })
+
+  it('US-21.6 offers popular tags and the latest captures when nothing is found', async () => {
+    const page = SearchResponse.parse(await (await search('q=qqqqqqzzzzzzwwww')).json())
+    expect(page).toMatchObject({ items: [], corrected: null, empty: { suggestions: [] } })
+    expect(page.empty!.latest.length).toBeGreaterThan(0) // the captures of this file at least
+  })
+
   it('US-21.7 cleans and cuts a long query with control characters, without a server error', async () => {
     const response = await search(`q=${encodeURIComponent(`Grid\u0000 ${'x'.repeat(500)}`)}`)
     expect(response.status).toBe(200)

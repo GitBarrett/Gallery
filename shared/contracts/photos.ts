@@ -191,11 +191,19 @@ export const SearchQuery = z.strictObject({
   limit: z.coerce.number().int().min(1).max(60).default(30),
 })
 export type SearchQuery = z.infer<typeof SearchQuery>
-/** The query as searched (`query`, to show it), and a page of captures. */
+/**
+ * The query as searched (`query`, to show it), and a page of captures. `corrected`: the zone or tag name searched
+ * instead of a mistyped query that found nothing (US-21.2). `empty`, when nothing is found (US-21.6): close names to
+ * suggest, popular tags and the latest captures.
+ */
 export const SearchResponse = z.strictObject({
   query: z.string(),
+  corrected: z.string().nullable(),
   items: z.array(GridItem),
   nextCursor: z.string().nullable(),
+  empty: z
+    .strictObject({ suggestions: z.array(z.string()), popularTags: z.array(z.string()), latest: z.array(GridItem) })
+    .nullable(),
 })
 export type SearchResponse = z.infer<typeof SearchResponse>
 

@@ -50,6 +50,7 @@ import {
   tagSlugs,
   zoneById,
   zoneByName,
+  closestNames,
   listGameVersions,
   suggestTags,
   suggestZones,
@@ -277,6 +278,8 @@ export function createContainer({
           repo: drizzleGalleryRepository(db()),
           gameVersions: listGameVersions({ repo: drizzleCatalogRepository(db()) }),
           zoneByName: zoneByName({ repo: drizzleCatalogRepository(db()) }),
+          closestNames: closestNames({ repo: drizzleCatalogRepository(db()) }),
+          popularTags: (limit) => drizzleGalleryRepository(db()).popularTags(limit),
           thresholds: async () => (await readSettings(logger))['quality.thresholds'],
         })(cmd),
       viewPhoto: (cmd) =>
