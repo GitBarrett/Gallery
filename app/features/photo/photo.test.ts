@@ -73,4 +73,19 @@ describe('PhotoDetails', () => {
     expect(bare.text()).not.toContain('Character')
     expect(await axeViolations(details.element)).toEqual([])
   })
+
+  it('US-21.5 names the zone in the language of the visitor: Hurlevent in French, Stormwind City in English', async () => {
+    const zone = { slug: 'stormwind', nameEn: 'Stormwind City', nameFr: 'Hurlevent' }
+    const details = await mountSuspended(PhotoDetails, { props: { photo: aPhoto({ zone }) } })
+    expect(details.text()).toContain('Stormwind City')
+    const { locale } = useNuxtApp().$i18n
+    locale.value = 'fr'
+    try {
+      await nextTick()
+      expect(details.text()).toContain('Hurlevent')
+      expect(details.text()).not.toContain('Stormwind City')
+    } finally {
+      locale.value = 'en'
+    }
+  })
 })
