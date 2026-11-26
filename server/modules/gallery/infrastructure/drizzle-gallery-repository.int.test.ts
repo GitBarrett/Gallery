@@ -263,4 +263,42 @@ describe('drizzleGalleryRepository', () => {
       expect(await repo.context(await w.capture({ status: 'pending_review' }))).toBeNull()
     })
   })
+
+  it('US-70.4 filters the grid by publication date', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      await w.capture() // T0 + 1 min
+      const later = await w.capture({ publishedAt: new Date(T0 + 3_600_000) })
+      const rows = await drizzleGalleryRepository(tx).grid({
+        ...base,
+        gameVersion: w.version,
+        publishedSince: new Date(T0 + 1_800_000),
+      })
+      expect(rows.map((r) => r.id)).toEqual([later])
+    })
+  })
+
+  it('US-24.1 gives a hero only from a public capture dark enough at the bottom left, the latest without a choice', async () => {
+    await withRollback(async (tx) => {
+      const w = await world(tx)
+      const dark = await w.capture({ lumaBl: 0.4, focalX: 0.25, focalY: 0.5 })
+      const bright = await w.capture({ lumaBl: 0.7 })
+      const unmeasured = await w.capture()
+      const hidden = await w.capture({ lumaBl: 0.2, status: 'hidden' })
+      const repo = drizzleGalleryRepository(tx)
+      expect(await repo.hero(dark, 0.6)).toEqual({
+        id: dark,
+        title: 'Capture 1',
+        width: 1920,
+        height: 1080,
+        focalX: 0.25,
+        focalY: 0.5,
+        username: w.author.username,
+      })
+      for (const id of [bright, unmeasured, hidden]) expect(await repo.hero(id, 0.6), id).toBeNull()
+      // Without a choice: the latest one dark enough (far in the future, ahead of the captures of other tests)
+      const latest = await w.capture({ lumaBl: 0.5, publishedAt: new Date('2099-01-01T00:00:00Z') })
+      expect((await repo.hero(null, 0.6))?.id).toBe(latest)
+    })
+  })
 })

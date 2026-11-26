@@ -1,10 +1,11 @@
-import { and, asc, desc, eq, gte, lt, notInArray, or, sql, type SQL } from 'drizzle-orm'
+import { and, asc, desc, eq, gte, lt, lte, notInArray, or, sql, type SQL } from 'drizzle-orm'
 import { avatarPath } from '../../../../shared/domain/avatar-file'
 import { TIME_OF_DAY_RANGES } from '../../../../shared/domain/time-of-day'
 import type { Db, Transaction } from '../../../db/client'
 import { gameVersions, photoMetadata, photos, photoTags, tags, users, zones } from '../../../db/schema'
 import type { GalleryRepository, GridFilter } from '../application/grid'
 import type { GalleryPhotos } from '../application/photo'
+import type { GalleryHome } from '../application/home'
 import type { GalleryRelated, PhotoContext } from '../application/related'
 
 // Read view of the grids (10 § Règles, "vue de lecture documentée"): the published captures with their author
@@ -52,7 +53,9 @@ async function neighbour(db: Db | Transaction, c: PhotoContext, older: boolean) 
   return row?.id ?? null
 }
 
-export const drizzleGalleryRepository = (db: Db | Transaction): GalleryRepository & GalleryPhotos & GalleryRelated => ({
+export const drizzleGalleryRepository = (
+  db: Db | Transaction,
+): GalleryRepository & GalleryPhotos & GalleryRelated & GalleryHome => ({
   async context(id) {
     const [row] = await db
       .select({
@@ -72,6 +75,32 @@ export const drizzleGalleryRepository = (db: Db | Transaction): GalleryRepositor
 
   async neighbours(c) {
     return { prev: await neighbour(db, c, false), next: await neighbour(db, c, true) }
+  },
+
+  async hero(photoId, maxLuminance) {
+    const [row] = await db
+      .select({
+        id: photos.id,
+        title: photos.title,
+        width: photos.width,
+        height: photos.height,
+        focalX: photos.focalX,
+        focalY: photos.focalY,
+        username: users.username,
+      })
+      .from(photos)
+      .innerJoin(users, eq(users.id, photos.userId))
+      .innerJoin(gameVersions, eq(gameVersions.id, photos.gameVersionId))
+      .where(
+        and(
+          visible(),
+          lte(photos.lumaBl, maxLuminance), // a capture not measured (null) is never a hero
+          photoId ? eq(photos.id, photoId) : undefined,
+        ),
+      )
+      .orderBy(desc(photos.publishedAt), desc(photos.id))
+      .limit(1)
+    return row ? { ...row, title: row.title ?? '' } : null
   },
 
   async grid(filter) {
@@ -108,6 +137,7 @@ export const drizzleGalleryRepository = (db: Db | Transaction): GalleryRepositor
           filter.zoneId ? eq(photoMetadata.zoneId, filter.zoneId) : undefined,
           filter.authorId ? eq(photos.userId, filter.authorId) : undefined,
           filter.exclude?.length ? notInArray(photos.id, filter.exclude) : undefined,
+          filter.publishedSince ? gte(photos.publishedAt, filter.publishedSince) : undefined,
           timeOfDay(filter.timeOfDay),
           filter.minLikes > 0 ? gte(photos.likesCount, filter.minLikes) : undefined,
           position,
