@@ -17,3 +17,17 @@ export function qualityFromLikes(likes: number, thresholds: QualityThresholds): 
 /** Fewest likes of a tier (the « Minimum quality » filter, US-20.3): 0 for Poor. */
 export const minLikes = (quality: Quality, thresholds: QualityThresholds) =>
   quality === 'poor' ? 0 : thresholds[quality]
+
+/**
+ * Where a capture stands (US-71.2, « Rare · 15+ likes · 35 likes to Epic »): its tier, the likes of that tier, and the
+ * likes it misses for the next one; no next tier for a Legendary capture.
+ */
+export function qualityProgress(likes: number, thresholds: QualityThresholds) {
+  const quality = qualityFromLikes(likes, thresholds)
+  const above = QUALITIES[QUALITIES.indexOf(quality) + 1]
+  return {
+    quality,
+    from: minLikes(quality, thresholds),
+    next: above ? { quality: above, missing: minLikes(above, thresholds) - likes } : null,
+  }
+}

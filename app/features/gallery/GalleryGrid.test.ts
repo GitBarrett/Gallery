@@ -22,6 +22,7 @@ describe('GalleryTile', () => {
     expect(tile.get('.title').classes()).toContain('rare')
     expect(tile.get('.meta').text()).toBe('Nagrand · Kaelys')
     expect(tile.get('.likes').text()).toBe('42 likes')
+    expect(tile.get('a').attributes('href')).toBe('/p/0193a000-0000-7000-8000-0000000000c1') // US-25.1: the PDP
   })
 
   it('shows « New » instead of a counter under 10 likes (07 § Aucun bloc vide)', async () => {

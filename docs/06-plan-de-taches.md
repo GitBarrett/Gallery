@@ -375,9 +375,9 @@ T-31a (page photo) est découpée le 26/11/2026 en T-31a (serveur) et T-31c (éc
   `GET /api/photos/{id}` : capture publiée seulement (404 sinon), détails, version, zone, tags, auteur et son avatar, likes et qualité, mis en cache en bordure.
   Stories : US-25.1. Tests : U, I.
 
-- [ ] **T-31c Page photo : écran** (dép. T-31a)
+- [x] **T-31c Page photo : écran** (dép. T-31a)
   PDP `/p/{id}`, infobulle façon objet, badge de qualité avec son seuil et les likes manquants, Open Graph, Twitter Card, `ImageObject` ; les tuiles de la grille mènent à la PDP.
-  Stories : US-25.1, US-71.2. Tests : U, I, E.
+  Stories : US-25.1, US-71.2. Tests : U, composants, E.
 
 - [ ] **T-31b Navigation entre captures** (dép. T-31c)
   Précédent/suivant, swipe, « More from » avec replis.
