@@ -168,13 +168,25 @@ describe('automatic moderation of a processed capture', () => {
     })
   })
 
-  it('US-50.3 US-14.3 publishes under the low threshold and notifies the author', async () => {
+  it('US-50.3 US-14.3 US-71.3 publishes under the low threshold, notifies the author and explains the quality once', async () => {
     const s = await setup(baseJpeg(), { decision: { outcome: 'published', score: 0.02 } })
     expect(await s.process()).toBe('processed')
     expect(s.rows.get(ID)).toMatchObject({
       status: 'published',
       processed: { moderationScore: 0.02, publishedAt: new Date('2026-11-24T10:00:00Z') },
     })
+    expect(s.sent()).toEqual([
+      ...notified('published'),
+      { topic: 'notifications', payload: { type: 'quality', userId: 'u-ash', photoId: ID, quality: 'poor' } },
+    ])
+  })
+
+  it('US-71.3 explains the quality on the first public capture only', async () => {
+    const s = await setup(baseJpeg(), { decision: { outcome: 'published', score: 0.02 } })
+    const earlier = '0193a000-0000-7000-8000-0000000000ab'
+    await s.deps.repo.createUpload({ id: earlier, userId: 'u-ash', mime: 'image/jpeg', bytes: 1, width: 1, height: 1 })
+    s.rows.get(earlier)!.status = 'published'
+    await s.process()
     expect(s.sent()).toEqual(notified('published'))
   })
 
@@ -203,7 +215,7 @@ describe('automatic moderation of a processed capture', () => {
     await s.process()
     await s.process()
     expect(s.moderate).toHaveBeenCalledTimes(1)
-    expect(s.sent()).toHaveLength(1)
+    expect(s.sent().map((m) => m.payload.type)).toEqual(['moderation', 'quality']) // the first run only
   })
 
   it('US-10.3 US-10.8 tells the author when the capture ends failed, once', async () => {

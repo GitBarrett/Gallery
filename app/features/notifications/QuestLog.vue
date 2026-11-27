@@ -9,6 +9,7 @@ import { useUnread } from './useUnread'
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const unread = useUnread()
+const settings = usePublicSettings()
 const items = ref<NotificationItem[]>()
 const unreadOnly = ref(false)
 const error = ref<string>()
@@ -36,6 +37,9 @@ function text(n: NotificationItem) {
   const title = n.photoTitle ? t('notifications.quoted', { title: n.photoTitle }) : t('notifications.untitled')
   const values = { actor: n.actor, others: n.others, title }
   if (n.type === 'like') return t('notifications.text.like', values, n.others)
+  // US-71.3: Poor is no tier reached, it is the first public capture: the quality explained, with the current threshold
+  if (n.type === 'quality' && n.detail === 'poor')
+    return t('notifications.text.qualityIntro', { title, likes: settings.value?.qualityThresholds.uncommon ?? 3 })
   if (n.type === 'quality') return t('notifications.text.quality', { title, quality: t(`quality.${n.detail}`) })
   if (n.type === 'moderation')
     return n.photoId
@@ -48,6 +52,7 @@ function text(n: NotificationItem) {
 function link(n: NotificationItem): { to: string; label: string } {
   if (n.type === 'follow') return { to: `/u/${n.actor}`, label: t('notifications.cta.profile') }
   if (n.type === 'contest') return { to: '/contests', label: t('notifications.cta.contests') }
+  if (n.type === 'quality' && n.detail === 'poor') return { to: '/help/quality', label: t('gallery.qualityHelp.link') }
   if (n.type === 'moderation' && !n.photoId) return { to: '/settings', label: t('notifications.cta.settings') }
   // A failed capture is uploaded again (Q68); a rejected one can be appealed by email (US-50.1, Terms)
   if (n.type === 'moderation' && n.detail === 'failed') return { to: '/upload', label: t('notifications.cta.upload') }

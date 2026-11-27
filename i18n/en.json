@@ -293,6 +293,7 @@
       "comment": "{actor} commented on {title}.",
       "follow": "{actor} started following you.",
       "quality": "Your capture {title} reached {quality} quality.",
+      "qualityIntro": "Your first capture {title} is online! Like items in the game, it earns a quality from likes: Poor for now, {likes} likes to Uncommon.",
       "moderation": {
         "published": "Your capture {title} was published.",
         "pending_review": "Your capture {title} is being reviewed by a moderator.",
@@ -461,6 +462,21 @@
       "empty": "Write something first.",
       "too_long": "A comment is 1,000 characters at most.",
       "turnstile": "New accounts pass a quick check: your comment is sent once it is done."
+    }
+  },
+  "help": {
+    "quality": {
+      "title": "How capture quality works",
+      "lead": "Like items in the game, every capture earns a quality from the community's likes: from Poor to Legendary, its frame and badge take the colour of its tier.",
+      "tiers": "The five tiers",
+      "tier": "Quality",
+      "likes": "Likes needed",
+      "start": "Every new capture",
+      "from": "{count} likes",
+      "changeTitle": "Why the thresholds change",
+      "change": "The thresholds follow the size of the community: as more members join and like, they rise so that Epic and Legendary stay rare. Each author is told once of each tier their capture reaches.",
+      "countTitle": "How likes are counted",
+      "count": "Each member likes a capture once, and nobody can like their own. A like can be taken back; the quality follows the likes it has now."
     }
   },
   "photo": {

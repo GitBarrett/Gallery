@@ -89,6 +89,13 @@ export const processCapture =
     const finished = await deps.uow.run(async (repo, publish) => {
       const done = await repo.finishProcessing(photoId, outcome, processed)
       if (done) publish(notifyAuthor(photo, outcome))
+      // US-71.3: their first public capture, the quality explained once (a `quality` notification at Poor)
+      // shortcut: two first captures published at the same instant both count 2 and none explains; rare at launch
+      if (done && outcome === 'published' && (await repo.publishedCount(photo.userId)) === 1)
+        publish({
+          topic: 'notifications',
+          payload: { type: 'quality', userId: photo.userId, photoId, quality: 'poor' },
+        })
       return done
     })
     // shortcut: a failure here leaves the rejected original in originals/ (private, never served); a sweep of the

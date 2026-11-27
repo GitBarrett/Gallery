@@ -72,6 +72,13 @@ export const drizzleMediaRepository = (db: Db | Transaction): MediaRepository =>
       .returning({ id: photos.id })
     return rows.length > 0
   },
+  async publishedCount(userId) {
+    const [row] = await db
+      .select({ n: count() })
+      .from(photos)
+      .where(and(eq(photos.userId, userId), eq(photos.status, 'published')))
+    return row?.n ?? 0
+  },
   async failProcessing(id) {
     const rows = await db
       .update(photos)

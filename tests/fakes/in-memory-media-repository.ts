@@ -74,6 +74,9 @@ export function inMemoryMediaRepository(clock: Clock) {
       Object.assign(row, { status, processed, bytes: processed.bytes })
       return true
     },
+    async publishedCount(userId) {
+      return [...rows.values()].filter((r) => r.userId === userId && r.status === 'published').length
+    },
     async listOwn(userId, { before, limit }) {
       return [...rows.values()]
         .filter((r) => r.userId === userId && r.uploadedAt && (!before || r.id < before))
