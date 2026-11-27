@@ -25,11 +25,16 @@ describe('GalleryTile', () => {
     expect(tile.get('a').attributes('href')).toBe('/p/0193a000-0000-7000-8000-0000000000c1') // US-25.1: the PDP
   })
 
-  it('shows « New » instead of a counter under 10 likes (07 § Aucun bloc vide)', async () => {
-    const tile = await mountSuspended(GalleryTile, { props: { capture: aCapture({ likes: 9 }) } })
+  it('US-70.6 shows « New » instead of a counter under 10 likes for 7 days, then nothing', async () => {
+    const recent = new Date(Date.now() - 86_400_000).toISOString() // relative: the test never ages
+    const tile = await mountSuspended(GalleryTile, { props: { capture: aCapture({ likes: 9, publishedAt: recent }) } })
     expect(tile.find('.likes').exists()).toBe(false)
     expect(tile.get('.new').text()).toBe('New')
     expect(tile.get('.meta').text()).toBe('Kaelys')
+    const old = new Date(Date.now() - 8 * 86_400_000).toISOString()
+    const older = await mountSuspended(GalleryTile, { props: { capture: aCapture({ likes: 4, publishedAt: old }) } })
+    expect(older.find('.new').exists()).toBe(false)
+    expect(older.find('.likes').exists()).toBe(false)
   })
 })
 

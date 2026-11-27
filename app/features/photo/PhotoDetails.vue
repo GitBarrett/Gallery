@@ -3,6 +3,7 @@
 // version, zone and in-game time, settings, character, size and format, the author's caption, then the publication
 // date and the downloads from 10 (US-70.6). Only what the capture has: no empty line. All author text as text.
 import type { PhotoResponse } from '~~/shared/contracts/photos'
+import { shownCount } from '~~/shared/domain/counters'
 
 const props = defineProps<{ photo: PhotoResponse }>()
 const { t, locale, n } = useI18n()
@@ -16,7 +17,8 @@ const place = computed(() => {
 const credit = computed(() => {
   const date = new Intl.DateTimeFormat(locale.value, { dateStyle: 'long', timeZone: 'UTC' })
   const published = t('photo.details.published', { date: date.format(new Date(props.photo.publishedAt)) })
-  const downloads = props.photo.downloads >= 10 && t('photo.details.downloads', { count: n(props.photo.downloads) })
+  const downloads =
+    shownCount(props.photo.downloads) && t('photo.details.downloads', { count: n(props.photo.downloads) })
   return [published, downloads].filter(Boolean).join(' · ')
 })
 </script>

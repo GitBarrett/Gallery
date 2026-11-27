@@ -16,7 +16,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 // A sign-up, its email, then the processing through the queue
 test.describe.configure({ timeout: 180_000 })
 
-test('US-05.3 US-20.1 US-20.2 a published capture shows on its profile and in the grid of its version, then the end', async ({
+test('US-05.3 US-20.1 US-20.2 US-70.6 a published capture shows on its profile and in the grid of its version, then the end', async ({
   page,
 }) => {
   const member = await verifiedMember(page)
@@ -34,7 +34,8 @@ test('US-05.3 US-20.1 US-20.2 a published capture shows on its profile and in th
   const tile = page.getByRole('article').filter({ hasText: title })
   await expect(tile).toBeVisible()
   await expect(tile).toContainText('Poor')
-  await expect(tile).toContainText('New') // under 10 likes, no counter
+  await expect(tile).toContainText('New') // US-70.6: under 10 likes, no counter, published less than 7 days ago
+  await expect(tile).not.toContainText('likes')
   await expectImageLoaded(tile.getByRole('img'))
   // Fewer than 30 captures in this version: a single page, then the end of the grid
   await expect(page.getByText("You've seen everything")).toBeVisible()

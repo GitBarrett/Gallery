@@ -52,7 +52,12 @@ const since = computed(() =>
         :title="own ? t('profile.emptyOwn') : t('profile.empty')"
         :description="own ? t('profile.emptyOwnText') : undefined"
         :heading-level="3"
-      />
+      >
+        <!-- 07 § États vides: the CTA Upload on one's own profile -->
+        <template v-if="own" #action>
+          <UiButton :to="localePath('/upload')">{{ t('gallery.upload') }}</UiButton>
+        </template>
+      </UiEmptyState>
     </section>
   </div>
 </template>

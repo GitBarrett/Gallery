@@ -36,5 +36,6 @@ describe('PublicProfile', () => {
     const wrapper = await mountSuspended(PublicProfile, { props: { profile: { ...profile, bio: null }, own: true } })
     expect(wrapper.get('a[href="/settings"]').text()).toBe('Settings')
     expect(wrapper.text()).toContain("You haven't published any capture yet")
+    expect(wrapper.get('.empty a[href="/upload"]').text()).toBe('Upload a capture') // 07 § États vides
   })
 })

@@ -473,7 +473,7 @@ T-43 est découpée le 27/11/2026 en T-43a et T-43b : le profil n'affiche pas en
   `GET /api/users/{username}/photos` et grille du profil (US-05.3), barre de progression vers le palier suivant sur ses propres captures (07 § Qualité, point 6).
   Stories : US-05.3. Tests : U, I, E.
 
-- [ ] **T-44 États vides complets** (dép. T-40, T-32)
+- [x] **T-44 États vides complets** (dép. T-40, T-32)
   Compteurs masqués sous 10, badge « New », tous les replis restants ; test E2E sur base vierge.
   Stories : US-70. Tests : U, E.
 
