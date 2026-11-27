@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // A capture of the grid (Category mockup): the image at its own ratio, the quality badge in a corner, then under the
 // image (never on it, 07-design.md § Texte sur image) its title in the colour of its quality, zone and author, and
-// its likes from 10 on (« New » below, 07 § Aucun bloc vide). The whole tile leads to the photo page (a touch target
-// as large as the capture).
+// its likes from 10 on, below « New » for 7 days after its publication, then nothing (US-70.6). The whole tile leads
+// to the photo page (a touch target as large as the capture).
+import { COUNTER_MIN, isNew } from '~~/shared/domain/counters'
 import { qualityProgress } from '~~/shared/domain/quality'
 import type { GridCapture } from './useGalleryFeed'
 
@@ -46,8 +47,10 @@ const alt = computed(() => t('captures.alt', { title: props.capture.title, autho
           <p class="title" :class="capture.quality">{{ capture.title }}</p>
           <p class="meta">{{ zone ? `${zone} · ${capture.author.username}` : capture.author.username }}</p>
         </div>
-        <span v-if="capture.likes >= 10" class="likes">{{ t('gallery.likes', { count: capture.likes }) }}</span>
-        <span v-else class="new">{{ t('gallery.new') }}</span>
+        <span v-if="capture.likes >= COUNTER_MIN" class="likes">{{
+          t('gallery.likes', { count: capture.likes })
+        }}</span>
+        <span v-else-if="isNew(capture.publishedAt)" class="new">{{ t('gallery.new') }}</span>
       </div>
       <div v-if="step" class="progress">
         <progress :value="step.value" :max="step.max" :aria-label="step.label"></progress>

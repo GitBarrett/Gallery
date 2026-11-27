@@ -2,6 +2,7 @@
 // Like of the photo page (US-30, Photo mockup): pressed when the member likes the capture, its counter beside. The
 // page is cached for everyone: the member's state is read once in the browser. Their own capture: disabled
 // (US-30.2); a visitor is sent to sign in, back to the page (US-30.4).
+import { shownCount } from '~~/shared/domain/counters'
 import { api, errorMessageKey } from '~/services/api'
 
 const props = defineProps<{ photoId: string; likes: number; author: string }>()
@@ -52,7 +53,7 @@ async function toggle() {
         <path d="M16 27s-10-6-12.5-12A6.5 6.5 0 0 1 16 9a6.5 6.5 0 0 1 12.5 6C26 21 16 27 16 27Z" />
       </svg>
       {{ t('photo.like.label') }}
-      <span class="count">{{ n(count) }}</span>
+      <span v-if="shownCount(count)" class="count">{{ n(count) }}</span>
     </UiButton>
     <p v-if="own" class="hint">{{ t('photo.like.own') }}</p>
     <p v-if="error" class="error" role="alert">{{ t(error) }}</p>

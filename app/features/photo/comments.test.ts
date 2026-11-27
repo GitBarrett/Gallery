@@ -51,7 +51,7 @@ const mount = (author = 'Kaelys') =>
 describe('PhotoComments', () => {
   it('US-31.1 shows the comments as plain text: no HTML, no Markdown, no link', async () => {
     const section = await mount()
-    expect(section.get('h2').text()).toBe('Comments · 2')
+    expect(section.get('h2').text()).toBe('Comments') // US-70.6: no counter under 10
     const bodies = section.findAll('.body')
     expect(bodies[1]!.text()).toBe(XSS)
     expect(section.find('.body img').exists()).toBe(false)
@@ -65,7 +65,7 @@ describe('PhotoComments', () => {
     await section.get('textarea').setValue('Lovely light')
     await section.get('form').trigger('submit')
     await vi.waitFor(() => expect(section.findAll('.body')[0]!.text()).toBe('Lovely light'))
-    expect(section.get('h2').text()).toBe('Comments · 3')
+    expect(section.findAll('article')).toHaveLength(3)
     expect((section.get('textarea').element as HTMLTextAreaElement).value).toBe('')
     await section.get('textarea').setValue('What a connard')
     await section.get('form').trigger('submit')
@@ -94,7 +94,7 @@ describe('PhotoComments', () => {
       .find((b) => b.text() === 'Delete')!
       .trigger('click')
     await vi.waitFor(() => expect(section.findAll('article')).toHaveLength(1))
-    expect(section.get('h2').text()).toBe('Comments · 1')
+    expect(section.findAll('article')).toHaveLength(1)
   })
 
   it('US-31.4 lets the author of the capture delete any comment under it', async () => {
@@ -105,6 +105,15 @@ describe('PhotoComments', () => {
       .findAll('button')
       .map((b) => b.text())
     expect(buttons).toEqual(['Delete'])
+  })
+
+  it('US-70.6 counts the comments from 10 on', async () => {
+    items = Array.from({ length: 12 }, (_, n) => comment(String(n + 10), 'Brook', `Comment ${n}`))
+    const section = await mountSuspended(PhotoComments, {
+      props: { photoId: ID, total: 12, author: 'Kaelys' },
+      route: `/p/${ID}`,
+    })
+    expect(section.get('h2').text()).toBe('Comments · 12')
   })
 
   it('US-31.6 US-08.1 invites to be the first; a visitor to sign in, an unverified member to verify', async () => {

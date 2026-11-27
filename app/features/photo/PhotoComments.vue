@@ -4,6 +4,7 @@
 // (US-31.1: no HTML nor Markdown, links not clickable). Its author edits a comment for 15 minutes (« edited »,
 // US-31.3); its author or the capture's deletes it (US-31.4). A Turnstile check when the server asks (US-31.5).
 import { canEditComment } from '~~/shared/domain/comments'
+import { shownCount } from '~~/shared/domain/counters'
 import TurnstileCheck from '~/features/auth/TurnstileCheck.vue'
 import { useComments } from './useComments'
 
@@ -50,7 +51,9 @@ function startEdit(commentId: string, body: string) {
 
 <template>
   <section class="comments" :aria-labelledby="`${id}-title`">
-    <h2 :id="`${id}-title`" class="title">{{ t('comments.title', { count }) }}</h2>
+    <h2 :id="`${id}-title`" class="title">
+      {{ shownCount(count) ? t('comments.title', { count }) : t('comments.heading') }}
+    </h2>
 
     <form v-if="me?.emailVerified" class="form" @submit.prevent="submit">
       <label :for="`${id}-new`" class="visually-hidden">{{ t('comments.add') }}</label>

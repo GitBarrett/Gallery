@@ -130,13 +130,12 @@ test('US-30.1 US-30.2 US-30.4 a member likes and unlikes a capture, its author c
   const like = page.getByRole('button', { name: /^Like/ })
   await like.click()
   await expect(like).toHaveAttribute('aria-pressed', 'true')
-  await expect(like).toContainText('1')
+  await expect(like).toHaveText('Like') // US-70.6: no counter under 10
   await page.reload()
   await hydrated(page)
   await expect(like).toHaveAttribute('aria-pressed', 'true')
   await like.click()
   await expect(like).toHaveAttribute('aria-pressed', 'false')
-  await expect(like).toContainText('0')
   expect(author.email).toBeTruthy()
 })
 
@@ -152,7 +151,7 @@ test('US-31.1 US-31.3 US-31.4 US-31.6 a comment with an XSS payload shows as tex
   })
   await page.goto(`/p/${id}`)
   await hydrated(page)
-  const section = page.getByRole('region', { name: /^Comments · / })
+  const section = page.getByRole('region', { name: 'Comments' }) // US-70.6: no counter under 10
   await expect(section.getByText('Be the first to comment')).toBeVisible()
 
   // Stored XSS (08 § 10): the payload is shown as text, never run, even after a reload rendered by the server
@@ -161,7 +160,6 @@ test('US-31.1 US-31.3 US-31.4 US-31.6 a comment with an XSS payload shows as tex
   await section.getByRole('button', { name: 'Post' }).click()
   // A new account: the server asks the Turnstile check (US-31.5, test key on previews), then the comment leaves
   await expect(section.getByText(xss)).toBeVisible({ timeout: 30_000 })
-  await expect(section.getByRole('heading', { name: 'Comments · 1' })).toBeVisible()
   await page.reload()
   await hydrated(page)
   await expect(section.getByText(xss)).toBeVisible()
@@ -177,7 +175,6 @@ test('US-31.1 US-31.3 US-31.4 US-31.6 a comment with an XSS payload shows as tex
   await expect(section.getByText('edited')).toBeVisible()
   await section.getByRole('button', { name: 'Delete' }).click()
   await expect(section.getByText('Be the first to comment')).toBeVisible()
-  await expect(section.getByRole('heading', { name: 'Comments · 0' })).toBeVisible()
 })
 
 test('US-32.1 US-32.3 US-72.1 without a native sheet, Share offers the link and the networks, tracked with consent', async ({

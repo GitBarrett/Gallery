@@ -447,6 +447,7 @@
   },
   "comments": {
     "title": "Commentaires · {count}",
+    "heading": "Commentaires",
     "add": "Ajouter un commentaire",
     "placeholder": "Dites ce que vous aimez dans cette capture…",
     "hint": "Restez bienveillant. Les insultes sont filtrées automatiquement.",

@@ -447,6 +447,7 @@
   },
   "comments": {
     "title": "Comments · {count}",
+    "heading": "Comments",
     "add": "Add a comment",
     "placeholder": "Share what you love about this shot…",
     "hint": "Be kind. Insults are filtered automatically.",
