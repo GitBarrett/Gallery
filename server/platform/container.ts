@@ -92,7 +92,17 @@ import {
   unreadCount,
 } from '../modules/notifications'
 import { MAX_HERO_LUMINANCE, type SiteSettings } from '../modules/settings'
-import { drizzleLikesRepository, likePhoto, unlikePhoto, viewLike } from '../modules/social'
+import {
+  deleteComment,
+  drizzleCommentsRepository,
+  drizzleLikesRepository,
+  editComment,
+  likePhoto,
+  listComments,
+  postComment,
+  unlikePhoto,
+  viewLike,
+} from '../modules/social'
 import { systemClock, type Clock } from './clock'
 import type { Config } from './config'
 import { uuidV7Generator, type IdGenerator } from './ids'
@@ -136,6 +146,10 @@ export interface Container {
     likePhoto: UseCase<typeof likePhoto>
     unlikePhoto: UseCase<typeof unlikePhoto>
     viewLike: UseCase<typeof viewLike>
+    listComments: UseCase<typeof listComments>
+    postComment: UseCase<typeof postComment>
+    editComment: UseCase<typeof editComment>
+    deleteComment: UseCase<typeof deleteComment>
   }
   notifications: {
     list: UseCase<typeof listNotifications>
@@ -408,6 +422,17 @@ export function createContainer({
         unlikePhoto({
           uow: drizzleUnitOfWork(db(), drizzleLikesRepository, outboxRelay(db(), queues, clock), logger),
         })(cmd),
+      listComments: (cmd) => listComments({ repo: drizzleCommentsRepository(db()) })(cmd),
+      postComment: (cmd) =>
+        postComment({
+          repo: drizzleCommentsRepository(db()),
+          uow: drizzleUnitOfWork(db(), drizzleCommentsRepository, outboxRelay(db(), queues, clock), logger),
+          limiter: dbRateLimiter(db(), ipHashKey(), clock),
+          human: (token, ip) => human().verify(token, ip, 'comment'),
+          clock,
+        })(cmd),
+      editComment: (cmd) => editComment({ repo: drizzleCommentsRepository(db()), clock })(cmd),
+      deleteComment: (cmd) => deleteComment({ repo: drizzleCommentsRepository(db()) })(cmd),
     },
     notifications: {
       list: (cmd) =>

@@ -1,7 +1,8 @@
 import { and, eq, sql } from 'drizzle-orm'
 import type { Db, Transaction } from '../../../db/client'
-import { gameVersions, likes, photos, users } from '../../../db/schema'
+import { likes, photos } from '../../../db/schema'
 import type { LikesRepository } from '../application/ports'
+import { photoTarget } from './photo-target'
 
 // The like and the counter change in one statement: of two concurrent likes, one inserts, one finds the row
 const counter = async (db: Db | Transaction, photoId: string) =>
@@ -9,24 +10,7 @@ const counter = async (db: Db | Transaction, photoId: string) =>
 
 /** likes table and the counter and notified tier of photos. */
 export const drizzleLikesRepository = (db: Db | Transaction): LikesRepository => ({
-  async target(photoId) {
-    const [row] = await db
-      .select({
-        authorId: photos.userId,
-        status: photos.status,
-        archived: gameVersions.archived,
-        authorStatus: users.status,
-      })
-      .from(photos)
-      .innerJoin(users, eq(users.id, photos.userId))
-      .leftJoin(gameVersions, eq(gameVersions.id, photos.gameVersionId))
-      .where(eq(photos.id, photoId))
-    if (!row) return null
-    // The rule of the grids (gallery visible()): published, version not archived, author neither banned nor leaving
-    const shown =
-      row.status === 'published' && row.archived === false && !['banned', 'pending_deletion'].includes(row.authorStatus)
-    return { authorId: row.authorId, public: shown }
-  },
+  target: (photoId) => photoTarget(db, photoId),
   async add(userId, photoId) {
     const rows = await db.execute<{ likes: number }>(sql`
       with added as (

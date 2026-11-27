@@ -9,5 +9,7 @@ export function orThrow<R extends Result<unknown, SocialError>>(result: R): Extr
   if (error.kind === 'rate_limited')
     throw new AppError('RATE_LIMITED', 'Too many requests', { retryAfterSeconds: error.retryAfterSeconds })
   if (error.kind === 'forbidden') throw new AppError('FORBIDDEN', 'Forbidden', { reason: error.reason })
+  if (error.kind === 'invalid')
+    throw new AppError('VALIDATION_FAILED', `Invalid ${error.field}`, { field: error.field, reason: error.reason })
   throw new AppError('NOT_FOUND', 'Not found')
 }
