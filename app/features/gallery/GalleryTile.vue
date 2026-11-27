@@ -3,10 +3,22 @@
 // image (never on it, 07-design.md § Texte sur image) its title in the colour of its quality, zone and author, and
 // its likes from 10 on (« New » below, 07 § Aucun bloc vide). The whole tile leads to the photo page (a touch target
 // as large as the capture).
+import { qualityProgress } from '~~/shared/domain/quality'
 import type { GridCapture } from './useGalleryFeed'
 
-const props = defineProps<{ capture: GridCapture }>()
+const props = defineProps<{ capture: GridCapture; progress?: boolean }>()
 const { t, locale } = useI18n()
+const settings = usePublicSettings()
+// One's own profile (07 § Qualité, point 6): the likes towards the next tier, with the current thresholds
+const step = computed(() => {
+  const thresholds = settings.value?.qualityThresholds
+  if (!props.progress || !thresholds) return null
+  const { from, next } = qualityProgress(props.capture.likes, thresholds)
+  if (!next) return { value: 1, max: 1, label: t('profile.progress.top') }
+  const done = props.capture.likes - from
+  const label = t('profile.progress.next', { count: next.missing, quality: t(`quality.${next.quality}`) }, next.missing)
+  return { value: done, max: done + next.missing, label }
+})
 const localePath = useLocalePath()
 const zone = computed(() => {
   const z = props.capture.zone
@@ -37,6 +49,10 @@ const alt = computed(() => t('captures.alt', { title: props.capture.title, autho
         <span v-if="capture.likes >= 10" class="likes">{{ t('gallery.likes', { count: capture.likes }) }}</span>
         <span v-else class="new">{{ t('gallery.new') }}</span>
       </div>
+      <div v-if="step" class="progress">
+        <progress :value="step.value" :max="step.max" :aria-label="step.label"></progress>
+        <span class="step">{{ step.label }}</span>
+      </div>
     </NuxtLink>
   </article>
 </template>
@@ -60,6 +76,23 @@ const alt = computed(() => t('captures.alt', { title: props.capture.title, autho
 
 .frame {
   position: relative;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: 0 var(--space-3) var(--space-2);
+}
+
+.progress progress {
+  width: 100%;
+  accent-color: var(--color-accent);
+}
+
+.step {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
 }
 
 .badge {

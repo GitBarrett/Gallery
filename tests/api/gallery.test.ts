@@ -153,6 +153,21 @@ describe('GET /api/home', () => {
   })
 })
 
+describe('GET /api/users/{username}/photos', () => {
+  it('US-05.3 lists the public captures of a profile, any case of its username, newest first, cached at the edge', async () => {
+    const response = await fetch(`/api/users/grid_${run.toUpperCase()}/photos?limit=2`)
+    expect(response.status).toBe(200)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=60, stale-while-revalidate=300')
+    const first = PhotosResponse.parse(await response.json())
+    expect(first.items.map((c) => c.id)).toEqual([ids[2], ids[1]]) // never the one in review
+    const next = PhotosResponse.parse(
+      await (await fetch(`/api/users/Grid_${run}/photos?limit=2&cursor=${first.nextCursor}`)).json(),
+    )
+    expect(next).toEqual({ items: [expect.objectContaining({ id: ids[0] })], nextCursor: null })
+    expect(PhotosResponse.parse(await (await fetch('/api/users/nobody_here/photos')).json()).items).toEqual([])
+  })
+})
+
 describe('GET /api/search', () => {
   const search = (query: string) => fetch(`/api/search?${query}`)
 

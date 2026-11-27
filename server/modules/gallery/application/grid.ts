@@ -15,6 +15,8 @@ export interface GridFilter {
   gameVersion?: string // slug, not archived
   zoneId?: string
   authorId?: string
+  /** The author by their username, any case (the profile, US-05.3). */
+  authorUsername?: string
   exclude?: string[] // capture ids left out (the page shown, those already picked)
   publishedSince?: Date
   /** A search (US-21, ADR-007): the text, the zone it names, the tags it may name. */
@@ -111,5 +113,5 @@ export const browseGrid =
     })
   }
 
-const cursorAfter = (sort: GridSort, last: GridRow) =>
+export const cursorAfter = (sort: GridSort, last: GridRow) =>
   encodeCursor(sort, { key: keyOf(sort, last), publishedAt: last.publishedAt, id: last.id })

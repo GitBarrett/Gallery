@@ -11,6 +11,8 @@ const props = defineProps<{
   done: boolean
   loading: boolean
   error?: string
+  /** One's own captures: the progress towards the next tier (07 § Qualité, point 6). */
+  progress?: boolean
 }>()
 const emit = defineEmits<{ more: [] }>()
 const { t } = useI18n()
@@ -41,7 +43,7 @@ onBeforeUnmount(() => observer?.disconnect())
 
 <template>
   <div class="gallery">
-    <GalleryMasonry :captures="captures" :label="label" />
+    <GalleryMasonry :captures="captures" :label="label" :progress="progress" />
     <div ref="end" class="end">
       <p v-if="error" class="error" role="alert">{{ error }}</p>
       <p v-if="done" class="done">{{ t('gallery.end') }}</p>

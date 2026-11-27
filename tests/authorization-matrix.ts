@@ -63,6 +63,7 @@ export const ROUTES: Record<string, { access: Access; row: string }> = {
   'PATCH /api/photos/[id]': { access: 'member', row: '`PATCH /api/photos/{id}`' },
   'POST /api/photos/[id]/download': { access: 'member', row: '`POST /api/photos/{id}/download`' },
   'GET /api/photos/[id]/comments': { access: 'public', row: 'Lectures publiques' },
+  'GET /api/users/[username]/photos': { access: 'public', row: 'Lectures publiques' },
   'POST /api/photos/[id]/comments': { access: 'member', row: '`POST /api/photos/{id}/comments`' },
   'PATCH /api/comments/[id]': { access: 'member', row: '`PATCH /api/comments/{id}`' },
   'DELETE /api/comments/[id]': { access: 'member', row: '`DELETE /api/comments/{id}`' },

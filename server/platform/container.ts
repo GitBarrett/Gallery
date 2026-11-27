@@ -57,6 +57,7 @@ import {
 } from '../modules/catalog'
 import {
   browseGrid,
+  authorCaptures,
   drizzleGalleryRepository,
   relatedPhotos,
   searchPhotos,
@@ -123,6 +124,7 @@ export interface Container {
   }
   gallery: {
     browseGrid: UseCase<typeof browseGrid>
+    authorCaptures: UseCase<typeof authorCaptures>
     searchPhotos: UseCase<typeof searchPhotos>
     readSitemap: UseCase<typeof readSitemap>
     viewPhoto: UseCase<typeof viewPhoto>
@@ -292,6 +294,11 @@ export function createContainer({
     logger,
     settings: () => readSettings(logger),
     gallery: {
+      authorCaptures: (cmd) =>
+        authorCaptures({
+          repo: drizzleGalleryRepository(db()),
+          thresholds: async () => (await readSettings(logger))['quality.thresholds'],
+        })(cmd),
       browseGrid: (cmd) =>
         browseGrid({
           repo: drizzleGalleryRepository(db()),
