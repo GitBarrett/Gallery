@@ -21,13 +21,12 @@ test('US-24.1 US-24.2 US-24.3 the home shows its hero, the version tabs and the 
 
   await page.goto('/')
   await hydrated(page)
-  // US-24.1: a public capture dark enough (this one or a newer one of another spec), credited and linked to its page
+  // US-24.1: the fixed hero screenshot (Q99), credited
   const hero = page.getByRole('region', { name: 'Azeroth, seen by its players.' })
   await expect(hero.getByRole('link', { name: 'Upload a capture' })).toHaveAttribute('href', '/upload')
   await expect(hero.getByRole('link', { name: 'Explore the gallery' })).toHaveAttribute('href', '/explore')
   await expectImageLoaded(hero.locator('img'))
-  await expect(hero.getByText(/^Background: “.+” by/)).toBeVisible()
-  await expect(hero.locator('.credit a')).toHaveAttribute('href', /^\/p\/[0-9a-f-]{36}$/)
+  await expect(hero.getByText('Background: a screenshot by Ash Barrett')).toBeVisible()
 
   // US-24.2: the version tabs lead to their PLP; the latest captures hold the one just published, linked to its page
   await expect(

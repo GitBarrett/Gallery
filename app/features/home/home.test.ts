@@ -20,26 +20,27 @@ const hero = {
 registerEndpoint('/api/home', () => ({ hero, week: null, latest: [aCapture()] }))
 
 describe('HomeHero', () => {
-  it('US-24.1 shows the hero on its focal point, the title, two calls to action and the credit linked to its page', async () => {
-    const section = await mountSuspended(HomeHero, { props: { hero } })
-    const img = section.get('img')
-    expect(img.attributes()).toMatchObject({ loading: 'eager', fetchpriority: 'high', width: '1920', height: '1080' })
-    expect(img.attributes('style')).toContain('--focal: 25% 50%')
-    expect(section.get('h1').text()).toBe('Azeroth, seen by its players.')
-    expect(section.findAll('.actions a').map((a) => [a.text(), a.attributes('href')])).toEqual([
-      ['Upload a capture', '/upload'],
-      ['Explore the gallery', '/explore'],
-    ])
-    expect(section.get('.credit').text()).toBe('Background: “Moonlit Path” by Lunelame')
-    expect(section.get('.credit a').attributes('href')).toBe(`/p/${HERO}`)
-    expect(await axeViolations(section.element)).toEqual([])
-  })
-
-  it('US-24.1 without a capture dark enough, the same text on the page gradient, no credit', async () => {
-    const section = await mountSuspended(HomeHero, { props: { hero: null } })
-    expect(section.find('img').exists()).toBe(false)
-    expect(section.get('h1').text()).toBe('Azeroth, seen by its players.')
-    expect(section.find('.credit').exists()).toBe(false)
+  // Static hero (Q99): the same screenshot whatever capture the API gives, or none
+  it('US-24.1 shows the fixed hero screenshot, the title, two calls to action and its credit', async () => {
+    for (const given of [hero, null]) {
+      const section = await mountSuspended(HomeHero, { props: { hero: given } })
+      const img = section.get('img')
+      expect(img.attributes()).toMatchObject({
+        src: '/hero/home-2560.webp',
+        fetchpriority: 'high',
+        width: '2560',
+        height: '1440',
+        alt: '',
+      })
+      expect(img.attributes('srcset')).toBe('/hero/home-1280.webp 1280w, /hero/home-2560.webp 2560w')
+      expect(section.get('h1').text()).toBe('Azeroth, seen by its players.')
+      expect(section.findAll('.actions a').map((a) => [a.text(), a.attributes('href')])).toEqual([
+        ['Upload a capture', '/upload'],
+        ['Explore the gallery', '/explore'],
+      ])
+      expect(section.get('.credit').text()).toBe('Background: a screenshot by Ash Barrett')
+      expect(await axeViolations(section.element)).toEqual([])
+    }
   })
 })
 
