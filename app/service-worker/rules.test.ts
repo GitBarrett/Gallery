@@ -42,6 +42,7 @@ describe('service worker rules (03-architecture.md § PWA)', () => {
       '/api/zones/suggest?q=s',
       '/api/health',
       '/api/photos/1/like', // US-30.1: the member's own state
+      '/api/photos/1/comments', // US-31.1: a comment posted shows at once
     ])
       expect(rule(path), path).toBe('network')
     expect(rule('/api/photos', { method: 'POST' })).toBe('network')

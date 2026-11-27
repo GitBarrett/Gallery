@@ -6,8 +6,8 @@ export type CacheRule = 'pages' | 'api-public' | 'img' | 'network'
 const PRIVATE_PAGE = /^(\/fr)?\/(settings|admin|notifications|upload|my-captures|auth|oauth)(\/|$)/
 // Public API reads (lists, photo page, profiles, search, home, public settings, leaderboard)
 const PUBLIC_API = /^\/api\/(photos|users|game-versions|search|home|settings\/public|leaderboard)(\/|$)/
-// …but the member's own state under them: their like of a capture (US-30.1)
-const MEMBER_API = /^\/api\/photos\/[^/]+\/like$/
+// …but what must be fresh under them: the member's like (US-30.1), the comments just posted (US-31.1)
+const MEMBER_API = /^\/api\/photos\/[^/]+\/(like|comments)$/
 // Display images up to 1200 px (US-64.1); never the 2400 px nor an original (US-64.5), nor a private preview
 const CACHED_IMAGE = /^\/img\/[0-9a-f-]{36}\/(400|800|1200)$/
 /** The `img` cache (US-64.6): the oldest image goes beyond 300, within the 50 MB budget. */

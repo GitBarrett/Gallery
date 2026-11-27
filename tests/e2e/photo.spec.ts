@@ -139,6 +139,46 @@ test('US-30.1 US-30.2 US-30.4 a member likes and unlikes a capture, its author c
   expect(author.email).toBeTruthy()
 })
 
+test('US-31.1 US-31.3 US-31.4 US-31.6 a comment with an XSS payload shows as text, edited then deleted', async ({
+  page,
+}) => {
+  await verifiedMember(page)
+  const id = await publishCapture(page, { title: `Comment ${crypto.randomUUID().slice(0, 8)}`, gameVersion: 'retail' })
+  let dialogs = 0
+  page.on('dialog', async (dialog) => {
+    dialogs++
+    await dialog.dismiss()
+  })
+  await page.goto(`/p/${id}`)
+  await hydrated(page)
+  const section = page.getByRole('region', { name: /^Comments · / })
+  await expect(section.getByText('Be the first to comment')).toBeVisible()
+
+  // Stored XSS (08 § 10): the payload is shown as text, never run, even after a reload rendered by the server
+  const xss = '<img src=x onerror=alert(1)><svg onload=alert(2)> **bold** https://example.com'
+  await section.getByLabel('Add a comment').fill(xss)
+  await section.getByRole('button', { name: 'Post' }).click()
+  // A new account: the server asks the Turnstile check (US-31.5, test key on previews), then the comment leaves
+  await expect(section.getByText(xss)).toBeVisible({ timeout: 30_000 })
+  await expect(section.getByRole('heading', { name: 'Comments · 1' })).toBeVisible()
+  await page.reload()
+  await hydrated(page)
+  await expect(section.getByText(xss)).toBeVisible()
+  await expect(section.locator('article img[src="x"], article svg[onload]')).toHaveCount(0)
+  await expect(section.locator('article').getByRole('link', { name: 'https://example.com' })).toHaveCount(0)
+  expect(dialogs).toBe(0)
+
+  // Its author edits it (« edited »), then deletes it
+  await section.getByRole('button', { name: 'Edit' }).click()
+  await section.getByLabel('Edit your comment').fill('Lovely light')
+  await section.getByRole('button', { name: 'Save' }).click()
+  await expect(section.getByText('Lovely light')).toBeVisible()
+  await expect(section.getByText('edited')).toBeVisible()
+  await section.getByRole('button', { name: 'Delete' }).click()
+  await expect(section.getByText('Be the first to comment')).toBeVisible()
+  await expect(section.getByRole('heading', { name: 'Comments · 0' })).toBeVisible()
+})
+
 test('US-23.1 US-23.2 a visitor signs in to download the original, counted once a day', async ({ page }) => {
   const member = await verifiedMember(page)
   const id = await publishCapture(page, { title: `Download ${crypto.randomUUID().slice(0, 8)}`, gameVersion: 'retail' })

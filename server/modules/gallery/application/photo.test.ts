@@ -21,6 +21,7 @@ const row: PhotoRow = {
   author: { username: 'Kaelys', avatarUrl: null },
   likes: 60,
   downloads: 0,
+  comments: 0,
   publishedAt: new Date('2026-11-25T10:00:00Z'),
 }
 

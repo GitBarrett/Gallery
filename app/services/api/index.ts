@@ -25,6 +25,7 @@ import {
   type UploadUrlBody,
   UploadUrlResponse,
 } from '~~/shared/contracts/photos'
+import { type CommentBody, CommentEdited, CommentItem, CommentsResponse } from '~~/shared/contracts/comments'
 import { PublicSettings } from '~~/shared/contracts/settings'
 import {
   AccountResponse,
@@ -155,6 +156,14 @@ export const api = {
   related: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}/related`, RelatedResponse, {}, fetch),
   // Search (US-21): a page of captures, the corrected query (a typo) or what to offer when nothing is found
   search: (query: Partial<SearchQuery>, fetch?: typeof $fetch) => call('/api/search', SearchResponse, { query }, fetch),
+  // Comments (US-31): newest first by pages; 400 text out of the rules or Turnstile asked, 403, 429
+  comments: (photoId: string, cursor?: string, fetch?: typeof $fetch) =>
+    call(`/api/photos/${photoId}/comments`, CommentsResponse, { query: cursor ? { cursor } : {} }, fetch),
+  postComment: (photoId: string, body: CommentBody) =>
+    call(`/api/photos/${photoId}/comments`, CommentItem, { method: 'POST', body }),
+  editComment: (id: string, body: string) =>
+    call(`/api/comments/${id}`, CommentEdited, { method: 'PATCH', body: { body } }),
+  deleteComment: (id: string) => call(`/api/comments/${id}`, z.unknown(), { method: 'DELETE' }),
   // Likes (US-30): the member's state (never cached), like and unlike; 403 own capture, 429 past 120 in an hour
   likeState: (photoId: string) => call(`/api/photos/${photoId}/like`, LikeResponse),
   like: (photoId: string) => call(`/api/photos/${photoId}/like`, LikeResponse, { method: 'PUT' }),

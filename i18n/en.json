@@ -440,6 +440,29 @@
     "popularTags": "Popular tags",
     "latest": "Latest captures"
   },
+  "comments": {
+    "title": "Comments · {count}",
+    "add": "Add a comment",
+    "placeholder": "Share what you love about this shot…",
+    "hint": "Be kind. Insults are filtered automatically.",
+    "post": "Post",
+    "verify": "Verify your email to comment.",
+    "signIn": "Sign in to comment",
+    "empty": "Be the first to comment",
+    "edited": "edited",
+    "edit": "Edit",
+    "editLabel": "Edit your comment",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "more": "Load more comments",
+    "errors": {
+      "insult": "This comment contains a word we don't allow. Please rephrase it.",
+      "empty": "Write something first.",
+      "too_long": "A comment is 1,000 characters at most.",
+      "turnstile": "New accounts pass a quick check: your comment is sent once it is done."
+    }
+  },
   "photo": {
     "title": "{title} — {version}",
     "description": "{title}, a {version} screenshot captured by {author} on Legendary Shots.",

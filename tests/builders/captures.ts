@@ -20,6 +20,7 @@ export const aPhoto = (more: Partial<PhotoResponse> = {}): PhotoResponse => ({
   author: { username: 'Kaelys', avatarUrl: null },
   likes: 0,
   downloads: 0,
+  comments: 0,
   quality: 'poor',
   publishedAt: '2026-11-25T10:00:00.000Z',
   ...more,
