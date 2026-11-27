@@ -42,6 +42,15 @@ export const likePhoto =
     })
   }
 
+/** Whether the member likes a public capture, and its counter, for the Like button (US-30.1). */
+export const viewLike =
+  (deps: { repo: LikesRepository }) =>
+  async (cmd: { actor: Actor; photoId: string }): Promise<Result<Liked, SocialError>> => {
+    const target = await deps.repo.target(cmd.photoId)
+    if (!target?.public) return err({ kind: 'not_found' })
+    return ok(await deps.repo.state(cmd.actor.id, cmd.photoId))
+  }
+
 /** Unlike (US-30.1): any member removes their like of a public capture; the tiers told stay (US-71.4). */
 export const unlikePhoto =
   (deps: Pick<Deps, 'uow'>) =>

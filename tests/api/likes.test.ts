@@ -52,7 +52,7 @@ afterAll(async () => {
   await db.$client.end()
 })
 
-const call = (method: 'PUT' | 'DELETE', id: string, cookie = '') =>
+const call = (method: 'GET' | 'PUT' | 'DELETE', id: string, cookie = '') =>
   fetch(`/api/photos/${id}/like`, {
     method,
     headers: { cookie, 'sec-fetch-site': 'same-origin', 'cf-connecting-ip': run },
@@ -72,7 +72,11 @@ describe('PUT / DELETE /api/photos/{id}/like', () => {
       .where(sql`${outbox.payload}->>'photoId' = ${ids.shown}`)
       .orderBy(outbox.createdAt)
     expect(events.map((e) => e.type)).toEqual(['like', 'quality'])
+    const state = await call('GET', ids.shown, cookies.fan)
+    expect(state.headers.get('cache-control')).toBe('private, no-store')
+    expect(await state.json()).toEqual({ liked: true, likes: 3 })
     expect(await (await call('DELETE', ids.shown, cookies.fan)).json()).toEqual({ liked: false, likes: 2 })
+    expect((await call('GET', ids.shown)).status).toBe(401)
   })
 
   it('US-30.2 refuses their own capture (403), a visitor (401), a capture that is not public (404)', async () => {

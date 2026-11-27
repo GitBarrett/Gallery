@@ -26,6 +26,9 @@ export function inMemoryLikesRepository(
       if (changed) counts.set(photoId, counts.get(photoId)! - 1)
       return { changed, likes: counts.get(photoId)! }
     },
+    async state(userId, photoId) {
+      return { liked: likes.has(`${userId}|${photoId}`), likes: counts.get(photoId) ?? 0 }
+    },
     async raiseNotifiedTier(photoId, tier) {
       if ((told.get(photoId) ?? 0) >= tier) return false
       told.set(photoId, tier)

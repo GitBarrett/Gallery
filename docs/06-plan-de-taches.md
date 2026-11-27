@@ -445,7 +445,7 @@ T-40 est découpée le 26/11/2026 en T-40a (serveur) et T-40b (écran) ; « T-40
   Like idempotent, interdiction de l'auto-like, limites, recalcul de qualité, notification de palier (une fois par palier).
   Stories : US-30.1, US-30.2, US-30.3, US-30.5, US-30.6, US-71.4, US-08.2 (like permis sans email vérifié). Tests : U, I (concurrence).
 
-- [ ] **T-40b Likes et qualité : écran** (dép. T-40a)
+- [x] **T-40b Likes et qualité : écran** (dép. T-40a)
   Bouton Like de la page photo (état liké, désactivé sur sa propre capture, invitation à se connecter).
   Stories : US-30 (parcours). Tests : E.
 

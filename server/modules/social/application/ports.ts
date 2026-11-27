@@ -11,6 +11,8 @@ export interface LikesRepository {
   add(userId: string, photoId: string): Promise<{ changed: boolean; likes: number }>
   /** Removes the like if there; `likes`: the counter after. */
   remove(userId: string, photoId: string): Promise<{ changed: boolean; likes: number }>
+  /** Whether the member likes the capture, and its counter (the photo page is cached for everyone). */
+  state(userId: string, photoId: string): Promise<{ liked: boolean; likes: number }>
   /** Records that the author was told of `tier` (0–4); false when they already were of it or a higher one. */
   raiseNotifiedTier(photoId: string, tier: number): Promise<boolean>
 }

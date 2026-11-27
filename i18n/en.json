@@ -448,6 +448,10 @@
     "download": {
       "label": "Download original · {size} MB"
     },
+    "like": {
+      "label": "Like",
+      "own": "You can't like your own capture."
+    },
     "quality": {
       "new": "new capture",
       "from": "{count}+ likes",
