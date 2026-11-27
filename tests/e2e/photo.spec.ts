@@ -16,7 +16,8 @@ test.beforeEach(async ({ page }, testInfo) => {
 // A sign-up, then two captures through the queue
 test.describe.configure({ timeout: 240_000 })
 
-test('US-25.1 US-71.2 the photo page shows the capture as an item, its quality, and its head for robots', async ({
+// US-32.2: the head for robots is the preview of a shared link (1200 px image, title, author)
+test('US-25.1 US-32.2 US-71.2 the photo page shows the capture as an item, its quality, and its head for robots', async ({
   page,
 }) => {
   await verifiedMember(page)
@@ -177,6 +178,49 @@ test('US-31.1 US-31.3 US-31.4 US-31.6 a comment with an XSS payload shows as tex
   await section.getByRole('button', { name: 'Delete' }).click()
   await expect(section.getByText('Be the first to comment')).toBeVisible()
   await expect(section.getByRole('heading', { name: 'Comments · 0' })).toBeVisible()
+})
+
+test('US-32.1 US-32.3 US-72.1 without a native sheet, Share offers the link and the networks, tracked with consent', async ({
+  page,
+  context,
+}) => {
+  await verifiedMember(page)
+  const id = await publishCapture(page, { title: `Share ${crypto.randomUUID().slice(0, 8)}`, gameVersion: 'retail' })
+  // A desktop browser without navigator.share; PostHog answered here, nothing reaches it
+  await page.addInitScript(() => Reflect.deleteProperty(Navigator.prototype, 'share'))
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  const events: Record<string, unknown>[] = []
+  await page.route('https://eu.i.posthog.com/**', async (route) => {
+    events.push(route.request().postDataJSON())
+    await route.fulfill({ status: 200, body: '{}' })
+  })
+  await page.goto(`/p/${id}`)
+  await hydrated(page)
+  await page.getByRole('region', { name: 'Your cookie choices' }).getByRole('button', { name: 'Accept all' }).click()
+
+  await page.getByRole('button', { name: 'Share' }).click()
+  const url = `${new URL(page.url()).origin}/p/${id}`
+  await expect(page.getByRole('link', { name: 'X', exact: true })).toHaveAttribute(
+    'href',
+    /^https:\/\/twitter\.com\/intent\/tweet\?url=/,
+  )
+  await expect(page.getByRole('link', { name: 'Reddit', exact: true })).toHaveAttribute(
+    'href',
+    /^https:\/\/www\.reddit\.com\/submit\?url=/,
+  )
+  await expect(page.getByRole('link', { name: 'Facebook', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Copy link' }).click()
+  await expect(page.getByRole('status').filter({ hasText: 'Link copied' })).toBeVisible()
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(url)
+  await expect
+    .poll(() => events.find((e) => e.event === 'photo_shared'))
+    .toMatchObject({
+      event: 'photo_shared',
+      distinct_id: expect.any(String),
+      properties: { method: 'copy' },
+    })
+  // Pseudonymous (US-72.1): no email nor username in what is sent
+  expect(JSON.stringify(events)).not.toMatch(/@example\.com|e2e_/)
 })
 
 test('US-23.1 US-23.2 a visitor signs in to download the original, counted once a day', async ({ page }) => {
