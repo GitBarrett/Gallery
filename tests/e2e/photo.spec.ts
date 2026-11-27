@@ -103,6 +103,42 @@ test('US-25.1 US-71.2 the photo page shows the capture as an item, its quality, 
   expect((await page.goto(`/p/${crypto.randomUUID()}`))?.status()).toBe(404)
 })
 
+test('US-30.1 US-30.2 US-30.4 a member likes and unlikes a capture, its author cannot, a visitor signs in', async ({
+  page,
+}) => {
+  const author = await verifiedMember(page)
+  const id = await publishCapture(page, { title: `Like ${crypto.randomUUID().slice(0, 8)}`, gameVersion: 'retail' })
+  // The author: the button is disabled on their own capture
+  await page.goto(`/p/${id}`)
+  await hydrated(page)
+  await expect(page.getByRole('button', { name: /^Like/ })).toBeDisabled()
+  await expect(page.getByText("You can't like your own capture.")).toBeVisible()
+  expect((await post(page, '/api/auth/signout', {})).status).toBe(204)
+
+  // A visitor is sent to sign in, back to the page
+  await page.goto(`/p/${id}`)
+  await hydrated(page)
+  await page.getByRole('button', { name: /^Like/ }).click()
+  await page.waitForURL(/\/signin\?/)
+  expect(new URL(page.url()).searchParams.get('redirect')).toBe(`/p/${id}`)
+
+  // Another member likes it, still liked after a reload, then unlikes it
+  await verifiedMember(page)
+  await page.goto(`/p/${id}`)
+  await hydrated(page)
+  const like = page.getByRole('button', { name: /^Like/ })
+  await like.click()
+  await expect(like).toHaveAttribute('aria-pressed', 'true')
+  await expect(like).toContainText('1')
+  await page.reload()
+  await hydrated(page)
+  await expect(like).toHaveAttribute('aria-pressed', 'true')
+  await like.click()
+  await expect(like).toHaveAttribute('aria-pressed', 'false')
+  await expect(like).toContainText('0')
+  expect(author.email).toBeTruthy()
+})
+
 test('US-23.1 US-23.2 a visitor signs in to download the original, counted once a day', async ({ page }) => {
   const member = await verifiedMember(page)
   const id = await publishCapture(page, { title: `Download ${crypto.randomUUID().slice(0, 8)}`, gameVersion: 'retail' })

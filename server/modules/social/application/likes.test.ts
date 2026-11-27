@@ -3,7 +3,7 @@ import { anActor } from '../../../../tests/builders/actor'
 import { inMemoryLikesRepository } from '../../../../tests/fakes/in-memory-likes-repository'
 import { inMemoryRateLimiter } from '../../../../tests/fakes/in-memory-rate-limiter'
 import { inMemoryUnitOfWork } from '../../../../tests/fakes/in-memory-unit-of-work'
-import { LIKES_PER_HOUR, likePhoto, unlikePhoto } from './likes'
+import { LIKES_PER_HOUR, likePhoto, unlikePhoto, viewLike } from './likes'
 
 const thresholds = { uncommon: 3, rare: 15, epic: 50, legendary: 150 }
 const AUTHOR = '0193a000-0000-7000-8000-00000000aa01'
@@ -87,6 +87,15 @@ describe('likePhoto', () => {
       { topic: 'notifications', payload: { type: 'quality', userId: AUTHOR, photoId: P, quality: 'uncommon' } },
     ])
     expect(s.told.get(P)).toBe(1)
+  })
+
+  it('US-30.1 tells the member whether they like a public capture, with its counter', async () => {
+    const s = setup({ [P]: { authorId: AUTHOR, likes: 4 }, hidden: { authorId: AUTHOR, public: false } })
+    const view = viewLike({ repo: s.repo })
+    expect(await view({ actor: ash, photoId: P })).toEqual({ ok: true, value: { liked: false, likes: 4 } })
+    await s.like({ actor: ash, photoId: P })
+    expect(await view({ actor: ash, photoId: P })).toEqual({ ok: true, value: { liked: true, likes: 5 } })
+    expect(await view({ actor: ash, photoId: 'hidden' })).toEqual({ ok: false, error: { kind: 'not_found' } })
   })
 
   it('US-71.4 tells nothing below the first tier', async () => {

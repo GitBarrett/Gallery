@@ -2,10 +2,11 @@
 // Photo page /p/{id} (US-25.1, Photo mockup), rendered by the server: the image, its quality badge (US-71.2), its
 // details as an item of the game, the author and the tags, the previous / next captures of the version (buttons,
 // swipe, arrow keys: US-67.2) and the « More from » block (US-70.1, US-70.2); Open Graph, Twitter Card, canonical,
-// hreflang and ImageObject for robots. A capture that is not public is the 404 page. The actions (the download,
-// US-23), sticky at the bottom below 768 px (07 § Responsive); likes, share and comments come with their tasks
+// hreflang and ImageObject for robots. A capture that is not public is the 404 page. The actions (the like,
+// US-30, and the download, US-23), sticky at the bottom below 768 px (07 § Responsive); share and comments come with their tasks
 // (T-40, T-42, T-41).
 import DownloadButton from '~/features/photo/DownloadButton.vue'
+import LikeButton from '~/features/photo/LikeButton.vue'
 import PhotoDetails from '~/features/photo/PhotoDetails.vue'
 import PhotoNav from '~/features/photo/PhotoNav.vue'
 import QualityBadgeTip from '~/features/photo/QualityBadgeTip.vue'
@@ -55,6 +56,7 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
       <aside class="aside">
         <h1 id="pdp-title" class="visually-hidden">{{ photo.title }}</h1>
         <div class="actions">
+          <LikeButton :photo-id="photo.id" :likes="photo.likes" :author="photo.author.username" />
           <DownloadButton :photo-id="photo.id" :bytes="photo.bytes" />
         </div>
         <PhotoDetails :photo="photo" />
@@ -160,7 +162,14 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
   min-width: 0;
 }
 
-/* Above the tab bar on a phone, so the download stays at hand while reading the details */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+/* Above the tab bar on a phone, so the actions stay at hand while reading the details */
 @media (width < 768px) {
   .actions {
     position: sticky;

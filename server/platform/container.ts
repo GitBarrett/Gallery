@@ -92,7 +92,7 @@ import {
   unreadCount,
 } from '../modules/notifications'
 import { MAX_HERO_LUMINANCE, type SiteSettings } from '../modules/settings'
-import { drizzleLikesRepository, likePhoto, unlikePhoto } from '../modules/social'
+import { drizzleLikesRepository, likePhoto, unlikePhoto, viewLike } from '../modules/social'
 import { systemClock, type Clock } from './clock'
 import type { Config } from './config'
 import { uuidV7Generator, type IdGenerator } from './ids'
@@ -135,6 +135,7 @@ export interface Container {
   social: {
     likePhoto: UseCase<typeof likePhoto>
     unlikePhoto: UseCase<typeof unlikePhoto>
+    viewLike: UseCase<typeof viewLike>
   }
   notifications: {
     list: UseCase<typeof listNotifications>
@@ -402,6 +403,7 @@ export function createContainer({
           limiter: dbRateLimiter(db(), ipHashKey(), clock),
           thresholds: async () => (await readSettings(logger))['quality.thresholds'],
         })(cmd),
+      viewLike: (cmd) => viewLike({ repo: drizzleLikesRepository(db()) })(cmd),
       unlikePhoto: (cmd) =>
         unlikePhoto({
           uow: drizzleUnitOfWork(db(), drizzleLikesRepository, outboxRelay(db(), queues, clock), logger),

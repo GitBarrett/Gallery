@@ -12,6 +12,7 @@ import {
   type CompleteUploadBody,
   CompleteUploadResponse,
   DownloadResponse,
+  LikeResponse,
   MyPhotoResponse,
   MyPhotosResponse,
   PhotoResponse,
@@ -154,6 +155,10 @@ export const api = {
   related: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}/related`, RelatedResponse, {}, fetch),
   // Search (US-21): a page of captures, the corrected query (a typo) or what to offer when nothing is found
   search: (query: Partial<SearchQuery>, fetch?: typeof $fetch) => call('/api/search', SearchResponse, { query }, fetch),
+  // Likes (US-30): the member's state (never cached), like and unlike; 403 own capture, 429 past 120 in an hour
+  likeState: (photoId: string) => call(`/api/photos/${photoId}/like`, LikeResponse),
+  like: (photoId: string) => call(`/api/photos/${photoId}/like`, LikeResponse, { method: 'PUT' }),
+  unlike: (photoId: string) => call(`/api/photos/${photoId}/like`, LikeResponse, { method: 'DELETE' }),
   // HD download (US-23): a URL of the original for 5 min; 401 for a visitor, 429 past 100 in an hour
   download: (photoId: string) => call(`/api/photos/${photoId}/download`, DownloadResponse, { method: 'POST' }),
   // The home (US-24, US-70.4): hero, capture of the week, latest captures

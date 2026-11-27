@@ -147,7 +147,7 @@ Une ligne par groupe de routes de `03-architecture.md` § Inventaire ; le test d
 | `PATCH /api/photos/{id}` | 401 | 403 | 403 (404 si non publiée) | ✓ | 403 | 403 (passer par `/api/admin/moderation`) | 403 (idem) |
 | `DELETE /api/photos/{id}` | 401 | 403 | 403 (404 si non publiée) | ✓ | ✓ | 403 (idem) | 403 (idem) |
 | `POST /api/photos/{id}/download` | 401 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `PUT/DELETE /api/photos/{id}/like` | 401 | ✓ | ✓ | 403 (auto-like) | 403 | ✓ | ✓ |
+| `GET/PUT/DELETE /api/photos/{id}/like` | 401 | ✓ | ✓ | 403 (auto-like) | 403 | ✓ | ✓ |
 | `POST /api/photos/{id}/comments` | 401 | 403 | ✓ | ✓ | 403 | ✓ | ✓ |
 | `PATCH /api/comments/{id}` | 401 | 403 | 403 | ✓ (auteur, < 15 min) | 403 | 403 | 403 |
 | `DELETE /api/comments/{id}` | 401 | 403 | 403 | ✓ (auteur du commentaire ou de la capture) | ✓ (idem) | 403 (passer par la modération) | 403 (idem) |

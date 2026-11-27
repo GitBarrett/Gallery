@@ -48,6 +48,14 @@ export const drizzleLikesRepository = (db: Db | Transaction): LikesRepository =>
     const [row] = Array.from(rows)
     return row ? { changed: true, likes: row.likes } : { changed: false, likes: await counter(db, photoId) }
   },
+  async state(userId, photoId) {
+    const [row] = await db
+      .select({ likes: photos.likesCount, mine: likes.userId })
+      .from(photos)
+      .leftJoin(likes, and(eq(likes.photoId, photos.id), eq(likes.userId, userId)))
+      .where(eq(photos.id, photoId))
+    return { liked: Boolean(row?.mine), likes: row?.likes ?? 0 }
+  },
   async raiseNotifiedTier(photoId, tier) {
     const rows = await db
       .update(photos)

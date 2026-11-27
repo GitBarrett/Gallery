@@ -199,7 +199,7 @@ Source de la matrice d'autorisation (08, annexe B) : toute route ajoutée ici y 
 | Médias | `GET /img/{photoId}/{400,800,1200,2400}`, `GET /img/{photoId}/og.jpg`, `GET /img/{photoId}/{w}?preview=1` (auteur, modérateurs), `GET /avatar/{userId}/{version}/{64,128,256}` |
 | Catalogue | `GET /api/game-versions`, `GET /api/zones/suggest?q=`, `GET /api/tags/suggest?q=`, `GET /api/search?q=` |
 | Accueil et réglages publics | `GET /api/home` (hero, capture de la semaine, dernières captures, bandeau de quête), `GET /api/settings/public` (seuils de qualité, flags visibles) |
-| Social | `PUT/DELETE /api/photos/{id}/like`, `GET/POST /api/photos/{id}/comments`, `PATCH/DELETE /api/comments/{id}` |
+| Social | `GET/PUT/DELETE /api/photos/{id}/like` (GET : l'état du membre, la page photo étant en cache public), `GET/POST /api/photos/{id}/comments`, `PATCH/DELETE /api/comments/{id}` |
 | Notifications | `GET /api/notifications`, `GET /api/notifications/unread-count`, `POST /api/notifications/{id}/read`, `POST /api/notifications/read-all` |
 | Signalements et recours | `POST /api/reports`, `GET /api/me/decisions` (décisions me concernant) ; recours par email au MVP (`POST /api/appeals` : v1.x, T-71) |
 | Admin (MFA) | `/api/admin/moderation/*` (file, décisions), `/api/admin/reports/*`, `/api/admin/sanctions/*`, `/api/admin/users` (recherche) et `/api/admin/users/{id}/role`, `/api/admin/game-versions/*`, `/api/admin/zones/*`, `/api/admin/settings`, `/api/admin/invites/*` et `/api/admin/waitlist`, `/api/admin/audit`, `/api/admin/bug-reports/*` |
