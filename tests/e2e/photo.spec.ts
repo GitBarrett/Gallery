@@ -155,15 +155,16 @@ test('US-31.1 US-31.3 US-31.4 US-31.6 a comment with an XSS payload shows as tex
   await expect(section.getByText('Be the first to comment')).toBeVisible()
 
   // Stored XSS (08 § 10): the payload is shown as text, never run, even after a reload rendered by the server
-  const xss = '<img src=x onerror=alert(1)><script>alert(2)</script> **bold** https://example.com'
+  const xss = '<img src=x onerror=alert(1)><svg onload=alert(2)> **bold** https://example.com'
   await section.getByLabel('Add a comment').fill(xss)
   await section.getByRole('button', { name: 'Post' }).click()
-  await expect(section.getByText(xss)).toBeVisible()
+  // A new account: the server asks the Turnstile check (US-31.5, test key on previews), then the comment leaves
+  await expect(section.getByText(xss)).toBeVisible({ timeout: 30_000 })
   await expect(section.getByRole('heading', { name: 'Comments · 1' })).toBeVisible()
   await page.reload()
   await hydrated(page)
   await expect(section.getByText(xss)).toBeVisible()
-  await expect(section.locator('article img[src="x"]')).toHaveCount(0)
+  await expect(section.locator('article img[src="x"], article svg[onload]')).toHaveCount(0)
   await expect(section.locator('article').getByRole('link', { name: 'https://example.com' })).toHaveCount(0)
   expect(dialogs).toBe(0)
 

@@ -459,7 +459,8 @@
     "errors": {
       "insult": "This comment contains a word we don't allow. Please rephrase it.",
       "empty": "Write something first.",
-      "too_long": "A comment is 1,000 characters at most."
+      "too_long": "A comment is 1,000 characters at most.",
+      "turnstile": "New accounts pass a quick check: your comment is sent once it is done."
     }
   },
   "photo": {

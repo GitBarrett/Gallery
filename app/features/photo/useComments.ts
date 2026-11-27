@@ -28,10 +28,12 @@ export async function useComments(photoId: string, initialCount: number) {
     } catch (thrown) {
       const field = thrown instanceof ApiError ? thrown.details?.field : undefined
       if (field === 'turnstileToken') turnstile.value = true
-      error.value =
-        thrown instanceof ApiError && field === 'body'
-          ? `comments.errors.${thrown.details?.reason}`
-          : errorMessageKey(thrown)
+      if (field === 'turnstileToken') error.value = 'comments.errors.turnstile'
+      else
+        error.value =
+          thrown instanceof ApiError && field === 'body'
+            ? `comments.errors.${thrown.details?.reason}`
+            : errorMessageKey(thrown)
     } finally {
       busy.value = false
     }

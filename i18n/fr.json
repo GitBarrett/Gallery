@@ -459,7 +459,8 @@
     "errors": {
       "insult": "Ce commentaire contient un mot que nous n’acceptons pas. Merci de le reformuler.",
       "empty": "Écrivez d’abord quelque chose.",
-      "too_long": "Un commentaire fait 1 000 caractères au plus."
+      "too_long": "Un commentaire fait 1 000 caractères au plus.",
+      "turnstile": "Les nouveaux comptes passent une vérification rapide : votre commentaire part dès qu’elle est faite."
     }
   },
   "photo": {

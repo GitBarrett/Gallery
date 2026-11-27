@@ -28,10 +28,15 @@ const canDelete = (username: string) => mine(username) || same(props.author, me.
 const canEdit = (c: { author: { username: string }; createdAt: string }) =>
   mine(c.author.username) && canEditComment(new Date(c.createdAt), new Date())
 
+const check = ref<InstanceType<typeof TurnstileCheck>>()
 async function submit() {
   if (await comments.post(draft.value, token.value || undefined)) draft.value = ''
-  token.value = ''
+  check.value?.reset() // a token is single use
 }
+// The check the server asked for is solved: the comment leaves on its own
+watch(token, (solved) => {
+  if (solved && turnstile.value && draft.value.trim() && !busy.value) void submit()
+})
 
 async function save(commentId: string) {
   if (await comments.edit(commentId, editText.value)) editing.value = undefined
@@ -57,7 +62,7 @@ function startEdit(commentId: string, body: string) {
         class="input"
         :placeholder="t('comments.placeholder')"
       ></textarea>
-      <TurnstileCheck v-if="turnstile" v-model="token" action="comment" />
+      <TurnstileCheck v-if="turnstile" ref="check" v-model="token" action="comment" />
       <div class="row">
         <span class="hint">{{ t('comments.hint') }}</span>
         <UiButton type="submit" :disabled="busy || !draft.trim()">{{ t('comments.post') }}</UiButton>
