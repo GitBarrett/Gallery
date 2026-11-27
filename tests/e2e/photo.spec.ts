@@ -200,15 +200,15 @@ test('US-32.1 US-32.3 US-72.1 without a native sheet, Share offers the link and 
 
   await page.getByRole('button', { name: 'Share' }).click()
   const url = `${new URL(page.url()).origin}/p/${id}`
-  await expect(page.getByRole('link', { name: 'X' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'X', exact: true })).toHaveAttribute(
     'href',
     /^https:\/\/twitter\.com\/intent\/tweet\?url=/,
   )
-  await expect(page.getByRole('link', { name: 'Reddit' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Reddit', exact: true })).toHaveAttribute(
     'href',
     /^https:\/\/www\.reddit\.com\/submit\?url=/,
   )
-  await expect(page.getByRole('link', { name: 'Facebook' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Facebook', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Copy link' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Link copied' })).toBeVisible()
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(url)
