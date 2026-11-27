@@ -3,13 +3,14 @@
 // details as an item of the game, the author and the tags, the previous / next captures of the version (buttons,
 // swipe, arrow keys: US-67.2) and the « More from » block (US-70.1, US-70.2); Open Graph, Twitter Card, canonical,
 // hreflang and ImageObject for robots. A capture that is not public is the 404 page. The actions (the like,
-// US-30, and the download, US-23), sticky at the bottom below 768 px (07 § Responsive); share and comments come with their tasks
-// (T-40, T-42, T-41).
+// US-30, and the download, US-23), sticky at the bottom below 768 px (07 § Responsive), then the comments (US-31);
+// share comes with its task (T-42).
 import DownloadButton from '~/features/photo/DownloadButton.vue'
 import LikeButton from '~/features/photo/LikeButton.vue'
 import PhotoDetails from '~/features/photo/PhotoDetails.vue'
 import PhotoNav from '~/features/photo/PhotoNav.vue'
 import QualityBadgeTip from '~/features/photo/QualityBadgeTip.vue'
+import PhotoComments from '~/features/photo/PhotoComments.vue'
 import RelatedBlock from '~/features/photo/RelatedBlock.vue'
 import { usePhoto } from '~/features/photo/usePhoto'
 import { usePhotoHead } from '~/features/photo/usePhotoHead'
@@ -68,6 +69,7 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
         <ul v-if="photo.tags.length" class="tags" :aria-label="t('photo.tags')">
           <li v-for="tag in photo.tags" :key="tag" class="tag">#{{ tag }}</li>
         </ul>
+        <PhotoComments :photo-id="photo.id" :total="photo.comments" :author="photo.author.username" />
         <RelatedBlock v-if="related?.sections.length" :sections="related.sections" :photo="photo" />
       </aside>
     </div>

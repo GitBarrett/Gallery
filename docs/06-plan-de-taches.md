@@ -455,7 +455,7 @@ T-41 est découpée le 27/11/2026 en T-41a (serveur) et T-41b (écran) ; « T-41
   API des commentaires : texte brut, filtre d'insultes (Q8), édition 15 min, suppression, limites, Turnstile des comptes récents.
   Stories : US-31.1, US-31.2, US-31.3, US-31.4, US-31.5, US-08.1 (email vérifié requis). Tests : U, I.
 
-- [ ] **T-41b Commentaires : écran** (dép. T-41a)
+- [x] **T-41b Commentaires : écran** (dép. T-41a)
   Section des commentaires de la page photo : formulaire, liste paginée, édition, suppression, état vide.
   Stories : US-31 (parcours). Tests : E (dont XSS).
 

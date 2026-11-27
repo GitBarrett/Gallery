@@ -255,6 +255,7 @@ export const drizzleGalleryRepository = (
         avatarKey: users.avatarKey,
         likes: photos.likesCount,
         downloads: photos.downloadsCount,
+        comments: photos.commentsCount,
         publishedAt: photos.publishedAt,
       })
       .from(photos)

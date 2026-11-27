@@ -262,6 +262,8 @@ export const PhotoResponse = z.strictObject({
   author: z.strictObject({ username: z.string(), avatarUrl: AvatarUrl }),
   likes: z.int(),
   downloads: z.int(),
+  /** Visible comments (US-31), for « Comments · N ». */
+  comments: z.int(),
   quality: z.enum(QUALITIES),
   publishedAt: z.iso.datetime(),
 })

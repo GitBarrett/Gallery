@@ -22,6 +22,7 @@ export interface PhotoRow {
   author: { username: string; avatarUrl: string | null }
   likes: number
   downloads: number
+  comments: number
   publishedAt: Date
 }
 

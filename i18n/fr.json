@@ -440,6 +440,28 @@
     "popularTags": "Tags populaires",
     "latest": "Dernières captures"
   },
+  "comments": {
+    "title": "Commentaires · {count}",
+    "add": "Ajouter un commentaire",
+    "placeholder": "Dites ce que vous aimez dans cette capture…",
+    "hint": "Restez bienveillant. Les insultes sont filtrées automatiquement.",
+    "post": "Publier",
+    "verify": "Vérifiez votre email pour commenter.",
+    "signIn": "Connectez-vous pour commenter",
+    "empty": "Soyez le premier à commenter",
+    "edited": "modifié",
+    "edit": "Modifier",
+    "editLabel": "Modifier votre commentaire",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "more": "Voir plus de commentaires",
+    "errors": {
+      "insult": "Ce commentaire contient un mot que nous n’acceptons pas. Merci de le reformuler.",
+      "empty": "Écrivez d’abord quelque chose.",
+      "too_long": "Un commentaire fait 1 000 caractères au plus."
+    }
+  },
   "photo": {
     "title": "{title} — {version}",
     "description": "{title}, une capture de {version} par {author} sur Legendary Shots.",

@@ -193,6 +193,7 @@ describe('drizzleGalleryRepository', () => {
         author: { username: w.author.username, avatarUrl: `/avatar/${w.author.id}/${avatar}` },
         likes: 12,
         downloads: 0,
+        comments: 0,
         publishedAt: new Date(T0 + 60_000),
       })
     })
