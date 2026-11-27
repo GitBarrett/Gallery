@@ -226,7 +226,9 @@ describe('drizzleMediaRepository', () => {
         moderationScore: 0.02,
         publishedAt: new Date('2026-11-25T10:00:00Z'),
       })
-      expect(sent()).toHaveLength(1) // US-14.3: the author is notified once
+      // US-14.3: the author is notified once; US-71.3: their first public capture, the quality explained once
+      expect(sent().map((m) => m.payload.type)).toEqual(['moderation', 'quality'])
+      expect(await repo.publishedCount(userId)).toBe(1)
     })
   })
 

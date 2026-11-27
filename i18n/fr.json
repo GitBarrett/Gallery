@@ -293,6 +293,7 @@
       "comment": "{actor} a commenté {title}.",
       "follow": "{actor} vous suit désormais.",
       "quality": "Votre capture {title} a atteint la qualité {quality}.",
+      "qualityIntro": "Votre première capture {title} est en ligne ! Comme les objets du jeu, elle gagne une qualité grâce aux likes : Médiocre pour l’instant, {likes} likes pour Inhabituelle.",
       "moderation": {
         "published": "Votre capture {title} est publiée.",
         "pending_review": "Votre capture {title} est en cours de vérification par un modérateur.",
@@ -461,6 +462,21 @@
       "empty": "Écrivez d’abord quelque chose.",
       "too_long": "Un commentaire fait 1 000 caractères au plus.",
       "turnstile": "Les nouveaux comptes passent une vérification rapide : votre commentaire part dès qu’elle est faite."
+    }
+  },
+  "help": {
+    "quality": {
+      "title": "Comment fonctionne la qualité des captures",
+      "lead": "Comme les objets du jeu, chaque capture gagne une qualité grâce aux likes de la communauté : de Médiocre à Légendaire, son cadre et son badge prennent la couleur de son palier.",
+      "tiers": "Les cinq paliers",
+      "tier": "Qualité",
+      "likes": "Likes nécessaires",
+      "start": "Toute nouvelle capture",
+      "from": "{count} likes",
+      "changeTitle": "Pourquoi les seuils évoluent",
+      "change": "Les seuils suivent la taille de la communauté : plus elle grandit et like, plus ils montent, pour qu’Épique et Légendaire restent rares. Chaque auteur est prévenu une fois de chaque palier atteint par sa capture.",
+      "countTitle": "Comment les likes sont comptés",
+      "count": "Chaque membre like une capture une seule fois, et personne ne peut liker la sienne. Un like peut être retiré ; la qualité suit les likes qu’elle a aujourd’hui."
     }
   },
   "photo": {

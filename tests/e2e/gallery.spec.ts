@@ -51,7 +51,7 @@ test('US-20.1 US-20.2 a published capture shows in the grid of its version, newe
   await expect(page.getByRole('heading', { name: 'No capture matches these filters' })).toBeVisible()
 })
 
-test('US-71.1 the « ? » of Minimum quality lists the five tiers with the thresholds of the settings', async ({
+test('US-71.1 US-71.3 the « ? » of Minimum quality lists the five tiers with the thresholds, then the help page', async ({
   page,
 }) => {
   await page.goto('/v/wow-forever')
@@ -68,6 +68,10 @@ test('US-71.1 the « ? » of Minimum quality lists the five tiers with the thres
     'Legendary150 likes',
   ])
   await expect(help.getByRole('link', { name: 'How quality works' })).toHaveAttribute('href', '/help/quality')
+  // US-71.3: the help page, with the same thresholds
+  await help.getByRole('link', { name: 'How quality works' }).click()
+  await expect(page.getByRole('heading', { level: 1, name: 'How capture quality works' })).toBeVisible()
+  await expect(page.getByRole('row', { name: /Rare/ })).toContainText('15 likes')
 })
 
 test('US-70.5 a version without capture invites to be the first, with the upload', async ({ page }) => {

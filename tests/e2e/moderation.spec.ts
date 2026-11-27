@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 // A sign-up, three uploads and their processing through the queues
 test.describe.configure({ timeout: 240_000 })
 
-test('US-50.1 US-50.3 US-14.3 US-14.4 US-68.3 US-75.3 the NSFW fixture is rejected into trash/, a clean capture published, both notified', async ({
+test('US-50.1 US-50.3 US-14.3 US-14.4 US-68.3 US-71.3 US-75.3 the NSFW fixture is rejected into trash/, a clean capture published, both notified', async ({
   page,
 }) => {
   await verifiedMember(page)
@@ -70,8 +70,9 @@ test('US-50.1 US-50.3 US-14.3 US-14.4 US-68.3 US-75.3 the NSFW fixture is reject
     .poll(async () => (await testRoute(page, '/api/notifications', 'GET')).body?.notifications.length, {
       timeout: 60_000,
     })
-    .toBe(3)
+    .toBe(4) // the three decisions, and the quality explained on the first public capture (US-71.3)
   await page.goto('/notifications')
+  await expect(page.getByText(/^Your first capture “Ice Crown” is online!/)).toBeVisible()
   await expect(page.getByText('Your capture “Fixture_nsfw” was rejected by the automatic moderation')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Appeal' })).toHaveAttribute('href', '/terms')
   await expect(page.getByText('Your capture “Ice Crown” was published.')).toBeVisible()

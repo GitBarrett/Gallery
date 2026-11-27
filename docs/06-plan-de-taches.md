@@ -463,9 +463,15 @@ T-41 est découpée le 27/11/2026 en T-41a (serveur) et T-41b (écran) ; « T-41
   `navigator.share`, menu de repli, événement analytics.
   Stories : US-32, US-72.1. Tests : E.
 
-- [ ] **T-43 Pédagogie de la qualité** (dép. T-40)
-  Survol/tap des badges, notification de première capture, progression sur le profil, page `/help/quality`.
+T-43 est découpée le 27/11/2026 en T-43a et T-43b : le profil n'affiche pas encore ses captures (`GET /api/users/{username}/photos`, US-05.3), prérequis de la progression.
+
+- [x] **T-43a Pédagogie de la qualité : notification et aide** (dép. T-40)
+  Survol/tap des badges (fait en T-31c), notification de première capture, page `/help/quality`.
   Stories : US-71.2–3. Tests : U, E.
+
+- [ ] **T-43b Captures du profil et progression** (dép. T-43a)
+  `GET /api/users/{username}/photos` et grille du profil (US-05.3), barre de progression vers le palier suivant sur ses propres captures (07 § Qualité, point 6).
+  Stories : US-05.3. Tests : U, I, E.
 
 - [ ] **T-44 États vides complets** (dép. T-40, T-32)
   Compteurs masqués sous 10, badge « New », tous les replis restants ; test E2E sur base vierge.

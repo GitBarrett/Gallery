@@ -118,6 +118,8 @@ export interface MediaRepository {
   deleteIncomplete(id: string): Promise<void>
   /** A capture still `processing` goes to `status` with its measures; false if it no longer was (replay). */
   finishProcessing(id: string, status: ProcessedStatus, processed: Processed): Promise<boolean>
+  /** How many captures of the member are published (their first one: the quality explained, US-71.3). */
+  publishedCount(userId: string): Promise<number>
   /** A capture still `processing` goes to `failed`; false if it no longer was. */
   failProcessing(id: string): Promise<boolean>
   /** Titles of the captures among `ids` that still exist, by id (null: not completed yet). */
