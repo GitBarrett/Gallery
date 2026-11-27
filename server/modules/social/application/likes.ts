@@ -8,7 +8,12 @@ import type { LikesRepository } from './ports'
 // 08-securite.md § 8: 120 likes per hour per account (exact counters); an unlike is not limited
 export const LIKES_PER_HOUR: RateLimitRule = { name: 'likes', limit: 120, windowSeconds: 3600 }
 
-export type SocialError = PolicyDenial | { kind: 'rate_limited'; retryAfterSeconds: number }
+export type SocialError =
+  | PolicyDenial
+  | { kind: 'rate_limited'; retryAfterSeconds: number }
+  | { kind: 'invalid'; field: string; reason: string }
+  /** A comment of another member (US-31.3, US-31.4), or older than its 15 minutes of edition. */
+  | { kind: 'forbidden'; reason: 'not_author' | 'edit_window' }
 type Deps = { uow: UnitOfWork<LikesRepository>; limiter: RateLimiter; thresholds: () => Promise<QualityThresholds> }
 type Liked = { liked: boolean; likes: number }
 

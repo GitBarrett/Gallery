@@ -330,6 +330,8 @@ export const photos = pgTable(
     // Written by the likes (T-40a) and the HD downloads (T-34a); the grids sort on them (US-20.3)
     likesCount: integer('likes_count').notNull().default(0),
     downloadsCount: integer('downloads_count').notNull().default(0),
+    /** Visible comments (US-31), written with them (T-41a). */
+    commentsCount: integer('comments_count').notNull().default(0),
     /** Highest quality tier the author was told of (US-71.4: once per tier), 0 (Poor) to 4 (Legendary); never lowered. */
     qualityTierNotified: integer('quality_tier_notified').notNull().default(0),
     uploadedAt: at('uploaded_at'),
@@ -496,6 +498,32 @@ export const photoMetadata = pgTable(
     index('photo_metadata_zone_custom_idx')
       .on(t.zoneCustom)
       .where(sql`${t.zoneCustom} is not null`),
+  ],
+)
+
+/**
+ * Comments (US-31): flat, plain text of 1 to 1 000 characters, editable 15 minutes by their author (`edited_at`),
+ * deleted for good; `hidden` by the moderation (T-50). The counter of photos follows them in the same statement.
+ */
+export const comments = pgTable(
+  'comments',
+  {
+    id: id(),
+    photoId: uuid('photo_id')
+      .notNull()
+      .references(() => photos.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    body: text('body').notNull(),
+    status: text('status').notNull().default('visible'),
+    editedAt: at('edited_at'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check('comments_status_check', sql`${t.status} in ('visible', 'hidden')`),
+    index('comments_photo_idx').on(t.photoId, t.createdAt.desc(), t.id.desc()),
+    index('comments_user_idx').on(t.userId),
   ],
 )
 
