@@ -35,7 +35,14 @@ describe('service worker rules (03-architecture.md § PWA)', () => {
       '/api/search?q=sw',
     ])
       expect(rule(path), path).toBe('api-public')
-    for (const path of ['/api/me', '/api/me/photos', '/api/notifications', '/api/zones/suggest?q=s', '/api/health'])
+    for (const path of [
+      '/api/me',
+      '/api/me/photos',
+      '/api/notifications',
+      '/api/zones/suggest?q=s',
+      '/api/health',
+      '/api/photos/1/like', // US-30.1: the member's own state
+    ])
       expect(rule(path), path).toBe('network')
     expect(rule('/api/photos', { method: 'POST' })).toBe('network')
     expect(rule('/api/photos', { sameOrigin: false })).toBe('network')
