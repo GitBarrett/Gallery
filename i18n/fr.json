@@ -476,6 +476,12 @@
       "label": "J’aime",
       "own": "Vous ne pouvez pas aimer votre propre capture."
     },
+    "share": {
+      "label": "Partager",
+      "copy": "Copier le lien",
+      "discord": "Discord (copier le lien)",
+      "copied": "Lien copié"
+    },
     "quality": {
       "new": "nouvelle capture",
       "from": "{count} J'aime et plus",

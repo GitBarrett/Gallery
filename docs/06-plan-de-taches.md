@@ -459,7 +459,7 @@ T-41 est découpée le 27/11/2026 en T-41a (serveur) et T-41b (écran) ; « T-41
   Section des commentaires de la page photo : formulaire, liste paginée, édition, suppression, état vide.
   Stories : US-31 (parcours). Tests : E (dont XSS).
 
-- [ ] **T-42 Partage** (dép. T-31a)
+- [x] **T-42 Partage** (dép. T-31a)
   `navigator.share`, menu de repli, événement analytics.
   Stories : US-32, US-72.1. Tests : E.
 

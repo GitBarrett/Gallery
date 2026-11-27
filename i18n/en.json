@@ -476,6 +476,12 @@
       "label": "Like",
       "own": "You can't like your own capture."
     },
+    "share": {
+      "label": "Share",
+      "copy": "Copy link",
+      "discord": "Discord (copy the link)",
+      "copied": "Link copied"
+    },
     "quality": {
       "new": "new capture",
       "from": "{count}+ likes",

@@ -3,8 +3,8 @@
 // details as an item of the game, the author and the tags, the previous / next captures of the version (buttons,
 // swipe, arrow keys: US-67.2) and the « More from » block (US-70.1, US-70.2); Open Graph, Twitter Card, canonical,
 // hreflang and ImageObject for robots. A capture that is not public is the 404 page. The actions (the like,
-// US-30, and the download, US-23), sticky at the bottom below 768 px (07 § Responsive), then the comments (US-31);
-// share comes with its task (T-42).
+// US-30, the download, US-23, the share, US-32), sticky at the bottom below 768 px (07 § Responsive), then the
+// comments (US-31).
 import DownloadButton from '~/features/photo/DownloadButton.vue'
 import LikeButton from '~/features/photo/LikeButton.vue'
 import PhotoDetails from '~/features/photo/PhotoDetails.vue'
@@ -12,6 +12,7 @@ import PhotoNav from '~/features/photo/PhotoNav.vue'
 import QualityBadgeTip from '~/features/photo/QualityBadgeTip.vue'
 import PhotoComments from '~/features/photo/PhotoComments.vue'
 import RelatedBlock from '~/features/photo/RelatedBlock.vue'
+import ShareButton from '~/features/photo/ShareButton.vue'
 import { usePhoto } from '~/features/photo/usePhoto'
 import { usePhotoHead } from '~/features/photo/usePhotoHead'
 import { usePhotoNavigation } from '~/features/photo/usePhotoNavigation'
@@ -59,6 +60,7 @@ const version = computed(() => (locale.value === 'fr' ? photo.value.version.name
         <div class="actions">
           <LikeButton :photo-id="photo.id" :likes="photo.likes" :author="photo.author.username" />
           <DownloadButton :photo-id="photo.id" :bytes="photo.bytes" />
+          <ShareButton :photo-id="photo.id" :title="photo.title" />
         </div>
         <PhotoDetails :photo="photo" />
         <p v-if="photo.description" class="description">{{ photo.description }}</p>
