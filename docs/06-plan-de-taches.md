@@ -469,7 +469,7 @@ T-43 est découpée le 27/11/2026 en T-43a et T-43b : le profil n'affiche pas en
   Survol/tap des badges (fait en T-31c), notification de première capture, page `/help/quality`.
   Stories : US-71.2–3. Tests : U, E.
 
-- [ ] **T-43b Captures du profil et progression** (dép. T-43a)
+- [x] **T-43b Captures du profil et progression** (dép. T-43a)
   `GET /api/users/{username}/photos` et grille du profil (US-05.3), barre de progression vers le palier suivant sur ses propres captures (07 § Qualité, point 6).
   Stories : US-05.3. Tests : U, I, E.
 

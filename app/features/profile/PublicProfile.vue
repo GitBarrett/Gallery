@@ -1,12 +1,15 @@
 <script setup lang="ts">
-// Public profile (US-05.3, Profile mockup): avatar, username, bio, membership date, then the captures. The avatar is
-// the initial when the member has none; statistics and the Follow / Share buttons come with the photos and follows
-// (every counter is under 10 until then, hidden: US-70). The member's own profile leads to « My captures » and the
-// settings (sign-out).
+// Public profile (US-05.3, Profile mockup): avatar, username, bio, membership date, then the public captures, newest
+// first (on one's own profile, the progress of each towards its next tier, 07 § Qualité). The avatar is the initial
+// when the member has none; statistics and the Follow / Share buttons come with the follows (v1.x). The member's own
+// profile leads to « My captures » and the settings (sign-out).
 import type { ProfileResponse } from '~~/shared/contracts/auth'
+import GalleryGrid from '~/features/gallery/GalleryGrid.vue'
 import SocialLinks from './SocialLinks.vue'
+import { useProfileCaptures } from './useProfileCaptures'
 
 const props = defineProps<{ profile: ProfileResponse; own: boolean }>()
+const feed = await useProfileCaptures(props.profile.username)
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const since = computed(() =>
@@ -34,7 +37,18 @@ const since = computed(() =>
     </section>
     <section class="captures" aria-labelledby="profile-captures">
       <h2 id="profile-captures" class="section-title">{{ t('profile.captures') }}</h2>
+      <GalleryGrid
+        v-if="feed.captures.value.length"
+        :captures="feed.captures.value"
+        :label="t('profile.captures')"
+        :done="feed.done.value"
+        :loading="feed.loading.value"
+        :error="feed.error.value && t(feed.error.value)"
+        :progress="own"
+        @more="feed.loadMore"
+      />
       <UiEmptyState
+        v-else
         :title="own ? t('profile.emptyOwn') : t('profile.empty')"
         :description="own ? t('profile.emptyOwnText') : undefined"
         :heading-level="3"

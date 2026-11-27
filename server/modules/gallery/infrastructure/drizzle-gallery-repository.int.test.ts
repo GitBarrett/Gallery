@@ -233,6 +233,9 @@ describe('drizzleGalleryRepository', () => {
       const ids = async (filter: Partial<GridFilter>) =>
         (await repo.grid({ ...base, gameVersion: w.version, ...filter })).map((r) => r.id)
       expect(await ids({ authorId: w.author.id, exclude: [shown] })).toEqual([mine])
+      // US-05.3: by the username of the profile, any case; never a capture in review
+      await w.capture({ status: 'pending_review' })
+      expect(await ids({ authorUsername: w.author.username.toUpperCase() })).toEqual([mine, shown])
     })
   })
 

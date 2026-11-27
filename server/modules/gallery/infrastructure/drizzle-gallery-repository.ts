@@ -206,6 +206,7 @@ export const drizzleGalleryRepository = (
           filter.gameVersion ? eq(gameVersions.slug, filter.gameVersion) : undefined,
           filter.zoneId ? eq(photoMetadata.zoneId, filter.zoneId) : undefined,
           filter.authorId ? eq(photos.userId, filter.authorId) : undefined,
+          filter.authorUsername ? sql`lower(${users.username}) = lower(${filter.authorUsername})` : undefined,
           filter.exclude?.length ? notInArray(photos.id, filter.exclude) : undefined,
           filter.publishedSince ? gte(photos.publishedAt, filter.publishedSince) : undefined,
           timeOfDay(filter.timeOfDay),

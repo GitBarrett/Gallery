@@ -16,12 +16,18 @@ test.beforeEach(async ({ page }, testInfo) => {
 // A sign-up, its email, then the processing through the queue
 test.describe.configure({ timeout: 180_000 })
 
-test('US-20.1 US-20.2 a published capture shows in the grid of its version, newest first, then the end', async ({
+test('US-05.3 US-20.1 US-20.2 a published capture shows on its profile and in the grid of its version, then the end', async ({
   page,
 }) => {
-  await verifiedMember(page)
+  const member = await verifiedMember(page)
   const title = `Grid ${crypto.randomUUID().slice(0, 8)}`
   await publishCapture(page, { title, gameVersion: 'classic-era' })
+
+  // US-05.3: the capture on the profile of its author, who sees its progress towards Uncommon (07 § Qualité)
+  await page.goto(`/u/${member.username}`)
+  const own = page.getByRole('article').filter({ hasText: title })
+  await expect(own).toBeVisible()
+  await expect(own.getByRole('progressbar', { name: '3 likes to Uncommon' })).toBeVisible()
 
   await page.goto('/v/classic-era')
   await expect(page.getByRole('heading', { level: 1, name: 'Classic Era' })).toBeVisible()

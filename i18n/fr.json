@@ -265,6 +265,10 @@
   "profile": {
     "description": "Captures d’écran de World of Warcraft par {username} sur Legendary Shots.",
     "memberSince": "Membre depuis {date}",
+    "progress": {
+      "next": "{count} like pour {quality} | {count} likes pour {quality}",
+      "top": "Légendaire : le plus haut palier"
+    },
     "settings": "Réglages",
     "captures": "Captures",
     "empty": "Aucune capture pour le moment",

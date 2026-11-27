@@ -48,7 +48,7 @@ export async function verifiedMember(page: Page) {
     )
     .toBeTruthy()
   expect((await post(page, '/api/auth/verify-email', { token })).status).toBe(204)
-  return { email, password }
+  return { email, password, username: `e2e_${run}` }
 }
 
 /**

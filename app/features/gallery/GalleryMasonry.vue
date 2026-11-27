@@ -4,12 +4,14 @@
 import GalleryTile from './GalleryTile.vue'
 import type { GridCapture } from './useGalleryFeed'
 
-defineProps<{ captures: GridCapture[]; label: string }>()
+defineProps<{ captures: GridCapture[]; label: string; progress?: boolean }>()
 </script>
 
 <template>
   <ul class="grid" :aria-label="label">
-    <li v-for="capture in captures" :key="capture.id" class="cell"><GalleryTile :capture="capture" /></li>
+    <li v-for="capture in captures" :key="capture.id" class="cell">
+      <GalleryTile :capture="capture" :progress="progress" />
+    </li>
   </ul>
 </template>
 

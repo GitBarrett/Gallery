@@ -156,6 +156,14 @@ export const api = {
   related: (id: string, fetch?: typeof $fetch) => call(`/api/photos/${id}/related`, RelatedResponse, {}, fetch),
   // Search (US-21): a page of captures, the corrected query (a typo) or what to offer when nothing is found
   search: (query: Partial<SearchQuery>, fetch?: typeof $fetch) => call('/api/search', SearchResponse, { query }, fetch),
+  // The captures of a profile (US-05.3): public ones, newest first, by pages of 30
+  userPhotos: (username: string, cursor?: string, fetch?: typeof $fetch) =>
+    call(
+      `/api/users/${encodeURIComponent(username)}/photos`,
+      PhotosResponse,
+      { query: cursor ? { cursor } : {} },
+      fetch,
+    ),
   // Comments (US-31): newest first by pages; 400 text out of the rules or Turnstile asked, 403, 429
   comments: (photoId: string, cursor?: string, fetch?: typeof $fetch) =>
     call(`/api/photos/${photoId}/comments`, CommentsResponse, { query: cursor ? { cursor } : {} }, fetch),

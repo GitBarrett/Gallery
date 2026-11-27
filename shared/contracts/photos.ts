@@ -156,6 +156,11 @@ export const PhotosQuery = z.strictObject({
   limit: z.coerce.number().int().min(1).max(60).default(30),
 })
 export type PhotosQuery = z.infer<typeof PhotosQuery>
+/** GET /api/users/{username}/photos (US-05.3): newest first; `cursor` the `nextCursor` of the previous page. */
+export const UserPhotosQuery = z.strictObject({
+  cursor: z.string().min(1).max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(60).default(30),
+})
 /** A capture of a grid or of the « More from » block. */
 const GridItem = z.strictObject({
   id: z.uuid(),
