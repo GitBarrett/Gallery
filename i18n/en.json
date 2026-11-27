@@ -347,7 +347,8 @@
       "lead": "Share your best captures, discover the community's, download them in full resolution.",
       "upload": "Upload a capture",
       "explore": "Explore the gallery",
-      "credit": "Background: “{title}” by"
+      "credit": "Background: “{title}” by",
+      "staticCredit": "Background: a screenshot by Ash Barrett"
     },
     "week": {
       "title": "Capture of the week",

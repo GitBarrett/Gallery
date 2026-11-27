@@ -6,17 +6,20 @@
 // LCP: priority.
 import type { HomeResponse } from '~~/shared/contracts/photos'
 
-const props = defineProps<{ hero: HomeResponse['hero'] }>()
+// Static hero (Adrien, 27/11/2026, Q99): a fixed screenshot in public/hero/ instead of the capture of the API; the
+// dynamic hero is kept below in comments, to bring back with the admin choice (T-53b).
+defineProps<{ hero: HomeResponse['hero'] }>()
 const { t } = useI18n()
 const localePath = useLocalePath()
-const focal = computed(() => {
-  const h = props.hero
-  return h ? `${(h.focalX ?? 0.5) * 100}% ${(h.focalY ?? 0.5) * 100}%` : undefined
-})
+// const focal = computed(() => {
+//   const h = props.hero
+//   return h ? `${(h.focalX ?? 0.5) * 100}% ${(h.focalY ?? 0.5) * 100}%` : undefined
+// })
 </script>
 
 <template>
   <section class="hero" aria-labelledby="home-title">
+    <!-- Dynamic hero (Q99):
     <UiWowImage
       v-if="hero"
       :photo-id="hero.id"
@@ -26,7 +29,18 @@ const focal = computed(() => {
       priority
       sizes="100vw"
       class="image"
-      :style="{ '--focal': focal }"
+      :style="{ '&#45;-focal': focal }"
+    />
+    -->
+    <img
+      src="/hero/home-2560.webp"
+      srcset="/hero/home-1280.webp 1280w, /hero/home-2560.webp 2560w"
+      sizes="100vw"
+      width="2560"
+      height="1440"
+      alt=""
+      fetchpriority="high"
+      class="image"
     />
     <span class="scrim" aria-hidden="true"></span>
     <div class="text">
@@ -36,10 +50,13 @@ const focal = computed(() => {
         <UiButton :to="localePath('/upload')" size="lg">{{ t('home.hero.upload') }}</UiButton>
         <UiButton :to="localePath('/explore')" variant="secondary" size="lg">{{ t('home.hero.explore') }}</UiButton>
       </div>
+      <!-- Dynamic credit (Q99):
       <p v-if="hero" class="credit">
         {{ t('home.hero.credit', { title: hero.title }) }}
         <NuxtLink :to="localePath(`/p/${hero.id}`)">{{ hero.author.username }}</NuxtLink>
       </p>
+      -->
+      <p class="credit">{{ t('home.hero.staticCredit') }}</p>
     </div>
   </section>
 </template>

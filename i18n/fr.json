@@ -347,7 +347,8 @@
       "lead": "Partagez vos plus belles captures, découvrez celles de la communauté, téléchargez-les en pleine résolution.",
       "upload": "Publier une capture",
       "explore": "Explorer la galerie",
-      "credit": "Fond : « {title} » par"
+      "credit": "Fond : « {title} » par",
+      "staticCredit": "Fond : une capture d’Ash Barrett"
     },
     "week": {
       "title": "Capture de la semaine",
